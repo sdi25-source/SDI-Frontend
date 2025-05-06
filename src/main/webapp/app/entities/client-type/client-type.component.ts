@@ -63,7 +63,41 @@ export default defineComponent({
       }
     };
 
+    const showAddRow = ref(false);
+    const newClientType = ref({
+      type: '',
+      createDate: '',
+      updateDate: '',
+      notes: '',
+    });
+
+    const saveNewClientType = async () => {
+      if (!newClientType.value.type) {
+        alertService().showAlert('Le champ type est requis.', 'danger');
+        return;
+      }
+
+      try {
+        const response = await clientTypeService().create(newClientType.value);
+        clientTypes.value.push(response);
+        showAddRow.value = false;
+        newClientType.value = { type: '', createDate: '', updateDate: '', notes: '' };
+        alertService().showAlert('Type de client ajouté avec succès.', 'success');
+      } catch (error) {
+        alertService().showHttpError(error.response);
+      }
+    };
+
+    const cancelNewClientType = () => {
+      showAddRow.value = false;
+      newClientType.value = { type: '', createDate: '', updateDate: '', notes: '' };
+    };
+
     return {
+      showAddRow,
+      newClientType,
+      cancelNewClientType,
+      saveNewClientType,
       clientTypes,
       handleSyncList,
       isFetching,

@@ -154,11 +154,6 @@
 <script lang="ts" src="./jhi-navbar.component.ts"></script>
 
 <style scoped>
-.userIcon {
-  width: 25px;
-  height: 25px;
-}
-
 .notification-icon svg {
   width: 20px;
   height: 20px;
