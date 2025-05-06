@@ -1,228 +1,278 @@
 <template>
-  <b-navbar data-cy="navbar" toggleable="md" type="dark" class="jh-navbar">
-    <b-navbar-brand class="logo" b-link to="/">
-      <span class="logo-img"></span>
-      <span v-text="t$('global.title')" class="navbar-title"></span> <span class="navbar-version">{{ version }}</span>
-    </b-navbar-brand>
-    <b-navbar-toggle
-      right
-      class="jh-navbar-toggler d-lg-none"
-      href="javascript:void(0);"
-      data-toggle="collapse"
-      target="header-tabs"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <font-awesome-icon icon="bars" />
-    </b-navbar-toggle>
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container w-100 px-4 d-flex align-items-center justify-content-between shadow">
+      <router-link to="/" class="logo d-flex align-items-center me-auto me-xl-0">
+        <h1 class="pl-5">
+          <strong>{{ t$('global.title') }}</strong>
+        </h1>
+      </router-link>
 
-    <b-collapse is-nav id="header-tabs">
-      <b-navbar-nav class="ml-auto">
-        <b-nav-item to="/" exact>
-          <span>
-            <font-awesome-icon icon="home" />
-            <span v-text="t$('global.menu.home')"></span>
-          </span>
-        </b-nav-item>
-        <b-nav-item-dropdown right id="entity-menu" v-if="authenticated" active-class="active" class="pointer" data-cy="entity">
-          <template #button-content>
-            <span class="navbar-dropdown-menu">
-              <font-awesome-icon icon="th-list" />
-              <span class="no-bold" v-text="t$('global.menu.entities.main')"></span>
-            </span>
-          </template>
-          <entities-menu></entities-menu>
-          <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
-        </b-nav-item-dropdown>
-        <b-nav-item-dropdown
-          right
-          id="admin-menu"
-          v-if="hasAnyAuthority('ROLE_ADMIN') && authenticated"
-          :class="{ 'router-link-active': subIsActive('/admin') }"
-          active-class="active"
-          class="pointer"
-          data-cy="adminMenu"
-        >
-          <template #button-content>
-            <span class="navbar-dropdown-menu">
-              <font-awesome-icon icon="users-cog" />
-              <span class="no-bold" v-text="t$('global.menu.admin.main')"></span>
-            </span>
-          </template>
-          <b-dropdown-item to="/admin/user-management" active-class="active">
-            <font-awesome-icon icon="users" />
-            <span v-text="t$('global.menu.admin.userManagement')"></span>
-          </b-dropdown-item>
-          <b-dropdown-item to="/admin/metrics" active-class="active">
-            <font-awesome-icon icon="tachometer-alt" />
-            <span v-text="t$('global.menu.admin.metrics')"></span>
-          </b-dropdown-item>
-          <b-dropdown-item to="/admin/health" active-class="active">
-            <font-awesome-icon icon="heart" />
-            <span v-text="t$('global.menu.admin.health')"></span>
-          </b-dropdown-item>
-          <b-dropdown-item to="/admin/configuration" active-class="active">
-            <font-awesome-icon icon="cogs" />
-            <span v-text="t$('global.menu.admin.configuration')"></span>
-          </b-dropdown-item>
-          <b-dropdown-item to="/admin/logs" active-class="active">
-            <font-awesome-icon icon="tasks" />
-            <span v-text="t$('global.menu.admin.logs')"></span>
-          </b-dropdown-item>
-          <b-dropdown-item v-if="openAPIEnabled" to="/admin/docs" active-class="active">
-            <font-awesome-icon icon="book" />
-            <span v-text="t$('global.menu.admin.apidocs')"></span>
-          </b-dropdown-item>
-        </b-nav-item-dropdown>
-        <b-nav-item-dropdown id="languagesnavBarDropdown" right v-if="languages && Object.keys(languages).length > 1">
-          <template #button-content>
-            <font-awesome-icon icon="flag" />
-            <span class="no-bold" v-text="t$('global.menu.language')"></span>
-          </template>
-          <b-dropdown-item
-            v-for="(value, key) in languages"
-            :key="`lang-${key}`"
-            @click="changeLanguage(key)"
-            :class="{ active: isActiveLanguage(key) }"
-          >
-            {{ value.name }}
-          </b-dropdown-item>
-        </b-nav-item-dropdown>
-        <b-nav-item-dropdown
-          right
-          href="javascript:void(0);"
-          id="account-menu"
-          :class="{ 'router-link-active': subIsActive('/account') }"
-          active-class="active"
-          class="pointer"
-          data-cy="accountMenu"
-        >
-          <template #button-content>
-            <span class="navbar-dropdown-menu">
-              <font-awesome-icon icon="user" />
-              <span class="no-bold" v-text="t$('global.menu.account.main')"></span>
-            </span>
-          </template>
-          <b-dropdown-item data-cy="settings" to="/account/settings" v-if="authenticated" active-class="active">
-            <font-awesome-icon icon="wrench" />
-            <span v-text="t$('global.menu.account.settings')"></span>
-          </b-dropdown-item>
-          <b-dropdown-item data-cy="passwordItem" to="/account/password" v-if="authenticated" active-class="active">
-            <font-awesome-icon icon="lock" />
-            <span v-text="t$('global.menu.account.password')"></span>
-          </b-dropdown-item>
-          <b-dropdown-item data-cy="logout" v-if="authenticated" @click="logout()" id="logout" active-class="active">
-            <font-awesome-icon icon="sign-out-alt" />
-            <span v-text="t$('global.menu.account.logout')"></span>
-          </b-dropdown-item>
-          <b-dropdown-item data-cy="login" v-if="!authenticated" @click="openLogin()" id="login" active-class="active">
-            <font-awesome-icon icon="sign-in-alt" />
-            <span v-text="t$('global.menu.account.login')"></span>
-          </b-dropdown-item>
-          <b-dropdown-item data-cy="register" to="/register" id="register" v-if="!authenticated" active-class="active">
-            <font-awesome-icon icon="user-plus" />
-            <span v-text="t$('global.menu.account.register')"></span>
-          </b-dropdown-item>
-        </b-nav-item-dropdown>
-      </b-navbar-nav>
-    </b-collapse>
-  </b-navbar>
+      <!-- Nav Menu -->
+      <nav id="navmenu" class="navmenu pl-5 ml-5">
+        <ul>
+          <li>
+            <router-link to="/" exact class="nav-link active">
+              <span>{{ t$('global.menu.home') }}</span>
+            </router-link>
+          </li>
+
+          <!-- Clients -->
+          <li v-if="authenticated" class="dropdown">
+            <a href="#"
+              ><span>{{ t$('global.menu.entities.client') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
+            ></a>
+            <ul>
+              <clients-menu class="entities-menu-scroll" />
+            </ul>
+          </li>
+
+          <!-- products -->
+          <li v-if="authenticated" class="dropdown">
+            <a href="#"
+              ><span>{{ t$('global.menu.entities.product') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
+            ></a>
+            <ul>
+              <products-menu class="entities-menu-scroll" />
+            </ul>
+          </li>
+
+          <!-- products Deployments -->
+          <li v-if="authenticated" class="dropdown">
+            <a href="#"
+              ><span>{{ t$('global.menu.entities.deployements') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
+            ></a>
+            <ul>
+              <deployments-menu class="entities-menu-scroll" />
+            </ul>
+          </li>
+
+          <!-- Admin Menu -->
+          <li v-if="authenticated && hasAnyAuthority('ROLE_ADMIN')" class="dropdown">
+            <a href="#"
+              ><span>{{ t$('global.menu.admin.main') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
+            ></a>
+            <ul>
+              <router-link to="/admin/user-management">
+                <font-awesome-icon icon="users" /> {{ t$('global.menu.admin.userManagement') }}
+              </router-link>
+            </ul>
+          </li>
+
+          <!-- parameters -->
+
+          <li v-if="authenticated" class="dropdown">
+            <a href="#"
+              ><span>{{ t$('global.menu.entities.parameters') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
+            ></a>
+            <ul>
+              <parameters-menu class="entities-menu-scroll" />
+            </ul>
+          </li>
+
+          <!-- Languages -->
+          <li v-if="!authenticated && languages && Object.keys(languages).length > 1" class="dropdown">
+            <a href="#"
+              ><span>{{ t$('global.menu.language') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
+            ></a>
+            <ul class="">
+              <li v-for="(value, key) in languages" :key="`lang-${key}`" :class="{ active: isActiveLanguage(key) }">
+                <a href="#" @click.prevent="changeLanguage(key)">{{ value.name }}</a>
+              </li>
+            </ul>
+          </li>
+
+          <!--  Account -->
+          <li class="dropdown" v-if="!authenticated">
+            <a href="#"
+              ><span>{{ t$('global.menu.account.main') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
+            ></a>
+            <ul>
+              <li>
+                <router-link to="/login" class="d-flex align-items-center gap-1">
+                  <font-awesome-icon icon="sign-in-alt" />
+                  <span>{{ t$('global.menu.account.login') }}</span>
+                </router-link>
+              </li>
+              <li>
+                <router-link to="/register" class="d-flex align-items-center gap-1">
+                  <font-awesome-icon icon="user-plus" />
+                  <span>{{ t$('global.menu.account.register') }}</span>
+                </router-link>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <router-link to="/login" class="d-flex align-items-center gap-1 btn-getstarted" v-if="!authenticated">{{
+        t$('global.menu.account.login')
+      }}</router-link>
+
+      <!--      <router-link-->
+      <!--        v-if="authenticated"-->
+      <!--        to="/account/settings"-->
+      <!--        class="pl-5"-->
+      <!--        style="width: 30px; height: 30px;"-->
+      <!--        title="profil"-->
+      <!--      >-->
+      <!--        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="userIcon"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8 .4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg>-->
+      <!--      </router-link>-->
+
+      <div class="dropdown notification-dropdown" @click="toggleDropdown" v-if="authenticated">
+        <a href="#" class="notification-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+            <path
+              d="M448 64c0-17.7-14.3-32-32-32L32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32zm0 256c0-17.7-14.3-32-32-32L32 288c-17.7 0-32 14.3-32 32s14.3 32 32 32l384 0c17.7 0 32-14.3 32-32zM0 192c0 17.7 14.3 32 32 32l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 160c-17.7 0-32 14.3-32 32zM448 448c0-17.7-14.3-32-32-32L32 416c-17.7 0-32 14.3-32 32s14.3 32 32 32l384 0c17.7 0 32-14.3 32-32z"
+            />
+          </svg>
+        </a>
+        <ul v-if="dropdownOpen" class="notification-menu">
+          <li v-if="authenticated">
+            <router-link to="/account/settings" class="d-flex align-items-center gap-1">
+              <font-awesome-icon icon="wrench" />
+              <span>{{ t$('global.menu.account.settings') }}</span>
+            </router-link>
+          </li>
+          <li v-if="authenticated">
+            <router-link to="/account/password" class="d-flex align-items-center gap-1">
+              <font-awesome-icon icon="lock" />
+              <span>{{ t$('global.menu.account.password') }}</span>
+            </router-link>
+          </li>
+          <li v-if="authenticated">
+            <a href="#" @click.prevent="logout" class="d-flex align-items-center gap-1">
+              <font-awesome-icon icon="sign-out-alt" />
+              <span>{{ t$('global.menu.account.logout') }}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </header>
 </template>
 
 <script lang="ts" src="./jhi-navbar.component.ts"></script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-/* ==========================================================================
-    Navbar
-    ========================================================================== */
-.navbar-version {
-  font-size: 0.65em;
-  color: #ccc;
+.notification-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
-.jh-navbar {
-  background-color: #353d47;
-  padding: 0.2em 1em;
+/* Notifications Dropdown */
+.notification-dropdown {
+  position: relative;
+  cursor: pointer;
 }
 
-.jh-navbar .profile-image {
-  margin: -10px 0;
-  height: 40px;
-  width: 40px;
-  border-radius: 50%;
+.notification-icon {
+  position: relative;
+  font-size: 19px;
+  color: #333;
+  text-decoration: none;
 }
 
-.jh-navbar .dropdown-item.active,
-.jh-navbar .dropdown-item.active:focus,
-.jh-navbar .dropdown-item.active:hover {
-  background-color: #353d47;
+.notification-menu {
+  position: absolute;
+  top: 35px;
+  right: 0;
+  width: 250px;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  padding: 10px 0;
+  border-radius: 8px;
+  z-index: 999;
 }
 
-.jh-navbar .dropdown-toggle::after {
-  margin-left: 0.15em;
+.notification-menu li {
+  padding: 10px 15px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.jh-navbar ul.navbar-nav {
-  padding: 0.5em;
+.notification-menu li:last-child {
+  border-bottom: none;
 }
 
-.jh-navbar .navbar-nav .nav-item {
-  margin-left: 1.5rem;
+/* Header container styles */
+.header-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 10px;
 }
 
-.jh-navbar a.nav-link,
-.jh-navbar .no-bold {
-  font-weight: 400;
+/* Menu de navigation */
+#navmenu {
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
-.jh-navbar .jh-navbar-toggler {
-  color: #ccc;
-  font-size: 1.5em;
-  padding: 10px;
+/* Style pour la liste des entités avec défilement interne */
+.entities-menu-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: block;
+  padding-right: 5px;
 }
 
-.jh-navbar .jh-navbar-toggler:hover {
-  color: #fff;
+/* Style pour la barre de défilement */
+.entities-menu-scroll::-webkit-scrollbar {
+  width: 5px;
 }
 
-@media screen and (min-width: 768px) {
-  .jh-navbar-toggler {
-    display: none;
+.entities-menu-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 5px;
+}
+
+.entities-menu-scroll::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+.entities-menu-scroll::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Media Queries pour des tailles d'écran spécifiques */
+@media (max-width: 1200px) {
+  .header-container {
+    max-width: 95%;
+    padding: 0 15px;
+  }
+
+  .entities-menu-scroll {
+    max-height: 280px;
   }
 }
 
-@media screen and (min-width: 768px) and (max-width: 1150px) {
-  span span {
-    display: none;
+@media (max-width: 768px) {
+  .header-container {
+    max-width: 90%;
+    padding: 0 20px;
+  }
+
+  #navmenu {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .entities-menu-scroll {
+    max-height: 250px;
   }
 }
 
-.navbar-title {
-  display: inline-block;
-  color: white;
-}
+@media (max-width: 576px) {
+  .header-container {
+    max-width: 100%;
+    padding: 0 10px;
+  }
 
-/* ==========================================================================
-    Logo styles
-    ========================================================================== */
-.navbar-brand.logo {
-  padding: 0 7px;
-}
-
-.logo .logo-img {
-  height: 45px;
-  display: inline-block;
-  vertical-align: middle;
-  width: 45px;
-}
-
-.logo-img {
-  height: 100%;
-  background: url('/content/images/logo-jhipster.png') no-repeat center center;
-  background-size: contain;
-  width: 100%;
-  filter: drop-shadow(0 0 0.05rem white);
-  margin: 0 5px;
+  .entities-menu-scroll {
+    max-height: 200px;
+  }
 }
 </style>

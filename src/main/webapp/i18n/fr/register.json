@@ -1,8 +1,13 @@
 {
   "register": {
-    "title": "Création de compte utilisateur",
+    "title": "S'inscrire",
+    "subTitle": "Inscrivez-vous, pour continuer",
     "form": {
-      "button": "Enregistrement"
+      "button": "Enregistrement",
+      "authority": "-- Choisir un rôle --",
+      "user": " Manager de déploiement",
+      "commercial": " Commercial",
+      "profile": "profil"
     },
     "messages": {
       "validate": {

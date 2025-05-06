@@ -7,12 +7,20 @@ import languages from '@/shared/config/languages';
 import EntitiesMenu from '@/entities/entities-menu.vue';
 
 import { useStore } from '@/store';
+import ClientsMenu from '@/entities/clients.vue';
+import ProductsMenu from '@/entities/products.vue';
+import DeploymentsMenu from '@/entities/deployments.vue';
+import ParametersMenu from '@/entities/parameters.vue';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'JhiNavbar',
   components: {
     'entities-menu': EntitiesMenu,
+    'clients-menu': ClientsMenu,
+    'products-menu': ProductsMenu,
+    'deployments-menu': DeploymentsMenu,
+    'parameters-menu': ParametersMenu,
   },
   setup() {
     const loginService = inject<LoginService>('loginService');
@@ -54,6 +62,12 @@ export default defineComponent({
       }
     };
 
+    const notifications = [{ message: 'Nouvelle mise à jour disponible' }, { message: 'Votre mot de passe expirera bientôt' }];
+    const dropdownOpen = ref(false);
+    const toggleDropdown = () => {
+      dropdownOpen.value = !dropdownOpen.value;
+    };
+
     return {
       logout,
       subIsActive,
@@ -68,6 +82,9 @@ export default defineComponent({
       openAPIEnabled,
       inProduction,
       authenticated,
+      notifications,
+      dropdownOpen,
+      toggleDropdown,
       t$: useI18n().t,
     };
   },

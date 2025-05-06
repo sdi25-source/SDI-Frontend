@@ -1,19 +1,35 @@
 {
   "home": {
-    "title": "Bienvenue, Java Hipster !",
-    "subtitle": "Ceci est votre page d'accueil",
+    "title": "Census and Mapping of Deployed S2M Products",
+    "subtitle": "Real-time visualization and optimized management of S2M product deployments.",
     "logged": {
-      "message": "Vous êtes connecté en tant que \"{ username }\"."
+      "message": "You are logged in as user \"{ username }\"."
     },
-    "question": "Si vous avez des questions à propos de JHipster :",
+    "question": "If you have any question on JHipster:",
     "link": {
-      "homepage": "Page d'accueil de JHipster",
-      "stackoverflow": "JHipster sur Stack Overflow",
+      "homepage": "JHipster homepage",
+      "stackoverflow": "JHipster on Stack Overflow",
       "bugtracker": "JHipster bug tracker",
       "chat": "JHipster public chat room",
-      "follow": "Suivez {'@'}jhipster sur Twitter"
+      "follow": "follow {'@'}jhipster on Twitter"
     },
-    "like": "Si vous aimez JHipster, donnez nous une étoile sur",
-    "github": "GitHub "
+    "like": "If you like JHipster, don't forget to give us a star on",
+    "github": "GitHub",
+    "adminHomeTitle": "Admin Space",
+    "dmHomeTitle": "Delivery Manager Space",
+    "commercialHomeTitle": "Commercial space",
+    "start": "Get Started",
+    "di": "Deployment Inventory",
+    "text1": "Census and Mapping",
+    "sd": "of Deployed",
+    "sp": "S2M Products",
+    "desc": "Real-time visualization and optimized management of S2M product deployments.",
+    "equipeC": "Sales Team",
+    "equipeCdesc": "Manages clients and centralizes needs to guide strategic decisions.",
+    "equipeD": "Deployment Team",
+    "equipeDdesc": "Oversees customizations, product versions, and deployments.",
+    "equipeA": "Administrator Area",
+    "equipeAdesc": "Manages users, their roles, and validates system data.",
+    "refTitle": "+110 accompanied customer references."
   }
 }

@@ -32,6 +32,10 @@
       <font-awesome-icon icon="asterisk" />
       <span v-text="t$('global.menu.entities.domaine')"></span>
     </b-dropdown-item>
+    <b-dropdown-item to="/feature-version">
+      <font-awesome-icon icon="asterisk" />
+      <span v-text="t$('global.menu.entities.featureVersion')"></span>
+    </b-dropdown-item>
     <b-dropdown-item to="/feature">
       <font-awesome-icon icon="asterisk" />
       <span v-text="t$('global.menu.entities.feature')"></span>
@@ -40,9 +44,9 @@
       <font-awesome-icon icon="asterisk" />
       <span v-text="t$('global.menu.entities.productDeployement')"></span>
     </b-dropdown-item>
-    <b-dropdown-item to="/product-deployement-detail">
+    <b-dropdown-item to="/product-deployement-upgrade">
       <font-awesome-icon icon="asterisk" />
-      <span v-text="t$('global.menu.entities.productDeployementDetail')"></span>
+      <span v-text="t$('global.menu.entities.productDeployementUpgrade')"></span>
     </b-dropdown-item>
     <b-dropdown-item to="/module-deployement">
       <font-awesome-icon icon="asterisk" />
@@ -51,6 +55,10 @@
     <b-dropdown-item to="/feature-deployement">
       <font-awesome-icon icon="asterisk" />
       <span v-text="t$('global.menu.entities.featureDeployement')"></span>
+    </b-dropdown-item>
+    <b-dropdown-item to="/customisation">
+      <font-awesome-icon icon="asterisk" />
+      <span v-text="t$('global.menu.entities.customisation')"></span>
     </b-dropdown-item>
     <b-dropdown-item to="/region">
       <font-awesome-icon icon="asterisk" />
@@ -103,10 +111,6 @@
     <b-dropdown-item to="/infra-component-version">
       <font-awesome-icon icon="asterisk" />
       <span v-text="t$('global.menu.entities.infraComponentVersion')"></span>
-    </b-dropdown-item>
-    <b-dropdown-item to="/request-of-change">
-      <font-awesome-icon icon="asterisk" />
-      <span v-text="t$('global.menu.entities.requestOfChange')"></span>
     </b-dropdown-item>
     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
   </div>

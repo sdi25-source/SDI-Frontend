@@ -1,6 +1,6 @@
 {
   "global": {
-    "title": "SdiFrontend",
+    "title": "SDI",
     "browsehappy": "You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/?locale=en\">upgrade your browser</a> to improve your experience.",
     "menu": {
       "home": "Home",
@@ -8,33 +8,46 @@
       "entities": {
         "main": "Entities",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
-        "deployementType": "Deployement Type",
+        "deployementType": "Deployment Type",
         "customisationLevel": "Customisation Level",
-        "productVersion": "Product Version",
-        "product": "Product",
+        "product": "Products",
         "productLine": "Product Line",
-        "moduleVersion": "Module Version",
-        "module": "Module",
-        "domaine": "Domaine",
-        "feature": "Feature",
-        "productDeployement": "Product Deployement",
-        "productDeployementDetail": "Product Deployement Detail",
-        "moduleDeployement": "Module Deployement",
-        "featureDeployement": "Feature Deployement",
-        "region": "Region",
+        "module": "Modules",
+        "domaine": "Domains",
+        "feature": "Features",
+        "deployements": "Deployments",
+        "productDeployement": "Product Deployments",
+        "moduleDeployement": "Modules Deployments",
+        "featureDeployement": "Features Deployments",
+        "region": "Regions",
         "clientCertification": "Client Certification",
         "clientSize": "Client Size",
-        "client": "Client",
+        "client": "Customers",
         "clientType": "Client Type",
         "certification": "Certification",
         "clientEvent": "Client Event",
         "clientEventType": "Client Event Type",
         "country": "Country",
         "ha": "HA",
+        "db": "DB",
+        "host": "HOST",
+        "os": "OS",
+        "hsm": "HSM",
+        "applicationServer": "Application Server",
+        "actionRequest": "Action Request",
+        "productVersion": "Product Versions",
+        "moduleVersion": "Module Versions",
+        "featureVersion": "Feature Versions",
+        "productDeployementUpgrade": "Product Deployments Details",
+        "customisation": "Customisations",
         "componentType": "Component Type",
-        "infraComponent": "Infra Component",
-        "infraComponentVersion": "Infra Component Version",
-        "requestOfChange": "Request Of Change"
+        "Components": "Components",
+        "ComponentVersion": "Components versions",
+        "infrastructure": "Infrastructure",
+        "alert": "Client Alerts",
+        "parameters": "Settings",
+        "parametersClient": "Paramètres Clients",
+        "features": "Fonctionnalités"
       },
       "account": {
         "main": "Account",
@@ -43,7 +56,8 @@
         "sessions": "Sessions",
         "login": "Sign in",
         "logout": "Sign out",
-        "register": "Register"
+        "register": "Register",
+        "profil": "Profil"
       },
       "admin": {
         "main": "Administration",
@@ -69,7 +83,9 @@
       "confirmpassword.label": "New password confirmation",
       "confirmpassword.placeholder": "Confirm the new password",
       "email.label": "Email",
-      "email.placeholder": "Your email"
+      "email.placeholder": "Your email",
+      "profile.label": "Profile",
+      "profile.select": "Choose a profile"
     },
     "messages": {
       "info": {
@@ -87,6 +103,12 @@
         "dontmatch": "The password and its confirmation do not match!"
       },
       "validate": {
+        "password": {
+          "required": "the password is required.",
+          "minlength": "the password is required to be at least 4 characters.",
+          "maxlength": "the password cannot be longer than 50 characters.",
+          "strength": "Password strength:"
+        },
         "newpassword": {
           "required": "Your password is required.",
           "minlength": "Your password is required to be at least 4 characters.",
@@ -112,7 +134,9 @@
     "ribbon": {
       "dev": "Development"
     },
-    "item-count": "Showing { first } - { second } of { total } items."
+    "item-count": "Showing { first } - { second } of { total } items.",
+    "actions": "Actions",
+    "others": "Others"
   },
   "entity": {
     "action": {
@@ -169,6 +193,5 @@
       "could.not.extract": "Could not extract file",
       "not.image": "File was expected to be an image but was found to be \"{ fileType }\""
     }
-  },
-  "footer": "This is your footer"
+  }
 }
