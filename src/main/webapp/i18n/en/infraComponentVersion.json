@@ -1,0 +1,30 @@
+{
+  "sdiFrontendApp": {
+    "infraComponentVersion": {
+      "home": {
+        "title": "Infra Component Versions",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Infra Component Version",
+        "createOrEditLabel": "Create or edit a Infra Component Version",
+        "notFound": "No Infra Component Versions found"
+      },
+      "created": "A new Infra Component Version is created with identifier { param }",
+      "updated": "A Infra Component Version is updated with identifier { param }",
+      "deleted": "A Infra Component Version is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Infra Component Version { id }?"
+      },
+      "detail": {
+        "title": "Infra Component Version"
+      },
+      "id": "ID",
+      "version": "Version",
+      "description": "Description",
+      "createDate": "Create Date",
+      "updateDate": "Update Date",
+      "infraComponent": "Infra Component",
+      "productVersion": "Product Version",
+      "productDeployementDetail": "Product Deployement Detail"
+    }
+  }
+}

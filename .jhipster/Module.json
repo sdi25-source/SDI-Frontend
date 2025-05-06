@@ -1,0 +1,27 @@
+{
+  "annotations": {
+    "changelogDate": "20250506083024"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "createDate",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "updateDate",
+      "fieldType": "LocalDate"
+    }
+  ],
+  "name": "Module",
+  "relationships": []
+}

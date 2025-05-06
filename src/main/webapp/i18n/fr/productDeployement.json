@@ -1,0 +1,28 @@
+{
+  "sdiFrontendApp": {
+    "productDeployement": {
+      "home": {
+        "title": "ProductDeployements",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Product Deployement",
+        "createOrEditLabel": "Créer ou éditer un Product Deployement",
+        "notFound": "Aucun Product Deployement trouvé"
+      },
+      "created": "Un nouveau Product Deployement a été créé avec l'identifiant { param }",
+      "updated": "Le Product Deployement avec l'identifiant { param } a été mis à jour",
+      "deleted": "Le Product Deployement avec l'identifiant { param } a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Product Deployement { id } ?"
+      },
+      "detail": {
+        "title": "Product Deployement"
+      },
+      "id": "ID",
+      "refContract": "Ref Contract",
+      "createDate": "Create Date",
+      "updateDate": "Update Date",
+      "notes": "Notes",
+      "client": "Client"
+    }
+  }
+}

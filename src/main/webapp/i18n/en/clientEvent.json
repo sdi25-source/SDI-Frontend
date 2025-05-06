@@ -1,0 +1,29 @@
+{
+  "sdiFrontendApp": {
+    "clientEvent": {
+      "home": {
+        "title": "Client Events",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Client Event",
+        "createOrEditLabel": "Create or edit a Client Event",
+        "notFound": "No Client Events found"
+      },
+      "created": "A new Client Event is created with identifier { param }",
+      "updated": "A Client Event is updated with identifier { param }",
+      "deleted": "A Client Event is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Client Event { id }?"
+      },
+      "detail": {
+        "title": "Client Event"
+      },
+      "id": "ID",
+      "event": "Event",
+      "description": "Description",
+      "eventDate": "Event Date",
+      "notes": "Notes",
+      "client": "Client",
+      "clientEventType": "Client Event Type"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "sdiFrontendApp": {
+    "productDeployementDetail": {
+      "home": {
+        "title": "ProductDeployementDetails",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Product Deployement Detail",
+        "createOrEditLabel": "Créer ou éditer un Product Deployement Detail",
+        "notFound": "Aucun Product Deployement Detail trouvé"
+      },
+      "created": "Un nouveau Product Deployement Detail a été créé avec l'identifiant { param }",
+      "updated": "Le Product Deployement Detail avec l'identifiant { param } a été mis à jour",
+      "deleted": "Le Product Deployement Detail avec l'identifiant { param } a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Product Deployement Detail { id } ?"
+      },
+      "detail": {
+        "title": "Product Deployement Detail"
+      },
+      "id": "ID",
+      "startDeployementDate": "Start Deployement Date",
+      "endDeployementDate": "End Deployement Date",
+      "notes": "Notes",
+      "moduleDeployement": "Module Deployement",
+      "productDeployement": "Product Deployement",
+      "infraComponentVersion": "Infra Component Version",
+      "allowedModuleVersion": "Allowed Module Version",
+      "productVersion": "Product Version",
+      "deployementType": "Deployement Type"
+    }
+  }
+}

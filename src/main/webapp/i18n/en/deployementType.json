@@ -1,0 +1,28 @@
+{
+  "sdiFrontendApp": {
+    "deployementType": {
+      "home": {
+        "title": "Deployement Types",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Deployement Type",
+        "createOrEditLabel": "Create or edit a Deployement Type",
+        "notFound": "No Deployement Types found"
+      },
+      "created": "A new Deployement Type is created with identifier { param }",
+      "updated": "A Deployement Type is updated with identifier { param }",
+      "deleted": "A Deployement Type is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Deployement Type { id }?"
+      },
+      "detail": {
+        "title": "Deployement Type"
+      },
+      "id": "ID",
+      "type": "Type",
+      "createDate": "Create Date",
+      "updateDate": "Update Date",
+      "notes": "Notes",
+      "productDeployementDetail": "Product Deployement Detail"
+    }
+  }
+}

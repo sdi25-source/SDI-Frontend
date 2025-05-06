@@ -1,0 +1,25 @@
+{
+  "sdiFrontendApp": {
+    "componentType": {
+      "home": {
+        "title": "Component Types",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Component Type",
+        "createOrEditLabel": "Create or edit a Component Type",
+        "notFound": "No Component Types found"
+      },
+      "created": "A new Component Type is created with identifier { param }",
+      "updated": "A Component Type is updated with identifier { param }",
+      "deleted": "A Component Type is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Component Type { id }?"
+      },
+      "detail": {
+        "title": "Component Type"
+      },
+      "id": "ID",
+      "type": "Type",
+      "infraComponent": "Infra Component"
+    }
+  }
+}

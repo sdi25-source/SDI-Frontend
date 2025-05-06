@@ -1,0 +1,32 @@
+{
+  "sdiFrontendApp": {
+    "requestOfChange": {
+      "home": {
+        "title": "RequestOfChanges",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Request Of Change",
+        "createOrEditLabel": "Créer ou éditer un Request Of Change",
+        "notFound": "Aucun Request Of Change trouvé"
+      },
+      "created": "Un nouveau Request Of Change a été créé avec l'identifiant { param }",
+      "updated": "Le Request Of Change avec l'identifiant { param } a été mis à jour",
+      "deleted": "Le Request Of Change avec l'identifiant { param } a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Request Of Change { id } ?"
+      },
+      "detail": {
+        "title": "Request Of Change"
+      },
+      "id": "ID",
+      "title": "Title",
+      "keywords": "Keywords",
+      "status": "Status",
+      "createDate": "Create Date",
+      "description": "Description",
+      "productVersion": "Product Version",
+      "client": "Client",
+      "moduleVersion": "Module Version",
+      "customisationLevel": "Customisation Level"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "sdiFrontendApp": {
+    "hA": {
+      "home": {
+        "title": "HAS",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new HA",
+        "createOrEditLabel": "Create or edit a HA",
+        "notFound": "No HAS found"
+      },
+      "created": "A new HA is created with identifier { param }",
+      "updated": "A HA is updated with identifier { param }",
+      "deleted": "A HA is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete HA { id }?"
+      },
+      "detail": {
+        "title": "HA"
+      },
+      "id": "ID",
+      "name": "Name",
+      "createDate": "Create Date",
+      "updateDate": "Update Date",
+      "notes": "Notes",
+      "productVersion": "Product Version"
+    }
+  }
+}

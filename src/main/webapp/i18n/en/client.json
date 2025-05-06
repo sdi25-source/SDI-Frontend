@@ -1,0 +1,42 @@
+{
+  "sdiFrontendApp": {
+    "client": {
+      "home": {
+        "title": "Clients",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Client",
+        "createOrEditLabel": "Create or edit a Client",
+        "notFound": "No Clients found"
+      },
+      "created": "A new Client is created with identifier { param }",
+      "updated": "A Client is updated with identifier { param }",
+      "deleted": "A Client is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Client { id }?"
+      },
+      "detail": {
+        "title": "Client"
+      },
+      "id": "ID",
+      "clientLogo": "Client Logo",
+      "name": "Name",
+      "code": "Code",
+      "mainContactName": "Main Contact Name",
+      "mainContactEmail": "Main Contact Email",
+      "currentCardHolderNumber": "Current Card Holder Number",
+      "currentBruncheNumber": "Current Brunche Number",
+      "currentCustomersNumber": "Current Customers Number",
+      "mainContactPhoneNumber": "Main Contact Phone Number",
+      "url": "Url",
+      "address": "Address",
+      "createDate": "Create Date",
+      "updateDate": "Update Date",
+      "notes": "Notes",
+      "productDeployement": "Product Deployement",
+      "country": "Country",
+      "size": "Size",
+      "clientType": "Client Type",
+      "certif": "Certif"
+    }
+  }
+}

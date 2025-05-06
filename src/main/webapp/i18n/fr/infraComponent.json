@@ -1,0 +1,28 @@
+{
+  "sdiFrontendApp": {
+    "infraComponent": {
+      "home": {
+        "title": "InfraComponents",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Infra Component",
+        "createOrEditLabel": "Créer ou éditer un Infra Component",
+        "notFound": "Aucun Infra Component trouvé"
+      },
+      "created": "Un nouveau Infra Component a été créé avec l'identifiant { param }",
+      "updated": "Le Infra Component avec l'identifiant { param } a été mis à jour",
+      "deleted": "Le Infra Component avec l'identifiant { param } a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Infra Component { id } ?"
+      },
+      "detail": {
+        "title": "Infra Component"
+      },
+      "id": "ID",
+      "name": "Name",
+      "vendor": "Vendor",
+      "notes": "Notes",
+      "createDate": "Create Date",
+      "componentType": "Component Type"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "sdiFrontendApp": {
+    "clientCertification": {
+      "home": {
+        "title": "Client Certifications",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Client Certification",
+        "createOrEditLabel": "Create or edit a Client Certification",
+        "notFound": "No Client Certifications found"
+      },
+      "created": "A new Client Certification is created with identifier { param }",
+      "updated": "A Client Certification is updated with identifier { param }",
+      "deleted": "A Client Certification is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Client Certification { id }?"
+      },
+      "detail": {
+        "title": "Client Certification"
+      },
+      "id": "ID",
+      "certification": "Certification",
+      "certificationDate": "Certification Date",
+      "createDate": "Create Date",
+      "updateDate": "Update Date",
+      "notes": "Notes",
+      "client": "Client",
+      "certif": "Certif"
+    }
+  }
+}

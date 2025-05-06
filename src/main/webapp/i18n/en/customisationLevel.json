@@ -1,0 +1,28 @@
+{
+  "sdiFrontendApp": {
+    "customisationLevel": {
+      "home": {
+        "title": "Customisation Levels",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Customisation Level",
+        "createOrEditLabel": "Create or edit a Customisation Level",
+        "notFound": "No Customisation Levels found"
+      },
+      "created": "A new Customisation Level is created with identifier { param }",
+      "updated": "A Customisation Level is updated with identifier { param }",
+      "deleted": "A Customisation Level is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Customisation Level { id }?"
+      },
+      "detail": {
+        "title": "Customisation Level"
+      },
+      "id": "ID",
+      "level": "Level",
+      "createDate": "Create Date",
+      "updateDate": "Update Date",
+      "notes": "Notes",
+      "requestOfChange": "Request Of Change"
+    }
+  }
+}

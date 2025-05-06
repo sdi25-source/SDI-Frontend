@@ -1,0 +1,23 @@
+{
+  "annotations": {
+    "changelogDate": "20250506083041"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "type",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "ComponentType",
+  "relationships": [
+    {
+      "otherEntityName": "infraComponent",
+      "otherEntityRelationshipName": "componentType",
+      "relationshipName": "infraComponent",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "sdiFrontendApp": {
+    "requestOfChange": {
+      "home": {
+        "title": "Request Of Changes",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Request Of Change",
+        "createOrEditLabel": "Create or edit a Request Of Change",
+        "notFound": "No Request Of Changes found"
+      },
+      "created": "A new Request Of Change is created with identifier { param }",
+      "updated": "A Request Of Change is updated with identifier { param }",
+      "deleted": "A Request Of Change is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Request Of Change { id }?"
+      },
+      "detail": {
+        "title": "Request Of Change"
+      },
+      "id": "ID",
+      "title": "Title",
+      "keywords": "Keywords",
+      "status": "Status",
+      "createDate": "Create Date",
+      "description": "Description",
+      "productVersion": "Product Version",
+      "client": "Client",
+      "moduleVersion": "Module Version",
+      "customisationLevel": "Customisation Level"
+    }
+  }
+}

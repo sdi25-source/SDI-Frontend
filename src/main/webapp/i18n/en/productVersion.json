@@ -1,0 +1,34 @@
+{
+  "sdiFrontendApp": {
+    "productVersion": {
+      "home": {
+        "title": "Product Versions",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Product Version",
+        "createOrEditLabel": "Create or edit a Product Version",
+        "notFound": "No Product Versions found"
+      },
+      "created": "A new Product Version is created with identifier { param }",
+      "updated": "A Product Version is updated with identifier { param }",
+      "deleted": "A Product Version is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Product Version { id }?"
+      },
+      "detail": {
+        "title": "Product Version"
+      },
+      "id": "ID",
+      "version": "Version",
+      "createDate": "Create Date",
+      "updateDate": "Update Date",
+      "notes": "Notes",
+      "productDeployementDetail": "Product Deployement Detail",
+      "productVersion": "Product Version",
+      "product": "Product",
+      "moduleVersion": "Module Version",
+      "infraComponentVersion": "Infra Component Version",
+      "ha": "Ha",
+      "root": "Root"
+    }
+  }
+}

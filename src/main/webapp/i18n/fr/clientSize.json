@@ -1,0 +1,30 @@
+{
+  "sdiFrontendApp": {
+    "clientSize": {
+      "home": {
+        "title": "ClientSizes",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Client Size",
+        "createOrEditLabel": "Créer ou éditer un Client Size",
+        "notFound": "Aucun Client Size trouvé"
+      },
+      "created": "Un nouveau Client Size a été créé avec l'identifiant { param }",
+      "updated": "Le Client Size avec l'identifiant { param } a été mis à jour",
+      "deleted": "Le Client Size avec l'identifiant { param } a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Client Size { id } ?"
+      },
+      "detail": {
+        "title": "Client Size"
+      },
+      "id": "ID",
+      "sizeName": "Size Name",
+      "sizeCode": "Size Code",
+      "sizeDescription": "Size Description",
+      "createDate": "Create Date",
+      "updateDate": "Update Date",
+      "notes": "Notes",
+      "client": "Client"
+    }
+  }
+}

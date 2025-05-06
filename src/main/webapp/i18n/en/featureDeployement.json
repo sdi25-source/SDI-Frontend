@@ -1,0 +1,29 @@
+{
+  "sdiFrontendApp": {
+    "featureDeployement": {
+      "home": {
+        "title": "Feature Deployements",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Feature Deployement",
+        "createOrEditLabel": "Create or edit a Feature Deployement",
+        "notFound": "No Feature Deployements found"
+      },
+      "created": "A new Feature Deployement is created with identifier { param }",
+      "updated": "A Feature Deployement is updated with identifier { param }",
+      "deleted": "A Feature Deployement is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Feature Deployement { id }?"
+      },
+      "detail": {
+        "title": "Feature Deployement"
+      },
+      "id": "ID",
+      "code": "Code",
+      "createDate": "Create Date",
+      "updateDate": "Update Date",
+      "notes": "Notes",
+      "feature": "Feature",
+      "moduleDeployement": "Module Deployement"
+    }
+  }
+}

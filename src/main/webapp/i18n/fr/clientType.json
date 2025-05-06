@@ -1,0 +1,28 @@
+{
+  "sdiFrontendApp": {
+    "clientType": {
+      "home": {
+        "title": "ClientTypes",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Client Type",
+        "createOrEditLabel": "Créer ou éditer un Client Type",
+        "notFound": "Aucun Client Type trouvé"
+      },
+      "created": "Un nouveau Client Type a été créé avec l'identifiant { param }",
+      "updated": "Le Client Type avec l'identifiant { param } a été mis à jour",
+      "deleted": "Le Client Type avec l'identifiant { param } a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Client Type { id } ?"
+      },
+      "detail": {
+        "title": "Client Type"
+      },
+      "id": "ID",
+      "type": "Type",
+      "createDate": "Create Date",
+      "updateDate": "Update Date",
+      "notes": "Notes",
+      "client": "Client"
+    }
+  }
+}

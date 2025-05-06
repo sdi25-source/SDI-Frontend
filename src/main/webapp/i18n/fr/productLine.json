@@ -1,0 +1,28 @@
+{
+  "sdiFrontendApp": {
+    "productLine": {
+      "home": {
+        "title": "ProductLines",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Product Line",
+        "createOrEditLabel": "Créer ou éditer un Product Line",
+        "notFound": "Aucun Product Line trouvé"
+      },
+      "created": "Un nouveau Product Line a été créé avec l'identifiant { param }",
+      "updated": "Le Product Line avec l'identifiant { param } a été mis à jour",
+      "deleted": "Le Product Line avec l'identifiant { param } a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Product Line { id } ?"
+      },
+      "detail": {
+        "title": "Product Line"
+      },
+      "id": "ID",
+      "name": "Name",
+      "createDate": "Create Date",
+      "updateDate": "Update Date",
+      "notes": "Notes",
+      "product": "Product"
+    }
+  }
+}
