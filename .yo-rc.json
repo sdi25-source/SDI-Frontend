@@ -1,0 +1,19 @@
+{
+  "generator-jhipster": {
+    "baseName": "sdiFrontend",
+    "clientFramework": "vue",
+    "clientTestFrameworks": [],
+    "clientTheme": "none",
+    "creationTimestamp": 1746520007645,
+    "enableTranslation": true,
+    "entities": [],
+    "jhipsterVersion": "8.9.0",
+    "languages": ["en", "fr"],
+    "microfrontend": null,
+    "microfrontends": [],
+    "nativeLanguage": "en",
+    "skipServer": true,
+    "testFrameworks": [],
+    "withAdminUi": true
+  }
+}
