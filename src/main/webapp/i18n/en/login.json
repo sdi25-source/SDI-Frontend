@@ -1,6 +1,7 @@
 {
   "login": {
     "title": "Sign in",
+    "subTitle": "Welcome Back",
     "form": {
       "password": "Password",
       "password.placeholder": "Your password",
@@ -13,7 +14,12 @@
       }
     },
     "password": {
-      "forgot": "Did you forget your password?"
-    }
+      "forgot": "Did you forget your password?",
+      "strong": "The password must contain an uppercase letter, a lowercase letter, a number, and a special character"
+    },
+    "dhaveaccount": "Don't have an account ?",
+    "haveaccount": "Do you already have an account?",
+    "signup": "Sign Up",
+    "signin": "Sign in"
   }
 }
