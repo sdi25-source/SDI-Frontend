@@ -13,7 +13,6 @@ import { type ICountry } from '@/shared/model/country.model';
 import ClientSizeService from '@/entities/client-size/client-size.service';
 import { type IClientSize } from '@/shared/model/client-size.model';
 import ClientTypeService from '@/entities/client-type/client-type.service';
-1;
 import { type IClientType } from '@/shared/model/client-type.model';
 import { Client, type IClient } from '@/shared/model/client.model';
 
@@ -141,7 +140,7 @@ export default defineComponent({
           .update(this.client)
           .then(param => {
             this.isSaving = false;
-            this.alertService.showInfo(this.t$('frontendApp.client.updated', { param: param.id }));
+            this.alertService.showInfo(this.t$('sdiFrontendApp.client.updated', { param: param.id }));
           })
           .catch(error => {
             this.isSaving = false;
@@ -152,7 +151,7 @@ export default defineComponent({
           .create(this.client)
           .then(param => {
             this.isSaving = false;
-            this.alertService.showSuccess(this.t$('frontendApp.client.created', { param: param.id }).toString());
+            this.alertService.showSuccess(this.t$('sdiFrontendApp.client.created', { param: param.id }).toString());
           })
           .catch(error => {
             this.isSaving = false;

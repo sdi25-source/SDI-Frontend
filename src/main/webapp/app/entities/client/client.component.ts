@@ -6,12 +6,14 @@ import useDataUtils from '@/shared/data/data-utils.service';
 import { useAlertService } from '@/shared/alert/alert.service';
 import ClientSizeService from '@/entities/client-size/client-size.service.ts';
 import ClientUpdate from '@/entities/client/client-update.vue';
+import ClientDetails from '@/entities/client/client-details.vue';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'Client',
   components: {
     ClientUpdate,
+    ClientDetails,
   },
   setup() {
     const { t: t$ } = useI18n();
@@ -35,6 +37,7 @@ export default defineComponent({
 
     const isFetching = ref(false);
     const showAddRow = ref(false);
+    const showDetailseModal = ref(false);
     const showCreateModal = ref(false);
     const showEditModal = ref(false);
     const selectedClientId = ref(null);
@@ -246,6 +249,7 @@ export default defineComponent({
     });
 
     return {
+      showDetailseModal,
       showCreateModal,
       selectedClientId,
       showEditModal,
@@ -282,6 +286,10 @@ export default defineComponent({
     };
   },
   methods: {
+    openDetailsModal(id) {
+      this.selectedClientId = id;
+      this.showDetailseModal = true;
+    },
     openEditModal(id) {
       this.selectedClientId = id;
       this.showEditModal = true;
