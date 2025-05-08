@@ -130,7 +130,8 @@
     },
     "item-count": "Affichage { first } - { second } de { total } items.",
     "actions": "Actions",
-    "others": "Autres"
+    "others": "Autres",
+    "new": "Nouveau"
   },
   "entity": {
     "action": {
@@ -187,6 +188,5 @@
       "could.not.extract": "Impossible d'extraire le fichier",
       "not.image": "Le fichier doit être une image et non du type \"{ fileType }\""
     }
-  },
-  "footer": "Ceci est votre pied de page"
+  }
 }

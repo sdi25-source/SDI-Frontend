@@ -21,12 +21,12 @@
         "featureDeployement": "Features Deployments",
         "region": "Regions",
         "clientCertification": "Client Certification",
-        "clientSize": "Client Size",
+        "clientSize": "Customer Size",
         "client": "Customers",
-        "clientType": "Client Type",
+        "clientType": "Customer Type",
         "certification": "Certification",
-        "clientEvent": "Client Event",
-        "clientEventType": "Client Event Type",
+        "clientEvent": "Customer Event",
+        "clientEventType": "Customer Event Type",
         "country": "Country",
         "ha": "HA",
         "db": "DB",
@@ -136,7 +136,8 @@
     },
     "item-count": "Showing { first } - { second } of { total } items.",
     "actions": "Actions",
-    "others": "Others"
+    "others": "Others",
+    "new": "New"
   },
   "entity": {
     "action": {

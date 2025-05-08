@@ -23,6 +23,7 @@
       "notes": "Notes",
       "createDate": "Create Date",
       "componentType": "Component Type"
-    }
+    },
+    "versions": "Versions"
   }
 }

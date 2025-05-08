@@ -18,7 +18,7 @@ export interface IClient {
   createDate?: Date | null;
   updateDate?: Date | null;
   notes?: string | null;
-  country?: string | null;
+  country?: ICountry | null;
   size?: IClientSize | null;
   clientType?: IClientType | null;
 }
@@ -40,7 +40,7 @@ export class Client implements IClient {
     public createDate?: Date | null,
     public updateDate?: Date | null,
     public notes?: string | null,
-    public country?: string | null,
+    public country?: ICountry | null,
     public size?: IClientSize | null,
     public clientType?: IClientType | null,
   ) {}

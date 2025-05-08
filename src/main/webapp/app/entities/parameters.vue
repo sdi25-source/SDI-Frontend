@@ -30,19 +30,15 @@
     <b-dropdown-item to="/infra-component">
       <span v-text="t$('global.menu.entities.Components')"></span>
     </b-dropdown-item>
-    <b-dropdown-item to="/infra-component-version">
-      <span v-text="t$('global.menu.entities.ComponentVersion')"></span>
-    </b-dropdown-item>
-
     <!--      <b-dropdown-item to="/client-event-type">-->
     <!--        <span v-text="t$('global.menu.entities.clientEventType')"></span>-->
     <!--      </b-dropdown-item>-->
-    <!--      <b-dropdown-item to="/region">-->
-    <!--        <span v-text="t$('global.menu.entities.region')"></span>-->
-    <!--      </b-dropdown-item>-->
-    <!--      <b-dropdown-item to="/country">-->
-    <!--        <span v-text="t$('global.menu.entities.country')"></span>-->
-    <!--      </b-dropdown-item>-->
+    <!--          <b-dropdown-item to="/region">-->
+    <!--            <span v-text="t$('global.menu.entities.region')"></span>-->
+    <!--          </b-dropdown-item>-->
+    <!--          <b-dropdown-item to="/country">-->
+    <!--            <span v-text="t$('global.menu.entities.country')"></span>-->
+    <!--          </b-dropdown-item>-->
     <!--      <b-dropdown-item to="/certification">-->
     <!--        <span v-text="t$('global.menu.entities.certification')"></span>-->
     <!--      </b-dropdown-item>-->
