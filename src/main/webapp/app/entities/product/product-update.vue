@@ -127,6 +127,42 @@
               </option>
             </select>
           </div>
+          <div class="form-group">
+            <label v-text="t$('sdiFrontendApp.product.module')" for="product-module"></label>
+            <select
+              class="form-control"
+              id="product-modules"
+              data-cy="module"
+              multiple
+              name="module"
+              v-if="product.modules !== undefined"
+              v-model="product.modules"
+            >
+              <option :value="getSelected(product.modules, moduleOption, 'id')" v-for="moduleOption in modules" :key="moduleOption.id">
+                {{ moduleOption.id }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label v-text="t$('sdiFrontendApp.product.infraComponentVersion')" for="product-infraComponentVersion"></label>
+            <select
+              class="form-control"
+              id="product-infraComponentVersions"
+              data-cy="infraComponentVersion"
+              multiple
+              name="infraComponentVersion"
+              v-if="product.infraComponentVersions !== undefined"
+              v-model="product.infraComponentVersions"
+            >
+              <option
+                :value="getSelected(product.infraComponentVersions, infraComponentVersionOption, 'id')"
+                v-for="infraComponentVersionOption in infraComponentVersions"
+                :key="infraComponentVersionOption.id"
+              >
+                {{ infraComponentVersionOption.id }}
+              </option>
+            </select>
+          </div>
         </div>
         <div>
           <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" @click="previousState()">

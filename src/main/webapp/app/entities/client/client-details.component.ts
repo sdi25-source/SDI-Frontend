@@ -10,7 +10,14 @@ import { useAlertService } from '@/shared/alert/alert.service';
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'ClientDetails',
-  setup() {
+  props: {
+    // eslint-disable-next-line vue/require-default-prop
+    clientId: {
+      type: [Number, String],
+      required: false,
+    },
+  },
+  setup(props) {
     const clientService = inject('clientService', () => new ClientService());
     const alertService = inject('alertService', () => useAlertService(), true);
 
@@ -31,16 +38,15 @@ export default defineComponent({
       }
     };
 
-    if (route.params?.clientId) {
-      retrieveClient(route.params.clientId);
+    if (props.clientId) {
+      retrieveClient(props.clientId);
     }
 
     return {
       alertService,
       client,
-
+      retrieveClient,
       ...dataUtils,
-
       previousState,
       t$: useI18n().t,
     };

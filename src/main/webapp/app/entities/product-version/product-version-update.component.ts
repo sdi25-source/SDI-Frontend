@@ -14,8 +14,6 @@ import ModuleVersionService from '@/entities/module-version/module-version.servi
 import { type IModuleVersion } from '@/shared/model/module-version.model';
 import InfraComponentVersionService from '@/entities/infra-component-version/infra-component-version.service';
 import { type IInfraComponentVersion } from '@/shared/model/infra-component-version.model';
-import HAService from '@/entities/ha/ha.service';
-import { type IHA } from '@/shared/model/ha.model';
 import { type IProductVersion, ProductVersion } from '@/shared/model/product-version.model';
 
 export default defineComponent({
@@ -40,10 +38,6 @@ export default defineComponent({
     const infraComponentVersionService = inject('infraComponentVersionService', () => new InfraComponentVersionService());
 
     const infraComponentVersions: Ref<IInfraComponentVersion[]> = ref([]);
-
-    const hAService = inject('hAService', () => new HAService());
-
-    const hAS: Ref<IHA[]> = ref([]);
     const isSaving = ref(false);
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'en'), true);
 
@@ -86,11 +80,6 @@ export default defineComponent({
         .then(res => {
           infraComponentVersions.value = res.data;
         });
-      hAService()
-        .retrieve()
-        .then(res => {
-          hAS.value = res.data;
-        });
     };
 
     initRelationships();
@@ -111,7 +100,6 @@ export default defineComponent({
       product: {},
       moduleVersions: {},
       infraComponentVersions: {},
-      ha: {},
       root: {},
     };
     const v$ = useVuelidate(validationRules, productVersion as any);
@@ -128,7 +116,6 @@ export default defineComponent({
       products,
       moduleVersions,
       infraComponentVersions,
-      hAS,
       ...dataUtils,
       v$,
       t$,

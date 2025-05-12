@@ -5,9 +5,9 @@
       <b-dropdown-item to="/product">
         <span v-text="t$('global.menu.entities.product')"></span>
       </b-dropdown-item>
-      <!--      <b-dropdown-item to="/product-version">-->
-      <!--        <span v-text="t$('global.menu.entities.productVersion')"></span>-->
-      <!--      </b-dropdown-item>-->
+      <!--            <b-dropdown-item to="/product-version">-->
+      <!--              <span v-text="t$('global.menu.entities.productVersion')"></span>-->
+      <!--            </b-dropdown-item>-->
     </div>
 
     <div class="entities-category">
@@ -15,16 +15,16 @@
       <b-dropdown-item to="/module">
         <span v-text="t$('global.menu.entities.module')"></span>
       </b-dropdown-item>
-      <!--      <b-dropdown-item to="/module-version">-->
-      <!--        <span v-text="t$('global.menu.entities.moduleVersion')"></span>-->
-      <!--      </b-dropdown-item>-->
+      <!--            <b-dropdown-item to="/module-version">-->
+      <!--              <span v-text="t$('global.menu.entities.moduleVersion')"></span>-->
+      <!--            </b-dropdown-item>-->
     </div>
 
     <!--    <div class="entities-category">-->
     <!--      <h6 class="entities-category-title" v-text="t$('global.menu.entities.feature')"></h6>-->
-    <!--      <b-dropdown-item to="/feature">-->
-    <!--        <span v-text="t$('global.menu.entities.feature')"></span>-->
-    <!--      </b-dropdown-item>-->
+    <!--          <b-dropdown-item to="/feature">-->
+    <!--            <span v-text="t$('global.menu.entities.feature')"></span>-->
+    <!--          </b-dropdown-item>-->
     <!--      <b-dropdown-item to="/feature-version">-->
     <!--        <span v-text="t$('global.menu.entities.featureVersion')"></span>-->
     <!--      </b-dropdown-item>-->

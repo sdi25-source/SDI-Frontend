@@ -10,7 +10,6 @@ import AlertService from '@/shared/alert/alert.service';
 import ProductService from '@/entities/product/product.service';
 import ModuleVersionService from '@/entities/module-version/module-version.service';
 import InfraComponentVersionService from '@/entities/infra-component-version/infra-component-version.service';
-import HAService from '@/entities/ha/ha.service';
 
 type ProductVersionUpdateComponentType = InstanceType<typeof ProductVersionUpdate>;
 
@@ -65,10 +64,6 @@ describe('Component Tests', () => {
             } as any),
           infraComponentVersionService: () =>
             sinon.createStubInstance<InfraComponentVersionService>(InfraComponentVersionService, {
-              retrieve: sinon.stub().resolves({}),
-            } as any),
-          hAService: () =>
-            sinon.createStubInstance<HAService>(HAService, {
               retrieve: sinon.stub().resolves({}),
             } as any),
         },

@@ -21,7 +21,8 @@
       "name": "Name",
       "description": "Description",
       "createDate": "Create Date",
-      "updateDate": "Update Date"
+      "updateDate": "Update Date",
+      "product": "Product"
     }
   }
 }

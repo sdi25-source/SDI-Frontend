@@ -36,7 +36,6 @@
             <th scope="row"><span v-text="t$('sdiFrontendApp.productVersion.product')"></span></th>
             <th scope="row"><span v-text="t$('sdiFrontendApp.productVersion.moduleVersion')"></span></th>
             <th scope="row"><span v-text="t$('sdiFrontendApp.productVersion.infraComponentVersion')"></span></th>
-            <th scope="row"><span v-text="t$('sdiFrontendApp.productVersion.ha')"></span></th>
             <th scope="row"><span v-text="t$('sdiFrontendApp.productVersion.root')"></span></th>
             <th scope="row"></th>
           </tr>
@@ -78,11 +77,6 @@
                   >{{ infraComponentVersion.id }}</router-link
                 >
               </span>
-            </td>
-            <td>
-              <div v-if="productVersion.ha">
-                <router-link :to="{ name: 'HAView', params: { hAId: productVersion.ha.id } }">{{ productVersion.ha.name }}</router-link>
-              </div>
             </td>
             <td>
               <div v-if="productVersion.root">
