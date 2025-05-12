@@ -39,6 +39,10 @@ export default defineComponent({
       retrieveModule(route.params.moduleId);
     }
 
+    const initRelationships = () => {};
+
+    initRelationships();
+
     const dataUtils = useDataUtils();
 
     const { t: t$ } = useI18n();
@@ -50,6 +54,7 @@ export default defineComponent({
       description: {},
       createDate: {},
       updateDate: {},
+      products: {},
     };
     const v$ = useVuelidate(validationRules, module as any);
     v$.value.$validate();

@@ -157,19 +157,6 @@
             </select>
           </div>
           <div class="form-group">
-            <label class="form-control-label" v-text="t$('sdiFrontendApp.productVersion.ha')" for="product-version-ha"></label>
-            <select class="form-control" id="product-version-ha" data-cy="ha" name="ha" v-model="productVersion.ha">
-              <option :value="null"></option>
-              <option
-                :value="productVersion.ha && hAOption.id === productVersion.ha.id ? productVersion.ha : hAOption"
-                v-for="hAOption in hAS"
-                :key="hAOption.id"
-              >
-                {{ hAOption.name }}
-              </option>
-            </select>
-          </div>
-          <div class="form-group">
             <label class="form-control-label" v-text="t$('sdiFrontendApp.productVersion.root')" for="product-version-root"></label>
             <select class="form-control" id="product-version-root" data-cy="root" name="root" v-model="productVersion.root">
               <option :value="null"></option>

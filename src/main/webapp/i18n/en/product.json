@@ -23,7 +23,10 @@
       "description": "Description",
       "createDate": "Create Date",
       "updateDate": "Update Date",
-      "productLine": "Product Line"
+      "productLine": "Product Line",
+      "module": "Module",
+      "infraComponentVersion": "Infra Component Version",
+      "config": "Configuaration"
     }
   }
 }

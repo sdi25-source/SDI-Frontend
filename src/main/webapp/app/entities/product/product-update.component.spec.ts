@@ -8,6 +8,8 @@ import ProductService from './product.service';
 import AlertService from '@/shared/alert/alert.service';
 
 import ProductLineService from '@/entities/product-line/product-line.service';
+import ModuleService from '@/entities/module/module.service';
+import InfraComponentVersionService from '@/entities/infra-component-version/infra-component-version.service';
 
 type ProductUpdateComponentType = InstanceType<typeof ProductUpdate>;
 
@@ -54,6 +56,14 @@ describe('Component Tests', () => {
           productService: () => productServiceStub,
           productLineService: () =>
             sinon.createStubInstance<ProductLineService>(ProductLineService, {
+              retrieve: sinon.stub().resolves({}),
+            } as any),
+          moduleService: () =>
+            sinon.createStubInstance<ModuleService>(ModuleService, {
+              retrieve: sinon.stub().resolves({}),
+            } as any),
+          infraComponentVersionService: () =>
+            sinon.createStubInstance<InfraComponentVersionService>(InfraComponentVersionService, {
               retrieve: sinon.stub().resolves({}),
             } as any),
         },

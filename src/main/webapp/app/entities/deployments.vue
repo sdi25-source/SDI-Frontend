@@ -5,9 +5,9 @@
       <b-dropdown-item to="/product-deployement">
         <span v-text="t$('global.menu.entities.productDeployement')"></span>
       </b-dropdown-item>
-      <!--      <b-dropdown-item to="/product-deployement-upgrade">-->
-      <!--        <span v-text="t$('global.menu.entities.productDeployementUpgrade')"></span>-->
-      <!--      </b-dropdown-item>-->
+      <!--            <b-dropdown-item to="/product-deployement-upgrade">-->
+      <!--              <span v-text="t$('global.menu.entities.productDeployementUpgrade')"></span>-->
+      <!--            </b-dropdown-item>-->
     </div>
 
     <div class="entities-category">

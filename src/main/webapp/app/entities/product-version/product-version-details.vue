@@ -63,14 +63,6 @@
             </span>
           </dd>
           <dt>
-            <span v-text="t$('sdiFrontendApp.productVersion.ha')"></span>
-          </dt>
-          <dd>
-            <div v-if="productVersion.ha">
-              <router-link :to="{ name: 'HAView', params: { hAId: productVersion.ha.id } }">{{ productVersion.ha.name }}</router-link>
-            </div>
-          </dd>
-          <dt>
             <span v-text="t$('sdiFrontendApp.productVersion.root')"></span>
           </dt>
           <dd>

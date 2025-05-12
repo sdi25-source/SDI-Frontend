@@ -88,6 +88,10 @@
             </svg>
           </button>
         </div>
+        <button class="btn btn-light btn-sm ml-3" @click="handleSyncList" :disabled="isFetching">
+          <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon>
+          <span v-text="t$('sdiFrontendApp.product.home.refreshListLabel')"></span>
+        </button>
       </div>
     </div>
 
@@ -181,11 +185,6 @@
           </tbody>
         </table>
       </div>
-    </div>
-
-    <!-- Alert si pas de données -->
-    <div class="alert alert-warning" v-if="!isFetching && (!clients || clients.length === 0)">
-      <span v-text="t$('sdiFrontendApp.client.home.notFound')"></span>
     </div>
 
     <!-- Card View -->
@@ -557,6 +556,15 @@
 }
 
 /* Card View Styles */
+.card {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 .card-view-container {
   margin-top: 1.5rem;
 }

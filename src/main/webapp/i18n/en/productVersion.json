@@ -27,7 +27,6 @@
       "product": "Product",
       "moduleVersion": "Module Version",
       "infraComponentVersion": "Infra Component Version",
-      "ha": "Ha",
       "root": "Root"
     }
   }

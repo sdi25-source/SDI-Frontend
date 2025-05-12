@@ -10,6 +10,10 @@ import { useAlertService } from '@/shared/alert/alert.service';
 
 import ProductLineService from '@/entities/product-line/product-line.service';
 import { type IProductLine } from '@/shared/model/product-line.model';
+import ModuleService from '@/entities/module/module.service';
+import { type IModule } from '@/shared/model/module.model';
+import InfraComponentVersionService from '@/entities/infra-component-version/infra-component-version.service';
+import { type IInfraComponentVersion } from '@/shared/model/infra-component-version.model';
 import { type IProduct, Product } from '@/shared/model/product.model';
 
 export default defineComponent({
@@ -24,6 +28,14 @@ export default defineComponent({
     const productLineService = inject('productLineService', () => new ProductLineService());
 
     const productLines: Ref<IProductLine[]> = ref([]);
+
+    const moduleService = inject('moduleService', () => new ModuleService());
+
+    const modules: Ref<IModule[]> = ref([]);
+
+    const infraComponentVersionService = inject('infraComponentVersionService', () => new InfraComponentVersionService());
+
+    const infraComponentVersions: Ref<IInfraComponentVersion[]> = ref([]);
     const isSaving = ref(false);
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'en'), true);
 
@@ -51,6 +63,16 @@ export default defineComponent({
         .then(res => {
           productLines.value = res.data;
         });
+      moduleService()
+        .retrieve()
+        .then(res => {
+          modules.value = res.data;
+        });
+      infraComponentVersionService()
+        .retrieve()
+        .then(res => {
+          infraComponentVersions.value = res.data;
+        });
     };
 
     initRelationships();
@@ -68,6 +90,8 @@ export default defineComponent({
       createDate: {},
       updateDate: {},
       productLines: {},
+      modules: {},
+      infraComponentVersions: {},
     };
     const v$ = useVuelidate(validationRules, product as any);
     v$.value.$validate();
@@ -80,6 +104,8 @@ export default defineComponent({
       isSaving,
       currentLanguage,
       productLines,
+      modules,
+      infraComponentVersions,
       ...dataUtils,
       v$,
       t$,
@@ -87,6 +113,8 @@ export default defineComponent({
   },
   created(): void {
     this.product.productLines = [];
+    this.product.modules = [];
+    this.product.infraComponentVersions = [];
   },
   methods: {
     save(): void {
