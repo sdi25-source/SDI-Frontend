@@ -1,0 +1,20 @@
+[33mcommit 7b44a3c031fd59d9bc63c9a60381e200b9cf3441[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Amine Khaldi <aminekhaldi563@gmail.com>
+Date:   Mon May 12 11:19:09 2025 +0100
+
+     setting and prodDepl_Detail
+
+src/main/webapp/app/entities/client-size/client-size.component.ts
+src/main/webapp/app/entities/client-size/client-size.vue
+src/main/webapp/app/entities/deployement-type/deployement-type.component.ts
+src/main/webapp/app/entities/deployement-type/deployement-type.vue
+src/main/webapp/app/entities/domaine/domaine.component.ts
+src/main/webapp/app/entities/domaine/domaine.vue
+src/main/webapp/app/entities/feature-deployement/feature-deployement.component.ts
+src/main/webapp/app/entities/feature-deployement/feature-deployement.vue
+src/main/webapp/app/entities/module-deployement/module-deployement.component.ts
+src/main/webapp/app/entities/module-deployement/module-deployement.vue
+src/main/webapp/app/entities/product-deployement/product-deployement.component.ts
+src/main/webapp/app/entities/product-deployement/product-deployement.vue
+src/main/webapp/app/entities/product-line/product-line.component.ts
+src/main/webapp/app/entities/product-line/product-line.vue
