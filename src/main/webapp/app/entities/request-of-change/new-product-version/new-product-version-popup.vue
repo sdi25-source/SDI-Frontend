@@ -72,13 +72,13 @@
               <h6 class="section-title">Informations du produit</h6>
               <div class="form-group">
                 <label for="version">Version</label>
-                <input type="text" id="version" class="form-control" v-model="newProductVersion.version" />
-                <small class="form-text text-muted">Version générée automatiquement, mais vous pouvez la modifier</small>
+                <input type="text" id="version" class="form-control" v-model="newProductVersion.version" readonly />
+                <small class="form-text text-muted">Version générée automatiquement</small>
               </div>
 
               <div class="form-group">
                 <label for="root">Version racine</label>
-                <select id="root" class="form-control" v-model="newProductVersion.root">
+                <select id="root" class="form-control" v-model="newProductVersion.root" disabled>
                   <option :value="null">Aucune</option>
                   <option v-for="version in availableRootVersions" :key="version.id" :value="version">
                     {{ version.product?.name }} - {{ version.version }}
@@ -101,17 +101,12 @@
             <!-- Step 2: Configuration -->
             <div v-if="currentStep === 2" class="step-content">
               <h6 class="section-title">Configuration</h6>
-              <p class="mb-3">
-                Vous pouvez modifier la configuration de cette version du produit. La configuration actuelle a été copiée depuis la version
-                précédente.
-              </p>
-
               <div class="card mb-3">
                 <div class="card-header d-flex justify-content-between align-items-center">
                   <h6 class="mb-0">Composants d'infrastructure</h6>
-                  <button class="btn btn-sm btn-primary" @click="showInfraSelector = !showInfraSelector">
-                    {{ showInfraSelector ? 'Fermer' : 'Ajouter' }}
-                  </button>
+                  <!--                  <button class="btn btn-sm btn-primary" @click="showInfraSelector = !showInfraSelector">-->
+                  <!--                    {{ showInfraSelector ? 'Fermer' : 'Ajouter' }}-->
+                  <!--                  </button>-->
                 </div>
                 <div class="card-body">
                   <div v-if="showInfraSelector" class="mb-3 p-3 border rounded">
@@ -140,24 +135,24 @@
                           <span class="font-weight-bold">{{ component.infraComponent?.name }}</span>
                           <span class="text-muted ml-2">{{ component.version }}</span>
                         </div>
-                        <button class="btn btn-sm btn-outline-danger" @click="removeInfraComponent(index)">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-trash"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"
-                            />
-                            <path
-                              fillRule="evenodd"
-                              d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
-                            />
-                          </svg>
-                        </button>
+                        <!--                        <button class="btn btn-sm btn-outline-danger" @click="removeInfraComponent(index)">-->
+                        <!--                          <svg-->
+                        <!--                            xmlns="http://www.w3.org/2000/svg"-->
+                        <!--                            width="16"-->
+                        <!--                            height="16"-->
+                        <!--                            fill="currentColor"-->
+                        <!--                            class="bi bi-trash"-->
+                        <!--                            viewBox="0 0 16 16"-->
+                        <!--                          >-->
+                        <!--                            <path-->
+                        <!--                              d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"-->
+                        <!--                            />-->
+                        <!--                            <path-->
+                        <!--                              fillRule="evenodd"-->
+                        <!--                              d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"-->
+                        <!--                            />-->
+                        <!--                          </svg>-->
+                        <!--                        </button>-->
                       </li>
                     </ul>
                   </div>
@@ -169,11 +164,6 @@
             <!-- Step 3: Module Versions -->
             <div v-if="currentStep === 3" class="step-content">
               <h6 class="section-title">Modules</h6>
-              <p class="mb-3">
-                Les modules mentionnés dans la demande de changement ont été automatiquement créés en tant que nouvelles versions. Vous
-                pouvez modifier leurs descriptions et ajouter des fonctionnalités.
-              </p>
-
               <!-- Modules list -->
               <div
                 v-for="(moduleVersion, index) in newProductVersion.moduleVersions"
