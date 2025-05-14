@@ -48,7 +48,9 @@
         "parametersClient": "Paramètres Clients",
         "features": "Features",
         "infrastructure": "Infrastructure",
-        "alert": "Alertes Client"
+        "alert": "Alertes Client",
+        "productDeployementDetail": "Product Deployement Detail",
+        "requestOfChange": "Request Of Change"
       },
       "account": {
         "main": "Compte",
