@@ -4,7 +4,7 @@
       "home": {
         "title": "Clients",
         "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Nouveau",
+        "createLabel": "Créer un nouveau Client",
         "createOrEditLabel": "Créer ou éditer un Client",
         "notFound": "Aucun Client trouvé"
       },
@@ -15,30 +15,30 @@
         "question": "Êtes-vous certain de vouloir supprimer le Client { id } ?"
       },
       "detail": {
-        "title": "Clients"
+        "title": "Client"
       },
       "id": "ID",
       "clientLogo": "Client Logo",
       "name": "Name",
       "code": "Code",
-      "mainContactName": "Nom de contact",
-      "mainContactEmail": "Email",
-      "currentCardHolderNumber": "Card Holder Number",
-      "currentBruncheNumber": "Brunche Number",
-      "currentCustomersNumber": "Customers Number",
-      "mainContactPhoneNumber": "Phone Number",
+      "mainContactName": "Main Contact Name",
+      "mainContactEmail": "Main Contact Email",
+      "currentCardHolderNumber": "Current Card Holder Number",
+      "currentBruncheNumber": "Current Brunche Number",
+      "currentCustomersNumber": "Current Customers Number",
+      "mainContactPhoneNumber": "Main Contact Phone Number",
       "url": "Url",
-      "industry": "Industry",
       "address": "Address",
       "createDate": "Create Date",
       "updateDate": "Update Date",
       "notes": "Notes",
+      "countryName": "Country Name",
+      "region": "Region",
       "productDeployement": "Product Deployement",
-      "country": "Country",
       "size": "Size",
-      "clientType": "Type Client",
-      "certif": "Certification",
-      "relatedInformation": "Informations connexes"
+      "clientType": "Client Type",
+      "certif": "Certif",
+      "country": "Country"
     }
   }
 }

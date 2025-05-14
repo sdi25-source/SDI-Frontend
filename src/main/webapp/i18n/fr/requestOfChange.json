@@ -12,7 +12,9 @@
       "updated": "Le Request Of Change avec l'identifiant { param } a été mis à jour",
       "deleted": "Le Request Of Change avec l'identifiant { param } a été supprimé",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Request Of Change { id } ?"
+        "question": "Êtes-vous certain de vouloir supprimer le Request Of Change { id } ?",
+        "cancel": "Annuler",
+        "delete": "Supprimer"
       },
       "detail": {
         "title": "Request Of Change"
@@ -21,12 +23,20 @@
       "title": "Title",
       "keywords": "Keywords",
       "status": "Status",
-      "createDate": "Create Date",
       "description": "Description",
-      "productVersion": "Product Version",
-      "client": "Client",
-      "moduleVersion": "Module Version",
-      "customisationLevel": "Customisation Level"
+      "createDate": "Créé le",
+      "updateDate": "Update Date",
+      "productVersion": "Produit",
+      "client": "Customer",
+      "moduleVersion": "Modules affectés",
+      "customisationLevel": "Customisation Level",
+      "back": "Retour à la liste",
+      "noModule": "Aucun module associé à cette demande",
+      "Approuver": "Approuver",
+      "Rejeter": "Rejeter",
+      "MarkOut": "Marquer comme terminé",
+      "AddNewProduct": "Ajouter une nouvelle version du produit",
+      "RemettreEnattente": "Remettre en attente"
     }
   }
 }

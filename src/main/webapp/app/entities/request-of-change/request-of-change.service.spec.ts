@@ -32,12 +32,16 @@ describe('Service Tests', () => {
     beforeEach(() => {
       service = new RequestOfChangeService();
       currentDate = new Date();
-      elemDefault = new RequestOfChange(123, 'AAAAAAA', 'AAAAAAA', 'PENDING', currentDate, 'AAAAAAA');
+      elemDefault = new RequestOfChange(123, 'AAAAAAA', 'AAAAAAA', 'PENDING', 'AAAAAAA', currentDate, currentDate);
     });
 
     describe('Service methods', () => {
       it('should find an element', async () => {
-        const returnedFromService = { createDate: dayjs(currentDate).format(DATE_FORMAT), ...elemDefault };
+        const returnedFromService = {
+          createDate: dayjs(currentDate).format(DATE_FORMAT),
+          updateDate: dayjs(currentDate).format(DATE_FORMAT),
+          ...elemDefault,
+        };
         axiosStub.get.resolves({ data: returnedFromService });
 
         return service.find(123).then(res => {
@@ -56,8 +60,13 @@ describe('Service Tests', () => {
       });
 
       it('should create a RequestOfChange', async () => {
-        const returnedFromService = { id: 123, createDate: dayjs(currentDate).format(DATE_FORMAT), ...elemDefault };
-        const expected = { createDate: currentDate, ...returnedFromService };
+        const returnedFromService = {
+          id: 123,
+          createDate: dayjs(currentDate).format(DATE_FORMAT),
+          updateDate: dayjs(currentDate).format(DATE_FORMAT),
+          ...elemDefault,
+        };
+        const expected = { createDate: currentDate, updateDate: currentDate, ...returnedFromService };
 
         axiosStub.post.resolves({ data: returnedFromService });
         return service.create({}).then(res => {
@@ -81,12 +90,13 @@ describe('Service Tests', () => {
           title: 'BBBBBB',
           keywords: 'BBBBBB',
           status: 'BBBBBB',
-          createDate: dayjs(currentDate).format(DATE_FORMAT),
           description: 'BBBBBB',
+          createDate: dayjs(currentDate).format(DATE_FORMAT),
+          updateDate: dayjs(currentDate).format(DATE_FORMAT),
           ...elemDefault,
         };
 
-        const expected = { createDate: currentDate, ...returnedFromService };
+        const expected = { createDate: currentDate, updateDate: currentDate, ...returnedFromService };
         axiosStub.put.resolves({ data: returnedFromService });
 
         return service.update(expected).then(res => {
@@ -106,10 +116,10 @@ describe('Service Tests', () => {
       });
 
       it('should partial update a RequestOfChange', async () => {
-        const patchObject = { createDate: dayjs(currentDate).format(DATE_FORMAT), description: 'BBBBBB', ...new RequestOfChange() };
+        const patchObject = { description: 'BBBBBB', createDate: dayjs(currentDate).format(DATE_FORMAT), ...new RequestOfChange() };
         const returnedFromService = Object.assign(patchObject, elemDefault);
 
-        const expected = { createDate: currentDate, ...returnedFromService };
+        const expected = { createDate: currentDate, updateDate: currentDate, ...returnedFromService };
         axiosStub.patch.resolves({ data: returnedFromService });
 
         return service.partialUpdate(patchObject).then(res => {
@@ -133,11 +143,12 @@ describe('Service Tests', () => {
           title: 'BBBBBB',
           keywords: 'BBBBBB',
           status: 'BBBBBB',
-          createDate: dayjs(currentDate).format(DATE_FORMAT),
           description: 'BBBBBB',
+          createDate: dayjs(currentDate).format(DATE_FORMAT),
+          updateDate: dayjs(currentDate).format(DATE_FORMAT),
           ...elemDefault,
         };
-        const expected = { createDate: currentDate, ...returnedFromService };
+        const expected = { createDate: currentDate, updateDate: currentDate, ...returnedFromService };
         axiosStub.get.resolves([returnedFromService]);
         return service.retrieve().then(res => {
           expect(res).toContainEqual(expected);

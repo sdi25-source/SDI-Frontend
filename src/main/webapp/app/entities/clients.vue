@@ -9,7 +9,7 @@
     <div class="entities-category">
       <h6 class="entities-category-title" v-text="t$('global.menu.entities.customisation')"></h6>
       <b-dropdown-item to="/request-of-change">
-        <span v-text="t$('global.menu.entities.customisation')"></span>
+        <span v-text="t$('global.menu.entities.req')"></span>
       </b-dropdown-item>
     </div>
 

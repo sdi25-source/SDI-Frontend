@@ -102,8 +102,9 @@ export default defineComponent({
       status: {
         required: validations.required(t$('entity.validation.required').toString()),
       },
-      createDate: {},
       description: {},
+      createDate: {},
+      updateDate: {},
       productVersion: {},
       client: {},
       moduleVersions: {},

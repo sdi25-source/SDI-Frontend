@@ -2,9 +2,10 @@
   "sdiFrontendApp": {
     "RequestStatus": {
       "null": "",
-      "PENDING": "PENDING",
-      "IN_PROGRESS": "IN_PROGRESS",
-      "COMPLETED": "COMPLETED"
+      "PENDING": "En attente",
+      "APPROVED": "Approuvée",
+      "REJECTED": "Rejetée",
+      "COMPLETED": "Terminée"
     }
   }
 }

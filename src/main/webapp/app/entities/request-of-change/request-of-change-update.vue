@@ -70,6 +70,21 @@
           <div class="form-group">
             <label
               class="form-control-label"
+              v-text="t$('sdiFrontendApp.requestOfChange.description')"
+              for="request-of-change-description"
+            ></label>
+            <textarea
+              class="form-control"
+              name="description"
+              id="request-of-change-description"
+              data-cy="description"
+              :class="{ valid: !v$.description.$invalid, invalid: v$.description.$invalid }"
+              v-model="v$.description.$model"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label
+              class="form-control-label"
               v-text="t$('sdiFrontendApp.requestOfChange.createDate')"
               for="request-of-change-createDate"
             ></label>
@@ -102,17 +117,34 @@
           <div class="form-group">
             <label
               class="form-control-label"
-              v-text="t$('sdiFrontendApp.requestOfChange.description')"
-              for="request-of-change-description"
+              v-text="t$('sdiFrontendApp.requestOfChange.updateDate')"
+              for="request-of-change-updateDate"
             ></label>
-            <textarea
-              class="form-control"
-              name="description"
-              id="request-of-change-description"
-              data-cy="description"
-              :class="{ valid: !v$.description.$invalid, invalid: v$.description.$invalid }"
-              v-model="v$.description.$model"
-            ></textarea>
+            <b-input-group class="mb-3">
+              <b-input-group-prepend>
+                <b-form-datepicker
+                  aria-controls="request-of-change-updateDate"
+                  v-model="v$.updateDate.$model"
+                  name="updateDate"
+                  class="form-control"
+                  :locale="currentLanguage"
+                  button-only
+                  today-button
+                  reset-button
+                  close-button
+                >
+                </b-form-datepicker>
+              </b-input-group-prepend>
+              <b-form-input
+                id="request-of-change-updateDate"
+                data-cy="updateDate"
+                type="text"
+                class="form-control"
+                name="updateDate"
+                :class="{ valid: !v$.updateDate.$invalid, invalid: v$.updateDate.$invalid }"
+                v-model="v$.updateDate.$model"
+              />
+            </b-input-group>
           </div>
           <div class="form-group">
             <label

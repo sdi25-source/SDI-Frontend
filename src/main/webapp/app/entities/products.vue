@@ -10,15 +10,15 @@
       <!--            </b-dropdown-item>-->
     </div>
 
-    <div class="entities-category">
-      <h6 class="entities-category-title" v-text="t$('global.menu.entities.module')"></h6>
-      <b-dropdown-item to="/module">
-        <span v-text="t$('global.menu.entities.module')"></span>
-      </b-dropdown-item>
-      <!--            <b-dropdown-item to="/module-version">-->
-      <!--              <span v-text="t$('global.menu.entities.moduleVersion')"></span>-->
-      <!--            </b-dropdown-item>-->
-    </div>
+    <!--    <div class="entities-category">-->
+    <!--      <h6 class="entities-category-title" v-text="t$('global.menu.entities.module')"></h6>-->
+    <!--      <b-dropdown-item to="/module">-->
+    <!--        <span v-text="t$('global.menu.entities.module')"></span>-->
+    <!--      </b-dropdown-item>-->
+    <!--            <b-dropdown-item to="/module-version">-->
+    <!--              <span v-text="t$('global.menu.entities.moduleVersion')"></span>-->
+    <!--            </b-dropdown-item>-->
+    <!--    </div>-->
 
     <!--    <div class="entities-category">-->
     <!--      <h6 class="entities-category-title" v-text="t$('global.menu.entities.feature')"></h6>-->

@@ -2,7 +2,7 @@
   "sdiFrontendApp": {
     "client": {
       "home": {
-        "title": "Customers",
+        "title": "Clients",
         "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Client",
         "createOrEditLabel": "Create or edit a Client",
@@ -15,30 +15,30 @@
         "question": "Are you sure you want to delete Client { id }?"
       },
       "detail": {
-        "title": "Customers"
+        "title": "Client"
       },
       "id": "ID",
       "clientLogo": "Client Logo",
       "name": "Name",
       "code": "Code",
-      "mainContactName": "Contact Name",
-      "mainContactEmail": "Email",
-      "currentCardHolderNumber": "Card Holder Number",
-      "currentBruncheNumber": "Brunche Number",
-      "currentCustomersNumber": "Customers Number",
-      "mainContactPhoneNumber": "Phone Number",
+      "mainContactName": "Main Contact Name",
+      "mainContactEmail": "Main Contact Email",
+      "currentCardHolderNumber": "Current Card Holder Number",
+      "currentBruncheNumber": "Current Brunche Number",
+      "currentCustomersNumber": "Current Customers Number",
+      "mainContactPhoneNumber": "Main Contact Phone Number",
       "url": "Url",
-      "industry": "Industry",
       "address": "Address",
       "createDate": "Create Date",
       "updateDate": "Update Date",
       "notes": "Notes",
+      "countryName": "Country Name",
+      "region": "Region",
       "productDeployement": "Product Deployement",
-      "country": "Country",
-      "size": "Customer Size",
-      "clientType": "Customer Type",
+      "size": "Size",
+      "clientType": "Client Type",
       "certif": "Certif",
-      "relatedInformation": "Related Information"
+      "country": "Country"
     }
   }
 }

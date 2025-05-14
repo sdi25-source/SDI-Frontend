@@ -101,13 +101,6 @@ entity FeatureDeployement {
 }
 
 
-entity Region{
-  name String required
-  createDate LocalDate
-  updateDate LocalDate
-  notes TextBlob
-}
-
 entity ClientCertification{
   certification String required
   certificationDate LocalDate
@@ -142,6 +135,8 @@ entity Client
   createDate LocalDate
   updateDate LocalDate
   notes TextBlob
+  countryName String
+  region String
 }
 
 entity ClientType {
@@ -176,16 +171,6 @@ entity ClientEventType{
 }
 
 
-entity Country
-{
-  countryname String required
-  countryCode String
-  countryFlag String
-  notes TextBlob
-  createDate LocalDate
-  updateDate LocalDate
-}
-
 // haute dispo
 entity HA
 {
@@ -218,13 +203,14 @@ entity InfraComponentVersion
 entity RequestOfChange {
   title String required
   keywords TextBlob
-  status RequestStatus required // PENDING, IN_PROGRESS, COMPLETED
-  createDate LocalDate
+  status RequestStatus required
   description TextBlob
+  createDate LocalDate
+  updateDate LocalDate
 }
 
 enum RequestStatus {
-  PENDING, IN_PROGRESS, COMPLETED
+  PENDING, APPROVED, REJECTED, COMPLETED
 }
 
 
@@ -261,8 +247,6 @@ relationship ManyToMany {
 
 relationship OneToMany{
 
-  Country to Client{country(countryname)}
-  Region to Country{region(name)}
   Domaine to ModuleVersion{domaine(name)}
   Certification to ClientCertification{certif(name)}
 

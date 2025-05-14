@@ -9,8 +9,9 @@ export interface IRequestOfChange {
   title?: string;
   keywords?: string | null;
   status?: keyof typeof RequestStatus;
-  createDate?: Date | null;
   description?: string | null;
+  createDate?: Date | null;
+  updateDate?: Date | null;
   productVersion?: IProductVersion | null;
   client?: IClient | null;
   moduleVersions?: IModuleVersion[] | null;
@@ -23,8 +24,9 @@ export class RequestOfChange implements IRequestOfChange {
     public title?: string,
     public keywords?: string | null,
     public status?: keyof typeof RequestStatus,
-    public createDate?: Date | null,
     public description?: string | null,
+    public createDate?: Date | null,
+    public updateDate?: Date | null,
     public productVersion?: IProductVersion | null,
     public client?: IClient | null,
     public moduleVersions?: IModuleVersion[] | null,

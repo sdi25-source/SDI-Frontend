@@ -7,7 +7,7 @@
           @click="showAddRow = true"
           id="jh-create-entity"
           data-cy="entityCreateButton"
-          class="btn btn-primary btn-sm mr-3 rounded-1"
+          class="btn button-primary btn-sm mr-3 rounded-1"
           :disabled="showAddRow"
         >
           <span v-text="t$('global.new')"></span>
@@ -664,10 +664,10 @@
                         </option>
                       </select>
                     </td>
+                    <td><input type="text" class="form-control-borderless" v-model="newVersion.notes" placeholder="Notes" /></td>
                     <td>
                       <input type="date" class="form-control-borderless" v-model="newVersion.createDate" placeholder="Date de création" />
                     </td>
-                    <td><input type="text" class="form-control-borderless" v-model="newVersion.notes" placeholder="Notes" /></td>
                     <td>
                       <div class="action-icons">
                         <div class="icon-container save-container" @click="saveNewVersion" title="Enregistrer">
@@ -2045,7 +2045,7 @@
 }
 
 .button-primary:hover {
-  background-color: #0a2547;
+  background-color: #26538a;
 }
 
 .button-secondary {

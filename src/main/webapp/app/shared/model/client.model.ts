@@ -1,6 +1,6 @@
-import { type ICountry } from '@/shared/model/country.model';
 import { type IClientSize } from '@/shared/model/client-size.model';
 import { type IClientType } from '@/shared/model/client-type.model';
+import { type ICountry } from '@/shared/model/country.model';
 
 export interface IClient {
   id?: number;
@@ -18,9 +18,11 @@ export interface IClient {
   createDate?: Date | null;
   updateDate?: Date | null;
   notes?: string | null;
-  country?: ICountry | null;
+  countryName?: string | null;
+  region?: string | null;
   size?: IClientSize | null;
   clientType?: IClientType | null;
+  country?: ICountry | null;
 }
 
 export class Client implements IClient {
@@ -40,8 +42,10 @@ export class Client implements IClient {
     public createDate?: Date | null,
     public updateDate?: Date | null,
     public notes?: string | null,
-    public country?: ICountry | null,
+    public countryName?: string | null,
+    public region?: string | null,
     public size?: IClientSize | null,
     public clientType?: IClientType | null,
+    public country?: ICountry | null,
   ) {}
 }

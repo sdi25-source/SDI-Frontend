@@ -2,7 +2,12 @@
   <div class="client-container section pt-5">
     <div class="navigation-bar d-flex align-items-center justify-content-between mb-4">
       <div class="d-flex align-items-center">
-        <button @click="showCreateModal = true" id="jh-create-entity" data-cy="entityCreateButton" class="btn btn-primary btn-sm mr-3">
+        <button
+          @click="showCreateModal = true"
+          id="jh-create-entity"
+          data-cy="entityCreateButton"
+          class="btn button-primary btn-sm mr-3 rounded-1"
+        >
           <span v-text="t$('global.new')"></span>
         </button>
         <h5 id="page-heading" class="m-0 font-weight-bold" data-cy="ClientHeading">
@@ -401,8 +406,6 @@
   </div>
   <section class="section"></section>
   <section class="section"></section>
-  <section class="section"></section>
-  <section class="section"></section>
 </template>
 
 <script lang="ts" src="./client.component.ts"></script>
@@ -422,6 +425,16 @@
 
 .client-container {
   padding: 1.5rem;
+}
+
+.button-primary {
+  background-color: #0c2d57;
+  color: white;
+  border-color: #0c2d57;
+}
+
+.button-primary:hover {
+  background-color: #26538a;
 }
 
 .navigation-bar {

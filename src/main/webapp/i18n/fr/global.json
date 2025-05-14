@@ -40,6 +40,7 @@
         "featureVersion": "Feature Version",
         "productDeployementUpgrade": "Product Deployement Details",
         "customisation": "Personnalisations",
+        "req": "demande de modifications",
         "componentType": "Component Type",
         "infraComponent": "Infra Component",
         "infraComponentVersion": "Infra Component Version",

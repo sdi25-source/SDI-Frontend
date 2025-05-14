@@ -25,16 +25,22 @@
             <span v-text="t$('sdiFrontendApp.RequestStatus.' + requestOfChange.status)"></span>
           </dd>
           <dt>
+            <span v-text="t$('sdiFrontendApp.requestOfChange.description')"></span>
+          </dt>
+          <dd>
+            <span>{{ requestOfChange.description }}</span>
+          </dd>
+          <dt>
             <span v-text="t$('sdiFrontendApp.requestOfChange.createDate')"></span>
           </dt>
           <dd>
             <span>{{ requestOfChange.createDate }}</span>
           </dd>
           <dt>
-            <span v-text="t$('sdiFrontendApp.requestOfChange.description')"></span>
+            <span v-text="t$('sdiFrontendApp.requestOfChange.updateDate')"></span>
           </dt>
           <dd>
-            <span>{{ requestOfChange.description }}</span>
+            <span>{{ requestOfChange.updateDate }}</span>
           </dd>
           <dt>
             <span v-text="t$('sdiFrontendApp.requestOfChange.productVersion')"></span>
