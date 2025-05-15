@@ -10,91 +10,99 @@
       <!-- Nav Menu -->
       <nav id="navmenu" class="navmenu pl-5 ml-5">
         <ul>
-          <li>
-            <router-link to="/" exact class="nav-link active">
-              <span>{{ t$('global.menu.home') }}</span>
-            </router-link>
-          </li>
-
           <!-- Clients -->
-          <li v-if="authenticated" class="dropdown">
-            <a href="#"
+          <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'customer' }">
+            <a href="#" class="no-link-style"
               ><span>{{ t$('global.menu.entities.client') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
             ></a>
             <ul>
-              <clients-menu class="entities-menu-scroll" />
+              <customers-menu class="entities-menu-scroll" @menu-item-clicked="setActiveMenu('customer')" />
             </ul>
           </li>
 
           <!-- products -->
-          <li v-if="authenticated" class="dropdown">
-            <a href="#"
+          <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'product' }">
+            <a href="#" class="no-link-style"
               ><span>{{ t$('global.menu.entities.product') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
             ></a>
             <ul>
-              <products-menu class="entities-menu-scroll" />
+              <products-menu class="entities-menu-scroll" @menu-item-clicked="setActiveMenu('product')" />
             </ul>
           </li>
 
           <!-- products Deployments -->
-          <li v-if="authenticated" class="dropdown">
-            <a href="#"
+          <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'deployments' }">
+            <a href="#" class="no-link-style"
               ><span>{{ t$('global.menu.entities.deployements') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
             ></a>
             <ul>
-              <deployments-menu class="entities-menu-scroll" />
-            </ul>
-          </li>
-
-          <!-- Admin Menu -->
-          <li v-if="authenticated && hasAnyAuthority('ROLE_ADMIN')" class="dropdown">
-            <a href="#"
-              ><span>{{ t$('global.menu.admin.main') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
-            ></a>
-            <ul>
-              <router-link to="/admin/user-management">
-                <font-awesome-icon icon="users" /> {{ t$('global.menu.admin.userManagement') }}
-              </router-link>
+              <deployments-menu class="entities-menu-scroll" @menu-item-clicked="setActiveMenu('deployments')" />
             </ul>
           </li>
 
           <!-- parameters -->
-
-          <li v-if="authenticated" class="dropdown">
-            <a href="#"
+          <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'parameters' }">
+            <a href="#" class="no-link-style"
               ><span>{{ t$('global.menu.entities.parameters') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
             ></a>
             <ul>
-              <parameters-menu class="entities-menu-scroll" />
+              <parameters-menu class="entities-menu-scroll" @menu-item-clicked="setActiveMenu('parameters')" />
             </ul>
+          </li>
+
+          <!-- Admin Menu -->
+          <li v-if="authenticated && hasAnyAuthority('ROLE_ADMIN')" class="dropdown" :class="{ active: activeMenu === 'administration' }">
+            <a href="#" class="no-link-style"
+              ><span>{{ t$('global.menu.admin.main') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
+            ></a>
+            <ul>
+              <administration-menu @menu-item-clicked="setActiveMenu('administration')" />
+            </ul>
+          </li>
+
+          <li>
+            <router-link to="/" exact class="nav-link active" v-if="!authenticated" :class="{ active: activeMenu === 'home' }">
+              <span>{{ t$('global.menu.home') }}</span>
+            </router-link>
           </li>
 
           <!-- Languages -->
-          <li v-if="!authenticated && languages && Object.keys(languages).length > 1" class="dropdown">
-            <a href="#"
-              ><span>{{ t$('global.menu.language') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
-            ></a>
-            <ul class="">
-              <li v-for="(value, key) in languages" :key="`lang-${key}`" :class="{ active: isActiveLanguage(key) }">
-                <a href="#" @click.prevent="changeLanguage(key)">{{ value.name }}</a>
-              </li>
-            </ul>
-          </li>
+          <!--          <li-->
+          <!--            v-if="!authenticated && languages && Object.keys(languages).length > 1"-->
+          <!--            class="dropdown""-->
+          <!--            :class="{ active: activeMenu === 'language' }"-->
+          <!--          >-->
+          <!--            <a href="#" class="no-link-style"-->
+          <!--              ><span>{{ t$('global.menu.language') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i-->
+          <!--            ></a>-->
+          <!--            <ul class="">-->
+          <!--              <li v-for="(value, key) in languages" :key="`lang-${key}`" :class="{ active: isActiveLanguage(key) }">-->
+          <!--                <a-->
+          <!--                  href="#"-->
+          <!--                  @click.prevent="-->
+          <!--                    changeLanguage(key);-->
+          <!--                    setActiveMenu('language');-->
+          <!--                  "-->
+          <!--                  >{{ value.name }}</a-->
+          <!--                >-->
+          <!--              </li>-->
+          <!--            </ul>-->
+          <!--          </li>-->
 
           <!--  Account -->
-          <li class="dropdown" v-if="!authenticated">
-            <a href="#"
+          <li class="dropdown" v-if="!authenticated" :class="{ active: activeMenu === 'account' }">
+            <a href="#" class="no-link-style"
               ><span>{{ t$('global.menu.account.main') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
             ></a>
             <ul>
               <li>
-                <router-link to="/login" class="d-flex align-items-center gap-1">
+                <router-link to="/login" class="d-flex align-items-center gap-1 no-link-style" @click="setActiveMenu('account')">
                   <font-awesome-icon icon="sign-in-alt" />
                   <span>{{ t$('global.menu.account.login') }}</span>
                 </router-link>
               </li>
               <li>
-                <router-link to="/register" class="d-flex align-items-center gap-1">
+                <router-link to="/register" class="d-flex align-items-center gap-1 no-link-style" @click="setActiveMenu('account')">
                   <font-awesome-icon icon="user-plus" />
                   <span>{{ t$('global.menu.account.register') }}</span>
                 </router-link>
@@ -104,22 +112,12 @@
         </ul>
       </nav>
 
-      <router-link to="/login" class="d-flex align-items-center gap-1 btn-getstarted" v-if="!authenticated">{{
-        t$('global.menu.account.login')
-      }}</router-link>
-
-      <!--      <router-link-->
-      <!--        v-if="authenticated"-->
-      <!--        to="/account/settings"-->
-      <!--        class="pl-5"-->
-      <!--        style="width: 30px; height: 30px;"-->
-      <!--        title="profil"-->
-      <!--      >-->
-      <!--        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="userIcon"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8 .4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg>-->
-      <!--      </router-link>-->
+      <router-link to="/login" class="d-flex align-items-center gap-1 btn-getstarted" v-if="!authenticated">
+        {{ t$('global.menu.account.login') }}
+      </router-link>
 
       <div class="dropdown notification-dropdown" @click="toggleDropdown" v-if="authenticated">
-        <a href="#" class="notification-icon">
+        <a href="#" class="notification-icon no-link-style">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
             <path
               d="M448 64c0-17.7-14.3-32-32-32L32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32zm0 256c0-17.7-14.3-32-32-32L32 288c-17.7 0-32 14.3-32 32s14.3 32 32 32l384 0c17.7 0 32-14.3 32-32zM0 192c0 17.7 14.3 32 32 32l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 160c-17.7 0-32 14.3-32 32zM448 448c0-17.7-14.3-32-32-32L32 416c-17.7 0-32 14.3-32 32s14.3 32 32 32l384 0c17.7 0 32-14.3 32-32z"
@@ -128,19 +126,19 @@
         </a>
         <ul v-if="dropdownOpen" class="notification-menu">
           <li v-if="authenticated">
-            <router-link to="/account/settings" class="d-flex align-items-center gap-1">
+            <router-link to="/account/settings" class="d-flex align-items-center gap-1 no-link-style">
               <font-awesome-icon icon="wrench" />
               <span>{{ t$('global.menu.account.settings') }}</span>
             </router-link>
           </li>
           <li v-if="authenticated">
-            <router-link to="/account/password" class="d-flex align-items-center gap-1">
+            <router-link to="/account/password" class="d-flex align-items-center gap-1 no-link-style">
               <font-awesome-icon icon="lock" />
               <span>{{ t$('global.menu.account.password') }}</span>
             </router-link>
           </li>
           <li v-if="authenticated">
-            <a href="#" @click.prevent="logout" class="d-flex align-items-center gap-1">
+            <a href="#" @click.prevent="logout" class="d-flex align-items-center gap-1 no-link-style">
               <font-awesome-icon icon="sign-out-alt" />
               <span>{{ t$('global.menu.account.logout') }}</span>
             </a>
@@ -154,6 +152,23 @@
 <script lang="ts" src="./jhi-navbar.component.ts"></script>
 
 <style scoped>
+.no-link-style {
+  text-decoration: none; /* Supprime la ligne en dessous */
+  color: inherit; /* Garde la couleur du texte comme le parent */
+  outline: none;
+}
+.no-link-style:hover,
+.no-link-style:focus,
+.no-link-style:active {
+  text-decoration: none;
+  color: inherit;
+}
+
+.dropdown.active > a {
+  color: #0d83fd !important;
+  font-weight: 600;
+}
+
 .notification-icon svg {
   width: 20px;
   height: 20px;

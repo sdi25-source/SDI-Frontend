@@ -18,6 +18,8 @@ import CustomisationLevelService from '@/entities/customisation-level/customisat
 import { type ICustomisationLevel } from '@/shared/model/customisation-level.model';
 import { type IRequestOfChange, RequestOfChange } from '@/shared/model/request-of-change.model';
 import { RequestStatus } from '@/shared/model/enumerations/request-status.model';
+import ProductService from '@/entities/product/product.service.ts';
+import type { IProduct } from '@/shared/model/product.model.ts';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -29,8 +31,11 @@ export default defineComponent({
     const requestOfChange: Ref<IRequestOfChange> = ref(new RequestOfChange());
 
     const productVersionService = inject('productVersionService', () => new ProductVersionService());
+    const productService = inject('productService', () => new ProductService());
 
     const productVersions: Ref<IProductVersion[]> = ref([]);
+
+    const products: Ref<IProduct[]> = ref([]);
 
     const clientService = inject('clientService', () => new ClientService());
 
@@ -66,11 +71,23 @@ export default defineComponent({
     }
 
     const initRelationships = () => {
+      productService()
+        .retrieve()
+        .then(res => {
+          products.value = res.data;
+        });
+
       productVersionService()
         .retrieve()
         .then(res => {
           productVersions.value = res.data;
         });
+
+      productVersions.value.forEach(request => {
+        request.product = products.value.find(pv => pv.id === request.product?.id);
+        console.log(request.product);
+      });
+
       clientService()
         .retrieve()
         .then(res => {

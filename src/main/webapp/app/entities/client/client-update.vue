@@ -1,28 +1,43 @@
 <template>
-  <div class="client-edit">
-    <div class="client-form-container">
+  <div class="user-edit p-5">
+    <div class="user-form-container">
       <form name="editForm" novalidate @submit.prevent="save()">
         <div class="form-content">
+          <div class="header">
+            <h1 class="welcome-title" v-if="!client.id">New Client</h1>
+            <h1 class="welcome-title" v-if="client.id">Update Client</h1>
+          </div>
+          <div class="divider mt-3"></div>
           <div class="form-fields">
-            <div class="form-group" v-if="client.id">
-              <label class="label-c" for="id" v-text="t$('global.field.id')"></label>
-              <b-form-input type="text" id="id" name="id" v-model="client.id" readonly></b-form-input>
-            </div>
-
-            <div class="form-group">
-              <label class="label-c" v-text="t$('sdiFrontendApp.client.clientLogo')" for="client-clientLogo"></label>
+            <div class="logo-upload-container">
               <div class="input-with-validation">
-                <b-form-input
-                  type="text"
-                  name="clientLogo"
+                <input
+                  type="file"
                   id="client-clientLogo"
+                  name="clientLogo"
                   data-cy="clientLogo"
-                  :state="v$.clientLogo.$anyDirty ? !v$.clientLogo.$invalid : null"
-                  v-model="v$.clientLogo.$model"
-                ></b-form-input>
+                  accept="image/*"
+                  class="form-control"
+                  @change="onLogoChange"
+                />
                 <span class="valid-check" v-if="v$.clientLogo.$anyDirty && !v$.clientLogo.$invalid">
                   <font-awesome-icon icon="check" class="text-success" />
                 </span>
+              </div>
+
+              <!-- Prévisualisation du logo -->
+              <div v-if="logoPreview" class="logo-preview mt-2">
+                <img :src="logoPreview" alt="Logo preview" class="preview-image" />
+                <button type="button" class="remove-logo-btn" @click="removeLogo">
+                  <font-awesome-icon icon="times" />
+                </button>
+              </div>
+
+              <!-- Informations sur la compression -->
+              <div v-if="compressionInfo" class="compression-info mt-2">
+                <small class="text-muted">
+                  {{ compressionInfo }}
+                </small>
               </div>
             </div>
 
@@ -184,7 +199,7 @@
             </div>
 
             <div class="form-group">
-              <label class="label-c" v-text="t$('sdiFrontendApp.client.url')" for="client-url"></label>
+              <label class="label-c" v-text="t$('sdiFrontendApp.client.website')" for="client-url"></label>
               <div class="input-with-validation">
                 <b-form-input
                   type="url"
@@ -195,23 +210,6 @@
                   v-model="v$.url.$model"
                 ></b-form-input>
                 <span class="valid-check" v-if="v$.url.$anyDirty && !v$.url.$invalid">
-                  <font-awesome-icon icon="check" class="text-success" />
-                </span>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="label-c" v-text="t$('sdiFrontendApp.client.industry')" for="client-industry"></label>
-              <div class="input-with-validation">
-                <b-form-input
-                  type="text"
-                  name="industry"
-                  id="client-industry"
-                  data-cy="industry"
-                  :state="v$.industry.$anyDirty ? !v$.industry.$invalid : null"
-                  v-model="v$.industry.$model"
-                ></b-form-input>
-                <span class="valid-check" v-if="v$.industry.$anyDirty && !v$.industry.$invalid">
                   <font-awesome-icon icon="check" class="text-success" />
                 </span>
               </div>
@@ -236,58 +234,68 @@
 
             <div class="form-group">
               <label class="label-c" v-text="t$('sdiFrontendApp.client.createDate')" for="client-createDate"></label>
-              <b-input-group>
-                <b-input-group-prepend>
-                  <b-form-datepicker
-                    aria-controls="client-createDate"
-                    v-model="v$.createDate.$model"
+              <div class="input-with-validation">
+                <b-input-group>
+                  <b-input-group-prepend>
+                    <b-form-datepicker
+                      aria-controls="client-createDate"
+                      v-model="v$.createDate.$model"
+                      name="createDate"
+                      class="date-picker"
+                      :locale="currentLanguage"
+                      button-only
+                      today-button
+                      reset-button
+                      close-button
+                    >
+                    </b-form-datepicker>
+                  </b-input-group-prepend>
+                  <b-form-input
+                    id="client-createDate"
+                    data-cy="createDate"
+                    type="text"
                     name="createDate"
-                    class="date-picker"
-                    :locale="currentLanguage"
-                    button-only
-                    today-button
-                    reset-button
-                    close-button
-                  >
-                  </b-form-datepicker>
-                </b-input-group-prepend>
-                <b-form-input
-                  id="client-createDate"
-                  data-cy="createDate"
-                  type="text"
-                  name="createDate"
-                  :state="v$.createDate.$anyDirty ? !v$.createDate.$invalid : null"
-                  v-model="v$.createDate.$model"
-                />
-              </b-input-group>
+                    :state="v$.createDate.$anyDirty ? !v$.createDate.$invalid : null"
+                    v-model="v$.createDate.$model"
+                  />
+                </b-input-group>
+                <span class="valid-check" v-if="v$.createDate.$anyDirty && !v$.createDate.$invalid">
+                  <font-awesome-icon icon="check" class="text-success" />
+                </span>
+              </div>
             </div>
 
             <div class="form-group">
               <label class="label-c" v-text="t$('sdiFrontendApp.client.updateDate')" for="client-updateDate"></label>
-              <b-input-group>
-                <b-input-group-prepend>
-                  <b-form-datepicker
-                    aria-controls="client-updateDate"
-                    v-model="v$.updateDate.$model"
+              <div class="input-with-validation">
+                <b-input-group>
+                  <b-input-group-prepend>
+                    <b-form-datepicker
+                      aria-controls="client-updateDate"
+                      v-model="v$.updateDate.$model"
+                      name="updateDate"
+                      class="date-picker"
+                      :locale="currentLanguage"
+                      button-only
+                      today-button
+                      reset-button
+                      close-button
+                    >
+                    </b-form-datepicker>
+                  </b-input-group-prepend>
+                  <b-form-input
+                    id="client-updateDate"
+                    data-cy="updateDate"
+                    type="text"
                     name="updateDate"
-                    class="date-picker"
-                    :locale="currentLanguage"
-                    button-only
-                    today-button
-                    reset-button
-                    close-button
-                  >
-                  </b-form-datepicker>
-                </b-input-group-prepend>
-                <b-form-input
-                  id="client-updateDate"
-                  data-cy="updateDate"
-                  type="text"
-                  name="updateDate"
-                  :state="v$.updateDate.$anyDirty ? !v$.updateDate.$invalid : null"
-                  v-model="v$.updateDate.$model"
-                />
-              </b-input-group>
+                    :state="v$.updateDate.$anyDirty ? !v$.updateDate.$invalid : null"
+                    v-model="v$.updateDate.$model"
+                  />
+                </b-input-group>
+                <span class="valid-check" v-if="v$.updateDate.$anyDirty && !v$.updateDate.$invalid">
+                  <font-awesome-icon icon="check" class="text-success" />
+                </span>
+              </div>
             </div>
 
             <div class="form-group">
@@ -310,15 +318,13 @@
             <div class="form-group">
               <label class="label-c" v-text="t$('sdiFrontendApp.client.country')"></label>
               <div class="checkbox-group">
-                <!-- Parcours de la liste des pays -->
                 <div v-for="country in countries" :key="country.id" class="profile-checkbox">
                   <b-form-checkbox
                     :id="'country-' + country.id"
                     :value="client.country && country.id === client.country.id ? client.country : country"
                     v-model="client.country"
-                    class="pl-5"
                   >
-                    <span class="option-label">{{ country.countryname }}</span>
+                    <span class="authority-label">{{ country.countryname }}</span>
                   </b-form-checkbox>
                 </div>
               </div>
@@ -332,9 +338,8 @@
                     :id="'size-' + size.id"
                     :value="client.size && size.id === client.size.id ? client.size : size"
                     v-model="client.size"
-                    class="pl-5"
                   >
-                    <span class="option-label">{{ size.sizeName }}</span>
+                    <span class="authority-label">{{ size.sizeName }}</span>
                   </b-form-checkbox>
                 </div>
               </div>
@@ -348,9 +353,8 @@
                     :id="'size-' + clientType.id"
                     :value="client.clientType && clientType.id === client.clientType.id ? client.clientType : clientType"
                     v-model="client.clientType"
-                    class="pl-5"
                   >
-                    <span class="option-label">{{ clientType.type }}</span>
+                    <span class="authority-label">{{ clientType.type }}</span>
                   </b-form-checkbox>
                 </div>
               </div>
@@ -358,9 +362,9 @@
           </div>
           <div class="divider mt-3 mb-3"></div>
           <div class="action-buttons">
-            <!--            <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="cancel-button" @click="previousState()">-->
-            <!--              <font-awesome-icon icon="ban"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.cancel')"></span>-->
-            <!--            </button>-->
+            <button type="button" class="cancel-button" @click="cancel">
+              <font-awesome-icon icon="ban"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.cancel')"></span>
+            </button>
             <button
               type="submit"
               id="save-entity"
@@ -380,22 +384,10 @@
 <script lang="ts" src="./client-update.component.ts"></script>
 
 <style scoped>
-.option-label {
-  font-size: 14px;
-  color: #333;
-  margin-left: 5px;
-}
-
-.checkbox-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 10px;
-  max-height: 200px;
-  overflow-y: auto;
-  background-color: #f8f9fa;
+.user-form-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
 }
 
 .label-c {
@@ -417,13 +409,13 @@
   background-color: #ffffff;
   color: #333333;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  padding: 40px 20px;
+  padding: 0;
 }
 
 .client-form-container {
   width: 100%;
-  max-width: 750px;
-  padding: 24px 0;
+  max-width: 100%;
+  padding: 0;
 }
 
 /* Form content */
@@ -488,7 +480,8 @@ label {
   align-items: center;
 }
 
-.input-with-validation .b-form-input {
+.input-with-validation .b-form-input,
+.input-with-validation input[type='file'] {
   width: 100%;
 }
 
@@ -503,12 +496,50 @@ label {
   color: #28a745 !important;
 }
 
-/* Form control elements styling */
+/* Logo preview styling */
+.logo-upload-container {
+  width: 100%;
+}
+
+.logo-preview {
+  position: relative;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.preview-image {
+  max-width: 150px;
+  max-height: 150px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 5px;
+}
+
+.remove-logo-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Compression info styling */
+.compression-info {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+/* Custom BS Form elements styling */
 .form-control,
-.b-form-select,
-.date-picker,
-.b-form-textarea,
-.b-form-input {
+.custom-select {
   padding: 10px 12px;
   height: auto;
   border: 1px solid #e2e8f0;
@@ -520,24 +551,35 @@ label {
 }
 
 .form-control:focus,
-.b-form-select:focus,
-.date-picker:focus,
-.b-form-textarea:focus,
-.b-form-input:focus {
+.custom-select:focus {
   border-color: #94a3b8;
   box-shadow: 0 0 0 1px #94a3b8;
 }
 
-/* Date picker styling */
-.b-input-group {
+/* Checkbox group styling */
+.checkbox-group {
   display: flex;
-  width: 100%;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #f8f9fa;
 }
 
-.date-picker {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  border-right: none;
+.profile-checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1px;
+  margin-left: 39px;
+}
+
+.authority-label {
+  font-size: 14px;
+  color: #333;
+  margin-left: 5px;
 }
 
 /* Validation */
@@ -545,6 +587,23 @@ label {
   color: #dc3545 !important;
   font-size: 0.75rem;
   margin-top: 4px;
+}
+
+.form-text.text-muted {
+  color: #6c757d;
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+/* Checkbox styling */
+.custom-checkbox {
+  margin: 10px 0;
+}
+
+.custom-checkbox label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
 }
 
 /* Button styling */
@@ -596,7 +655,7 @@ button {
 /* For responsive design */
 @media (max-width: 768px) {
   .client-form-container {
-    padding: 15px;
+    padding: 0;
   }
 
   .action-buttons {

@@ -41,7 +41,7 @@ export default defineComponent({
     const selectedModule = ref(null);
     const showModuleVersionsModal = ref(false);
     const activeTabIndex = ref(0);
-    const tabs = ['Details', 'Versions', 'Modules', 'Configuration'];
+    const tabs = ['Versions', 'Modules', 'Configuration'];
     const tabRefs = reactive([]);
     const hoveredIndex = ref(null);
     const hoverStyle = ref({ left: '0px', width: '0px' });

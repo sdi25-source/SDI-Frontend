@@ -9,7 +9,14 @@ import { useAlertService } from '@/shared/alert/alert.service';
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'JhiUserManagementView',
-  setup() {
+  props: {
+    userId: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: ['close', 'updated'],
+  setup(props, { emit }) {
     const route = useRoute();
     const { formatDateLong: formatDate } = useDateFormat();
 
@@ -27,7 +34,7 @@ export default defineComponent({
       }
     }
 
-    loadUser(route.params?.userId);
+    loadUser(props.userId);
 
     return {
       formatDate,

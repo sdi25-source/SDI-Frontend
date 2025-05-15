@@ -355,133 +355,133 @@
           <!-- Tab Content -->
           <div class="tab-content mt-4">
             <!-- Details -->
-            <div v-if="activeTabIndex === 0" class="product-details border rounded bg-white">
-              <div class="row g-0 p-3">
-                <div class="col-lg-12">
-                  <div class="p-3">
-                    <div class="mb-4 d-flex justify-content-between align-items-start">
-                      <div class="flex-grow-1">
-                        <h6 class="text-muted mb-2 small">Description</h6>
-                        <p class="mb-0">{{ selectedProduct.description || 'No description available' }}</p>
-                      </div>
-                      <div class="ms-4 text-end">
-                        <h6 class="text-muted mb-2 small">Created</h6>
-                        <div
-                          class="alert alert-secondary d-inline-flex align-items-center py-1 px-2 btn-sm"
-                          style="font-size: 0.9rem; line-height: 1; gap: 0.25rem; margin-top: 0px; margin-bottom: 0px"
-                        >
-                          {{ formatDate(selectedProduct.createDate) }}
-                        </div>
-                      </div>
-                    </div>
+            <!--            <div v-if="activeTabIndex === 0" class="product-details border rounded bg-white">-->
+            <!--              <div class="row g-0 p-3">-->
+            <!--                <div class="col-lg-12">-->
+            <!--                  <div class="p-3">-->
+            <!--                    <div class="mb-4 d-flex justify-content-between align-items-start">-->
+            <!--                      <div class="flex-grow-1">-->
+            <!--                        <h6 class="text-muted mb-2 small">Description</h6>-->
+            <!--                        <p class="mb-0">{{ selectedProduct.description || 'No description available' }}</p>-->
+            <!--                      </div>-->
+            <!--                      <div class="ms-4 text-end">-->
+            <!--                        <h6 class="text-muted mb-2 small">Created</h6>-->
+            <!--                        <div-->
+            <!--                          class="alert alert-secondary d-inline-flex align-items-center py-1 px-2 btn-sm"-->
+            <!--                          style="font-size: 0.9rem; line-height: 1; gap: 0.25rem; margin-top: 0px; margin-bottom: 0px"-->
+            <!--                        >-->
+            <!--                          {{ formatDate(selectedProduct.createDate) }}-->
+            <!--                        </div>-->
+            <!--                      </div>-->
+            <!--                    </div>-->
 
-                    <!-- Product Lines -->
-                    <div>
-                      <h6 class="text-muted mb-2 small">Product Lines</h6>
-                      <div v-if="selectedProduct.productLines && selectedProduct.productLines.length > 0" class="d-flex flex-wrap">
-                        <span
-                          v-for="productLine in selectedProduct.productLines"
-                          :key="productLine.id"
-                          class="badge bg-light text-dark me-2 mb-2 px-2 py-1 border"
-                        >
-                          {{ productLine.name }}
-                        </span>
-                      </div>
-                      <p v-else class="text-muted mb-0">No product lines assigned</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="row pt-lg-3">
-                  <!-- Versions -->
-                  <div class="col-md-4 mb-4 pl-5">
-                    <div class="mb-3 pb-3 pl-2 border-left">
-                      <div class="d-flex align-items-center">
-                        <div class="stat-icon me-3">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-layers text-secondary"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M8.235 1.559a.5.5 0 0 0-.47 0l-7.5 4a.5.5 0 0 0 0 .882L3.188 8 .264 9.559a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882L12.813 8l2.922-1.559a.5.5 0 0 0 0-.882l-7.5-4zm3.515 7.008L14.438 10 8 13.433 1.562 10 4.25 8.567l3.515 1.874a.5.5 0 0 0 .47 0l3.515-1.874zM8 9.433 1.562 6 8 2.567 14.438 6 8 9.433z"
-                            />
-                          </svg>
-                        </div>
-                        <div class="flex-grow-1">
-                          <div class="d-flex align-items-baseline">
-                            <span class="h5 mb-0 me-2">{{ productVersions.length }}</span>
-                            <span class="text-muted small">Versions</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            <!--                    &lt;!&ndash; Product Lines &ndash;&gt;-->
+            <!--                    <div>-->
+            <!--                      <h6 class="text-muted mb-2 small">Product Lines</h6>-->
+            <!--                      <div v-if="selectedProduct.productLines && selectedProduct.productLines.length > 0" class="d-flex flex-wrap">-->
+            <!--                        <span-->
+            <!--                          v-for="productLine in selectedProduct.productLines"-->
+            <!--                          :key="productLine.id"-->
+            <!--                          class="badge bg-light text-dark me-2 mb-2 px-2 py-1 border"-->
+            <!--                        >-->
+            <!--                          {{ productLine.name }}-->
+            <!--                        </span>-->
+            <!--                      </div>-->
+            <!--                      <p v-else class="text-muted mb-0">No product lines assigned</p>-->
+            <!--                    </div>-->
+            <!--                  </div>-->
+            <!--                </div>-->
+            <!--                <div class="row pt-lg-3">-->
+            <!--                  &lt;!&ndash; Versions &ndash;&gt;-->
+            <!--                  <div class="col-md-4 mb-4 pl-5">-->
+            <!--                    <div class="mb-3 pb-3 pl-2 border-left">-->
+            <!--                      <div class="d-flex align-items-center">-->
+            <!--                        <div class="stat-icon me-3">-->
+            <!--                          <svg-->
+            <!--                            xmlns="http://www.w3.org/2000/svg"-->
+            <!--                            width="16"-->
+            <!--                            height="16"-->
+            <!--                            fill="currentColor"-->
+            <!--                            class="bi bi-layers text-secondary"-->
+            <!--                            viewBox="0 0 16 16"-->
+            <!--                          >-->
+            <!--                            <path-->
+            <!--                              d="M8.235 1.559a.5.5 0 0 0-.47 0l-7.5 4a.5.5 0 0 0 0 .882L3.188 8 .264 9.559a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882L12.813 8l2.922-1.559a.5.5 0 0 0 0-.882l-7.5-4zm3.515 7.008L14.438 10 8 13.433 1.562 10 4.25 8.567l3.515 1.874a.5.5 0 0 0 .47 0l3.515-1.874zM8 9.433 1.562 6 8 2.567 14.438 6 8 9.433z"-->
+            <!--                            />-->
+            <!--                          </svg>-->
+            <!--                        </div>-->
+            <!--                        <div class="flex-grow-1">-->
+            <!--                          <div class="d-flex align-items-baseline">-->
+            <!--                            <span class="h5 mb-0 me-2">{{ productVersions.length }}</span>-->
+            <!--                            <span class="text-muted small">Versions</span>-->
+            <!--                          </div>-->
+            <!--                        </div>-->
+            <!--                      </div>-->
+            <!--                    </div>-->
+            <!--                  </div>-->
 
-                  <!-- Modules -->
-                  <div class="col-md-4 mb-4">
-                    <div class="mb-3 pb-3 border-left">
-                      <div class="d-flex align-items-center">
-                        <div class="stat-icon me-3">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-puzzle text-secondary"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M3.112 3.645A1.5 1.5 0 0 1 4.605 2H7a.5.5 0 0 1 .5.5v.382c0 .696-.497 1.182-.872 1.469a.459.459 0 0 0-.115.118.113.113 0 0 0-.012.025L6.5 4.5v.003l.003.01c.004.01.014.028.036.053a.86.86 0 0 0 .27.194C7.09 4.9 7.51 5 8 5c.492 0 .912-.1 1.19-.24a.86.86 0 0 0 .271-.194.213.213 0 0 0 .039-.063v-.009a.112.112 0 0 0-.012-.025.459.459 0 0 0-.115-.118c-.375-.287-.872-.773-.872-1.469V2.5A.5.5 0 0 1 9 2h2.395a1.5 1.5 0 0 1 1.493 1.645L12.645 6.5h.237c.195 0 .42-.147.675-.48.21-.274.528-.52.943-.52.568 0 .947.447 1.154.862C15.877 6.807 16 7.387 16 8s-.123 1.193-.346 1.638c-.207.415-.586.862-1.154.862-.415 0-.733-.246-.943-.52-.255-.333-.48-.48-.675-.48h-.237l.243 2.855A1.5 1.5 0 0 1 11.395 14H9a.5.5 0 0 1-.5-.5v-.382c0-.696.497-1.182.872-1.469a.459.459 0 0 0 .115-.118.113.113 0 0 0 .012-.025L9.5 11.5v-.003a.214.214 0 0 0-.039-.064.859.859 0 0 0-.27-.193C8.91 11.1 8.49 11 8 11c-.491 0-.912.1-1.19.24a.859.859 0 0 0-.271.194.214.214 0 0 0-.039.063v.003l.001.006a.113.113 0 0 0 .012.025c.016.027.05.068.115.118.375.287.872.773.872 1.469v.382a.5.5 0 0 1-.5.5H4.605a1.5 1.5 0 0 1-1.493-1.645L3.356 9.5h-.238c-.195 0-.42.147-.675.48-.21.274-.528.52-.943.52-.568 0-.947-.447-1.154-.862C.123 9.193 0 8.613 0 8s.123-1.193.346-1.638C.553 5.947.932 5.5 1.5 5.5c.415 0 .733.246.943.52.255.333.48.48.675.48h.238l-.244-2.855z"
-                            />
-                          </svg>
-                        </div>
-                        <div class="flex-grow-1">
-                          <div class="d-flex align-items-baseline">
-                            <span class="h5 mb-0 me-2">{{ selectedProduct.modules ? selectedProduct.modules.length : 0 }}</span>
-                            <span class="text-muted small">Modules</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            <!--                  &lt;!&ndash; Modules &ndash;&gt;-->
+            <!--                  <div class="col-md-4 mb-4">-->
+            <!--                    <div class="mb-3 pb-3 border-left">-->
+            <!--                      <div class="d-flex align-items-center">-->
+            <!--                        <div class="stat-icon me-3">-->
+            <!--                          <svg-->
+            <!--                            xmlns="http://www.w3.org/2000/svg"-->
+            <!--                            width="16"-->
+            <!--                            height="16"-->
+            <!--                            fill="currentColor"-->
+            <!--                            class="bi bi-puzzle text-secondary"-->
+            <!--                            viewBox="0 0 16 16"-->
+            <!--                          >-->
+            <!--                            <path-->
+            <!--                              d="M3.112 3.645A1.5 1.5 0 0 1 4.605 2H7a.5.5 0 0 1 .5.5v.382c0 .696-.497 1.182-.872 1.469a.459.459 0 0 0-.115.118.113.113 0 0 0-.012.025L6.5 4.5v.003l.003.01c.004.01.014.028.036.053a.86.86 0 0 0 .27.194C7.09 4.9 7.51 5 8 5c.492 0 .912-.1 1.19-.24a.86.86 0 0 0 .271-.194.213.213 0 0 0 .039-.063v-.009a.112.112 0 0 0-.012-.025.459.459 0 0 0-.115-.118c-.375-.287-.872-.773-.872-1.469V2.5A.5.5 0 0 1 9 2h2.395a1.5 1.5 0 0 1 1.493 1.645L12.645 6.5h.237c.195 0 .42-.147.675-.48.21-.274.528-.52.943-.52.568 0 .947.447 1.154.862C15.877 6.807 16 7.387 16 8s-.123 1.193-.346 1.638c-.207.415-.586.862-1.154.862-.415 0-.733-.246-.943-.52-.255-.333-.48-.48-.675-.48h-.237l.243 2.855A1.5 1.5 0 0 1 11.395 14H9a.5.5 0 0 1-.5-.5v-.382c0-.696.497-1.182.872-1.469a.459.459 0 0 0 .115-.118.113.113 0 0 0 .012-.025L9.5 11.5v-.003a.214.214 0 0 0-.039-.064.859.859 0 0 0-.27-.193C8.91 11.1 8.49 11 8 11c-.491 0-.912.1-1.19.24a.859.859 0 0 0-.271.194.214.214 0 0 0-.039.063v.003l.001.006a.113.113 0 0 0 .012.025c.016.027.05.068.115.118.375.287.872.773.872 1.469v.382a.5.5 0 0 1-.5.5H4.605a1.5 1.5 0 0 1-1.493-1.645L3.356 9.5h-.238c-.195 0-.42.147-.675.48-.21.274-.528.52-.943.52-.568 0-.947-.447-1.154-.862C.123 9.193 0 8.613 0 8s.123-1.193.346-1.638C.553 5.947.932 5.5 1.5 5.5c.415 0 .733.246.943.52.255.333.48.48.675.48h.238l-.244-2.855z"-->
+            <!--                            />-->
+            <!--                          </svg>-->
+            <!--                        </div>-->
+            <!--                        <div class="flex-grow-1">-->
+            <!--                          <div class="d-flex align-items-baseline">-->
+            <!--                            <span class="h5 mb-0 me-2">{{ selectedProduct.modules ? selectedProduct.modules.length : 0 }}</span>-->
+            <!--                            <span class="text-muted small">Modules</span>-->
+            <!--                          </div>-->
+            <!--                        </div>-->
+            <!--                      </div>-->
+            <!--                    </div>-->
+            <!--                  </div>-->
 
-                  <!-- Product Lines -->
-                  <div class="col-md-4 mb-4">
-                    <div class="mb-3 pb-3 border-left">
-                      <div class="d-flex align-items-center">
-                        <div class="stat-icon me-3">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-tag text-secondary"
-                            viewBox="0 0 16 16"
-                          >
-                            <path d="M6 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-1 0a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z" />
-                            <path
-                              d="M2 1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 1 6.586V2a1 1 0 0 1 1-1zm0 5.586 7 7L13.586 9l-7-7H2v4.586z"
-                            />
-                          </svg>
-                        </div>
-                        <div class="flex-grow-1">
-                          <div class="d-flex align-items-baseline">
-                            <span class="h5 mb-0 me-2">{{ selectedProduct.productLines ? selectedProduct.productLines.length : 0 }}</span>
-                            <span class="text-muted small">Product Lines</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <!--                  &lt;!&ndash; Product Lines &ndash;&gt;-->
+            <!--                  <div class="col-md-4 mb-4">-->
+            <!--                    <div class="mb-3 pb-3 border-left">-->
+            <!--                      <div class="d-flex align-items-center">-->
+            <!--                        <div class="stat-icon me-3">-->
+            <!--                          <svg-->
+            <!--                            xmlns="http://www.w3.org/2000/svg"-->
+            <!--                            width="16"-->
+            <!--                            height="16"-->
+            <!--                            fill="currentColor"-->
+            <!--                            class="bi bi-tag text-secondary"-->
+            <!--                            viewBox="0 0 16 16"-->
+            <!--                          >-->
+            <!--                            <path d="M6 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-1 0a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z" />-->
+            <!--                            <path-->
+            <!--                              d="M2 1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 1 6.586V2a1 1 0 0 1 1-1zm0 5.586 7 7L13.586 9l-7-7H2v4.586z"-->
+            <!--                            />-->
+            <!--                          </svg>-->
+            <!--                        </div>-->
+            <!--                        <div class="flex-grow-1">-->
+            <!--                          <div class="d-flex align-items-baseline">-->
+            <!--                            <span class="h5 mb-0 me-2">{{ selectedProduct.productLines ? selectedProduct.productLines.length : 0 }}</span>-->
+            <!--                            <span class="text-muted small">Product Lines</span>-->
+            <!--                          </div>-->
+            <!--                        </div>-->
+            <!--                      </div>-->
+            <!--                    </div>-->
+            <!--                  </div>-->
+            <!--                </div>-->
+            <!--              </div>-->
+            <!--            </div>-->
 
             <!-- Versions Tab -->
-            <div v-if="activeTabIndex === 1" class="versions-tab">
+            <div v-if="activeTabIndex === 0" class="versions-tab">
               <div class="d-flex justify-content-between mb-3">
                 <h6 class="mb-0">Product versions</h6>
                 <button class="btn btn-sm btn-primary rounded-1" @click="showAddVersionRow = true" :disabled="showAddVersionRow">
@@ -717,7 +717,7 @@
             </div>
 
             <!-- Modules Tab -->
-            <div v-if="activeTabIndex === 2" class="modules-tab">
+            <div v-if="activeTabIndex === 1" class="modules-tab">
               <div v-if="!selectedVersion" class="d-flex justify-content-between mb-3">
                 <h6 class="mb-0">Modules</h6>
                 <button class="btn btn-sm btn-primary rounded-1" @click="showAddModuleRow = true" :disabled="showAddModuleRow">
@@ -924,7 +924,7 @@
             </div>
 
             <!-- Configuration Tab -->
-            <div v-if="activeTabIndex === 3" class="configuration-tab">
+            <div v-if="activeTabIndex === 2" class="configuration-tab">
               <div class="d-flex justify-content-between mb-3">
                 <h6 class="mb-0">Configuration</h6>
               </div>

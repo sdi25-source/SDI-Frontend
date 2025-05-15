@@ -199,6 +199,20 @@
               </div>
             </div>
 
+            <!-- Role Selection -->
+            <div class="form-group">
+              <label for="authority" class="label-c">
+                <!--                <span v-text="t$('register.form.profile')"></span>-->
+                <span>Profile</span>
+                <span class="text-danger">*</span>
+              </label>
+              <select id="authority" name="authority" class="form-control rounded-3" v-model="v$.registerAccount.authority.$model" required>
+                <option disabled v-text="t$('register.form.authority')"></option>
+                <option value="ROLE_USER" v-text="t$('register.form.user')"></option>
+                <option value="ROLE_COMMERCIAL" v-text="t$('register.form.commercial')"></option>
+              </select>
+            </div>
+
             <button
               type="submit"
               :disabled="v$.$invalid"

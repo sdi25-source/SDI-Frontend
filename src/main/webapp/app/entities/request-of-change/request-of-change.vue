@@ -571,11 +571,7 @@
                 ></textarea>
               </div>
               <div class="form-group">
-                <label
-                  class="form-control-label"
-                  v-text="t$('sdiFrontendApp.requestOfChange.productVersion')"
-                  for="request-of-change-productVersion"
-                ></label>
+                <label class="form-control-label" for="request-of-change-productVersion">Product Version</label>
                 <select
                   class="form-control form-control-sm"
                   id="request-of-change-productVersion"
@@ -585,7 +581,7 @@
                 >
                   <option :value="null"></option>
                   <option :value="productVersionOption" v-for="productVersionOption in productVersions" :key="productVersionOption.id">
-                    {{ productVersionOption.version }}
+                    {{ productVersionOption.product?.name }} {{ ' ' }} {{ productVersionOption.version }}
                   </option>
                 </select>
               </div>
@@ -777,6 +773,8 @@
       @product-created="handleProductCreated"
     />
   </div>
+  <div class="section"></div>
+  <div class="section"></div>
   <div class="section"></div>
   <div class="section"></div>
 </template>
