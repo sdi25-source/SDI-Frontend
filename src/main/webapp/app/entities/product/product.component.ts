@@ -209,6 +209,7 @@ export default defineComponent({
     const getFilteredInfraComponents = computed(() => {
       if (!selectedProduct.value) return [];
       if (selectedVersion.value) {
+        console.log('id', selectedVersion.value.id);
         // Return components specific to the selected version
         return selectedVersion.value.infraComponentVersions || [];
       } else {
@@ -243,12 +244,24 @@ export default defineComponent({
       isFetching.value = true;
       try {
         const res = await productService().retrieve();
-        products.value = res.data.map(product => ({
-          ...product,
-          isEditing: false,
-          showDropdown: false,
-          originalData: { ...product },
-        }));
+        products.value = res.data.map(product => {
+          // Enrichir les modules de chaque produit
+          const modulesWithExpansion = product.modules
+            ? product.modules.map(mod => ({
+                ...mod,
+                isExpanded: false,
+                versions: [],
+                isLoadingVersions: false,
+              }))
+            : [];
+          return {
+            ...product,
+            isEditing: false,
+            showDropdown: false,
+            originalData: { ...product },
+            modules: modulesWithExpansion,
+          };
+        });
         allProducts.value = [...products.value];
         updateTotalItems();
       } catch (err) {
@@ -271,6 +284,7 @@ export default defineComponent({
       try {
         const res = await infraComponentVersionService().retrieve();
         infraComponentVersionOptions.value = res.data;
+        console.log(infraComponentVersionOptions.value);
       } catch (err) {
         alertService.showHttpError(err.response);
       }
@@ -408,6 +422,14 @@ export default defineComponent({
         const res = await productVersionService().retrieve();
         // Filtrer les versions de produit par ID du produit
         productVersions.value = res.data.filter(pv => pv.product?.id === productId);
+        productVersions.value.forEach(request => {
+          if (request.moduleVersions) {
+            request.moduleVersions = request.moduleVersions.map(mv => {
+              const full = moduleVersions.value.find(opt => opt.id === mv.id);
+              return full ? full : mv;
+            });
+          }
+        });
         updateTotalVersionItems();
       } catch (err) {
         alertService.showHttpError(err.response);
@@ -611,6 +633,7 @@ export default defineComponent({
 
     const addInfraToVersion = () => {
       if (!selectedVersionInfraComponentId.value) return;
+      console.log(versionInfraComponents.value);
 
       const component = getInfraComponentById(selectedVersionInfraComponentId.value);
       if (component) {
@@ -1429,8 +1452,83 @@ export default defineComponent({
       }
     });
 
+    const newModuleInSettingsModal = ref({
+      name: '',
+      description: '',
+      createDate: new Date().toISOString().split('T')[0],
+      updateDate: new Date().toISOString().split('T')[0],
+    });
+
+    // Variable pour contrôler l'affichage du formulaire d'ajout de module
+    const showNewModuleForm = ref(false);
+
+    // Variable pour stocker les versions de modules déployées
+    const expandedVersions = ref(new Set());
+
+    // Fonction pour afficher/masquer les modules d'une version
+    const toggleVersionModules = versionId => {
+      if (expandedVersions.value.has(versionId)) {
+        expandedVersions.value.delete(versionId);
+      } else {
+        expandedVersions.value.add(versionId);
+      }
+    };
+
+    // Fonction pour ajouter un nouveau module depuis le modal de paramètres
+    const addNewModuleFromSettingsModal = async () => {
+      if (!newModuleInSettingsModal.value.name) {
+        alertService.showInfo('Le nom du module est requis', { variant: 'danger' });
+        return;
+      }
+
+      try {
+        // Création du module
+        const moduleData = {
+          ...newModuleInSettingsModal.value,
+        };
+        const result = await moduleService().create(moduleData);
+
+        // Ajout du module à la liste des options
+        moduleOptions.value.push(result);
+
+        // Sélection automatique du nouveau module créé
+        selectedModuleVersionId.value = result.id.toString();
+
+        // Réinitialisation du formulaire
+        newModuleInSettingsModal.value = {
+          name: '',
+          description: '',
+          createDate: new Date().toISOString().split('T')[0],
+          updateDate: new Date().toISOString().split('T')[0],
+        };
+
+        showNewModuleForm.value = false;
+
+        alertService.showInfo('Module créé avec succès', { variant: 'success' });
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
+    };
+
+    // Fonction pour annuler l'ajout d'un nouveau module
+    const cancelNewModuleInSettings = () => {
+      showNewModuleForm.value = false;
+      newModuleInSettingsModal.value = {
+        name: '',
+        description: '',
+        createDate: new Date().toISOString().split('T')[0],
+        updateDate: new Date().toISOString().split('T')[0],
+      };
+    };
+
     return {
       t$,
+      newModuleInSettingsModal,
+      showNewModuleForm,
+      expandedVersions,
+      toggleVersionModules,
+      addNewModuleFromSettingsModal,
+      cancelNewModuleInSettings,
       products,
       isFetching,
       removeId,
@@ -1595,6 +1693,7 @@ export default defineComponent({
       returnToProductList,
       setHoveredIndex,
       setActiveTabIndex,
+
       dataUtils,
     };
   },
