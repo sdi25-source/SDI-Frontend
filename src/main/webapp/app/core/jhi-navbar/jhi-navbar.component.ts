@@ -7,20 +7,22 @@ import languages from '@/shared/config/languages';
 import EntitiesMenu from '@/entities/entities-menu.vue';
 
 import { useStore } from '@/store';
-import ClientsMenu from '@/entities/clients.vue';
+import CustomersMenu from '@/entities/customers.vue';
 import ProductsMenu from '@/entities/products.vue';
 import DeploymentsMenu from '@/entities/deployments.vue';
 import ParametersMenu from '@/entities/parameters.vue';
+import AdministrationMenu from '@/entities/administration.vue';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'JhiNavbar',
   components: {
     'entities-menu': EntitiesMenu,
-    'clients-menu': ClientsMenu,
+    'customers-menu': CustomersMenu,
     'products-menu': ProductsMenu,
     'deployments-menu': DeploymentsMenu,
     'parameters-menu': ParametersMenu,
+    'administration-menu': AdministrationMenu,
   },
   setup() {
     const loginService = inject<LoginService>('loginService');
@@ -32,6 +34,11 @@ export default defineComponent({
       return key === currentLanguage.value;
     };
 
+    const activeMenu = ref('');
+
+    const setActiveMenu = menu => {
+      activeMenu.value = menu;
+    };
     const router = useRouter();
     const store = useStore();
 
@@ -84,6 +91,8 @@ export default defineComponent({
       authenticated,
       notifications,
       dropdownOpen,
+      activeMenu,
+      setActiveMenu,
       toggleDropdown,
       t$: useI18n().t,
     };

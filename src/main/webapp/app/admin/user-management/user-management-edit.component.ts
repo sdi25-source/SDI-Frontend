@@ -1,8 +1,7 @@
-import { type Ref, defineComponent, inject, ref } from 'vue';
+import { type Ref, defineComponent, inject, ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useVuelidate } from '@vuelidate/core';
 import { email, maxLength, minLength, required } from '@vuelidate/validators';
-import { useRoute, useRouter } from 'vue-router';
 import UserManagementService from './user-management.service';
 import { type IUser, User } from '@/shared/model/user.model';
 import { useAlertService } from '@/shared/alert/alert.service';
@@ -41,33 +40,83 @@ export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'JhiUserManagementEdit',
   validations,
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-
+  props: {
+    userId: {
+      type: String,
+      required: false,
+    },
+  },
+  emits: ['close', 'user-saved'],
+  setup(props, { emit }) {
     const alertService = inject('alertService', () => useAlertService(), true);
     const userManagementService = inject('userManagementService', () => new UserManagementService(), true);
-    const previousState = () => router.go(-1);
 
     const userAccount: Ref<IUser> = ref({ ...new User(), authorities: [] });
     const isSaving: Ref<boolean> = ref(false);
     const authorities: Ref<string[]> = ref([]);
+    const i18n = useI18n(); // Initialize useI18n here
 
     const initAuthorities = async () => {
-      const response = await userManagementService.retrieveAuthorities();
-      authorities.value = response.data;
+      try {
+        const response = await userManagementService.retrieveAuthorities();
+        authorities.value = response.data;
+      } catch (error) {
+        console.error('Erreur lors du chargement des autorités:', error);
+        alertService.showHttpError(error.response);
+      }
     };
 
     const loadUser = async (userId: string) => {
-      const response = await userManagementService.get(userId);
-      userAccount.value = response.data;
+      try {
+        const response = await userManagementService.get(userId);
+        userAccount.value = response.data;
+      } catch (error) {
+        console.error("Erreur lors du chargement de l'utilisateur:", error);
+        alertService.showHttpError(error.response);
+      }
     };
 
-    initAuthorities();
-    const userId = route.params?.userId;
-    if (userId) {
-      loadUser(userId);
-    }
+    // Initialiser les autorités
+    onMounted(() => {
+      initAuthorities();
+
+      // Charger l'utilisateur si un ID est fourni
+      if (props.userId) {
+        loadUser(props.userId);
+      }
+    });
+
+    const cancel = () => {
+      emit('close');
+    };
+
+    const save = async () => {
+      isSaving.value = true;
+      try {
+        let response;
+        if (userAccount.value.id) {
+          response = await userManagementService.update(userAccount.value);
+          alertService.showInfo(getToastMessageFromHeader(response));
+        } else {
+          response = await userManagementService.create(userAccount.value);
+          alertService.showSuccess(getToastMessageFromHeader(response));
+        }
+        isSaving.value = false;
+        emit('user-saved', response.data);
+        emit('close');
+      } catch (error) {
+        isSaving.value = false;
+        alertService.showHttpError(error.response);
+      }
+    };
+
+    const getToastMessageFromHeader = (res: any): string => {
+      return i18n
+        .t(res.headers['x-sdiapp-alert'], {
+          param: decodeURIComponent(res.headers['x-sdiapp-params'].replace(/\+/g, ' ')),
+        })
+        .toString();
+    };
 
     return {
       alertService,
@@ -75,49 +124,12 @@ export default defineComponent({
       isSaving,
       authorities,
       userManagementService,
-      previousState,
       v$: useVuelidate(),
       languages: languages(),
-      t$: useI18n().t,
+      t$: i18n.t,
+      cancel,
+      save,
+      getToastMessageFromHeader,
     };
-  },
-  methods: {
-    save(): void {
-      this.isSaving = true;
-      if (this.userAccount.id) {
-        this.userManagementService
-          .update(this.userAccount)
-          .then(res => {
-            this.returnToList();
-            this.alertService.showInfo(this.getToastMessageFromHeader(res));
-          })
-          .catch(error => {
-            this.isSaving = true;
-            this.alertService.showHttpError(error.response);
-          });
-      } else {
-        this.userManagementService
-          .create(this.userAccount)
-          .then(res => {
-            this.returnToList();
-            this.alertService.showSuccess(this.getToastMessageFromHeader(res));
-          })
-          .catch(error => {
-            this.isSaving = true;
-            this.alertService.showHttpError(error.response);
-          });
-      }
-    },
-
-    returnToList(): void {
-      this.isSaving = false;
-      this.previousState();
-    },
-
-    getToastMessageFromHeader(res: any): string {
-      return this.t$(res.headers['x-sdifrontendapp-alert'], {
-        param: decodeURIComponent(res.headers['x-sdifrontendapp-params'].replace(/\+/g, ' ')),
-      }).toString();
-    },
   },
 });

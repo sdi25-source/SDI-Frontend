@@ -1,27 +1,7 @@
 <template>
   <div class="entities-menu-container">
     <div class="entities-category">
-      <h6 class="entities-category-title" v-text="t$('global.menu.entities.product')"></h6>
-      <b-dropdown-item to="/product-deployement">
-        <span v-text="t$('global.menu.entities.productDeployement')"></span>
-      </b-dropdown-item>
-      <!--            <b-dropdown-item to="/product-deployement-upgrade">-->
-      <!--              <span v-text="t$('global.menu.entities.productDeployementUpgrade')"></span>-->
-      <!--            </b-dropdown-item>-->
-    </div>
-
-    <div class="entities-category">
-      <h6 class="entities-category-title" v-text="t$('global.menu.entities.module')"></h6>
-      <b-dropdown-item to="/module-deployement">
-        <span v-text="t$('global.menu.entities.moduleDeployement')"></span>
-      </b-dropdown-item>
-    </div>
-
-    <div class="entities-category">
-      <h6 class="entities-category-title" v-text="t$('global.menu.entities.feature')"></h6>
-      <b-dropdown-item to="/feature-deployement">
-        <span v-text="t$('global.menu.entities.featureDeployement')"></span>
-      </b-dropdown-item>
+      <b-dropdown-item to="/product-deployement" @click="emitMenuItemClicked"> Products Deployement Management </b-dropdown-item>
     </div>
   </div>
 </template>

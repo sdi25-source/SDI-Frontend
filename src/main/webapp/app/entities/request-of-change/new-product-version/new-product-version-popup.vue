@@ -178,40 +178,38 @@
                       Nouvelle version
                     </span>
                   </h6>
-                  <div>
-                    <button
-                      v-if="isNewlyCreatedModule(moduleVersion)"
-                      class="btn btn-sm btn-outline-info mr-2"
-                      @click="toggleFeaturesVisibility(index)"
-                    >
-                      {{ moduleVersionsUIState[index]?.showFeatures ? 'Masquer features' : 'Voir features' }}
-                    </button>
-                    <button v-if="isNewlyCreatedModule(moduleVersion)" class="btn btn-sm btn-primary mr-2" @click="toggleEditMode(index)">
-                      {{ moduleVersionsUIState[index]?.isEditing ? 'Terminer' : 'Modifier' }}
-                    </button>
-                  </div>
+                  <!--                  <div>-->
+                  <!--                    <button-->
+                  <!--                      v-if="isNewlyCreatedModule(moduleVersion)"-->
+                  <!--                      class="btn btn-sm btn-outline-info mr-2"-->
+                  <!--                      @click="toggleFeaturesVisibility(index)"-->
+                  <!--                    >-->
+                  <!--                      {{ moduleVersionsUIState[index]?.showFeatures ? 'Masquer features' : 'Voir features' }}-->
+                  <!--                    </button>-->
+                  <!--                    <button v-if="isNewlyCreatedModule(moduleVersion)" class="btn btn-sm btn-primary mr-2" @click="toggleEditMode(index)">-->
+                  <!--                      {{ moduleVersionsUIState[index]?.isEditing ? 'Terminer' : 'Modifier' }}-->
+                  <!--                    </button>-->
+                  <!--                  </div>-->
                 </div>
                 <div class="card-body">
                   <div class="row">
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label>Version</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          v-model="moduleVersion.version"
-                          :readonly="!isNewlyCreatedModule(moduleVersion) || !moduleVersionsUIState[index]?.isEditing"
-                          :disabled="!isNewlyCreatedModule(moduleVersion) || !moduleVersionsUIState[index]?.isEditing"
-                        />
-                      </div>
+                    <div class="form-group">
+                      <label>Version</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        v-model="moduleVersion.version"
+                        :readonly="!isNewlyCreatedModule(moduleVersion) || !moduleVersionsUIState[index]?.isEditing"
+                        :disabled="!isNewlyCreatedModule(moduleVersion) || !moduleVersionsUIState[index]?.isEditing"
+                      />
                     </div>
                     <div class="col-md-6">
                       <div class="form-group">
-                        <label>Version racine</label>
                         <select
                           class="form-control"
                           v-model="moduleVersion.root"
                           :disabled="!isNewlyCreatedModule(moduleVersion) || !moduleVersionsUIState[index]?.isEditing"
+                          hidden="true"
                         >
                           <option :value="null">Aucune</option>
                           <option
@@ -304,12 +302,12 @@
                   <div class="row">
                     <div class="col-md-6">
                       <p><strong>Version:</strong> {{ newProductVersion.version }}</p>
-                      <p>
-                        <strong>Version racine:</strong>
-                        {{
-                          newProductVersion.root ? `${newProductVersion.root.product?.name} - ${newProductVersion.root.version}` : 'Aucune'
-                        }}
-                      </p>
+                      <!--                      <p>-->
+                      <!--                        <strong>Version racine:</strong>-->
+                      <!--                        {{-->
+                      <!--                          newProductVersion.root ? `${newProductVersion.root.product?.name} - ${newProductVersion.root.version}` : 'Aucune'-->
+                      <!--                        }}-->
+                      <!--                      </p>-->
                     </div>
                     <div class="col-md-6">
                       <p><strong>Date de création:</strong> {{ formatDate(newProductVersion.createDate) }}</p>
@@ -350,17 +348,6 @@
                       <div class="row">
                         <div class="col-md-6">
                           <p><strong>Version:</strong> {{ moduleVersion.version }}</p>
-                          <p>
-                            <strong>Version racine:</strong>
-                            {{ moduleVersion.root ? moduleVersion.root.version : 'Aucune' }}
-                          </p>
-                        </div>
-                        <div class="col-md-6">
-                          <p><strong>Description:</strong> {{ moduleVersion.notes || 'Aucune' }}</p>
-                          <p>
-                            <strong>Fonctionnalités:</strong>
-                            {{ moduleVersion.features && moduleVersion.features.length > 0 ? moduleVersion.features.length : 'Aucune' }}
-                          </p>
                         </div>
                       </div>
                     </div>
@@ -387,26 +374,26 @@
     <div class="modal-backdrop" v-if="showAddFeatureModal" @click="showAddFeatureModal = false"></div>
     <div class="modal-container" v-if="showAddFeatureModal" role="dialog" aria-modal="true">
       <div class="modal-content" style="max-width: 500px">
-        <div class="modal-header">
-          <h5 class="modal-title">Ajouter une fonctionnalité</h5>
-          <button type="button" class="close-button" @click="showAddFeatureModal = false" aria-label="Fermer">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              class="icon"
-            >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
+        <!--        <div class="modal-header">-->
+        <!--          <h5 class="modal-title">Ajouter une fonctionnalité</h5>-->
+        <!--          <button type="button" class="close-button" @click="showAddFeatureModal = false" aria-label="Fermer">-->
+        <!--            <svg-->
+        <!--              xmlns="http://www.w3.org/2000/svg"-->
+        <!--              width="24"-->
+        <!--              height="24"-->
+        <!--              viewBox="0 0 24 24"-->
+        <!--              fill="none"-->
+        <!--              stroke="currentColor"-->
+        <!--              strokeWidth="2"-->
+        <!--              strokeLinecap="round"-->
+        <!--              strokeLinejoin="round"-->
+        <!--              class="icon"-->
+        <!--            >-->
+        <!--              <line x1="18" y1="6" x2="6" y2="18"></line>-->
+        <!--              <line x1="6" y1="6" x2="18" y2="18"></line>-->
+        <!--            </svg>-->
+        <!--          </button>-->
+        <!--        </div>-->
         <div class="modal-body">
           <div class="form-group">
             <label for="featureName">Nom</label>
@@ -434,7 +421,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, computed, PropType, watch } from 'vue';
+import type { PropType } from 'vue';
+import { defineComponent, ref, reactive, computed, watch } from 'vue';
 import type { IRequestOfChange } from '@/shared/model/request-of-change.model';
 import type { IProductVersion } from '@/shared/model/product-version.model';
 import type { IModuleVersion } from '@/shared/model/module-version.model';
@@ -608,7 +596,6 @@ export default defineComponent({
                 } else {
                   newVersionName = `New_${moduleVersion.version}`;
                 }
-
                 // Créer d'abord les features si nécessaire
                 let savedFeatures: IFeature[] = [];
                 if (moduleVersion.features && moduleVersion.features.length > 0) {

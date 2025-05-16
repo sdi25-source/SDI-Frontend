@@ -6,18 +6,22 @@ import { useStore } from '@/store.ts';
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'ParametersMenu',
-  setup() {
+  emits: ['menu-item-clicked'],
+  setup(props, { emit }) {
     const i18n = useI18n();
     const store = useStore();
     const accountService = inject<AccountService>('accountService');
     const hasAnyAuthorityValues: Ref<any> = ref({});
     const authenticated = computed(() => store.authenticated);
-
+    const emitMenuItemClicked = () => {
+      emit('menu-item-clicked');
+    };
     return {
-      t$: i18n.t,
       authenticated,
       accountService,
       hasAnyAuthorityValues,
+      emitMenuItemClicked,
+      t$: i18n.t,
     };
   },
   methods: {

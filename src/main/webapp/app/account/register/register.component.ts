@@ -5,6 +5,7 @@ import { email, helpers, maxLength, minLength, required, sameAs } from '@vuelida
 import type LoginService from '@/account/login.service';
 import RegisterService from '@/account/register/register.service';
 import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from '@/constants';
+import { useRouter } from 'vue-router'; // <-- change here
 
 const loginPattern = helpers.regex(/^[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$|^[_.@A-Za-z0-9-]+$/);
 
@@ -31,6 +32,9 @@ export default defineComponent({
           minLength: minLength(4),
           maxLength: maxLength(254),
         },
+        authority: {
+          required,
+        },
       },
       confirmPassword: {
         required,
@@ -55,11 +59,14 @@ export default defineComponent({
       login: undefined,
       email: undefined,
       password: undefined,
+      authority: undefined,
     });
 
     const openLogin = () => {
       loginService.openLogin();
     };
+
+    const router = useRouter();
 
     return {
       openLogin,
@@ -71,12 +78,14 @@ export default defineComponent({
       success,
       confirmPassword,
       registerAccount,
+      router,
       v$: useVuelidate(),
       t$: useI18n().t,
     };
   },
   methods: {
     register(): void {
+      console.log(this.registerAccount);
       this.error = null;
       this.errorUserExists = null;
       this.errorEmailExists = null;
@@ -85,6 +94,7 @@ export default defineComponent({
         .processRegistration(this.registerAccount)
         .then(() => {
           this.success = true;
+          this.router.push({ name: 'Login' });
         })
         .catch(error => {
           this.success = null;

@@ -6,7 +6,7 @@
           @click="showAddRow = true"
           id="jh-create-entity"
           data-cy="entityCreateButton"
-          class="btn btn-primary btn-sm mr-3"
+          class="button button-primary btn-sm mr-3"
           :disabled="showAddRow"
         >
           <span v-text="t$('global.new')"></span>
@@ -23,7 +23,9 @@
           <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="button">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                <path
+                  d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"
+                />
               </svg>
             </button>
           </div>
@@ -36,25 +38,57 @@
         </div>
         <div class="pagination-arrows d-flex">
           <button class="btn btn-light btn-sm mr-1" :disabled="isPrevDisabled" @click="goToPrevPage">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-chevron-left"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
+              />
             </svg>
           </button>
           <button class="btn btn-light btn-sm" :disabled="isNextDisabled" @click="goToNextPage">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-chevron-right"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
+              />
             </svg>
           </button>
         </div>
         <div class="view-toggle ml-3">
           <button class="btn btn-light btn-sm" :class="{ active: viewMode === 'list' }" @click="viewMode = 'list'">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+              <path
+                fill-rule="evenodd"
+                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"
+              />
             </svg>
           </button>
           <button class="btn btn-light btn-sm" :class="{ active: viewMode === 'card' }" @click="viewMode = 'card'">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grid-3x3-gap-fill" viewBox="0 0 16 16">
-              <path d="M1 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 12a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-grid-3x3-gap-fill"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M1 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 12a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"
+              />
             </svg>
           </button>
         </div>
@@ -66,44 +100,120 @@
       <div class="table-responsive">
         <table class="table table-hover mb-0" aria-describedby="deployementTypes">
           <thead class="thead-light">
-          <tr>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.deployementType.type')"></span></th>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.deployementType.createDate')"></span></th>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.deployementType.updateDate')"></span></th>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.deployementType.notes')"></span></th>
-            <th scope="col" width="160" class="text-center">Actions</th>
-          </tr>
+            <tr>
+              <th scope="col"><span v-text="t$('sdiFrontendApp.deployementType.type')"></span></th>
+              <!--              <th scope="col"><span v-text="t$('sdiFrontendApp.deployementType.createDate')"></span></th>-->
+              <!--              <th scope="col"><span v-text="t$('sdiFrontendApp.deployementType.updateDate')"></span></th>-->
+              <th scope="col"><span v-text="t$('sdiFrontendApp.deployementType.notes')"></span></th>
+              <th scope="col" width="160" class="text-center">Actions</th>
+            </tr>
           </thead>
           <tbody>
-          <tr v-for="deployementType in paginatedDeployementTypes" :key="deployementType.id" data-cy="entityTable" class="align-middle">
-            <td>
-              <template v-if="deployementType.isEditing">
-                <input v-model="deployementType.type" type="text" class="form-control-borderless" />
-              </template>
-              <template v-else>{{ deployementType.type }}</template>
-            </td>
-            <td>
-              <template v-if="deployementType.isEditing">
-                <input v-model="deployementType.createDate" type="date" class="form-control-borderless" />
-              </template>
-              <template v-else>{{ deployementType.createDate }}</template>
-            </td>
-            <td>
-              <template v-if="deployementType.isEditing">
-                <input v-model="deployementType.updateDate" type="date" class="form-control-borderless" />
-              </template>
-              <template v-else>{{ deployementType.updateDate }}</template>
-            </td>
-            <td class="text-truncate" style="max-width: 250px" :title="deployementType.notes">
-              <template v-if="deployementType.isEditing">
-                <input v-model="deployementType.notes" type="text" class="form-control-borderless" />
-              </template>
-              <template v-else>{{ deployementType.notes }}</template>
-            </td>
-            <td class="text-center">
-              <div class="btn-group">
+            <tr v-for="deployementType in paginatedDeployementTypes" :key="deployementType.id" data-cy="entityTable" class="align-middle">
+              <td>
                 <template v-if="deployementType.isEditing">
-                  <div class="icon-container save-container" @click="saveDeployementType(deployementType)" title="Enregistrer">
+                  <input v-model="deployementType.type" type="text" class="form-control-borderless" />
+                </template>
+                <template v-else>{{ deployementType.type }}</template>
+              </td>
+              <!--              <td>-->
+              <!--                <template v-if="deployementType.isEditing">-->
+              <!--                  <input v-model="deployementType.createDate" type="date" class="form-control-borderless" />-->
+              <!--                </template>-->
+              <!--                <template v-else>{{ deployementType.createDate }}</template>-->
+              <!--              </td>-->
+              <!--              <td>-->
+              <!--                <template v-if="deployementType.isEditing">-->
+              <!--                  <input v-model="deployementType.updateDate" type="date" class="form-control-borderless" />-->
+              <!--                </template>-->
+              <!--                <template v-else>{{ deployementType.updateDate }}</template>-->
+              <!--              </td>-->
+              <td class="text-truncate" style="max-width: 250px" :title="deployementType.notes">
+                <template v-if="deployementType.isEditing">
+                  <input v-model="deployementType.notes" type="text" class="form-control-borderless" />
+                </template>
+                <template v-else>{{ deployementType.notes }}</template>
+              </td>
+              <td class="text-center">
+                <div class="btn-group">
+                  <template v-if="deployementType.isEditing">
+                    <div class="icon-container save-container" @click="saveDeployementType(deployementType)" title="Enregistrer">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
+                        <path
+                          d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </div>
+                    <div class="icon-container cancel-container" @click="cancelEdit(deployementType)" title="Annuler">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
+                        <path
+                          d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="action-icons">
+                      <div class="icon-container edit-container" @click="editDeployementType(deployementType)" title="Modifier">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          class="bi bi-pencil-fill"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                          />
+                        </svg>
+                      </div>
+                      <div class="icon-container delete-container" @click="prepareRemove(deployementType)" title="Supprimer">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="26"
+                          height="26"
+                          fill="currentColor"
+                          class="bi bi-x"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      </div>
+                      <div class="icon-container view-container" @click="viewDeployementType(deployementType)" title="Voir">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          class="bi bi-eye"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"
+                          />
+                          <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                        </svg>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </td>
+            </tr>
+
+            <tr v-if="showAddRow" class="add-row">
+              <td><input v-model="newDeployementType.type" type="text" class="form-control-borderless" placeholder="Type" /></td>
+              <!--              <td><input v-model="newDeployementType.createDate" type="date" class="form-control-borderless" /></td>-->
+              <!--              <td><input v-model="newDeployementType.updateDate" type="date" class="form-control-borderless" /></td>-->
+              <td><input v-model="newDeployementType.notes" type="text" class="form-control-borderless" placeholder="Notes" /></td>
+              <td class="text-center">
+                <div class="action-icons">
+                  <div class="icon-container save-container" @click="saveNewDeployementType" title="Enregistrer">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
                       <path
                         d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
@@ -111,7 +221,7 @@
                       />
                     </svg>
                   </div>
-                  <div class="icon-container cancel-container" @click="cancelEdit(deployementType)" title="Annuler">
+                  <div class="icon-container cancel-container" @click="cancelNewDeployementType" title="Annuler">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
                       <path
                         d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
@@ -119,85 +229,9 @@
                       />
                     </svg>
                   </div>
-                </template>
-                <template v-else>
-                  <div class="action-icons">
-                    <div class="icon-container edit-container" @click="editDeployementType(deployementType)" title="Modifier">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-pencil-fill"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
-                        />
-                      </svg>
-                    </div>
-                    <div class="icon-container delete-container" @click="prepareRemove(deployementType)" title="Supprimer">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="26"
-                        height="26"
-                        fill="currentColor"
-                        class="bi bi-x"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    </div>
-                    <div class="icon-container view-container" @click="viewDeployementType(deployementType)" title="Voir">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-eye"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"
-                        />
-                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
-                      </svg>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </td>
-          </tr>
-
-          <tr v-if="showAddRow" class="add-row">
-            <td><input v-model="newDeployementType.type" type="text" class="form-control-borderless" placeholder="Type" /></td>
-            <td><input v-model="newDeployementType.createDate" type="date" class="form-control-borderless" /></td>
-            <td><input v-model="newDeployementType.updateDate" type="date" class="form-control-borderless" /></td>
-            <td><input v-model="newDeployementType.notes" type="text" class="form-control-borderless" placeholder="Notes" /></td>
-            <td class="text-center">
-              <div class="action-icons">
-                <div class="icon-container save-container" @click="saveNewDeployementType" title="Enregistrer">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
-                    <path
-                      d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
-                      fill="currentColor"
-                    />
-                  </svg>
                 </div>
-                <div class="icon-container cancel-container" @click="cancelNewDeployementType" title="Annuler">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
-                    <path
-                      d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </td>
-          </tr>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -263,7 +297,6 @@
                     </svg>
                     Supprimer
                   </a>
-
                 </div>
               </div>
             </div>
@@ -273,14 +306,14 @@
                   <label>Type</label>
                   <input v-model="deployementType.type" type="text" class="form-control" />
                 </div>
-                <div class="form-group">
-                  <label>Date de création</label>
-                  <input v-model="deployementType.createDate" type="date" class="form-control" />
-                </div>
-                <div class="form-group">
-                  <label>Date de mise à jour</label>
-                  <input v-model="deployementType.updateDate" type="date" class="form-control" />
-                </div>
+                <!--                <div class="form-group">-->
+                <!--                  <label>Date de création</label>-->
+                <!--                  <input v-model="deployementType.createDate" type="date" class="form-control" />-->
+                <!--                </div>-->
+                <!--                <div class="form-group">-->
+                <!--                  <label>Date de mise à jour</label>-->
+                <!--                  <input v-model="deployementType.updateDate" type="date" class="form-control" />-->
+                <!--                </div>-->
                 <div class="form-group">
                   <label>Notes</label>
                   <textarea v-model="deployementType.notes" class="form-control" rows="3"></textarea>
@@ -296,14 +329,14 @@
                     <span class="info-label">Type:</span>
                     <span class="info-value">{{ deployementType.type }}</span>
                   </div>
-                  <div class="info-row">
-                    <span class="info-label">Date de création:</span>
-                    <span class="info-value">{{ deployementType.createDate }}</span>
-                  </div>
-                  <div class="info-row">
-                    <span class="info-label">Date de mise à jour:</span>
-                    <span class="info-value">{{ deployementType.updateDate }}</span>
-                  </div>
+                  <!--                  <div class="info-row">-->
+                  <!--                    <span class="info-label">Date de création:</span>-->
+                  <!--                    <span class="info-value">{{ deployementType.createDate }}</span>-->
+                  <!--                  </div>-->
+                  <!--                  <div class="info-row">-->
+                  <!--                    <span class="info-label">Date de mise à jour:</span>-->
+                  <!--                    <span class="info-value">{{ deployementType.updateDate }}</span>-->
+                  <!--                  </div>-->
                   <div class="info-row">
                     <span class="info-label">Notes:</span>
                     <span class="info-value notes-text">{{ deployementType.notes }}</span>
@@ -393,6 +426,28 @@
 <script lang="ts" src="./deployement-type.component.ts"></script>
 
 <style scoped>
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+}
+
+.button-primary {
+  background-color: #0c2d57;
+  color: white;
+  border-color: #0c2d57;
+}
+
+.button-primary:hover {
+  background-color: #26538a;
+}
 .deployement-type-container {
   padding: 1.5rem;
 }

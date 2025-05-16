@@ -1,14 +1,14 @@
 <template>
   <div class="entities-menu-container">
     <div class="entities-category">
-      <b-dropdown-item to="/product" @click="emitMenuItemClicked">
-        <span>Products Management</span>
+      <b-dropdown-item to="/admin/user-management" @click="emitMenuItemClicked">
+        <span v-text="t$('global.menu.admin.userManagement')"></span>
       </b-dropdown-item>
     </div>
   </div>
 </template>
 
-<script lang="ts" src="./products-menu.component.ts"></script>
+<script lang="ts" src="./administration-menu.component.ts"></script>
 
 <style scoped>
 .entities-menu-container {

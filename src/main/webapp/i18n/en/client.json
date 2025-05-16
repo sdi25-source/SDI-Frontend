@@ -27,7 +27,8 @@
       "currentBruncheNumber": "Current Brunche Number",
       "currentCustomersNumber": "Current Customers Number",
       "mainContactPhoneNumber": "Main Contact Phone Number",
-      "url": "Url",
+      "url": "Web site",
+      "website": "Web site",
       "address": "Address",
       "createDate": "Create Date",
       "updateDate": "Update Date",
@@ -38,7 +39,8 @@
       "size": "Size",
       "clientType": "Client Type",
       "certif": "Certif",
-      "country": "Country"
+      "country": "Country",
+      "relatedInformation": "Releted Information"
     }
   }
 }

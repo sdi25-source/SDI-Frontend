@@ -1,31 +1,25 @@
 <template>
   <div class="entities-menu-container">
     <div class="entities-category">
-      <h6 class="entities-category-title" v-text="t$('global.menu.entities.client')"></h6>
-      <b-dropdown-item to="/client">
-        <span v-text="t$('global.menu.entities.client')"></span>
+      <b-dropdown-item to="/client" @click="emitMenuItemClicked">
+        <span>Customers Management</span>
+      </b-dropdown-item>
+      <b-dropdown-item to="/client-certification" @click="emitMenuItemClicked">
+        <span v-text="t$('global.menu.entities.clientCertification')"></span>
+      </b-dropdown-item>
+      <b-dropdown-item to="/client-event" @click="emitMenuItemClicked">
+        <span v-text="t$('global.menu.entities.clientEvent')"></span>
       </b-dropdown-item>
     </div>
     <div class="entities-category">
-      <h6 class="entities-category-title" v-text="t$('global.menu.entities.customisation')"></h6>
-      <b-dropdown-item to="/request-of-change">
+      <b-dropdown-item to="/request-of-change" @click="emitMenuItemClicked">
         <span v-text="t$('global.menu.entities.req')"></span>
       </b-dropdown-item>
     </div>
-
-    <!--      <b-dropdown-item to="/client-certification">-->
-    <!--        <span v-text="t$('global.menu.entities.clientCertification')"></span>-->
-    <!--      </b-dropdown-item>-->
-    <!--    <div class="entities-category">-->
-    <!--      <h6 class="entities-category-title" v-text="t$('global.menu.entities.alert')"></h6>-->
-    <!--      <b-dropdown-item to="/client-event">-->
-    <!--        <span v-text="t$('global.menu.entities.clientEvent')"></span>-->
-    <!--      </b-dropdown-item>-->
-    <!--    </div>-->
   </div>
 </template>
 
-<script lang="ts" src="./clients-menu.component.ts"></script>
+<script lang="ts" src="./customers-menu.components.ts"></script>
 
 <style scoped>
 .entities-menu-container {

@@ -7,11 +7,13 @@ import { useAlertService } from '@/shared/alert/alert.service';
 import ClientSizeService from '@/entities/client-size/client-size.service.ts';
 import ClientUpdate from '@/entities/client/client-update.vue';
 import ClientDetails from '@/entities/client/client-details.vue';
+import JhiUserManagementEdit from '@/admin/user-management/user-management-edit.component.ts';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'Client',
   components: {
+    JhiUserManagementEdit,
     ClientUpdate,
     ClientDetails,
   },

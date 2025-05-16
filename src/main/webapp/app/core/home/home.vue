@@ -80,14 +80,895 @@
       </div>
     </section>
   </div>
-  <div class="home row" v-if="authenticated">
-    <div class="section"></div>
-    <div class="section"></div>
-    <div class="section"></div>
-    <div class="section"></div>
-    <div class="section"></div>
-    <div class="section"></div>
+
+  <!-- Dashboard Section (Authenticated) -->
+  <div class="dashboard-container" v-if="authenticated">
+    <div class="dashboard-content">
+      <div class="dashboard-header"></div>
+
+      <!-- Stats Cards -->
+      <div class="stats-cards"></div>
+
+      <!-- Products Overview Section -->
+      <div class="dashboard-section">
+        <div class="section-header">
+          <h2>Products Overview</h2>
+          <button class="view-all-button">View All</button>
+        </div>
+        <div class="section-content">
+          <div class="product-cards">
+            <div class="product-card">
+              <div class="product-icon">
+                <i class="bi bi-credit-card"></i>
+              </div>
+              <div class="product-info">
+                <h4>Payment Gateway</h4>
+                <p>5 versions • 8 modules</p>
+                <div class="product-status active">Active</div>
+              </div>
+            </div>
+            <div class="product-card">
+              <div class="product-icon">
+                <i class="bi bi-people"></i>
+              </div>
+              <div class="product-info">
+                <h4>Customer Portal</h4>
+                <p>3 versions • 6 modules</p>
+                <div class="product-status active">Active</div>
+              </div>
+            </div>
+            <div class="product-card">
+              <div class="product-icon">
+                <i class="bi bi-calendar-check"></i>
+              </div>
+              <div class="product-info">
+                <h4>Booking System</h4>
+                <p>4 versions • 10 modules</p>
+                <div class="product-status active">Active</div>
+              </div>
+            </div>
+            <div class="product-card">
+              <div class="product-icon">
+                <i class="bi bi-phone"></i>
+              </div>
+              <div class="product-info">
+                <h4>Mobile Banking</h4>
+                <p>6 versions • 12 modules</p>
+                <div class="product-status active">Active</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Recent Deployments Table -->
+      <div class="dashboard-section">
+        <div class="section-header">
+          <h2>Recent Deployments</h2>
+          <div class="section-actions">
+            <div class="search-container">
+              <i class="bi bi-search"></i>
+              <input type="text" placeholder="Search deployments..." class="search-input" />
+            </div>
+            <button class="filter-button">
+              <i class="bi bi-funnel"></i>
+              <span>Filter</span>
+            </button>
+          </div>
+        </div>
+        <div class="section-content">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Client</th>
+                  <th>Product</th>
+                  <th>Version</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>DEP-001</td>
+                  <td>Bank of Africa</td>
+                  <td>Payment Gateway</td>
+                  <td>v2.3.1</td>
+                  <td>2023-04-12</td>
+                  <td><span class="status-badge completed">Completed</span></td>
+                  <td>
+                    <button class="action-button"><i class="bi bi-eye"></i></button>
+                    <button class="action-button"><i class="bi bi-pencil"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>DEP-002</td>
+                  <td>Maroc Telecom</td>
+                  <td>Customer Portal</td>
+                  <td>v1.8.0</td>
+                  <td>2023-04-10</td>
+                  <td><span class="status-badge in-progress">In Progress</span></td>
+                  <td>
+                    <button class="action-button"><i class="bi bi-eye"></i></button>
+                    <button class="action-button"><i class="bi bi-pencil"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>DEP-003</td>
+                  <td>Royal Air Maroc</td>
+                  <td>Booking System</td>
+                  <td>v3.2.1</td>
+                  <td>2023-04-08</td>
+                  <td><span class="status-badge pending">Pending</span></td>
+                  <td>
+                    <button class="action-button"><i class="bi bi-eye"></i></button>
+                    <button class="action-button"><i class="bi bi-pencil"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>DEP-004</td>
+                  <td>OCP Group</td>
+                  <td>Analytics Dashboard</td>
+                  <td>v2.0.0</td>
+                  <td>2023-04-05</td>
+                  <td><span class="status-badge completed">Completed</span></td>
+                  <td>
+                    <button class="action-button"><i class="bi bi-eye"></i></button>
+                    <button class="action-button"><i class="bi bi-pencil"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>DEP-005</td>
+                  <td>Attijariwafa Bank</td>
+                  <td>Mobile Banking</td>
+                  <td>v4.1.2</td>
+                  <td>2023-04-01</td>
+                  <td><span class="status-badge completed">Completed</span></td>
+                  <td>
+                    <button class="action-button"><i class="bi bi-eye"></i></button>
+                    <button class="action-button"><i class="bi bi-pencil"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <div class="pagination">
+              <button class="pagination-button"><i class="bi bi-chevron-left"></i></button>
+              <button class="pagination-button active">1</button>
+              <button class="pagination-button">2</button>
+              <button class="pagination-button">3</button>
+              <button class="pagination-button"><i class="bi bi-chevron-right"></i></button>
+            </div>
+            <div class="items-per-page">
+              <span>Items per page:</span>
+              <select>
+                <option>5</option>
+                <option>10</option>
+                <option>20</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module Overview Section -->
+      <div class="dashboard-section">
+        <div class="section-header">
+          <h2>Module Overview</h2>
+          <button class="view-all-button">View All</button>
+        </div>
+        <div class="section-content">
+          <div class="module-grid">
+            <div class="module-card">
+              <div class="module-header">
+                <div class="module-icon">
+                  <i class="bi bi-credit-card-2-front"></i>
+                </div>
+                <div class="module-title">
+                  <h4>Payment Processing</h4>
+                  <span class="module-badge">Finance</span>
+                </div>
+              </div>
+              <div class="module-stats">
+                <div class="module-stat">
+                  <span class="stat-value">4</span>
+                  <span class="stat-label">Versions</span>
+                </div>
+                <div class="module-stat">
+                  <span class="stat-value">12</span>
+                  <span class="stat-label">Features</span>
+                </div>
+                <div class="module-stat">
+                  <span class="stat-value">2</span>
+                  <span class="stat-label">Products</span>
+                </div>
+              </div>
+            </div>
+            <div class="module-card">
+              <div class="module-header">
+                <div class="module-icon">
+                  <i class="bi bi-shield-lock"></i>
+                </div>
+                <div class="module-title">
+                  <h4>User Authentication</h4>
+                  <span class="module-badge">Security</span>
+                </div>
+              </div>
+              <div class="module-stats">
+                <div class="module-stat">
+                  <span class="stat-value">5</span>
+                  <span class="stat-label">Versions</span>
+                </div>
+                <div class="module-stat">
+                  <span class="stat-value">8</span>
+                  <span class="stat-label">Features</span>
+                </div>
+                <div class="module-stat">
+                  <span class="stat-value">4</span>
+                  <span class="stat-label">Products</span>
+                </div>
+              </div>
+            </div>
+            <div class="module-card">
+              <div class="module-header">
+                <div class="module-icon">
+                  <i class="bi bi-graph-up"></i>
+                </div>
+                <div class="module-title">
+                  <h4>Reporting Engine</h4>
+                  <span class="module-badge">Analytics</span>
+                </div>
+              </div>
+              <div class="module-stats">
+                <div class="module-stat">
+                  <span class="stat-value">3</span>
+                  <span class="stat-label">Versions</span>
+                </div>
+                <div class="module-stat">
+                  <span class="stat-value">15</span>
+                  <span class="stat-label">Features</span>
+                </div>
+                <div class="module-stat">
+                  <span class="stat-value">3</span>
+                  <span class="stat-label">Products</span>
+                </div>
+              </div>
+            </div>
+            <div class="module-card">
+              <div class="module-header">
+                <div class="module-icon">
+                  <i class="bi bi-bell"></i>
+                </div>
+                <div class="module-title">
+                  <h4>Notification System</h4>
+                  <span class="module-badge">Communication</span>
+                </div>
+              </div>
+              <div class="module-stats">
+                <div class="module-stat">
+                  <span class="stat-value">2</span>
+                  <span class="stat-label">Versions</span>
+                </div>
+                <div class="module-stat">
+                  <span class="stat-value">6</span>
+                  <span class="stat-label">Features</span>
+                </div>
+                <div class="module-stat">
+                  <span class="stat-value">5</span>
+                  <span class="stat-label">Products</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts" src="./home.component.ts"></script>
+
+<style>
+/* Dashboard Styles */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+/* Sidebar Styles */
+.dashboard-sidebar {
+  width: 250px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  z-index: 100;
+}
+
+.sidebar-header {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+}
+
+.sidebar-logo {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.sidebar-menu {
+  flex: 1;
+  padding: 20px 0;
+}
+
+.menu-item {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.menu-item:hover {
+  background-color: #f5f5f5;
+  color: #4361ee;
+}
+
+.menu-item.active {
+  background-color: #f0f4ff;
+  color: #4361ee;
+  border-left: 3px solid #4361ee;
+}
+
+.menu-item i {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.sidebar-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.user-name {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.user-role {
+  margin: 0;
+  font-size: 12px;
+  color: #777;
+}
+
+/* Dashboard Content Styles */
+.dashboard-content {
+  flex: 1;
+  margin-left: 20px;
+  padding: 20px;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.search-container {
+  position: relative;
+  margin-right: 15px;
+}
+
+.search-input {
+  padding: 8px 15px 8px 35px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 250px;
+}
+
+.search-container i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+}
+
+.notification-icon {
+  position: relative;
+  cursor: pointer;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #ff4757;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Stats Cards Styles */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+}
+
+.stat-icon i {
+  font-size: 24px;
+  color: white;
+}
+
+.product-icon {
+  background-color: #4361ee;
+}
+
+.client-icon {
+  background-color: #3bc9db;
+}
+
+.deployment-icon {
+  background-color: #f03e3e;
+}
+
+.module-icon {
+  background-color: #fab005;
+}
+
+.stat-details h3 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.stat-details p {
+  margin: 5px 0 0;
+  color: #777;
+  font-size: 14px;
+}
+
+/* Dashboard Section Styles */
+.dashboard-section {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.view-all-button {
+  padding: 6px 12px;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-button {
+  display: flex;
+  align-items: center;
+  padding: 8px 15px;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.filter-button i {
+  margin-right: 5px;
+}
+
+/* Product Cards Styles */
+.product-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.product-card {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.product-card .product-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}
+
+.product-card .product-icon i {
+  font-size: 20px;
+  color: white;
+}
+
+.product-info h4 {
+  margin: 0 0 5px;
+  font-size: 16px;
+}
+
+.product-info p {
+  margin: 0 0 5px;
+  font-size: 12px;
+  color: #777;
+}
+
+.product-status {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.product-status.active {
+  background-color: #e6f7ee;
+  color: #0ca678;
+}
+
+/* Client List Styles */
+.client-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.client-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+}
+
+.client-rank {
+  width: 24px;
+  height: 24px;
+  background-color: #4361ee;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  margin-right: 15px;
+}
+
+.client-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 15px;
+}
+
+.client-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.client-info {
+  flex: 1;
+}
+
+.client-info h4 {
+  margin: 0 0 5px;
+  font-size: 16px;
+}
+
+.client-info p {
+  margin: 0;
+  font-size: 12px;
+  color: #777;
+}
+
+.client-stats {
+  display: flex;
+  gap: 15px;
+}
+
+.client-stats .stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #777;
+}
+
+/* Table Styles */
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.data-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.completed {
+  background-color: #e6f7ee;
+  color: #0ca678;
+}
+
+.in-progress {
+  background-color: #e7f5ff;
+  color: #1c7ed6;
+}
+
+.pending {
+  background-color: #fff9db;
+  color: #f59f00;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  color: #777;
+  cursor: pointer;
+  padding: 5px;
+  margin-right: 5px;
+}
+
+.action-button:hover {
+  color: #4361ee;
+}
+
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+}
+
+.pagination-button {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.pagination-button.active {
+  background-color: #4361ee;
+  color: white;
+  border-color: #4361ee;
+}
+
+.items-per-page {
+  display: flex;
+  align-items: center;
+}
+
+.items-per-page span {
+  margin-right: 10px;
+  font-size: 14px;
+  color: #777;
+}
+
+.items-per-page select {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Module Grid Styles */
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.module-card {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.module-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.module-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background-color: #4361ee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}
+
+.module-icon i {
+  font-size: 20px;
+  color: white;
+}
+
+.module-title h4 {
+  margin: 0 0 5px;
+  font-size: 16px;
+}
+
+.module-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  background-color: #e7f5ff;
+  color: #1c7ed6;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.module-stats {
+  display: flex;
+  justify-content: space-between;
+}
+
+.module-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+  .product-cards,
+  .module-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .stats-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-sidebar {
+    width: 70px;
+  }
+
+  .sidebar-header h3,
+  .menu-item span,
+  .user-details {
+    display: none;
+  }
+
+  .dashboard-content {
+    margin-left: 70px;
+  }
+
+  .stats-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .product-cards,
+  .module-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .client-stats {
+    display: none;
+  }
+}
+</style>

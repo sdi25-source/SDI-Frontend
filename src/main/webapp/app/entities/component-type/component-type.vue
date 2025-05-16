@@ -6,7 +6,7 @@
           @click="showAddRow = true"
           id="jh-create-entity"
           data-cy="entityCreateButton"
-          class="btn btn-primary btn-sm mr-3"
+          class="button button-primary btn-sm mr-3"
           :disabled="showAddRow"
         >
           <span v-text="t$('global.new')"></span>
@@ -368,6 +368,29 @@
 <script lang="ts" src="./component-type.component.ts"></script>
 
 <style scoped>
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+}
+
+.button-primary {
+  background-color: #0c2d57;
+  color: white;
+  border-color: #0c2d57;
+}
+
+.button-primary:hover {
+  background-color: #26538a;
+}
+
 .component-type-container {
   padding: 1.5rem;
 }
