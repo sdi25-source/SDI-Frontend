@@ -82,4 +82,17 @@ export default class ProductDeployementDetailService {
         });
     });
   }
+  // À ajouter dans product-deployement-detail.service.ts
+  public findByDeploymentId(deploymentId: number): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      axios
+        .get(`${baseApiUrl}?productDeployementId.equals=${deploymentId}`)
+        .then(res => {
+          resolve(res);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
 }

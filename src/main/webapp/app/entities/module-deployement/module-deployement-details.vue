@@ -48,9 +48,9 @@
               <router-link
                 :to="{
                   name: 'ProductDeployementDetailView',
-                  params: { productDeployementDetailId: moduleDeployement.productDeployementDetail.id },
+                  params: { productDeployementDetailId: moduleDeployement.productDeployementDetail.notes },
                 }"
-                >{{ moduleDeployement.productDeployementDetail.id }}</router-link
+                >{{ moduleDeployement.productDeployementDetail.notes }}</router-link
               >
             </div>
           </dd>

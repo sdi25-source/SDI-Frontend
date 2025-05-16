@@ -155,7 +155,7 @@
               <template v-if="moduleDeployement.isEditing">
                 <select v-model="moduleDeployement.productDeployementDetail" class="form-control-borderless">
                   <option v-for="detail in productDeployementDetails" :key="detail.id" :value="detail">
-                    {{ detail.id }}
+                    {{ detail.notes }}
                   </option>
                 </select>
               </template>
@@ -167,7 +167,7 @@
                       params: { productDeployementDetailId: moduleDeployement.productDeployementDetail.id },
                     }"
                   >
-                    {{ moduleDeployement.productDeployementDetail.id }}
+                    {{ moduleDeployement.productDeployementDetail.notes }}
                   </router-link>
                 </div>
               </template>
@@ -260,7 +260,7 @@
               <select v-model="newModuleDeployement.productDeployementDetail" class="form-control-borderless">
                 <option value="" disabled selected>Sélectionner un détail</option>
                 <option v-for="detail in productDeployementDetails" :key="detail.id" :value="detail">
-                  {{ detail.id }}
+                  {{ detail.notes }}
                 </option>
               </select>
             </td>
@@ -431,7 +431,7 @@
                     <span class="info-label">Détail du déploiement:</span>
                     <span class="info-value">
                       <router-link v-if="moduleDeployement.productDeployementDetail" :to="{ name: 'ProductDeployementDetailView', params: { productDeployementDetailId: moduleDeployement.productDeployementDetail.id } }">
-                        {{ moduleDeployement.productDeployementDetail.id }}
+                        {{ moduleDeployement.productDeployementDetail.notes }}
                       </router-link>
                       <span v-else>-</span>
                     </span>
@@ -475,7 +475,7 @@
                 <select v-model="newModuleDeployement.productDeployementDetail" class="form-control">
                   <option value="" disabled selected>Sélectionner un détail</option>
                   <option v-for="detail in productDeployementDetails" :key="detail.id" :value="detail">
-                    {{ detail.id }}
+                    {{ detail.notes }}
                   </option>
                 </select>
               </div>
