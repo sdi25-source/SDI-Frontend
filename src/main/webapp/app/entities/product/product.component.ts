@@ -851,6 +851,8 @@ export default defineComponent({
           moduleVersions: versionModuleVersions.value,
         };
 
+        console.log(versionData);
+
         // Créer la version
         await productVersionService().create(versionData);
 

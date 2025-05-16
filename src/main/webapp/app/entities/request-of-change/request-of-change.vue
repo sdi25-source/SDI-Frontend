@@ -120,7 +120,7 @@
                       <div class="form-check">
                         <input
                           class="form-check-input"
-                          type="checkbox"
+                          type="radio"
                           :id="`request-${request.id}`"
                           :checked="selectedRequest && selectedRequest.id === request.id"
                           @change="toggleRequestSelection(request)"
@@ -363,7 +363,10 @@
                     <p class="mb-3">{{ selectedRequest.client ? selectedRequest.client.code : '-' }}</p>
 
                     <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.productVersion')"></h6>
-                    <p class="mb-0">{{ selectedRequest.productVersion ? selectedRequest.productVersion.version : '-' }}</p>
+                    <p class="mb-0">
+                      {{ selectedRequest.productVersion?.product?.name }}{{ ' - '
+                      }}{{ selectedRequest.productVersion ? selectedRequest.productVersion.version : '-' }}
+                    </p>
                   </div>
                   <div class="col-md-6">
                     <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.customisationLevel')"></h6>
@@ -572,17 +575,13 @@
               </div>
               <div class="form-group">
                 <label class="form-control-label" for="request-of-change-productVersion">Product Version</label>
-                <select
-                  class="form-control form-control-sm"
-                  id="request-of-change-productVersion"
-                  data-cy="productVersion"
-                  name="productVersion"
-                  v-model="newRequest.productVersion"
-                >
-                  <option :value="null"></option>
-                  <option :value="productVersionOption" v-for="productVersionOption in productVersions" :key="productVersionOption.id">
-                    {{ productVersionOption.product?.name }} {{ ' ' }} {{ productVersionOption.version }}
-                  </option>
+                <select v-model="newRequest.productVersion" class="form-select">
+                  <option value="" disabled>Sélectionnez une version de produit</option>
+                  <optgroup v-for="group in groupedProductVersions" :key="group.product.id" :label="group.product.name">
+                    <option v-for="version in group.versions" :key="version.id" :value="version">
+                      {{ version.version }}
+                    </option>
+                  </optgroup>
                 </select>
               </div>
               <div class="form-group">
@@ -605,20 +604,18 @@
                 </select>
               </div>
               <div class="form-group">
-                <label v-text="t$('sdiFrontendApp.requestOfChange.moduleVersion')" for="request-of-change-moduleVersion"></label>
-                <select
-                  class="form-control form-control-sm"
-                  id="request-of-change-moduleVersions"
-                  data-cy="moduleVersion"
-                  multiple
-                  name="moduleVersion"
-                  v-model="newRequest.moduleVersions"
-                >
-                  <option :value="moduleVersionOption" v-for="moduleVersionOption in moduleVersions" :key="moduleVersionOption.id">
-                    {{ moduleVersionOption?.module?.name }} {{ ' - ' }} {{ moduleVersionOption.version }}
+                <label>Versions des modules</label>
+                <select v-model="newRequest.moduleVersions" multiple class="form-select" :disabled="!newRequest.productVersion">
+                  <option v-if="!newRequest.productVersion" disabled>Sélectionnez d'abord une version de produit</option>
+                  <option v-else-if="filteredModuleVersions.length === 0" disabled>
+                    Aucun module disponible pour cette version de produit
+                  </option>
+                  <option v-for="moduleVersion in filteredModuleVersions" :key="moduleVersion.id" :value="moduleVersion">
+                    {{ moduleVersion.module ? moduleVersion.module.name : '' }} - {{ moduleVersion.version }}
                   </option>
                 </select>
               </div>
+
               <div class="form-group">
                 <label
                   class="form-control-label"

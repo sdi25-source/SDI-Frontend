@@ -2,7 +2,8 @@
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="header-container w-100 px-4 d-flex align-items-center justify-content-between shadow">
       <router-link to="/" class="logo d-flex align-items-center me-auto me-xl-0">
-        <h1 class="pl-5">
+        <!--        <img src="../../../content/images/SDILogo.png" alt="Logo" class="logo-img" />-->
+        <h1>
           <strong>{{ t$('global.title') }}</strong>
         </h1>
       </router-link>
@@ -162,6 +163,30 @@
 .no-link-style:active {
   text-decoration: none;
   color: inherit;
+}
+
+/* Ajout du style pour le logo */
+.logo-img {
+  height: 180px; /* Logo plus grand pour correspondre à la hauteur du titre */
+  width: 60px;
+  margin-right: -10px; /* Espace plus petit entre le logo et le titre */
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.logo h1 {
+  margin-bottom: 0; /* Supprime la marge en bas du titre */
+  margin-left: 0; /* Supprime la marge à gauche du titre */
+  padding-left: 0; /* Supprime le padding à gauche du titre */
+  line-height: 1; /* Ajuste la hauteur de ligne */
+  display: inline-flex;
+  align-items: center;
 }
 
 .dropdown.active > a {

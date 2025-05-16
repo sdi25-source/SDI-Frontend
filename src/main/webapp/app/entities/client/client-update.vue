@@ -319,13 +319,12 @@
               <label class="label-c" v-text="t$('sdiFrontendApp.client.country')"></label>
               <div class="checkbox-group">
                 <div v-for="country in countries" :key="country.id" class="profile-checkbox">
-                  <b-form-checkbox
+                  <input
                     :id="'country-' + country.id"
                     :value="client.country && country.id === client.country.id ? client.country : country"
                     v-model="client.country"
-                  >
-                    <span class="authority-label">{{ country.countryname }}</span>
-                  </b-form-checkbox>
+                    type="radio"
+                  /><span class="authority-label">{{ country.countryname }}</span>
                 </div>
               </div>
             </div>
@@ -334,13 +333,12 @@
               <label class="label-c" v-text="t$('sdiFrontendApp.client.size')"></label>
               <div class="checkbox-group">
                 <div v-for="size in clientSizes" :key="size.id" class="profile-checkbox">
-                  <b-form-checkbox
+                  <input
                     :id="'size-' + size.id"
                     :value="client.size && size.id === client.size.id ? client.size : size"
                     v-model="client.size"
-                  >
-                    <span class="authority-label">{{ size.sizeName }}</span>
-                  </b-form-checkbox>
+                    type="radio"
+                  /><span class="authority-label">{{ size.sizeName }}</span>
                 </div>
               </div>
             </div>
@@ -349,13 +347,12 @@
               <label class="label-c" v-text="t$('sdiFrontendApp.client.clientType')"></label>
               <div class="checkbox-group">
                 <div v-for="clientType in clientTypes" :key="clientType.id" class="profile-checkbox">
-                  <b-form-checkbox
+                  <input
                     :id="'size-' + clientType.id"
                     :value="client.clientType && clientType.id === client.clientType.id ? client.clientType : clientType"
                     v-model="client.clientType"
-                  >
-                    <span class="authority-label">{{ clientType.type }}</span>
-                  </b-form-checkbox>
+                    type="radio"
+                  /><span class="authority-label">{{ clientType.type }}</span>
                 </div>
               </div>
             </div>

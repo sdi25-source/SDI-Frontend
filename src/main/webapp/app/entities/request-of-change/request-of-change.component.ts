@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, computed, reactive, nextTick, inject } from 'vue';
+import { defineComponent, ref, onMounted, computed, reactive, nextTick, inject, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { RequestOfChange } from '@/shared/model/request-of-change.model';
@@ -222,11 +222,20 @@ export default defineComponent({
     };
 
     // Toggle request selection with checkbox
-    const toggleRequestSelection = request => {
+    const toggleRequestSelection = async request => {
       if (selectedRequest.value && selectedRequest.value.id === request.id) {
         selectedRequest.value = null;
       } else {
         selectedRequest.value = request;
+        const res = await productVersionService.retrieve();
+        const matchedVersion = res.data.find(pv => pv.id === request.productVersion?.id);
+
+        if (matchedVersion) {
+          request.productVersion.product = matchedVersion.product;
+        }
+
+        console.log(request.productVersion);
+
         currentStep.value = request.status;
       }
     };
@@ -408,7 +417,123 @@ export default defineComponent({
       updateTabStyles();
     });
 
+    // Fonction pour regrouper les versions par produit
+    const groupedProductVersions = computed(() => {
+      const grouped = {};
+
+      productVersions.value.forEach(version => {
+        if (!version.product) return;
+        const productId = version.product.id;
+        if (!grouped[productId]) {
+          grouped[productId] = {
+            product: version.product,
+            versions: [],
+          };
+        }
+
+        grouped[productId].versions.push(version);
+        console.log(grouped);
+      });
+      return Object.values(grouped);
+    });
+
+    // Filtrer les moduleVersions en fonction du productVersion sélectionné
+    const filteredModuleVersions = computed(() => {
+      if (!newRequest.value.productVersion || !newRequest.value.productVersion.id) {
+        return [];
+      }
+
+      if (
+        newRequest.value.productVersion.moduleVersions &&
+        Array.isArray(newRequest.value.productVersion.moduleVersions) &&
+        newRequest.value.productVersion.moduleVersions.length > 0
+      ) {
+        console.log('Module versions disponibles:', newRequest.value.productVersion.moduleVersions);
+
+        // Enrichir les moduleVersions avec les données complètes si nécessaire
+        // Cette opération ne doit pas être effectuée dans un computed car elle modifie l'état
+        // Déplacée dans une fonction séparée appelée lors du changement de productVersion
+
+        return newRequest.value.productVersion.moduleVersions;
+      } else {
+        console.log('Aucun moduleVersion trouvé pour cette version de produit');
+        return [];
+      }
+    });
+
+    // Fonction pour enrichir les moduleVersions avec les données complètes
+    const enrichModuleVersions = () => {
+      if (
+        !newRequest.value.productVersion ||
+        !newRequest.value.productVersion.moduleVersions ||
+        !Array.isArray(newRequest.value.productVersion.moduleVersions) ||
+        newRequest.value.productVersion.moduleVersions.length === 0
+      ) {
+        return;
+      }
+
+      // Enrichir chaque moduleVersion avec les données complètes disponibles
+      newRequest.value.productVersion.moduleVersions = newRequest.value.productVersion.moduleVersions.map(mv => {
+        const full = moduleVersions.value.find(opt => opt.id === mv.id);
+        return full ? full : mv;
+      });
+    };
+
+    const loadModuleVersionsForProductVersion = async productVersionId => {
+      if (!productVersionId) return;
+
+      try {
+        // Appel à l'API pour récupérer la productVersion avec ses moduleVersions
+        const response = await productVersionService.find(productVersionId);
+        if (response && response.data) {
+          // Si la réponse contient la productVersion complète
+          // Assurez-vous que les modules sont correctement chargés dans chaque moduleVersion
+          const productVersion = response.data;
+
+          // Si les moduleVersions existent mais n'ont pas leurs modules chargés,
+          // nous devons peut-être les charger séparément
+          if (productVersion.moduleVersions && productVersion.moduleVersions.length > 0) {
+            // Optionnel: charger les détails des modules si nécessaire
+            productVersion.moduleVersions = await loadModuleDetails(productVersion.moduleVersions);
+          }
+
+          // Mise à jour de la productVersion dans la requête
+          newRequest.value.productVersion = productVersion;
+        }
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
+    };
+
+    // Mettre à jour le watcher pour appeler enrichModuleVersions
+    const watchProductVersionChange = () => {
+      watch(
+        () => newRequest.value.productVersion,
+        newValue => {
+          // Réinitialiser les moduleVersions sélectionnés lorsque la productVersion change
+          if (newValue) {
+            newRequest.value.moduleVersions = [];
+
+            // Enrichir les moduleVersions si disponibles
+            enrichModuleVersions();
+
+            // Charger les moduleVersions associés à cette productVersion si nécessaire
+            if (newValue.id && (!newValue.moduleVersions || newValue.moduleVersions.length === 0)) {
+              loadModuleVersionsForProductVersion(newValue.id);
+            }
+          }
+        },
+        { immediate: true },
+      );
+    };
+
+    // Appelez cette fonction dans le setup()
+    watchProductVersionChange();
+
     return {
+      filteredModuleVersions,
+      loadModuleVersionsForProductVersion,
+      groupedProductVersions,
       requestOfChanges,
       productVersions,
       clients,
