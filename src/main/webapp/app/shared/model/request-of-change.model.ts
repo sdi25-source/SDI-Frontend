@@ -16,6 +16,7 @@ export interface IRequestOfChange {
   client?: IClient | null;
   moduleVersions?: IModuleVersion[] | null;
   customisationLevel?: ICustomisationLevel | null;
+  done?: boolean | false;
 }
 
 export class RequestOfChange implements IRequestOfChange {
@@ -31,5 +32,6 @@ export class RequestOfChange implements IRequestOfChange {
     public client?: IClient | null,
     public moduleVersions?: IModuleVersion[] | null,
     public customisationLevel?: ICustomisationLevel | null,
+    public done?: boolean | false,
   ) {}
 }

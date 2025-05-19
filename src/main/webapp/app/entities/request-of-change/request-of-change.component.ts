@@ -284,6 +284,7 @@ export default defineComponent({
       newRequest.value.status = 'PENDING';
       newRequest.value.createDate = new Date().toISOString().split('T')[0];
       newRequest.value.moduleVersions = [];
+      newRequest.value.done = false;
       showCreateModal.value = true;
     };
 

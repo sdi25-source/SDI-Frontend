@@ -387,20 +387,26 @@
                     </td>
                   </tr>
                   <template v-for="(version, index) in paginatedVersions" :key="index">
-                    <tr
-                      :class="{ 'selected-row': selectedVersion && selectedVersion.id === version.id }"
-                      @click="toggleVersionSelection(version)"
-                      style="cursor: pointer"
-                    >
+                    <tr>
                       <td class="text-center" @click.stop>
-                        <div class="form-check">
-                          <input
-                            class="form-check-input"
-                            type="radio"
-                            :id="`version-${index}`"
-                            :checked="selectedVersion && selectedVersion.id === version.id"
-                            @change="toggleVersionSelection(version)"
-                          />
+                        <div
+                          class="icon-container expand-container mr-2"
+                          @click.stop="toggleVersionModules(version.id)"
+                          title="Voir les modules de cette version"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            fill="currentColor"
+                            :class="{ expanded: expandedVersions.has(version.id) }"
+                            viewBox="0 0 16 16"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
+                            />
+                          </svg>
                         </div>
                       </td>
                       <td>
@@ -442,7 +448,7 @@
                         </template>
                         <template v-else>
                           <span class="text-truncate" style="max-width: 200px" :title="version.notes">
-                            {{ version.notes || '-' }}
+                            {{ version.notes || 'No Description available' }}
                           </span>
                         </template>
                       </td>
@@ -544,80 +550,72 @@
                             </div>
                           </template>
                         </div>
-                        <div
-                          class="icon-container expand-container mr-2"
-                          @click.stop="toggleVersionModules(version.id)"
-                          title="Voir les modules de cette version"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            fill="currentColor"
-                            :class="{ expanded: expandedVersions.has(version.id) }"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
-                            />
-                          </svg>
-                        </div>
                       </td>
                     </tr>
-
-                    <!-- Modules de la version (expandable row) -->
-                    <tr v-if="expandedVersions.has(version.id)" class="modules-row">
+                    <tr v-if="paginatedVersions.length === 0 && !selectedVersion">
+                      <td colspan="6" class="text-center">
+                        <span>No Module version available</span>
+                      </td>
+                    </tr>
+                    <!-- Modules de la version (redesigned expandable row) -->
+                    <tr v-if="expandedVersions.has(version.id)">
                       <td colspan="5">
-                        <div class="p-3 bg-light rounded">
-                          <div v-if="version.moduleVersions && version.moduleVersions.length > 0">
-                            <div class="table-responsive">
-                              <table class="table table-sm table-bordered mb-0">
-                                <thead class="thead-light">
-                                  <tr>
-                                    <th>Module</th>
-                                    <th>Version</th>
-                                    <th>Root</th>
-                                    <th>Features</th>
-                                    <th>Description</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr v-for="(moduleVersion, idx) in version.moduleVersions" :key="idx">
-                                    <td>{{ moduleVersion.module?.name }}</td>
-                                    <td>{{ moduleVersion.version }}</td>
-                                    <td>{{ moduleVersion.module?.name }} {{ ' - ' }} {{ moduleVersion.root?.version }}</td>
-                                    <td>
-                                      <div
-                                        class="alert alert-primary d-inline-flex align-items-center py-1 px-2 btn-sm"
-                                        style="font-size: 0.9rem; line-height: 1; gap: 0.25rem; margin-top: 0px; margin-bottom: 0px"
-                                        @click="openModuleFeaturesModal(moduleVersion)"
-                                        title="Voir les features du module version"
-                                      >
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          width="14"
-                                          height="14"
-                                          fill="currentColor"
-                                          class="bi bi-layers"
-                                          viewBox="0 0 512 512"
-                                        >
-                                          <path
-                                            d="M345 39.1L472.8 168.4c52.4 53 52.4 138.2 0 191.2L360.8 472.9c-9.3 9.4-24.5 9.5-33.9 .2s-9.5-24.5-.2-33.9L438.6 325.9c33.9-34.3 33.9-89.4 0-123.7L310.9 72.9c-9.3-9.4-9.2-24.6 .2-33.9s24.6-9.2 33.9 .2zM0 229.5L0 80C0 53.5 21.5 32 48 32l149.5 0c17 0 33.3 6.7 45.3 18.7l168 168c25 25 25 65.5 0 90.5L277.3 442.7c-25 25-65.5 25-90.5 0l-168-168C6.7 262.7 0 246.5 0 229.5zM144 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"
-                                          />
-                                        </svg>
-                                        Features
-                                      </div>
-                                    </td>
-                                    <td class="text-truncate" style="max-width: 250px" :title="moduleVersion.description">
-                                      {{ moduleVersion.description || '-' }}
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
+                        <div class="card">
+                          <div class="card-header">
+                            <div class="card-title-s">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon"
+                              >
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                              </svg>
+                              <span>Modules in this version</span>
                             </div>
                           </div>
-                          <div v-else class="text-center py-2 text-muted">No module for this version</div>
+                          <div class="card-body-m">
+                            <ul class="component-list" v-if="version.moduleVersions && version.moduleVersions.length > 0">
+                              <li v-for="(moduleVersion, idx) in version.moduleVersions" :key="idx" class="component-item alert-info">
+                                <div class="component-info-s d-flex align-items-center">
+                                  <span class="component-root ml-2">
+                                    {{ getModuleVersionWithModuleCached(moduleVersion.id)?.module?.name }}
+                                    {{ getModuleVersionWithModuleCached(moduleVersion.id)?.version }}
+                                  </span>
+                                </div>
+                                <div class="action-buttons">
+                                  <div
+                                    class="button-icon features-button"
+                                    @click="openModuleFeaturesModal(moduleVersion)"
+                                    title="Voir les features du module version"
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="14"
+                                      height="14"
+                                      fill="currentColor"
+                                      viewBox="0 0 512 512"
+                                    >
+                                      <path
+                                        d="M345 39.1L472.8 168.4c52.4 53 52.4 138.2 0 191.2L360.8 472.9c-9.3 9.4-24.5 9.5-33.9 .2s-9.5-24.5-.2-33.9L438.6 325.9c33.9-34.3 33.9-89.4 0-123.7L310.9 72.9c-9.3-9.4-9.2-24.6 .2-33.9s24.6-9.2 33.9 .2zM0 229.5L0 80C0 53.5 21.5 32 48 32l149.5 0c17 0 33.3 6.7 45.3 18.7l168 168c25 25 25 65.5 0 90.5L277.3 442.7c-25 25-65.5 25-90.5 0l-168-168C6.7 262.7 0 246.5 0 229.5zM144 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"
+                                      />
+                                    </svg>
+                                    <span class="pl-2">Features</span>
+                                  </div>
+                                </div>
+                              </li>
+                            </ul>
+                            <div v-else class="empty-message">No modules for this version</div>
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -659,13 +657,29 @@
                             />
                           </svg>
                         </div>
+                        <div class="icon-container settings-container" @click="openNewVersionSettings" title="Paramètres">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            fill="currentColor"
+                            class="bi bi-gear"
+                            viewBox="0 0 16 16"
+                          >
+                            <path
+                              d="M8 4.754a3.246 3.246 0 1 0 0 6.492a3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"
+                            />
+                            <path
+                              d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291a1.873 1.873 0 0 0-1.116-2.693l-.318-.094c-.835-.246-.835-1.428 0-1.674l.319-.094a1.873 1.873 0 0 0 1.115-2.692l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"
+                            />
+                          </svg>
+                        </div>
                       </div>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-
             <!-- Modules Tab -->
             <div v-if="activeTabIndex === 1" class="modules-tab">
               <div v-if="!selectedVersion" class="d-flex justify-content-between mb-3">
@@ -1272,7 +1286,7 @@
                     <rect x="14" y="14" width="7" height="7"></rect>
                     <rect x="3" y="14" width="7" height="7"></rect>
                   </svg>
-                  <span>Available modules</span>
+                  <span>Modules Version</span>
                 </div>
                 <button
                   class="button"
@@ -1892,6 +1906,16 @@
 <script lang="ts" src="./product.component.ts"></script>
 
 <style scoped>
+.component-info-s {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.component-version,
+.component-root {
+  margin-left: 8px;
+}
 /* Style général pour la ligne contenant les modules */
 .modules-row td {
   padding: 0;
@@ -2161,11 +2185,24 @@ tr:not(.add-row):hover {
   color: #0f172a;
 }
 
+.card-title-s {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #131f3a;
+}
+.card-body-m {
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
 .card-body {
   padding: 1rem;
   flex: 1;
   overflow-y: auto;
-  max-height: 500px;
+  max-height: 900px;
 }
 
 .button {

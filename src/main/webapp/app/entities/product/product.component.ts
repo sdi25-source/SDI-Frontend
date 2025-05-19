@@ -9,6 +9,8 @@ import InfraComponentVersionService from '@/entities/infra-component-version/inf
 import ProductLineService from '@/entities/product-line/product-line.service';
 import useDataUtils from '@/shared/data/data-utils.service';
 import { useAlertService } from '@/shared/alert/alert.service';
+import ComponentTypeService from '@/entities/component-type/component-type.service.ts';
+import InfraComponentService from '@/entities/infra-component/infra-component.service.ts';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -22,6 +24,8 @@ export default defineComponent({
     const moduleVersionService = inject('moduleVersionService', () => new ModuleVersionService());
     const featureService = inject('featureService', () => new FeatureService());
     const infraComponentVersionService = inject('infraComponentVersionService', () => new InfraComponentVersionService());
+    const componentTypeService = inject('componentTypeService', () => new ComponentTypeService());
+    const infraComponentService = inject('infraComponentService', () => new InfraComponentService());
     const productLineService = inject('productLineService', () => new ProductLineService());
     const alertService = inject('alertService', () => useAlertService(), true);
 
@@ -58,6 +62,8 @@ export default defineComponent({
     // Options pour les selects
     const productLineOptions = ref([]);
     const infraComponentVersionOptions = ref([]);
+    const infraComponentOptions = ref<IInfraComponent[]>([]);
+    const componentTypeOptions = ref<IComponentType[]>([]);
     const moduleOptions = ref([]);
     const moduleVersionOptions = ref([]);
     const selectedProductLineIds = ref([]);
@@ -208,14 +214,40 @@ export default defineComponent({
     // Get filtered components based on selected version
     const getFilteredInfraComponents = computed(() => {
       if (!selectedProduct.value) return [];
-      if (selectedVersion.value) {
-        console.log('id', selectedVersion.value.id);
-        // Return components specific to the selected version
-        return selectedVersion.value.infraComponentVersions || [];
-      } else {
-        // Return all components for the product
-        return selectedProduct.value.infraComponentVersions || [];
-      }
+
+      // Récupérer la liste brute des composants (IDs ou objets partiels)
+      const rawComponents = selectedVersion.value
+        ? selectedVersion.value.infraComponentVersions || []
+        : selectedProduct.value.infraComponentVersions || [];
+
+      return rawComponents
+        .map(component => {
+          // 1. Récupérer l'ID réel
+          const componentId = typeof component === 'number' ? component : component.id;
+
+          // 2. Trouver la version complète
+          const fullComponentVersion = infraComponentVersionOptions.value.find(icv => icv.id === componentId);
+
+          if (!fullComponentVersion) return null;
+
+          // 3. Trouver le composant parent
+          const infraComponent = infraComponentOptions.value.find(ic => ic.id === fullComponentVersion.infraComponent?.id);
+
+          // 4. Trouver le type de composant
+          const componentType = componentTypeOptions.value.find(ct => ct.id === infraComponent?.componentType?.id);
+
+          // 5. Fusionner les données
+          return {
+            ...fullComponentVersion,
+            infraComponent: infraComponent
+              ? {
+                  ...infraComponent,
+                  componentType: componentType || null,
+                }
+              : null,
+          };
+        })
+        .filter(Boolean); // Filtrer les entrées non trouvées
     });
 
     // Get filtered modules based on selected version
@@ -285,6 +317,24 @@ export default defineComponent({
         const res = await infraComponentVersionService().retrieve();
         infraComponentVersionOptions.value = res.data;
         console.log(infraComponentVersionOptions.value);
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
+    };
+
+    const fetchInfraComponents = async () => {
+      try {
+        const res = await infraComponentService().retrieve();
+        infraComponentOptions.value = res.data;
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
+    };
+
+    const fetchComponentTypes = async () => {
+      try {
+        const res = await componentTypeService().retrieve();
+        componentTypeOptions.value = res.data;
       } catch (err) {
         alertService.showHttpError(err.response);
       }
@@ -1417,6 +1467,8 @@ export default defineComponent({
       await retrieveProducts();
       await fetchProductLineOptions();
       await fetchInfraComponentVersionOptions();
+      await fetchInfraComponents();
+      await fetchComponentTypes();
       await fetchModuleOptions();
       await fetchModuleVersionOptions();
 
@@ -1521,8 +1573,24 @@ export default defineComponent({
       };
     };
 
+    const getModuleVersionWithModuleCached = moduleVersionId => {
+      // 1. Trouver la version de module dans le cache
+      const moduleVersion = moduleVersionOptions.value.find(mv => mv.id === moduleVersionId);
+
+      if (!moduleVersion) return null;
+
+      // 2. Trouver le module associé dans le cache
+      const module = moduleOptions.value.find(m => m.id === moduleVersion.module?.id);
+
+      // 3. Fusionner les données
+      return {
+        ...moduleVersion,
+        module: module ? { ...module } : null,
+      };
+    };
     return {
       t$,
+      getModuleVersionWithModuleCached,
       newModuleInSettingsModal,
       showNewModuleForm,
       expandedVersions,
@@ -1555,6 +1623,8 @@ export default defineComponent({
       isEditingVersion,
       productLineOptions,
       infraComponentVersionOptions,
+      infraComponentOptions,
+      componentTypeOptions,
       moduleOptions,
       moduleVersionOptions,
       selectedProductLineIds,
@@ -1693,7 +1763,6 @@ export default defineComponent({
       returnToProductList,
       setHoveredIndex,
       setActiveTabIndex,
-
       dataUtils,
     };
   },

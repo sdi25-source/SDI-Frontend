@@ -203,7 +203,7 @@
                   </tr>
                   <tr v-if="getRequestsByStatus(status.value).length === 0">
                     <td colspan="8" class="text-center py-3">
-                      <span class="text-muted">Aucune demande de changement avec ce statut</span>
+                      <span class="text-muted">No request for a change with this status</span>
                     </td>
                   </tr>
                 </tbody>
@@ -362,7 +362,7 @@
                     <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.client')"></h6>
                     <p class="mb-3">{{ selectedRequest.client ? selectedRequest.client.code : '-' }}</p>
 
-                    <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.productVersion')"></h6>
+                    <h6 class="text-muted mb-2 small">Product Version</h6>
                     <p class="mb-0">
                       {{ selectedRequest.productVersion?.product?.name }}{{ ' - '
                       }}{{ selectedRequest.productVersion ? selectedRequest.productVersion.version : '-' }}
@@ -467,11 +467,27 @@
             </div>
             <div v-if="selectedRequest.status === 'COMPLETED'">
               <button
+                v-if="selectedRequest && !selectedRequest.done"
                 class="button button-primary btn-sm rounded-2"
-                v-if="selectedRequest && selectedRequest.status === 'COMPLETED'"
                 @click="openNewProductVersionPopup"
                 v-text="t$('sdiFrontendApp.requestOfChange.AddNewProduct')"
               ></button>
+              <div v-else class="alert alert-success d-inline-flex align-items-center py-1 px-2 btn-sm">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  class="bi bi-check-circle mr-1"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                  <path
+                    d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"
+                  />
+                </svg>
+                New product version already created
+              </div>
             </div>
             <div v-if="selectedRequest.status === 'REJECTED'">
               <button class="button button-secondary btn-sm rounded-2" @click="changeRequestStatus('PENDING')">
@@ -576,13 +592,54 @@
               <div class="form-group">
                 <label class="form-control-label" for="request-of-change-productVersion">Product Version</label>
                 <select v-model="newRequest.productVersion" class="form-select">
-                  <option value="" disabled>Sélectionnez une version de produit</option>
+                  <option value="" disabled>Select a product version</option>
                   <optgroup v-for="group in groupedProductVersions" :key="group.product.id" :label="group.product.name">
                     <option v-for="version in group.versions" :key="version.id" :value="version">
                       {{ version.version }}
                     </option>
                   </optgroup>
                 </select>
+              </div>
+              <div class="form-group">
+                <label>Modules versions</label>
+
+                <div v-if="!newRequest.productVersion" class="text-muted border rounded p-2 mt-2">First select a product version</div>
+
+                <div v-else-if="filteredModuleVersions.length === 0" class="text-muted border rounded p-2 mt-2">
+                  No module available for this product version
+                </div>
+
+                <div
+                  v-else
+                  class="border rounded p-3 mt-2"
+                  style="
+                    min-height: 100px;
+                    max-height: 300px;
+                    overflow-y: auto;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    justify-content: flex-start;
+                  "
+                >
+                  <div
+                    v-for="moduleVersion in filteredModuleVersions"
+                    :key="moduleVersion.id"
+                    class="form-check mb-1"
+                    style="display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start"
+                  >
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      :key="moduleVersion.id"
+                      :value="moduleVersion"
+                      v-model="newRequest.moduleVersions"
+                    />
+                    <label class="form-check-label">
+                      {{ moduleVersion.module ? moduleVersion.module.name : '' }} - {{ moduleVersion.version }}
+                    </label>
+                  </div>
+                </div>
               </div>
               <div class="form-group">
                 <label
@@ -603,19 +660,6 @@
                   </option>
                 </select>
               </div>
-              <div class="form-group">
-                <label>Versions des modules</label>
-                <select v-model="newRequest.moduleVersions" multiple class="form-select" :disabled="!newRequest.productVersion">
-                  <option v-if="!newRequest.productVersion" disabled>Sélectionnez d'abord une version de produit</option>
-                  <option v-else-if="filteredModuleVersions.length === 0" disabled>
-                    Aucun module disponible pour cette version de produit
-                  </option>
-                  <option v-for="moduleVersion in filteredModuleVersions" :key="moduleVersion.id" :value="moduleVersion">
-                    {{ moduleVersion.module ? moduleVersion.module.name : '' }} - {{ moduleVersion.version }}
-                  </option>
-                </select>
-              </div>
-
               <div class="form-group">
                 <label
                   class="form-control-label"
@@ -738,11 +782,11 @@
         </div>
 
         <div class="modal-body">
-          <p>Êtes-vous sûr de vouloir supprimer cette demande de changement ?</p>
+          <p>Are you sure you want to delete this request for change ?</p>
           <p v-if="requestToDelete">
             <strong>{{ requestToDelete.title }}</strong>
           </p>
-          <p>Cette action est irréversible.</p>
+          <p>This action is irreversible.</p>
         </div>
 
         <div class="modal-footer">

@@ -17,11 +17,9 @@
               <p class="mb-4 mb-md-5" v-text="t$('home.desc')"></p>
             </div>
           </div>
-
           <div class="col-lg-6">
             <div class="hero-image" data-aos="zoom-out" data-aos-delay="300">
               <img src="../../../content/images/hero-img.png" alt="Hero Image" class="img-fluid" />
-
               <div class="customers-badge">
                 <div class="customer-avatars">
                   <img src="../../../content/images/avatar-1.webp" alt="Customer 1" class="avatar" />
@@ -36,9 +34,7 @@
             </div>
           </div>
         </div>
-
         <div class="row stats-row gy-4 mt-5" data-aos="fade-up" data-aos-delay="500">
-          <!-- Équipe Commerciale -->
           <div class="col-lg-4 col-md-6">
             <div class="stat-item text-center">
               <div class="stat-icon mb-2">
@@ -50,8 +46,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Équipe Déploiement -->
           <div class="col-lg-4 col-md-6">
             <div class="stat-item text-center">
               <div class="stat-icon mb-2">
@@ -63,8 +57,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Administrateur -->
           <div class="col-lg-4 col-md-6">
             <div class="stat-item text-center">
               <div class="stat-icon mb-2">
@@ -85,9 +77,6 @@
   <div class="dashboard-container" v-if="authenticated">
     <div class="dashboard-content">
       <div class="dashboard-header"></div>
-
-      <!-- Stats Cards -->
-      <div class="stats-cards"></div>
 
       <!-- Products Overview Section -->
       <div class="dashboard-section">
@@ -136,118 +125,6 @@
                 <p>6 versions • 12 modules</p>
                 <div class="product-status active">Active</div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Recent Deployments Table -->
-      <div class="dashboard-section">
-        <div class="section-header">
-          <h2>Recent Deployments</h2>
-          <div class="section-actions">
-            <div class="search-container">
-              <i class="bi bi-search"></i>
-              <input type="text" placeholder="Search deployments..." class="search-input" />
-            </div>
-            <button class="filter-button">
-              <i class="bi bi-funnel"></i>
-              <span>Filter</span>
-            </button>
-          </div>
-        </div>
-        <div class="section-content">
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Client</th>
-                  <th>Product</th>
-                  <th>Version</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>DEP-001</td>
-                  <td>Bank of Africa</td>
-                  <td>Payment Gateway</td>
-                  <td>v2.3.1</td>
-                  <td>2023-04-12</td>
-                  <td><span class="status-badge completed">Completed</span></td>
-                  <td>
-                    <button class="action-button"><i class="bi bi-eye"></i></button>
-                    <button class="action-button"><i class="bi bi-pencil"></i></button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>DEP-002</td>
-                  <td>Maroc Telecom</td>
-                  <td>Customer Portal</td>
-                  <td>v1.8.0</td>
-                  <td>2023-04-10</td>
-                  <td><span class="status-badge in-progress">In Progress</span></td>
-                  <td>
-                    <button class="action-button"><i class="bi bi-eye"></i></button>
-                    <button class="action-button"><i class="bi bi-pencil"></i></button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>DEP-003</td>
-                  <td>Royal Air Maroc</td>
-                  <td>Booking System</td>
-                  <td>v3.2.1</td>
-                  <td>2023-04-08</td>
-                  <td><span class="status-badge pending">Pending</span></td>
-                  <td>
-                    <button class="action-button"><i class="bi bi-eye"></i></button>
-                    <button class="action-button"><i class="bi bi-pencil"></i></button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>DEP-004</td>
-                  <td>OCP Group</td>
-                  <td>Analytics Dashboard</td>
-                  <td>v2.0.0</td>
-                  <td>2023-04-05</td>
-                  <td><span class="status-badge completed">Completed</span></td>
-                  <td>
-                    <button class="action-button"><i class="bi bi-eye"></i></button>
-                    <button class="action-button"><i class="bi bi-pencil"></i></button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>DEP-005</td>
-                  <td>Attijariwafa Bank</td>
-                  <td>Mobile Banking</td>
-                  <td>v4.1.2</td>
-                  <td>2023-04-01</td>
-                  <td><span class="status-badge completed">Completed</span></td>
-                  <td>
-                    <button class="action-button"><i class="bi bi-eye"></i></button>
-                    <button class="action-button"><i class="bi bi-pencil"></i></button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="table-footer">
-            <div class="pagination">
-              <button class="pagination-button"><i class="bi bi-chevron-left"></i></button>
-              <button class="pagination-button active">1</button>
-              <button class="pagination-button">2</button>
-              <button class="pagination-button">3</button>
-              <button class="pagination-button"><i class="bi bi-chevron-right"></i></button>
-            </div>
-            <div class="items-per-page">
-              <span>Items per page:</span>
-              <select>
-                <option>5</option>
-                <option>10</option>
-                <option>20</option>
-              </select>
             </div>
           </div>
         </div>
@@ -364,6 +241,144 @@
           </div>
         </div>
       </div>
+
+      <!-- Recent Deployments & Clients Section -->
+      <div class="dashboard-section">
+        <div class="section-header">
+          <div class="tabs">
+            <button class="tab-button" :class="{ active: activeTab === 'deployments' }" @click="activeTab = 'deployments'">
+              Recent Deployments
+            </button>
+            <button class="tab-button" :class="{ active: activeTab === 'clients' }" @click="activeTab = 'clients'">Clients</button>
+          </div>
+        </div>
+        <div class="section-content">
+          <!-- Deployments Table -->
+          <div v-if="activeTab === 'deployments'">
+            <div class="table-controls">
+              <div class="search-container">
+                <i class="bi bi-search"></i>
+                <input type="text" v-model="deploymentSearch" placeholder="Search deployments..." class="search-input" />
+              </div>
+              <div class="filter-container">
+                <select v-model="deploymentClientFilter" class="filter-select">
+                  <option value="">All Clients</option>
+                  <option v-for="client in clients" :value="client.name" :key="client.id">
+                    {{ client.name }}
+                  </option>
+                </select>
+                <select v-model="deploymentProductFilter" class="filter-select">
+                  <option value="">All Products</option>
+                  <option v-for="product in products" :value="product.name" :key="product.id">
+                    {{ product.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Client</th>
+                    <th>Product</th>
+                    <th>Version</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="deployment in filteredDeployments" :key="deployment.id">
+                    <td>{{ deployment.client }}</td>
+                    <td>{{ deployment.product }}</td>
+                    <td>{{ deployment.version }}</td>
+                    <td>{{ deployment.date }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <div class="pagination">
+                <button class="pagination-button"><i class="bi bi-chevron-left"></i></button>
+                <button class="pagination-button active">1</button>
+                <button class="pagination-button">2</button>
+                <button class="pagination-button">3</button>
+                <button class="pagination-button"><i class="bi bi-chevron-right"></i></button>
+              </div>
+              <div class="items-per-page">
+                <span>Items per page:</span>
+                <select>
+                  <option>5</option>
+                  <option>10</option>
+                  <option>20</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Clients Table -->
+          <div v-if="activeTab === 'clients'">
+            <div class="table-controls">
+              <div class="search-container">
+                <i class="bi bi-search"></i>
+                <input type="text" v-model="clientSearch" placeholder="Search clients..." class="search-input" />
+              </div>
+              <div class="filter-container">
+                <select v-model="clientSizeFilter" class="filter-select">
+                  <option value="">All Sizes</option>
+                  <option value="Small">Small</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Large">Large</option>
+                </select>
+                <select v-model="clientTypeFilter" class="filter-select">
+                  <option value="">All Types</option>
+                  <option value="Banking">Banking</option>
+                  <option value="Telecom">Telecom</option>
+                  <option value="Aviation">Aviation</option>
+                  <option value="Industry">Industry</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Location</th>
+                    <th>Email</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="client in filteredClients" :key="client.id">
+                    <td>{{ client.name }}</td>
+                    <td>{{ client.type }}</td>
+                    <td>{{ client.size }}</td>
+                    <td>{{ client.location }}</td>
+                    <td>{{ client.email }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <div class="pagination">
+                <button class="pagination-button"><i class="bi bi-chevron-left"></i></button>
+                <button class="pagination-button active">1</button>
+                <button class="pagination-button">2</button>
+                <button class="pagination-button">3</button>
+                <button class="pagination-button"><i class="bi bi-chevron-right"></i></button>
+              </div>
+              <div class="items-per-page">
+                <span>Items per page:</span>
+                <select>
+                  <option>5</option>
+                  <option>10</option>
+                  <option>20</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -384,7 +399,7 @@
   background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   display: flex;
-  flex-direction: column;
+  flex-direction: column aren’t;
   position: fixed;
   height: 100vh;
   z-index: 100;
@@ -419,13 +434,13 @@
 
 .menu-item:hover {
   background-color: #f5f5f5;
-  color: #4361ee;
+  color: #0c2d57;
 }
 
 .menu-item.active {
   background-color: #f0f4ff;
-  color: #4361ee;
-  border-left: 3px solid #4361ee;
+  color: #0c2d57;
+  border-left: 3px solid #0c2d57;
 }
 
 .menu-item i {
@@ -554,7 +569,7 @@
 }
 
 .product-icon {
-  background-color: #4361ee;
+  background-color: #0c2d57;
 }
 
 .client-icon {
@@ -704,7 +719,7 @@
 .client-rank {
   width: 24px;
   height: 24px;
-  background-color: #4361ee;
+  background-color: #0c2d57;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -819,7 +834,7 @@
 }
 
 .action-button:hover {
-  color: #4361ee;
+  color: #0c2d57;
 }
 
 .table-footer {
@@ -847,9 +862,9 @@
 }
 
 .pagination-button.active {
-  background-color: #4361ee;
+  background-color: #0c2d57;
   color: white;
-  border-color: #4361ee;
+  border-color: #0c2d57;
 }
 
 .items-per-page {
@@ -892,7 +907,7 @@
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  background-color: #4361ee;
+  background-color: #0c2d57;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -929,6 +944,71 @@
   align-items: center;
 }
 
+/* Tabs Styles */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.tab-button {
+  padding: 8px 20px;
+  border: none;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.tab-button.active {
+  background-color: #0c2d57;
+  color: white;
+}
+
+.tab-button:hover {
+  background-color: #e7f5ff;
+}
+
+/* Charts Styles */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.chart-card {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.chart-card h4 {
+  margin: 0 0 15px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Table Controls Styles */
+.table-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.filter-container {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-select {
+  padding: 8px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 1200px) {
   .product-cards,
@@ -940,6 +1020,9 @@
 @media (max-width: 992px) {
   .stats-cards {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .charts-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -969,6 +1052,109 @@
 
   .client-stats {
     display: none;
+  }
+
+  .table-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .filter-container {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+}
+/* Tabs Styles */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.tab-button {
+  padding: 8px 20px;
+  border: none;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.tab-button.active {
+  background-color: #0c2d57;
+  color: white;
+}
+
+.tab-button:hover {
+  background-color: #e7f5ff;
+}
+
+/* Charts Styles */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.chart-card {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.chart-card h4 {
+  margin: 0 0 15px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Table Controls Styles */
+.table-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.filter-container {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-select {
+  padding: 8px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .filter-container {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .filter-select {
+    width: 100%;
   }
 }
 </style>

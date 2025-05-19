@@ -9,37 +9,37 @@
           </div>
           <div class="divider mt-3"></div>
           <div class="form-fields">
-            <div class="logo-upload-container">
-              <div class="input-with-validation">
-                <input
-                  type="file"
-                  id="client-clientLogo"
-                  name="clientLogo"
-                  data-cy="clientLogo"
-                  accept="image/*"
-                  class="form-control"
-                  @change="onLogoChange"
-                />
-                <span class="valid-check" v-if="v$.clientLogo.$anyDirty && !v$.clientLogo.$invalid">
-                  <font-awesome-icon icon="check" class="text-success" />
-                </span>
-              </div>
+            <!--            <div class="logo-upload-container">-->
+            <!--              <div class="input-with-validation">-->
+            <!--                <input-->
+            <!--                  type="file"-->
+            <!--                  id="client-clientLogo"-->
+            <!--                  name="clientLogo"-->
+            <!--                  data-cy="clientLogo"-->
+            <!--                  accept="image/*"-->
+            <!--                  class="form-control"-->
+            <!--                  @change="onLogoChange"-->
+            <!--                />-->
+            <!--                <span class="valid-check" v-if="v$.clientLogo.$anyDirty && !v$.clientLogo.$invalid">-->
+            <!--                  <font-awesome-icon icon="check" class="text-success" />-->
+            <!--                </span>-->
+            <!--              </div>-->
 
-              <!-- Prévisualisation du logo -->
-              <div v-if="logoPreview" class="logo-preview mt-2">
-                <img :src="logoPreview" alt="Logo preview" class="preview-image" />
-                <button type="button" class="remove-logo-btn" @click="removeLogo">
-                  <font-awesome-icon icon="times" />
-                </button>
-              </div>
+            <!--              &lt;!&ndash; Prévisualisation du logo &ndash;&gt;-->
+            <!--              <div v-if="logoPreview" class="logo-preview mt-2">-->
+            <!--                <img :src="logoPreview" alt="Logo preview" class="preview-image" />-->
+            <!--                <button type="button" class="remove-logo-btn" @click="removeLogo">-->
+            <!--                  <font-awesome-icon icon="times" />-->
+            <!--                </button>-->
+            <!--              </div>-->
 
-              <!-- Informations sur la compression -->
-              <div v-if="compressionInfo" class="compression-info mt-2">
-                <small class="text-muted">
-                  {{ compressionInfo }}
-                </small>
-              </div>
-            </div>
+            <!--              &lt;!&ndash; Informations sur la compression &ndash;&gt;-->
+            <!--              <div v-if="compressionInfo" class="compression-info mt-2">-->
+            <!--                <small class="text-muted">-->
+            <!--                  {{ compressionInfo }}-->
+            <!--                </small>-->
+            <!--              </div>-->
+            <!--            </div>-->
 
             <div class="form-group">
               <label class="label-c" v-text="t$('sdiFrontendApp.client.name')" for="client-name"></label>
