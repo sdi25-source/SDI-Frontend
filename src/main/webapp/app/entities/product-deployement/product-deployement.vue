@@ -746,7 +746,7 @@
             <div class="d-flex justify-content-between">
               <button type="button" class="btn btn-secondary" @click="closeModuleSettingsModal">Annuler</button>
               <button type="button" class="btn btn-primary" @click="saveModuleSettingsAndCreateDeployments">
-                Enregistrer les modules autorisés
+                Enregistrer et créer les déploiements
               </button>
             </div>
           </div>
@@ -805,35 +805,39 @@
           <!-- Onglet Modules Deployement -->
           <div v-if="activeTab === 'modulesDeployement'" class="modules-tab">
             <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5>Modules Deployement</h5>
+              <h5>Modules de déploiement</h5>
             </div>
 
-            <!-- Tableau des modules autorisés -->
+            <!-- Tableau des modules de déploiement (affichage statique) -->
             <div class="table-responsive">
               <table class="table table-hover">
                 <thead class="thead-light">
                 <tr>
-                  <th scope="col">Module</th>
-                  <th scope="col">Version</th>
+                  <th scope="col">Code</th>
+                  <th scope="col">Notes</th>
+                  <th scope="col">Version du module</th>
                 </tr>
                 </thead>
                 <tbody>
-                <!-- Lignes des modules autorisés -->
-                <tr v-for="(moduleVersion, index) in getAllowedModulesFromSelectedDetails()" :key="index">
-                  <td>{{ moduleVersion.module?.name }}</td>
+                <!-- Lignes des modules de déploiement -->
+                <tr v-for="moduleDeployement in filteredModuleDeployements" :key="moduleDeployement.id">
+                  <td>{{ moduleDeployement.code }}</td>
+                  <td class="text-truncate" style="max-width: 200px" :title="moduleDeployement.notes">
+                    {{ moduleDeployement.notes }}
+                  </td>
                   <td>
-                    <span class="badge badge-info">{{ moduleVersion.version }}</span>
+                    <span class="badge badge-info">{{ moduleDeployement.moduleVersion ? moduleDeployement.moduleVersion.module?.name + ' - ' + moduleDeployement.moduleVersion.version : '-' }}</span>
                   </td>
                 </tr>
 
                 <!-- Message si aucun module -->
-                <tr v-if="getAllowedModulesFromSelectedDetails().length === 0">
-                  <td colspan="2" class="text-center py-4">
+                <tr v-if="filteredModuleDeployements.length === 0">
+                  <td colspan="3" class="text-center py-4">
                     <div class="empty-state">
                       <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-box text-muted mb-3" viewBox="0 0 16 16">
                         <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5 8 5.961 14.154 3.5 8.186 1.113zM15 4.239l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464L7.443.184z"/>
                       </svg>
-                      <h5 class="text-muted">Aucun module autorisé trouvé</h5>
+                      <h5 class="text-muted">Aucun module de déploiement trouvé</h5>
                       <p class="text-muted">Utilisez l'icône de configuration sur un détail pour ajouter des modules</p>
                     </div>
                   </td>

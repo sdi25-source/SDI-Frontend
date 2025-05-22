@@ -92,6 +92,8 @@ export default defineComponent({
     const selectedModuleVersionId = ref('')
     const selectedAllowedModuleVersions = ref([])
 
+    const filtredModulesVersion = ref([])
+
     // Computed properties pour la sélection
     const hasSelection = computed(() => selectedDetails.value.length > 0)
 
@@ -914,6 +916,11 @@ export default defineComponent({
       }
     }
 
+    const modulesVersionFilter = () => {
+      const filtredModulesVersion = selectedDetail.productVersion?.moduleVersions.value;
+      console.log("Filtred modules version:", selectedDetail.productVersion?.moduleVersions.value);
+    }
+
     const retrieveModuleDeployementsBySelectedDetails = async () => {
       if (selectedDetails.value.length === 0) {
         filteredModuleDeployements.value = []
@@ -1244,6 +1251,7 @@ export default defineComponent({
           productDeployments.value.forEach((pd) => (pd.showDropdown = false))
         }
       })
+      modulesVersionFilter();
     })
 
     // Computed property pour vérifier si tous les détails sont sélectionnés
@@ -1306,42 +1314,56 @@ export default defineComponent({
           // Appeler l'API pour sauvegarder les modifications
           await productDeployementDetailService().update(selectedDetail.value)
 
+          // Supprimer d'abord tous les modules de déploiement existants pour ce détail
+          const existingModules = moduleDeployements.value.filter(
+            md => md.productDeployementDetail && md.productDeployementDetail.id === selectedDetail.value.id
+          )
+
+          for (const module of existingModules) {
+            await moduleDeployementService().delete(module.id)
+            // Retirer de la liste des modules
+            moduleDeployements.value = moduleDeployements.value.filter(md => md.id !== module.id)
+          }
+
+          // Créer automatiquement les modules de déploiement
+          for (let i = 0; i < selectedAllowedModuleVersions.value.length; i++) {
+            const moduleVersion = selectedAllowedModuleVersions.value[i]
+
+            // Créer un code unique pour le module de déploiement (MD 1, MD 2, etc.)
+            const code = `MD ${i + 1}`
+
+            // Créer un nouveau module de déploiement
+            const newModuleDeployement = {
+              code: code,
+              notes: `Module déployé: ${moduleVersion.module?.name}`,
+              createDate: new Date().toISOString().split("T")[0],
+              moduleVersion: moduleVersion,
+              productDeployementDetail: selectedDetail.value
+            }
+
+            // Sauvegarder le nouveau module de déploiement
+            const response = await moduleDeployementService().create(newModuleDeployement)
+
+            // Ajouter à la liste des modules de déploiement
+            moduleDeployements.value.push({
+              ...response,
+              isEditing: false,
+              originalData: JSON.parse(JSON.stringify(response))
+            })
+          }
+
+          // Rafraîchir les modules de déploiement
+          await retrieveModuleDeployementsBySelectedDetails()
+
           // Sélectionner le détail pour afficher les modules dans l'onglet
           selectDetail(selectedDetail.value)
 
-          alertService.showInfo('Modules autorisés configurés avec succès', { variant: 'success' })
+          alertService.showInfo('Modules autorisés configurés et déploiements créés avec succès', { variant: 'success' })
         }
         closeModuleSettingsModal()
       } catch (error) {
         alertService.showHttpError(error.response)
       }
-    }
-
-    // Fonction pour récupérer tous les modules autorisés des détails sélectionnés
-    const getAllowedModulesFromSelectedDetails = () => {
-      if (selectedDetails.value.length === 0) {
-        return []
-      }
-
-      // Créer un ensemble pour stocker les modules uniques (par ID)
-      const uniqueModules = new Map()
-
-      // Parcourir tous les détails sélectionnés
-      selectedDetails.value.forEach(detail => {
-        // Si le détail a des modules autorisés
-        if (detail.allowedModuleVersions && detail.allowedModuleVersions.length > 0) {
-          // Ajouter chaque module à l'ensemble
-          detail.allowedModuleVersions.forEach(moduleVersion => {
-            // Utiliser l'ID comme clé pour éviter les doublons
-            if (moduleVersion && moduleVersion.id) {
-              uniqueModules.set(moduleVersion.id, moduleVersion)
-            }
-          })
-        }
-      })
-
-      // Convertir l'ensemble en tableau
-      return Array.from(uniqueModules.values())
     }
 
     return {
@@ -1476,8 +1498,7 @@ export default defineComponent({
       addModuleToDetail,
       removeModuleFromDetail,
       saveModuleSettingsAndCreateDeployments,
-      // Ajouter cette ligne dans le return
-      getAllowedModulesFromSelectedDetails,
+      modulesVersionFilter,
     }
   },
 })
