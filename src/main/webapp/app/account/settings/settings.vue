@@ -1,4 +1,5 @@
 <template>
+  <div class="section"></div>
   <div>
     <div class="row justify-content-center">
       <div class="col-md-8 toastify-container">
@@ -133,6 +134,8 @@
       </div>
     </div>
   </div>
+  <div class="section"></div>
+  <div class="section"></div>
 </template>
 
 <script lang="ts" src="./settings.component.ts"></script>

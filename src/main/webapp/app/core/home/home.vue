@@ -74,7 +74,7 @@
   </div>
 
   <!-- Dashboard Section (Authenticated) -->
-  <div class="dashboard-container" v-if="authenticated">
+  <div class="dashboard-container pt-2" v-if="authenticated">
     <div class="dashboard-content">
       <div class="dashboard-header"></div>
 
@@ -82,7 +82,6 @@
       <div class="dashboard-section">
         <div class="section-header">
           <h2>Products Overview</h2>
-          <button class="view-all-button">View All</button>
         </div>
         <div class="section-content">
           <div class="product-cards">
@@ -134,7 +133,6 @@
       <div class="dashboard-section">
         <div class="section-header">
           <h2>Module Overview</h2>
-          <button class="view-all-button">View All</button>
         </div>
         <div class="section-content">
           <div class="module-grid">
@@ -243,142 +241,142 @@
       </div>
 
       <!-- Recent Deployments & Clients Section -->
-      <div class="dashboard-section">
-        <div class="section-header">
-          <div class="tabs">
-            <button class="tab-button" :class="{ active: activeTab === 'deployments' }" @click="activeTab = 'deployments'">
-              Recent Deployments
-            </button>
-            <button class="tab-button" :class="{ active: activeTab === 'clients' }" @click="activeTab = 'clients'">Clients</button>
-          </div>
-        </div>
-        <div class="section-content">
-          <!-- Deployments Table -->
-          <div v-if="activeTab === 'deployments'">
-            <div class="table-controls">
-              <div class="search-container">
-                <i class="bi bi-search"></i>
-                <input type="text" v-model="deploymentSearch" placeholder="Search deployments..." class="search-input" />
-              </div>
-              <div class="filter-container">
-                <select v-model="deploymentClientFilter" class="filter-select">
-                  <option value="">All Clients</option>
-                  <option v-for="client in clients" :value="client.name" :key="client.id">
-                    {{ client.name }}
-                  </option>
-                </select>
-                <select v-model="deploymentProductFilter" class="filter-select">
-                  <option value="">All Products</option>
-                  <option v-for="product in products" :value="product.name" :key="product.id">
-                    {{ product.name }}
-                  </option>
-                </select>
-              </div>
-            </div>
-            <div class="table-container">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Client</th>
-                    <th>Product</th>
-                    <th>Version</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="deployment in filteredDeployments" :key="deployment.id">
-                    <td>{{ deployment.client }}</td>
-                    <td>{{ deployment.product }}</td>
-                    <td>{{ deployment.version }}</td>
-                    <td>{{ deployment.date }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="table-footer">
-              <div class="pagination">
-                <button class="pagination-button"><i class="bi bi-chevron-left"></i></button>
-                <button class="pagination-button active">1</button>
-                <button class="pagination-button">2</button>
-                <button class="pagination-button">3</button>
-                <button class="pagination-button"><i class="bi bi-chevron-right"></i></button>
-              </div>
-              <div class="items-per-page">
-                <span>Items per page:</span>
-                <select>
-                  <option>5</option>
-                  <option>10</option>
-                  <option>20</option>
-                </select>
-              </div>
-            </div>
-          </div>
+      <!--      <div class="dashboard-section">-->
+      <!--        <div class="section-header">-->
+      <!--          <div class="tabs">-->
+      <!--            <button class="tab-button" :class="{ active: activeTab === 'deployments' }" @click="activeTab = 'deployments'">-->
+      <!--              Recent Deployments-->
+      <!--            </button>-->
+      <!--            <button class="tab-button" :class="{ active: activeTab === 'clients' }" @click="activeTab = 'clients'">Clients</button>-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--        <div class="section-content">-->
+      <!--          &lt;!&ndash; Deployments Table &ndash;&gt;-->
+      <!--          <div v-if="activeTab === 'deployments'">-->
+      <!--            <div class="table-controls">-->
+      <!--              <div class="search-container">-->
+      <!--                <i class="bi bi-search"></i>-->
+      <!--                <input type="text" v-model="deploymentSearch" placeholder="Search deployments..." class="search-input" />-->
+      <!--              </div>-->
+      <!--              <div class="filter-container">-->
+      <!--                <select v-model="deploymentClientFilter" class="filter-select">-->
+      <!--                  <option value="">All Clients</option>-->
+      <!--                  <option v-for="client in clients" :value="client.name" :key="client.id">-->
+      <!--                    {{ client.name }}-->
+      <!--                  </option>-->
+      <!--                </select>-->
+      <!--                <select v-model="deploymentProductFilter" class="filter-select">-->
+      <!--                  <option value="">All Products</option>-->
+      <!--                  <option v-for="product in products" :value="product.name" :key="product.id">-->
+      <!--                    {{ product.name }}-->
+      <!--                  </option>-->
+      <!--                </select>-->
+      <!--              </div>-->
+      <!--            </div>-->
+      <!--            <div class="table-container">-->
+      <!--              <table class="data-table">-->
+      <!--                <thead>-->
+      <!--                  <tr>-->
+      <!--                    <th>Client</th>-->
+      <!--                    <th>Product</th>-->
+      <!--                    <th>Version</th>-->
+      <!--                    <th>Date</th>-->
+      <!--                  </tr>-->
+      <!--                </thead>-->
+      <!--                <tbody>-->
+      <!--                  <tr v-for="deployment in filteredDeployments" :key="deployment.id">-->
+      <!--                    <td>{{ deployment.client }}</td>-->
+      <!--                    <td>{{ deployment.product }}</td>-->
+      <!--                    <td>{{ deployment.version }}</td>-->
+      <!--                    <td>{{ deployment.date }}</td>-->
+      <!--                  </tr>-->
+      <!--                </tbody>-->
+      <!--              </table>-->
+      <!--            </div>-->
+      <!--            <div class="table-footer">-->
+      <!--              <div class="pagination">-->
+      <!--                <button class="pagination-button"><i class="bi bi-chevron-left"></i></button>-->
+      <!--                <button class="pagination-button active">1</button>-->
+      <!--                <button class="pagination-button">2</button>-->
+      <!--                <button class="pagination-button">3</button>-->
+      <!--                <button class="pagination-button"><i class="bi bi-chevron-right"></i></button>-->
+      <!--              </div>-->
+      <!--              <div class="items-per-page">-->
+      <!--                <span>Items per page:</span>-->
+      <!--                <select>-->
+      <!--                  <option>5</option>-->
+      <!--                  <option>10</option>-->
+      <!--                  <option>20</option>-->
+      <!--                </select>-->
+      <!--              </div>-->
+      <!--            </div>-->
+      <!--          </div>-->
 
-          <!-- Clients Table -->
-          <div v-if="activeTab === 'clients'">
-            <div class="table-controls">
-              <div class="search-container">
-                <i class="bi bi-search"></i>
-                <input type="text" v-model="clientSearch" placeholder="Search clients..." class="search-input" />
-              </div>
-              <div class="filter-container">
-                <select v-model="clientSizeFilter" class="filter-select">
-                  <option value="">All Sizes</option>
-                  <option value="Small">Small</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Large">Large</option>
-                </select>
-                <select v-model="clientTypeFilter" class="filter-select">
-                  <option value="">All Types</option>
-                  <option value="Banking">Banking</option>
-                  <option value="Telecom">Telecom</option>
-                  <option value="Aviation">Aviation</option>
-                  <option value="Industry">Industry</option>
-                </select>
-              </div>
-            </div>
-            <div class="table-container">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Size</th>
-                    <th>Location</th>
-                    <th>Email</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="client in filteredClients" :key="client.id">
-                    <td>{{ client.name }}</td>
-                    <td>{{ client.type }}</td>
-                    <td>{{ client.size }}</td>
-                    <td>{{ client.location }}</td>
-                    <td>{{ client.email }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="table-footer">
-              <div class="pagination">
-                <button class="pagination-button"><i class="bi bi-chevron-left"></i></button>
-                <button class="pagination-button active">1</button>
-                <button class="pagination-button">2</button>
-                <button class="pagination-button">3</button>
-                <button class="pagination-button"><i class="bi bi-chevron-right"></i></button>
-              </div>
-              <div class="items-per-page">
-                <span>Items per page:</span>
-                <select>
-                  <option>5</option>
-                  <option>10</option>
-                  <option>20</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!--          &lt;!&ndash; Clients Table &ndash;&gt;-->
+      <!--          <div v-if="activeTab === 'clients'">-->
+      <!--            <div class="table-controls">-->
+      <!--              <div class="search-container">-->
+      <!--                <i class="bi bi-search"></i>-->
+      <!--                <input type="text" v-model="clientSearch" placeholder="Search clients..." class="search-input" />-->
+      <!--              </div>-->
+      <!--              <div class="filter-container">-->
+      <!--                <select v-model="clientSizeFilter" class="filter-select">-->
+      <!--                  <option value="">All Sizes</option>-->
+      <!--                  <option value="Small">Small</option>-->
+      <!--                  <option value="Medium">Medium</option>-->
+      <!--                  <option value="Large">Large</option>-->
+      <!--                </select>-->
+      <!--                <select v-model="clientTypeFilter" class="filter-select">-->
+      <!--                  <option value="">All Types</option>-->
+      <!--                  <option value="Banking">Banking</option>-->
+      <!--                  <option value="Telecom">Telecom</option>-->
+      <!--                  <option value="Aviation">Aviation</option>-->
+      <!--                  <option value="Industry">Industry</option>-->
+      <!--                </select>-->
+      <!--              </div>-->
+      <!--            </div>-->
+      <!--            <div class="table-container">-->
+      <!--              <table class="data-table">-->
+      <!--                <thead>-->
+      <!--                  <tr>-->
+      <!--                    <th>Name</th>-->
+      <!--                    <th>Type</th>-->
+      <!--                    <th>Size</th>-->
+      <!--                    <th>Location</th>-->
+      <!--                    <th>Email</th>-->
+      <!--                  </tr>-->
+      <!--                </thead>-->
+      <!--                <tbody>-->
+      <!--                  <tr v-for="client in filteredClients" :key="client.id">-->
+      <!--                    <td>{{ client.name }}</td>-->
+      <!--                    <td>{{ client.type }}</td>-->
+      <!--                    <td>{{ client.size }}</td>-->
+      <!--                    <td>{{ client.location }}</td>-->
+      <!--                    <td>{{ client.email }}</td>-->
+      <!--                  </tr>-->
+      <!--                </tbody>-->
+      <!--              </table>-->
+      <!--            </div>-->
+      <!--            <div class="table-footer">-->
+      <!--              <div class="pagination">-->
+      <!--                <button class="pagination-button"><i class="bi bi-chevron-left"></i></button>-->
+      <!--                <button class="pagination-button active">1</button>-->
+      <!--                <button class="pagination-button">2</button>-->
+      <!--                <button class="pagination-button">3</button>-->
+      <!--                <button class="pagination-button"><i class="bi bi-chevron-right"></i></button>-->
+      <!--              </div>-->
+      <!--              <div class="items-per-page">-->
+      <!--                <span>Items per page:</span>-->
+      <!--                <select>-->
+      <!--                  <option>5</option>-->
+      <!--                  <option>10</option>-->
+      <!--                  <option>20</option>-->
+      <!--                </select>-->
+      <!--              </div>-->
+      <!--            </div>-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--      </div>-->
     </div>
   </div>
 </template>

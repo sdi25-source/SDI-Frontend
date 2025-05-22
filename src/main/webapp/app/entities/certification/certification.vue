@@ -100,52 +100,97 @@
       <div class="table-responsive">
         <table class="table table-hover mb-0" aria-describedby="certifications">
           <thead class="thead-light">
-          <tr>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.certification.name')"></span></th>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.certification.description')"></span></th>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.certification.createDate')"></span></th>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.certification.expireDate')"></span></th>
-            <th scope="col" width="160" class="text-center">Actions</th>
-          </tr>
+            <tr>
+              <th scope="col"><span v-text="t$('sdiFrontendApp.certification.name')"></span></th>
+              <th scope="col"><span v-text="t$('sdiFrontendApp.certification.description')"></span></th>
+              <th scope="col" width="160" class="text-center">Actions</th>
+            </tr>
           </thead>
           <tbody>
-          <tr v-for="certification in paginatedCertifications" :key="certification.id" data-cy="entityTable" class="align-middle">
-            <td>
-              <template v-if="certification.isEditing">
-                <input v-model="certification.name" type="text" class="form-control-borderless" />
-              </template>
-              <template v-else>
-                {{ certification.name }}
-              </template>
-            </td>
-            <td class="text-truncate" style="max-width: 250px" :title="certification.description">
-              <template v-if="certification.isEditing">
-                <input v-model="certification.description" type="text" class="form-control-borderless" />
-              </template>
-              <template v-else>
-                {{ certification.description }}
-              </template>
-            </td>
-            <td>
-              <template v-if="certification.isEditing">
-                <input v-model="certification.createDate" type="date" class="form-control-borderless" />
-              </template>
-              <template v-else>
-                {{ formatDate(certification.createDate) }}
-              </template>
-            </td>
-            <td>
-              <template v-if="certification.isEditing">
-                <input v-model="certification.expireDate" type="date" class="form-control-borderless" />
-              </template>
-              <template v-else>
-                {{ formatDate(certification.expireDate) }}
-              </template>
-            </td>
-            <td class="text-center">
-              <div class="btn-group">
+            <tr v-for="certification in paginatedCertifications" :key="certification.id" data-cy="entityTable" class="align-middle">
+              <td>
                 <template v-if="certification.isEditing">
-                  <div class="icon-container save-container" @click="saveCertification(certification)" title="Enregistrer">
+                  <input v-model="certification.name" type="text" class="form-control-borderless" />
+                </template>
+                <template v-else>
+                  {{ certification.name }}
+                </template>
+              </td>
+              <td class="text-truncate" style="max-width: 250px" :title="certification.description">
+                <template v-if="certification.isEditing">
+                  <input v-model="certification.description" type="text" class="form-control-borderless" />
+                </template>
+                <template v-else>
+                  {{ certification.description }}
+                </template>
+              </td>
+              <td class="text-center">
+                <div class="btn-group">
+                  <template v-if="certification.isEditing">
+                    <div class="icon-container save-container" @click="saveCertification(certification)" title="Enregistrer">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
+                        <path
+                          d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </div>
+                    <div class="icon-container cancel-container" @click="cancelEdit(certification)" title="Annuler">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
+                        <path
+                          d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="action-icons">
+                      <div class="icon-container edit-container" @click="editCertification(certification)" title="Modifier">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          class="bi bi-pencil-fill"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                          />
+                        </svg>
+                      </div>
+                      <div class="icon-container delete-container" @click="prepareRemove(certification)" title="Supprimer">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="26"
+                          height="26"
+                          fill="currentColor"
+                          class="bi bi-x"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </td>
+            </tr>
+
+            <tr v-if="showAddRow" class="add-row">
+              <td><input type="text" class="form-control-borderless" v-model="newCertification.name" placeholder="Nom" /></td>
+              <td>
+                <input type="text" class="form-control-borderless" v-model="newCertification.description" placeholder="Description" />
+              </td>
+              <td><input type="date" class="form-control-borderless" v-model="newCertification.createDate" /></td>
+              <td><input type="date" class="form-control-borderless" v-model="newCertification.expireDate" /></td>
+              <td class="text-center">
+                <div class="action-icons">
+                  <div class="icon-container save-container" @click="saveNewCertification" title="Enregistrer">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
                       <path
                         d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
@@ -153,7 +198,7 @@
                       />
                     </svg>
                   </div>
-                  <div class="icon-container cancel-container" @click="cancelEdit(certification)" title="Annuler">
+                  <div class="icon-container cancel-container" @click="cancelNewCertification" title="Annuler">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
                       <path
                         d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
@@ -161,70 +206,9 @@
                       />
                     </svg>
                   </div>
-                </template>
-                <template v-else>
-                  <div class="action-icons">
-                    <div class="icon-container edit-container" @click="editCertification(certification)" title="Modifier">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-pencil-fill"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
-                        />
-                      </svg>
-                    </div>
-                    <div class="icon-container delete-container" @click="prepareRemove(certification)" title="Supprimer">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="26"
-                        height="26"
-                        fill="currentColor"
-                        class="bi bi-x"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </td>
-          </tr>
-
-          <tr v-if="showAddRow" class="add-row">
-            <td><input type="text" class="form-control-borderless" v-model="newCertification.name" placeholder="Nom" /></td>
-            <td><input type="text" class="form-control-borderless" v-model="newCertification.description" placeholder="Description" /></td>
-            <td><input type="date" class="form-control-borderless" v-model="newCertification.createDate" /></td>
-            <td><input type="date" class="form-control-borderless" v-model="newCertification.expireDate" /></td>
-            <td class="text-center">
-              <div class="action-icons">
-                <div class="icon-container save-container" @click="saveNewCertification" title="Enregistrer">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
-                    <path
-                      d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
-                      fill="currentColor"
-                    />
-                  </svg>
                 </div>
-                <div class="icon-container cancel-container" @click="cancelNewCertification" title="Annuler">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
-                    <path
-                      d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </td>
-          </tr>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -403,7 +387,11 @@
         </div>
       </template>
       <div class="modal-body">
-        <p id="jhi-delete-certification-heading" class="mb-0" v-text="t$('sdiFrontendApp.certification.delete.question', { id: removeId })"></p>
+        <p
+          id="jhi-delete-certification-heading"
+          class="mb-0"
+          v-text="t$('sdiFrontendApp.certification.delete.question', { id: removeId })"
+        ></p>
       </div>
       <template #modal-footer>
         <div class="w-100">
@@ -428,7 +416,7 @@
   <section class="section"></section>
 </template>
 
-<script lang="ts" src="./certification.component.ts"> </script>
+<script lang="ts" src="./certification.component.ts"></script>
 
 <style scoped>
 .button {

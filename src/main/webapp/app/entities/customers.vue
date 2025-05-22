@@ -4,9 +4,6 @@
       <b-dropdown-item to="/client" @click="emitMenuItemClicked">
         <span>Customers Management</span>
       </b-dropdown-item>
-      <b-dropdown-item to="/client-certification" @click="emitMenuItemClicked">
-        <span v-text="t$('global.menu.entities.clientCertification')"></span>
-      </b-dropdown-item>
       <b-dropdown-item to="/client-event" @click="emitMenuItemClicked">
         <span v-text="t$('global.menu.entities.clientEvent')"></span>
       </b-dropdown-item>

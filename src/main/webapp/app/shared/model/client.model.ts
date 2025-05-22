@@ -18,8 +18,6 @@ export interface IClient {
   createDate?: Date | null;
   updateDate?: Date | null;
   notes?: string | null;
-  countryName?: string | null;
-  region?: string | null;
   size?: IClientSize | null;
   clientType?: IClientType | null;
   country?: ICountry | null;
@@ -42,8 +40,6 @@ export class Client implements IClient {
     public createDate?: Date | null,
     public updateDate?: Date | null,
     public notes?: string | null,
-    public countryName?: string | null,
-    public region?: string | null,
     public size?: IClientSize | null,
     public clientType?: IClientType | null,
     public country?: ICountry | null,

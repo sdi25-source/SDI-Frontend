@@ -102,7 +102,7 @@
                     <th scope="col"><span v-text="t$('sdiFrontendApp.requestOfChange.title')"></span></th>
                     <th scope="col"><span v-text="t$('sdiFrontendApp.requestOfChange.client')"></span></th>
                     <th scope="col"><span v-text="t$('sdiFrontendApp.requestOfChange.productVersion')"></span></th>
-                    <th scope="col"><span v-text="t$('sdiFrontendApp.requestOfChange.customisationLevel')"></span></th>
+                    <th scope="col"><span>Request Type</span></th>
                     <th scope="col"><span>Modules affect</span></th>
                     <th scope="col"><span v-text="t$('sdiFrontendApp.requestOfChange.createDate')"></span></th>
                     <th scope="col" width="160" class="text-center">Actions</th>
@@ -130,8 +130,9 @@
                     <td>{{ request.title }}</td>
                     <td>
                       <div v-if="request.client">
-                        {{ request.client.code }}
+                        {{ request.client.name }}
                       </div>
+                      <div v-else>-</div>
                     </td>
                     <td>
                       <div v-if="request.productVersion">
@@ -140,7 +141,7 @@
                     </td>
                     <td>
                       <div class="badge bg-light text-dark p-2 rounded-pill">
-                        {{ request.customisationLevel?.level }}
+                        {{ request.type }}
                       </div>
                     </td>
 
@@ -234,16 +235,17 @@
           <div class="container-fluid mb-4 px-0">
             <div class="wrapper">
               <div class="arrow-steps clearfix">
+                <!-- PENDING Step -->
                 <div
                   class="step"
                   :class="{
-                    current: isStepActive('PENDING') || isStepActive('APPROVED') || isStepActive('COMPLETED'),
+                    current: isStepActive('PENDING') || isStepActive('APPROVED') || isStepActive('COMPLETED') || isStepActive('REJECTED'),
                     done: isStepCompleted('PENDING') && !isStepActive('REJECTED'),
                   }"
                 >
                   <span>
                     <svg
-                      v-if="isStepCompleted('PENDING') && !isStepActive('REJECTED')"
+                      v-if="(isStepCompleted('PENDING') && !isStepActive('REJECTED')) || isStepActive('REJECTED')"
                       xmlns="http://www.w3.org/2000/svg"
                       width="14"
                       height="14"
@@ -258,18 +260,18 @@
                     <span v-text="t$('sdiFrontendApp.RequestStatus.PENDING')"></span>
                   </span>
                 </div>
+                <!-- APPROVED Step (Hidden if REJECTED is active) -->
                 <div
+                  v-if="!isStepActive('REJECTED')"
                   class="step ml-2 mr-2"
                   :class="{
                     current: isStepActive('APPROVED') || isStepActive('COMPLETED'),
-                    done: isStepCompleted('APPROVED') && !isStepActive('REJECTED') && isStepActive('COMPLETED'),
+                    done: isStepCompleted('APPROVED') && isStepActive('COMPLETED'),
                   }"
                 >
                   <span>
                     <svg
-                      v-if="
-                        (isStepCompleted('APPROVED') && !isStepActive('REJECTED') && isStepActive('COMPLETED')) || isStepActive('APPROVED')
-                      "
+                      v-if="isStepCompleted('APPROVED') && isStepActive('COMPLETED')"
                       xmlns="http://www.w3.org/2000/svg"
                       width="14"
                       height="14"
@@ -284,16 +286,18 @@
                     <span v-text="t$('sdiFrontendApp.RequestStatus.APPROVED')"></span>
                   </span>
                 </div>
+                <!-- COMPLETED Step (Hidden if REJECTED is active) -->
                 <div
-                  class="step mr-2"
+                  v-if="!isStepActive('REJECTED')"
+                  class="step mr-3"
                   :class="{
                     current: isStepActive('COMPLETED'),
-                    done: isStepActive('COMPLETED') && isStepCompleted('PENDING') && isStepCompleted('APPROVED'),
+                    done: isStepCompleted('COMPLETED'),
                   }"
                 >
                   <span>
                     <svg
-                      v-if="isStepActive('COMPLETED') && isStepCompleted('PENDING') && isStepCompleted('APPROVED')"
+                      v-if="selectedRequest.done"
                       xmlns="http://www.w3.org/2000/svg"
                       width="14"
                       height="14"
@@ -308,14 +312,16 @@
                     <span v-text="t$('sdiFrontendApp.RequestStatus.COMPLETED')"></span>
                   </span>
                 </div>
+                <!-- REJECTED Step (Shown only if active) -->
                 <div
-                  class="step ml-1 mr-2"
+                  v-if="isStepActive('REJECTED')"
+                  class="step ml-2 mr-2"
                   :class="{
                     current: isStepActive('REJECTED'),
                     rejected: isStepActive('REJECTED'),
                   }"
                 >
-                  <span v-if="isStepActive('REJECTED')">
+                  <span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="14"
@@ -330,7 +336,6 @@
                     </svg>
                     <span v-text="t$('sdiFrontendApp.RequestStatus.REJECTED')"></span>
                   </span>
-                  <span v-else v-text="t$('sdiFrontendApp.RequestStatus.REJECTED')"></span>
                 </div>
               </div>
             </div>
@@ -360,7 +365,7 @@
                 <div class="row mb-4">
                   <div class="col-md-6">
                     <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.client')"></h6>
-                    <p class="mb-3">{{ selectedRequest.client ? selectedRequest.client.code : '-' }}</p>
+                    <p class="mb-3">{{ selectedRequest.client ? selectedRequest.client.name : '-' }}</p>
 
                     <h6 class="text-muted mb-2 small">Product Version</h6>
                     <p class="mb-0">
@@ -370,13 +375,16 @@
                   </div>
                   <div class="col-md-6">
                     <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.customisationLevel')"></h6>
-                    <p class="mb-3">{{ selectedRequest.customisationLevel ? selectedRequest.customisationLevel.level : '-' }}</p>
-
-                    <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.status')"></h6>
-                    <div :class="['status-badge', getStatusColorClass(selectedRequest.status)]">
-                      {{ getStatusText(selectedRequest.status) }}
-                    </div>
+                    <p class="mb-3 badge bg-light text-dark p-2 rounded-pill">
+                      {{ selectedRequest.customisationLevel ? selectedRequest.customisationLevel.level : '-' }}
+                    </p>
+                    <h6 class="text-muted mb-2 small">Request Type</h6>
+                    <p class="mb-3">{{ selectedRequest.type }}</p>
                   </div>
+                </div>
+                <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.status')"></h6>
+                <div :class="['status-badge', getStatusColorClass(selectedRequest.status)]">
+                  {{ getStatusText(selectedRequest.status) }}
                 </div>
 
                 <!-- Modules affectés -->
@@ -445,7 +453,7 @@
               </button>
             </div>
             <div v-if="selectedRequest.status === 'APPROVED'">
-              <button class="button button-primary btn-sm rounded-2 mr-2" @click="changeRequestStatus('COMPLETED')">
+              <button v-if="selectedRequest" class="button button-primary btn-sm rounded-2" @click="openNewProductVersionPopup">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -460,19 +468,12 @@
                   style="display: inline-block; vertical-align: text-bottom"
                 >
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-                <span v-text="t$('sdiFrontendApp.requestOfChange.MarkOut')"></span>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline></svg
+                ><span v-text="t$('sdiFrontendApp.requestOfChange.AddNewProduct')"></span>
               </button>
             </div>
             <div v-if="selectedRequest.status === 'COMPLETED'">
-              <button
-                v-if="selectedRequest && !selectedRequest.done"
-                class="button button-primary btn-sm rounded-2"
-                @click="openNewProductVersionPopup"
-                v-text="t$('sdiFrontendApp.requestOfChange.AddNewProduct')"
-              ></button>
-              <div v-else class="alert alert-success d-inline-flex align-items-center py-1 px-2 btn-sm">
+              <div class="alert alert-success d-inline-flex align-items-center py-1 px-2 btn-sm">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -559,21 +560,49 @@
                   required
                 />
               </div>
+
               <div class="form-group">
                 <label
                   class="form-control-label"
                   v-text="t$('sdiFrontendApp.requestOfChange.keywords')"
                   for="request-of-change-keywords"
                 ></label>
-                <textarea
+                <input
+                  type="text"
                   class="form-control form-control-sm"
                   name="keywords"
                   id="request-of-change-keywords"
                   data-cy="keywords"
-                  v-model="newRequest.keywords"
-                  rows="2"
-                ></textarea>
+                  v-model="keywordInput"
+                  @keyup.enter="addKeyword"
+                  @keyup="handleKeywordInput"
+                  placeholder="Enter a keyword followed by ,"
+                />
+                <div class="badge-container d-flex flex-wrap gap-2 mt-2">
+                  <span
+                    v-for="(keyword, index) in keywordsList"
+                    :key="index"
+                    class="badge bg-primary text-white p-2 rounded-pill"
+                    @click="removeKeyword(index)"
+                    style="cursor: pointer"
+                  >
+                    {{ keyword }}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      fill="currentColor"
+                      class="bi bi-x ms-1"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+                      />
+                    </svg>
+                  </span>
+                </div>
               </div>
+
               <div class="form-group">
                 <label
                   class="form-control-label"
@@ -592,7 +621,6 @@
               <div class="form-group">
                 <label class="form-control-label" for="request-of-change-productVersion">Product Version</label>
                 <select v-model="newRequest.productVersion" class="form-select">
-                  <option value="" disabled>Select a product version</option>
                   <optgroup v-for="group in groupedProductVersions" :key="group.product.id" :label="group.product.name">
                     <option v-for="version in group.versions" :key="version.id" :value="version">
                       {{ version.version }}
@@ -626,22 +654,37 @@
                     v-for="moduleVersion in filteredModuleVersions"
                     :key="moduleVersion.id"
                     class="form-check mb-1"
-                    style="display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start"
+                    style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start"
                   >
                     <input
                       type="checkbox"
                       class="form-check-input"
-                      :key="moduleVersion.id"
+                      :id="'module-version-' + moduleVersion.id"
                       :value="moduleVersion"
                       v-model="newRequest.moduleVersions"
                     />
-                    <label class="form-check-label">
+                    <label class="form-check-label" :for="'module-version-' + moduleVersion.id">
                       {{ moduleVersion.module ? moduleVersion.module.name : '' }} - {{ moduleVersion.version }}
                     </label>
                   </div>
                 </div>
               </div>
               <div class="form-group">
+                <label class="form-control-label" for="request-of-change-type">Request Type</label>
+                <select
+                  class="form-control form-control-sm"
+                  id="request-of-change-type"
+                  data-cy="type"
+                  name="type"
+                  v-model="newRequest.type"
+                  required
+                >
+                  <option v-for="type in typesRequest" :key="type.value" :value="type.value">
+                    {{ type.label }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group" v-if="newRequest.type === 'EXTERNAL'">
                 <label
                   class="form-control-label"
                   v-text="t$('sdiFrontendApp.requestOfChange.client')"
@@ -823,6 +866,27 @@
 <script lang="ts" src="./request-of-change.component.ts"></script>
 
 <style scoped>
+.badge-container {
+  min-height: 30px;
+  padding: 5px;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  margin: 2px;
+  transition: background-color 0.2s ease;
+}
+
+.badge:hover {
+  background-color: #0056b3; /* Couleur plus foncée au survol */
+}
+
 .request-of-change-container {
   padding: 1.5rem;
 }

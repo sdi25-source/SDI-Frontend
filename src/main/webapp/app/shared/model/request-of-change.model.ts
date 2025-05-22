@@ -2,8 +2,9 @@ import { type IProductVersion } from '@/shared/model/product-version.model';
 import { type IClient } from '@/shared/model/client.model';
 import { type IModuleVersion } from '@/shared/model/module-version.model';
 import { type ICustomisationLevel } from '@/shared/model/customisation-level.model';
-
 import { type RequestStatus } from '@/shared/model/enumerations/request-status.model';
+import { type TypeRequest } from '@/shared/model/enumerations/type-request.model';
+
 export interface IRequestOfChange {
   id?: number;
   title?: string;
@@ -17,6 +18,7 @@ export interface IRequestOfChange {
   moduleVersions?: IModuleVersion[] | null;
   customisationLevel?: ICustomisationLevel | null;
   done?: boolean | false;
+  type?: keyof typeof TypeRequest;
 }
 
 export class RequestOfChange implements IRequestOfChange {
@@ -33,5 +35,6 @@ export class RequestOfChange implements IRequestOfChange {
     public moduleVersions?: IModuleVersion[] | null,
     public customisationLevel?: ICustomisationLevel | null,
     public done?: boolean | false,
+    public type?: keyof typeof TypeRequest,
   ) {}
 }

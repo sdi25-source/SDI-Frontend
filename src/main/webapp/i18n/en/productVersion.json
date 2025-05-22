@@ -27,7 +27,7 @@
       "product": "Product",
       "moduleVersion": "Module Version",
       "infraComponentVersion": "Infra Component Version",
-      "root": "Root"
+      "root": "Basic Version"
     }
   }
 }

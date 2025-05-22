@@ -83,8 +83,7 @@
         <table class="table table-hover mb-0" aria-describedby="products">
           <thead class="thead-light">
             <tr>
-              <th scope="col" width="50"></th>
-              <th scope="col"><span v-text="t$('sdiFrontendApp.product.logo')"></span></th>
+              <th scope="col"><span class="pl-4" v-text="t$('sdiFrontendApp.product.logo')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.product.name')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.product.description')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.product.productLine')"></span></th>
@@ -102,23 +101,19 @@
               @click="toggleProductSelection(product)"
               style="cursor: pointer"
             >
-              <td class="text-center" @click.stop>
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    :id="`product-${product.id}`"
-                    :checked="selectedProduct && selectedProduct.id === product.id"
-                    @change="toggleProductSelection(product)"
-                  />
-                </div>
-              </td>
               <td>
                 <template v-if="product.isEditing">
                   <input type="text" class="form-control-borderless" v-model="product.logo" placeholder="Logo URL" @click.stop />
                 </template>
                 <template v-else>
-                  <img v-if="product.logo" :src="product.logo" :alt="product.name + ' logo'" class="product-logo" width="40" height="40" />
+                  <img
+                    v-if="product.logo"
+                    :src="product.logo"
+                    :alt="product.name + ' logo'"
+                    class="product-logo ml-4"
+                    width="40"
+                    height="40"
+                  />
                   <span v-else>-</span>
                 </template>
               </td>
@@ -221,18 +216,37 @@
                     <div class="icon-container settings-container" @click="openProductSettings(product)" title="Paramètres">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        fill="currentColor"
-                        class="bi bi-gear"
-                        viewBox="0 0 16 16"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon"
                       >
-                        <path
-                          d="M8 4.754a3.246 3.246 0 1 0 0 6.492a3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"
-                        />
-                        <path
-                          d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291a1.873 1.873 0 0 0-1.116-2.693l-.318-.094c-.835-.246-.835-1.428 0-1.674l.319-.094a1.873 1.873 0 0 0 1.115-2.692l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"
-                        />
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                      </svg>
+                    </div>
+                    <div class="icon-container settings-container" @click="openCertifications(product)" title="Certification">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon"
+                      >
+                        <circle cx="12" cy="8" r="7"></circle>
+                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
                       </svg>
                     </div>
                   </template>
@@ -242,8 +256,38 @@
 
             <!-- Row to add a new product -->
             <tr v-if="showAddRow" class="add-row">
-              <td></td>
-              <td><input type="text" class="form-control-borderless" v-model="newProduct.logo" placeholder="Logo" /></td>
+              <td class="logo-input-container">
+                <div class="custom-file-upload">
+                  <input
+                    type="file"
+                    id="logo-upload"
+                    class="form-control-file"
+                    accept="image/*"
+                    @change="handleNewImageUpload($event)"
+                    aria-label="Upload product logo"
+                  />
+                  <label for="logo-upload" class="file-upload-label">
+                    <span class="file-upload-text">Choose Image</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="upload-icon"
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  </label>
+                  <small v-if="newProduct.logo" class="form-text text-muted"> Loaded image </small>
+                </div>
+              </td>
               <td><input type="text" class="form-control-borderless" v-model="newProduct.name" placeholder="Name" /></td>
               <td><input type="text" class="form-control-borderless" v-model="newProduct.description" placeholder="Description" /></td>
               <td>
@@ -280,18 +324,20 @@
                   <div class="icon-container settings-container" @click="openSettingsModal" title="Paramètres">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      width="14"
-                      height="14"
-                      fill="currentColor"
-                      class="bi bi-gear"
-                      viewBox="0 0 16 16"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="icon"
                     >
-                      <path
-                        d="M8 4.754a3.246 3.246 0 1 0 0 6.492a3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"
-                      />
-                      <path
-                        d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319z"
-                      />
+                      <rect x="3" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="14" width="7" height="7"></rect>
+                      <rect x="3" y="14" width="7" height="7"></rect>
                     </svg>
                   </div>
                 </div>
@@ -303,112 +349,107 @@
     </div>
 
     <!-- Detailed View Section (appears when a product is selected) -->
-    <div v-if="selectedProduct" class="mt-4">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h6 class="m-0">{{ selectedProduct.name }}</h6>
-        <button class="btn btn-sm btn-outline-secondary rounded-1" @click="returnToProductList">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-            <path
-              fillRule="evenodd"
-              d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"
-            />
-          </svg>
-          Back to list
-        </button>
-      </div>
-      <div class="card-body">
-        <!-- Tabs Navigation -->
-        <div class="vercel-tabs-container">
-          <div class="tabs-header position-relative">
-            <!-- Hover Highlight -->
-            <div
-              class="absolute-tab-highlight hover-highlight"
-              :style="{
-                left: `${hoverStyle.left}px`,
-                width: `${hoverStyle.width}px`,
-                opacity: hoveredIndex !== null ? 1 : 0,
-              }"
-            ></div>
-
-            <!-- Active Indicator -->
-            <div
-              class="absolute-tab-highlight active-indicator"
-              :style="{
-                left: `${activeStyle.left}px`,
-                width: `${activeStyle.width}px`,
-              }"
-            ></div>
-
-            <!-- Tabs -->
-            <div class="tabs-list">
-              <div
-                v-for="(tab, index) in tabs"
-                :key="index"
-                :ref="
-                  el => {
-                    if (el) tabRefs[index] = el;
-                  }
-                "
-                class="tab-item"
-                :class="{ active: index === activeTabIndex }"
-                @mouseenter="setHoveredIndex(index)"
-                @mouseleave="setHoveredIndex(null)"
-                @click="setActiveTabIndex(index)"
-              >
-                {{ tab }}
+    <div v-if="selectedProduct" class="mt-4 product-detail-view" style="transition: all 2s ease">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <!-- GitHub-style Breadcrumb Navigation -->
+            <div class="breadcrumb-navigation">
+              <div class="d-flex align-items-center">
+                <template v-for="(item, index) in breadcrumb" :key="index">
+                  <span v-if="index > 0" class="mx-2 text-muted" style="user-select: none">/</span>
+                  <span
+                    class="breadcrumb-item"
+                    :class="{ active: index === breadcrumb.length - 1, clickable: index < breadcrumb.length - 1 }"
+                    @click="navigateToBreadcrumb(index)"
+                  >
+                    {{ item.name }}
+                  </span>
+                </template>
               </div>
             </div>
           </div>
+          <button class="btn btn-sm btn-outline-secondary rounded-1" @click="returnToProductList">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+              <path
+                fillRule="evenodd"
+                d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"
+              />
+            </svg>
+            Back to list
+          </button>
+        </div>
+        <div class="card-body">
+          <!-- Tabs Navigation -->
+          <div class="vercel-tabs-container">
+            <div class="tabs-header position-relative">
+              <!-- Hover Highlight -->
+              <div
+                class="absolute-tab-highlight hover-highlight"
+                :style="{
+                  left: `${hoverStyle.left}px`,
+                  width: `${hoverStyle.width}px`,
+                  opacity: hoveredIndex !== null ? 1 : 0,
+                }"
+              ></div>
 
-          <!-- Tab Content -->
-          <div class="tab-content mt-4">
-            <!-- Versions Tab -->
-            <div v-if="activeTabIndex === 0" class="versions-tab">
-              <div class="d-flex justify-content-between mb-3">
-                <h6 class="mb-0">Product versions</h6>
-                <button class="btn btn-sm btn-primary rounded-1" @click="showAddVersionRow = true" :disabled="showAddVersionRow">
-                  New Version
-                </button>
+              <!-- Active Indicator -->
+              <div
+                class="absolute-tab-highlight active-indicator"
+                :style="{
+                  left: `${activeStyle.left}px`,
+                  width: `${activeStyle.width}px`,
+                }"
+              ></div>
+
+              <!-- Tabs -->
+              <div class="tabs-list">
+                <div
+                  v-for="(tab, index) in tabs"
+                  :key="index"
+                  :ref="
+                    el => {
+                      if (el) tabRefs[index] = el;
+                    }
+                  "
+                  class="tab-item"
+                  :class="{ active: index === activeTabIndex }"
+                  @mouseenter="setHoveredIndex(index)"
+                  @mouseleave="setHoveredIndex(null)"
+                  @click="setActiveTabIndex(index)"
+                >
+                  {{ tab }}
+                </div>
               </div>
-              <table class="table table-hover">
-                <thead class="thead-light">
-                  <tr>
-                    <th width="50"></th>
-                    <th scope="row"><span v-text="t$('sdiFrontendApp.productVersion.version')"></span></th>
-                    <th scope="col"><span v-text="t$('sdiFrontendApp.productVersion.root')"></span></th>
-                    <th scope="row"><span v-text="t$('sdiFrontendApp.productVersion.notes')"></span></th>
-                    <th scope="row" class="pl-5 ml-5"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-if="productVersions.length === 0 && !showAddVersionRow">
-                    <td colspan="6" class="text-center">
-                      <span>No version available</span>
-                    </td>
-                  </tr>
-                  <template v-for="(version, index) in paginatedVersions" :key="index">
+            </div>
+
+            <div class="tab-content mt-4" style="transition: all 2s ease">
+              <!-- Versions Tab (when no version is selected) -->
+              <div v-if="!selectedVersion && activeTabIndex === 0" class="versions-tab">
+                <div class="d-flex justify-content-between mb-3">
+                  <h6 class="mb-0"></h6>
+                  <button class="btn btn-sm btn-primary rounded-1" @click="showAddVersionLigne" :disabled="showAddVersionRow">
+                    New Version
+                  </button>
+                </div>
+                <table class="table table-hover">
+                  <thead class="thead-light">
                     <tr>
-                      <td class="text-center" @click.stop>
-                        <div
-                          class="icon-container expand-container mr-2"
-                          @click.stop="toggleVersionModules(version.id)"
-                          title="Voir les modules de cette version"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            fill="currentColor"
-                            :class="{ expanded: expandedVersions.has(version.id) }"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
-                            />
-                          </svg>
-                        </div>
+                      <th></th>
+                      <th scope="row"><span v-text="t$('sdiFrontendApp.productVersion.version')"></span></th>
+                      <th scope="col"><span v-text="t$('sdiFrontendApp.productVersion.root')"></span></th>
+                      <th scope="row"><span v-text="t$('sdiFrontendApp.productVersion.notes')"></span></th>
+                      <th scope="row" class="pl-lg-5 ml-5"><span class="pl-lg-5 ml-5">Actions</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="productVersions.length === 0 && !showAddVersionRow">
+                      <td colspan="6" class="text-center">
+                        <span>No version available</span>
                       </td>
+                    </tr>
+                    <tr v-for="(version, index) in paginatedVersions" :key="index" @click="selectVersion(version)" style="cursor: pointer">
+                      <td></td>
                       <td>
                         <template v-if="isEditingVersion && editingVersionData && editingVersionData.id === version.id">
                           <input
@@ -424,17 +465,8 @@
                         </template>
                       </td>
                       <td>
-                        <template v-if="isEditingVersion && editingVersionData && editingVersionData.id === version.id">
-                          <select v-model="editingVersionData.root" class="form-control-borderless" @click.stop>
-                            <option v-for="option in productVersions" :key="option.id" :value="option">
-                              {{ editingVersionData.product.name }} {{ ' - ' }} {{ option.version }}
-                            </option>
-                          </select>
-                        </template>
-                        <template v-else>
-                          <div v-if="version.root">{{ version.product.name }} {{ ' - ' }} {{ version.root?.version }}</div>
-                          <div v-else>-</div>
-                        </template>
+                        <div v-if="version.root">{{ version.product.name }} {{ ' - ' }} {{ version.root?.version }}</div>
+                        <div v-else>-</div>
                       </td>
                       <td>
                         <template v-if="isEditingVersion && editingVersionData && editingVersionData.id === version.id">
@@ -453,7 +485,7 @@
                         </template>
                       </td>
                       <td @click.stop class="d-flex align-items-center justify-content-center">
-                        <div class="action-icons">
+                        <div class="mr-lg-5 action-icons">
                           <template v-if="isEditingVersion && editingVersionData && editingVersionData.id === version.id">
                             <div class="icon-container save-container" @click="saveEditVersion(version)" title="Enregistrer">
                               <svg
@@ -557,399 +589,240 @@
                         <span>No Module version available</span>
                       </td>
                     </tr>
-                    <!-- Modules de la version (redesigned expandable row) -->
-                    <tr v-if="expandedVersions.has(version.id)">
-                      <td colspan="5">
-                        <div class="card">
-                          <div class="card-header">
-                            <div class="card-title-s">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="icon"
-                              >
-                                <rect x="3" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="14" width="7" height="7"></rect>
-                                <rect x="3" y="14" width="7" height="7"></rect>
-                              </svg>
-                              <span>Modules in this version</span>
-                            </div>
+
+                    <!-- Add new version row -->
+                    <tr v-if="showAddVersionRow" class="add-row">
+                      <td></td>
+                      <td><input type="text" class="form-control-borderless" v-model="newVersion.version" value="newVersion.version" /></td>
+                      <td>{{ newVersion.root?.product.name }}{{ ' - ' }}{{ newVersion.root?.version }}</td>
+                      <td><input type="text" class="form-control-borderless" v-model="newVersion.notes" placeholder="Notes" /></td>
+                      <td>
+                        <div class="mr-lg-5 action-icons">
+                          <div class="icon-container save-container" @click="saveNewVersion" title="Enregistrer">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save" height="16" width="16">
+                              <path
+                                d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
+                                fill="currentColor"
+                              />
+                            </svg>
                           </div>
-                          <div class="card-body-m">
-                            <ul class="component-list" v-if="version.moduleVersions && version.moduleVersions.length > 0">
-                              <li v-for="(moduleVersion, idx) in version.moduleVersions" :key="idx" class="component-item alert-info">
-                                <div class="component-info-s d-flex align-items-center">
-                                  <span class="component-root ml-2">
-                                    {{ getModuleVersionWithModuleCached(moduleVersion.id)?.module?.name }}
-                                    {{ getModuleVersionWithModuleCached(moduleVersion.id)?.version }}
-                                  </span>
-                                </div>
-                                <div class="action-buttons">
-                                  <div
-                                    class="button-icon features-button"
-                                    @click="openModuleFeaturesModal(moduleVersion)"
-                                    title="Voir les features du module version"
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      width="14"
-                                      height="14"
-                                      fill="currentColor"
-                                      viewBox="0 0 512 512"
-                                    >
-                                      <path
-                                        d="M345 39.1L472.8 168.4c52.4 53 52.4 138.2 0 191.2L360.8 472.9c-9.3 9.4-24.5 9.5-33.9 .2s-9.5-24.5-.2-33.9L438.6 325.9c33.9-34.3 33.9-89.4 0-123.7L310.9 72.9c-9.3-9.4-9.2-24.6 .2-33.9s24.6-9.2 33.9 .2zM0 229.5L0 80C0 53.5 21.5 32 48 32l149.5 0c17 0 33.3 6.7 45.3 18.7l168 168c25 25 25 65.5 0 90.5L277.3 442.7c-25 25-65.5 25-90.5 0l-168-168C6.7 262.7 0 246.5 0 229.5zM144 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"
-                                      />
-                                    </svg>
-                                    <span class="pl-2">Features</span>
-                                  </div>
-                                </div>
-                              </li>
-                            </ul>
-                            <div v-else class="empty-message">No modules for this version</div>
+                          <div class="icon-container delete-container" @click="cancelNewVersion" title="Annuler">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
+                              fill="currentColor"
+                              class="bi bi-x"
+                              viewBox="0 0 16 16"
+                            >
+                              <path
+                                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+                              />
+                            </svg>
+                          </div>
+                          <div class="icon-container settings-container" @click="openNewVersionSettings" title="Paramètres">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="14"
+                              height="14"
+                              fill="currentColor"
+                              class="bi bi-gear"
+                              viewBox="0 0 16 16"
+                            >
+                              <path
+                                d="M8 4.754a3.246 3.246 0 1 0 0 6.492a3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"
+                              />
+                              <path
+                                d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291a1.873 1.873 0 0 0-1.116-2.693l-.318-.094c-.835-.246-.835-1.428 0-1.674l.319-.094a1.873 1.873 0 0 0 1.115-2.692l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"
+                              />
+                            </svg>
                           </div>
                         </div>
                       </td>
                     </tr>
-                  </template>
-
-                  <!-- Add new version row -->
-                  <tr v-if="showAddVersionRow" class="add-row">
-                    <td></td>
-                    <td><input type="text" class="form-control-borderless" v-model="newVersion.version" placeholder="Version" /></td>
-                    <td>
-                      <select class="form-control-borderless" v-model="newVersion.root">
-                        <option v-for="option in productVersions" :key="option.id" :value="option">
-                          {{ option.product.name }} {{ ' - ' }} {{ option.version }}
-                        </option>
-                      </select>
-                    </td>
-                    <td><input type="text" class="form-control-borderless" v-model="newVersion.notes" placeholder="Notes" /></td>
-                    <td>
-                      <div class="action-icons">
-                        <div class="icon-container save-container" @click="saveNewVersion" title="Enregistrer">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save" height="16" width="16">
-                            <path
-                              d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
-                              fill="currentColor"
-                            />
-                          </svg>
-                        </div>
-                        <div class="icon-container delete-container" @click="cancelNewVersion" title="Annuler">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            fill="currentColor"
-                            class="bi bi-x"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
-                            />
-                          </svg>
-                        </div>
-                        <div class="icon-container settings-container" @click="openNewVersionSettings" title="Paramètres">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            height="14"
-                            fill="currentColor"
-                            class="bi bi-gear"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M8 4.754a3.246 3.246 0 1 0 0 6.492a3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"
-                            />
-                            <path
-                              d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291a1.873 1.873 0 0 0-1.116-2.693l-.318-.094c-.835-.246-.835-1.428 0-1.674l.319-.094a1.873 1.873 0 0 0 1.115-2.692l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <!-- Modules Tab -->
-            <div v-if="activeTabIndex === 1" class="modules-tab">
-              <div v-if="!selectedVersion" class="d-flex justify-content-between mb-3">
-                <h6 class="mb-0">Modules</h6>
-                <button class="btn btn-sm btn-primary rounded-1" @click="showAddModuleRow = true" :disabled="showAddModuleRow">
-                  New Module
-                </button>
+                  </tbody>
+                </table>
               </div>
-              <table v-if="!selectedVersion" class="table table-hover">
-                <thead class="thead-light">
-                  <tr>
-                    <th scope="col">Nom</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Versions</th>
-                    <th scope="col" class="pl-lg-5">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-if="getFilteredModules.length === 0 && !showAddModuleRow">
-                    <td colspan="5" class="text-center">
-                      <span>No module available</span>
-                    </td>
-                  </tr>
-                  <tr v-for="(module, index) in getFilteredModules" :key="index">
-                    <td>{{ module.name }}</td>
-                    <td class="text-truncate" style="max-width: 250px" :title="module.description">
-                      {{ module.description }}
-                    </td>
-                    <td v-if="selectedVersion">{{ module.version }}</td>
-                    <td>
-                      <div
-                        class="alert alert-primary d-inline-flex align-items-center py-1 px-2 btn-sm"
-                        style="font-size: 0.9rem; line-height: 1; gap: 0.25rem; margin-top: 0px; margin-bottom: 0px"
-                        @click="openModuleVersionsModal(module)"
-                        title="Voir les versions"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="14"
-                          height="14"
-                          fill="currentColor"
-                          class="bi bi-layers"
-                          viewBox="0 0 512 512"
+
+              <!-- Modules Tab (when version is selected) -->
+              <div v-if="selectedVersion && activeTabIndex === 0" class="modules-tab" style="transition: all 2s ease">
+                <div class="d-flex justify-content-between mb-3">
+                  <h6 class="mb-0"></h6>
+                  <button class="btn btn-sm btn-outline-secondary rounded-1" @click="returnToVersionsList">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      class="bi bi-arrow-left"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"
+                      />
+                    </svg>
+                    Back to versions
+                  </button>
+                </div>
+                <table class="table table-hover">
+                  <thead class="thead-light">
+                    <tr>
+                      <th class="pl-5">Module</th>
+                      <th>Version</th>
+                      <th>Features</th>
+                      <th>Description</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="getFilteredModules.length === 0">
+                      <td colspan="6" class="text-center">
+                        <span>No module available for this version</span>
+                      </td>
+                    </tr>
+                    <tr v-for="(module, index) in getFilteredModules" :key="index">
+                      <td class="pl-5">{{ getModuleVersionWithModuleCached(module.id)?.module?.name }}</td>
+                      <td>{{ module.version }}</td>
+                      <td>
+                        <div
+                          class="alert alert-primary d-inline-flex align-items-center py-1 px-2 btn-sm"
+                          style="font-size: 0.9rem; line-height: 1; gap: 0.25rem; margin-top: 0px; margin-bottom: 0px"
+                          @click="openModuleFeaturesModal(module)"
+                          title="Voir les features du module version"
                         >
-                          <path
-                            d="M345 39.1L472.8 168.4c52.4 53 52.4 138.2 0 191.2L360.8 472.9c-9.3 9.4-24.5 9.5-33.9 .2s-9.5-24.5-.2-33.9L438.6 325.9c33.9-34.3 33.9-89.4 0-123.7L310.9 72.9c-9.3-9.4-9.2-24.6 .2-33.9s24.6-9.2 33.9 .2zM0 229.5L0 80C0 53.5 21.5 32 48 32l149.5 0c17 0 33.3 6.7 45.3 18.7l168 168c25 25 25 65.5 0 90.5L277.3 442.7c-25 25-65.5 25-90.5 0l-168-168C6.7 262.7 0 246.5 0 229.5zM144 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"
-                          />
-                        </svg>
-                        Versions
-                      </div>
-                    </td>
-                    <td>
-                      <div class="action-icons">
-                        <div class="icon-container edit-container" @click="editModule(module)" title="Modifier">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="14"
                             height="14"
                             fill="currentColor"
-                            class="bi bi-pencil-fill"
-                            viewBox="0 0 16 16"
+                            class="bi bi-layers"
+                            viewBox="0 0 512 512"
                           >
                             <path
-                              d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                              d="M345 39.1L472.8 168.4c52.4 53 52.4 138.2 0 191.2L360.8 472.9c-9.3 9.4-24.5 9.5-33.9 .2s-9.5-24.5-.2-33.9L438.6 325.9c33.9-34.3 33.9-89.4 0-123.7L310.9 72.9c-9.3-9.4-9.2-24.6 .2-33.9s24.6-9.2 33.9 .2zM0 229.5L0 80C0 53.5 21.5 32 48 32l149.5 0c17 0 33.3 6.7 45.3 18.7l168 168c25 25 25 65.5 0 90.5L277.3 442.7c-25 25-65.5 25-90.5 0l-168-168C6.7 262.7 0 246.5 0 229.5zM144 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"
                             />
                           </svg>
+                          Features
                         </div>
-                        <div class="icon-container delete-container" @click="prepareRemoveModule(module)" title="Supprimer">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            fill="currentColor"
-                            class="bi bi-x"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+                      </td>
+                      <td class="text-truncate" style="max-width: 250px" :title="module.notes">
+                        {{ getModuleVersionWithModuleCached(module.id).notes }}
+                      </td>
+                      <td>
+                        <div class="action-icons">
+                          <div class="icon-container edit-container" title="Modifier">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="14"
+                              height="14"
                               fill="currentColor"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <!-- Row to add a new module -->
-                  <tr v-if="showAddModuleRow" class="add-row">
-                    <td><input type="text" class="form-control-borderless" v-model="newModule.name" placeholder="Nom du module" /></td>
-                    <td><input type="text" class="form-control-borderless" v-model="newModule.description" placeholder="Description" /></td>
-                    <td>-</td>
-                    <td>
-                      <div class="action-icons">
-                        <div class="icon-container save-container" @click="saveNewModule" title="Enregistrer">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save" height="16" width="16">
-                            <path
-                              d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
+                              class="bi bi-pencil-fill"
+                              viewBox="0 0 16 16"
+                            >
+                              <path
+                                d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                              />
+                            </svg>
+                          </div>
+                          <div class="icon-container delete-container" title="Supprimer">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
                               fill="currentColor"
-                            />
-                          </svg>
+                              class="bi bi-x"
+                              viewBox="0 0 16 16"
+                            >
+                              <path
+                                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+                                fill="currentColor"
+                              />
+                            </svg>
+                          </div>
                         </div>
-                        <div class="icon-container cancel-container" @click="cancelNewModule" title="Annuler">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            fill="currentColor"
-                            class="bi bi-x"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <div v-if="selectedVersion" class="d-flex justify-content-between mb-3">
-                <h6 class="mb-0">{{ selectedVersion.product?.name }}{{ '-' }}{{ selectedVersion.version }} {{ '  Modules Versions' }}</h6>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <table v-if="selectedVersion" class="table table-hover">
-                <thead class="thead-light">
-                  <tr>
-                    <th>Module</th>
-                    <th>Version</th>
-                    <th>Root</th>
-                    <th>Features</th>
-                    <th>Description</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-if="getFilteredModules.length === 0 && !showAddModuleVersionRow">
-                    <td colspan="6" class="text-center">
-                      <span v-if="selectedVersion">No module available for this version</span>
-                    </td>
-                  </tr>
-                  <tr v-for="(module, index) in getFilteredModules" :key="index">
-                    <td>{{ module.module?.name }}</td>
-                    <td>{{ module.version }}</td>
-                    <td>{{ module.module?.name }} {{ ' - ' }} {{ module.root?.version }}</td>
-                    <td>
-                      <div
-                        class="alert alert-primary d-inline-flex align-items-center py-1 px-2 btn-sm"
-                        style="font-size: 0.9rem; line-height: 1; gap: 0.25rem; margin-top: 0px; margin-bottom: 0px"
-                        @click="openModuleFeaturesModal(module)"
-                        title="Voir les features du module version"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="14"
-                          height="14"
-                          fill="currentColor"
-                          class="bi bi-layers"
-                          viewBox="0 0 512 512"
-                        >
-                          <path
-                            d="M345 39.1L472.8 168.4c52.4 53 52.4 138.2 0 191.2L360.8 472.9c-9.3 9.4-24.5 9.5-33.9 .2s-9.5-24.5-.2-33.9L438.6 325.9c33.9-34.3 33.9-89.4 0-123.7L310.9 72.9c-9.3-9.4-9.2-24.6 .2-33.9s24.6-9.2 33.9 .2zM0 229.5L0 80C0 53.5 21.5 32 48 32l149.5 0c17 0 33.3 6.7 45.3 18.7l168 168c25 25 25 65.5 0 90.5L277.3 442.7c-25 25-65.5 25-90.5 0l-168-168C6.7 262.7 0 246.5 0 229.5zM144 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"
-                          />
-                        </svg>
-                        Features
-                      </div>
-                    </td>
-                    <td class="text-truncate" style="max-width: 250px" :title="module.description">
-                      {{ module.description }}
-                    </td>
-                    <td>
-                      <div class="action-icons">
-                        <div class="icon-container edit-container" @click="editModuleVersion(module)" title="Modifier">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            height="14"
-                            fill="currentColor"
-                            class="bi bi-pencil-fill"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
-                            />
-                          </svg>
-                        </div>
-                        <div class="icon-container delete-container" @click="removeModuleVersion(module)" title="Supprimer">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            fill="currentColor"
-                            class="bi bi-x"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
-                              fill="currentColor"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Configuration Tab -->
-            <div v-if="activeTabIndex === 2" class="configuration-tab">
-              <div class="d-flex justify-content-between mb-3">
-                <h6 class="mb-0">{{ 'Configuration' }}</h6>
+              <!-- Configuration Tab (when version is selected) -->
+              <div v-if="selectedVersion && activeTabIndex === 1" class="configuration-tab" style="transition: all 2s ease">
+                <div class="d-flex justify-content-between mb-2">
+                  <h6 class="mb-0"></h6>
+                  <button class="btn btn-sm btn-outline-secondary rounded-1" @click="returnToVersionsList">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      class="bi bi-arrow-left"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"
+                      />
+                    </svg>
+                    Back to versions
+                  </button>
+                </div>
+                <table class="table table-hover">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>Type</th>
+                      <th>Nom</th>
+                      <th>Version</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="getFilteredInfraComponents.length === 0">
+                      <td colspan="4" class="text-center">
+                        <span>No component available for this version</span>
+                      </td>
+                    </tr>
+                    <tr v-for="(component, index) in getFilteredInfraComponents" :key="index">
+                      <td>{{ component.infraComponent?.componentType.type }}</td>
+                      <td>{{ component.infraComponent?.name }}</td>
+                      <td>{{ component.version }}</td>
+                      <td>{{ component.description }}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <table class="table table-hover">
-                <thead class="thead-light">
-                  <tr>
-                    <th>Type</th>
-                    <th>Nom</th>
-                    <th>Version</th>
-                    <th>Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-if="getFilteredInfraComponents.length === 0">
-                    <td colspan="4" class="text-center">
-                      <span v-if="selectedVersion">No component available for this version</span>
-                      <span v-else>No infrastructure component available</span>
-                    </td>
-                  </tr>
-                  <tr v-for="(component, index) in getFilteredInfraComponents" :key="index">
-                    <td>{{ component.infraComponent?.componentType.type }}</td>
-                    <td>{{ component.infraComponent?.name }}</td>
-                    <td>{{ component.version }}</td>
-                    <td>{{ component.description }}</td>
-                  </tr>
-                </tbody>
-              </table>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Product Settings Modal -->
-    <div class="modal-backdrop" v-if="showSettingsModal" @click="closeSettingsModal"></div>
-    <div class="modal-container" v-if="showSettingsModal" role="dialog" aria-modal="true">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Product parameters</h5>
-          <button type="button" class="close-button" @click="closeSettingsModal" aria-label="Fermer">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="icon"
-            >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
+      <!-- Product certifications Modal -->
+      <div class="modal-backdrop" v-if="showCertificationsModal" @click="closeCertificationsModal"></div>
+      <div class="modal-container" v-if="showCertificationsModal" role="dialog" aria-modal="true">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Product Certifications</h5>
+            <button type="button" class="close-button" @click="closeCertificationsModal" aria-label="Fermer">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
 
-        <div class="modal-body">
-          <div class="grid">
-            <!-- Infrastructure Components Section -->
+          <div class="modal-body">
+            <!-- certification Section -->
             <div class="card">
               <div class="card-header">
                 <div class="card-title">
@@ -965,64 +838,98 @@
                     stroke-linejoin="round"
                     class="icon"
                   >
-                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-                    <line x1="6" y1="6" x2="6.01" y2="6"></line>
-                    <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
                   </svg>
-                  <span>Infrastructure components</span>
+                  <span>Available certification</span>
                 </div>
                 <button
                   class="button"
-                  :class="{ 'button-primary': !showInfraSelector, 'button-secondary': showInfraSelector }"
-                  @click="showInfraSelector = !showInfraSelector"
+                  :class="{ 'button-primary': !showCertificationSelector, 'button-secondary': showCertificationSelector }"
+                  @click="showCertificationSelector = !showCertificationSelector"
                 >
-                  {{ showInfraSelector ? 'Close' : 'Add' }}
+                  {{ showCertificationSelector ? 'Close' : 'Add' }}
                 </button>
               </div>
 
               <div class="card-body">
-                <div v-if="showInfraSelector" class="selector-container">
+                <div v-if="showCertificationSelector" class="selector-container">
                   <div class="select-wrapper">
-                    <select class="select" v-model="selectedInfraComponentId">
-                      <option value="">Select a component</option>
-                      <option v-for="component in infraComponentVersionOptions" :key="component.id" :value="component.id">
-                        {{ component.infraComponent.name }} ({{ component.version }})
+                    <select class="select" v-model="selectedCertificationId">
+                      <option value="">Select a certifications</option>
+                      <option v-for="cert in certificationsOptions" :key="cert.id" :value="cert.id">
+                        {{ cert.name }}
                       </option>
                     </select>
                   </div>
-                  <button class="button button-success" @click="addInfraToProduct" :disabled="!selectedInfraComponentId">Add</button>
+                  <button class="button button-success" @click="addCertificationToProduct" :disabled="!selectedCertificationId">Add</button>
                 </div>
-
                 <ul class="component-list">
-                  <li v-for="(component, index) in productInfraComponents" :key="index" class="component-item">
+                  <li v-for="(cert, index) in productCertifications" :key="index" class="component-item">
                     <div class="component-info">
-                      <span class="component-name">{{ component.name }}</span>
-                      <span class="component-version">{{ component.version }}</span>
+                      <span class="component-name">{{ cert.name }}</span>
                     </div>
-                    <button class="button-icon" @click="removeInfraFromProduct(index)" aria-label="Supprimer">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="icon"
-                      >
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                      </svg>
-                    </button>
+                    <div class="action-buttons">
+                      <button class="button-icon" @click="removeCertificationFromProduct(index)" aria-label="Supprimer">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="icon"
+                        >
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    </div>
                   </li>
-                  <li v-if="productInfraComponents.length === 0" class="empty-message">No selected component</li>
+                  <li v-if="productCertifications.length === 0" class="empty-message">No selected certification</li>
                 </ul>
               </div>
             </div>
+          </div>
 
+          <div class="modal-footer">
+            <button type="button" class="button button-secondary" @click="closeCertificationsModal">Cancel</button>
+            <button type="button" class="button button-primary" @click="saveCertificationsModal">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Settings Modal -->
+      <div class="modal-backdrop" v-if="showSettingsModal" @click="closeSettingsModal"></div>
+      <div class="modal-container" v-if="showSettingsModal" role="dialog" aria-modal="true">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Product modules</h5>
+            <button type="button" class="close-button" @click="closeSettingsModal" aria-label="Fermer">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="modal-body">
             <!-- Modules Section -->
             <div class="card">
               <div class="card-header">
@@ -1054,7 +961,6 @@
                   {{ showModuleSelector ? 'Close' : 'Add' }}
                 </button>
               </div>
-
               <div class="card-body">
                 <div v-if="showModuleSelector" class="selector-container">
                   <div class="select-wrapper">
@@ -1155,168 +1061,95 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="modal-footer">
-          <button type="button" class="button button-secondary" @click="closeSettingsModal">Cancel</button>
-          <button type="button" class="button button-primary" @click="saveSettingsModal">Save</button>
+          <div class="modal-footer">
+            <button type="button" class="button button-secondary" @click="closeSettingsModal">Cancel</button>
+            <button type="button" class="button button-primary" @click="saveSettingsModal">Save</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Version Settings Modal -->
-    <div class="modal-backdrop" v-if="showVersionSettingsModal" @click="closeVersionSettingsModal"></div>
-    <div class="modal-container" v-if="showVersionSettingsModal" role="dialog" aria-modal="true">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Product Version parameters</h5>
-          <button type="button" class="close-button" @click="closeVersionSettingsModal" aria-label="Fermer">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="icon"
-            >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
+      <!-- Version Settings Modal -->
+      <div class="modal-backdrop" v-if="showVersionSettingsModal" @click="closeVersionSettingsModal"></div>
+      <div class="modal-container" v-if="showVersionSettingsModal" role="dialog" aria-modal="true">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Product Version parameters</h5>
+            <button type="button" class="close-button" @click="closeVersionSettingsModal" aria-label="Fermer">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
 
-        <div class="modal-body">
-          <div class="grid">
-            <!-- Infrastructure Components Section -->
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="icon"
-                  >
-                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-                    <line x1="6" y1="6" x2="6.01" y2="6"></line>
-                    <line x1="6" y1="18" x2="6.01" y2="18"></line>
-                  </svg>
-                  <span>Infrastructure components</span>
-                </div>
-                <button
-                  class="button"
-                  :class="{ 'button-primary': !showVersionInfraSelector, 'button-secondary': showVersionInfraSelector }"
-                  @click="showVersionInfraSelector = !showVersionInfraSelector"
-                >
-                  {{ showVersionInfraSelector ? 'Close' : 'Add' }}
-                </button>
-              </div>
-
-              <div class="card-body">
-                <div v-if="showVersionInfraSelector" class="selector-container">
-                  <div class="select-wrapper">
-                    <select class="select" v-model="selectedVersionInfraComponentId">
-                      <option value="">Select a component</option>
-                      <option v-for="component in infraComponentVersionOptions" :key="component.id" :value="component.id">
-                        {{ component.infraComponent.name }} ({{ component.version }})
-                      </option>
-                    </select>
+          <div class="modal-body">
+            <div class="grid">
+              <!-- Infrastructure Components Section -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="icon"
+                    >
+                      <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                      <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                      <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                      <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                    </svg>
+                    <span>Infrastructure components</span>
                   </div>
-                  <button class="button button-success" @click="addInfraToVersion" :disabled="!selectedVersionInfraComponentId">Add</button>
+                  <button
+                    class="button"
+                    :class="{ 'button-primary': !showVersionInfraSelector, 'button-secondary': showVersionInfraSelector }"
+                    @click="showVersionInfraSelector = !showVersionInfraSelector"
+                  >
+                    {{ showVersionInfraSelector ? 'Close' : 'Add' }}
+                  </button>
                 </div>
 
-                <ul class="component-list">
-                  <li v-for="(component, index) in versionInfraComponents" :key="index" class="component-item">
-                    <div class="component-info">
-                      <span class="component-name">{{ component.infraComponent?.name }}</span>
-                      <span class="component-version">{{ component.version }}</span>
+                <div class="card-body">
+                  <div v-if="showVersionInfraSelector" class="selector-container">
+                    <div class="select-wrapper">
+                      <select class="select" v-model="selectedVersionInfraComponentId">
+                        <option value="">Select a component</option>
+                        <option v-for="component in infraComponentVersionOptions" :key="component.id" :value="component.id">
+                          {{ component.infraComponent.name }} ({{ component.version }})
+                        </option>
+                      </select>
                     </div>
-                    <button class="button-icon" @click="removeInfraFromVersion(index)" aria-label="Supprimer">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="icon"
-                      >
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                      </svg>
+                    <button class="button button-success" @click="addInfraToVersion" :disabled="!selectedVersionInfraComponentId">
+                      Add
                     </button>
-                  </li>
-                  <li v-if="versionInfraComponents.length === 0" class="empty-message">No selected component</li>
-                </ul>
-              </div>
-            </div>
-
-            <!-- Modules Section -->
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="icon"
-                  >
-                    <rect x="3" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="14" width="7" height="7"></rect>
-                    <rect x="3" y="14" width="7" height="7"></rect>
-                  </svg>
-                  <span>Modules Version</span>
-                </div>
-                <button
-                  class="button"
-                  :class="{ 'button-primary': !showVersionModuleSelector, 'button-secondary': showVersionModuleSelector }"
-                  @click="showVersionModuleSelector = !showVersionModuleSelector"
-                >
-                  {{ showModuleSelector ? 'Close' : 'Add' }}
-                </button>
-              </div>
-
-              <div class="card-body">
-                <div v-if="showVersionModuleSelector" class="selector-container">
-                  <div class="select-wrapper">
-                    <select class="select" v-model="selectedVersionModuleId">
-                      <option value="">Select a module</option>
-                      <option v-for="moduleVersion in moduleVersionOptions" :key="moduleVersion.id" :value="moduleVersion.id">
-                        {{ moduleVersion.module?.name }} ({{ moduleVersion.version }})
-                      </option>
-                    </select>
                   </div>
-                  <button class="button button-success" @click="addModuleToVersion" :disabled="!selectedVersionModuleId">Add</button>
-                </div>
 
-                <ul class="component-list">
-                  <li v-for="(moduleVersion, index) in versionModuleVersions" :key="index" class="component-item">
-                    <div class="component-info">
-                      <span class="component-name">{{ moduleVersion.module?.name }} ({{ moduleVersion.version }})</span>
-                    </div>
-                    <div class="action-buttons">
-                      <button class="button-icon" @click="removeModuleFromVersion(index)" aria-label="Supprimer">
+                  <ul class="component-list">
+                    <li v-for="(component, index) in versionInfraComponents" :key="index" class="component-item">
+                      <div class="component-info">
+                        <span class="component-name">{{ component.infraComponent?.name }}</span>
+                        <span class="component-version">{{ component.version }}</span>
+                      </div>
+                      <button class="button-icon" @click="removeInfraFromVersion(index)" aria-label="Supprimer">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="18"
@@ -1333,173 +1166,389 @@
                           <line x1="6" y1="6" x2="18" y2="18"></line>
                         </svg>
                       </button>
+                    </li>
+                    <li v-if="versionInfraComponents.length === 0" class="empty-message">No selected component</li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Modules Section -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="icon"
+                    >
+                      <rect x="3" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="14" width="7" height="7"></rect>
+                      <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>Modules Version</span>
+                  </div>
+                  <button
+                    class="button"
+                    :class="{ 'button-primary': !showVersionModuleSelector, 'button-secondary': showVersionModuleSelector }"
+                    @click="showVersionModuleSelector = !showVersionModuleSelector"
+                  >
+                    {{ showModuleSelector ? 'Close' : 'Add' }}
+                  </button>
+                </div>
+
+                <div class="card-body">
+                  <div v-if="showVersionModuleSelector" class="selector-container">
+                    <div class="select-wrapper">
+                      <select id="module-select" class="select" v-model="selectedModuleId" @change="fetchModuleVersionsForSelectedModule">
+                        <option value="">Select a module</option>
+                        <option v-for="module in selectedProduct.modules" :key="module.id" :value="module.id">
+                          {{ module.name }}
+                        </option>
+                      </select>
                     </div>
-                  </li>
-                  <li v-if="versionModuleVersions.length === 0" class="empty-message">No selected module</li>
-                </ul>
+                    <div class="select-wrapper" v-if="selectedModuleId">
+                      <select id="module-version-select" class="select" v-model="selectedVersionModuleId">
+                        <option value="">Select a version</option>
+                        <option v-for="moduleVersion in filteredModuleVersionOptions" :key="moduleVersion.id" :value="moduleVersion.id">
+                          {{ moduleVersion.version }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <!-- Bouton pour ajouter la version du module -->
+                    <button class="button button-success" @click="addModuleToVersion" :disabled="!selectedVersionModuleId">Add</button>
+                  </div>
+
+                  <ul class="component-list">
+                    <li v-for="(moduleVersion, index) in versionModuleVersions" :key="index" class="component-item">
+                      <div class="component-info">
+                        <span class="component-name">
+                          {{ getModuleVersionWithModuleCached(moduleVersion.id)?.module?.name }} ({{ moduleVersion.version }})</span
+                        >
+                      </div>
+                      <div class="action-buttons">
+                        <button class="button-icon" @click="removeModuleFromVersion(index)" aria-label="Supprimer">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      </div>
+                    </li>
+                    <li v-if="versionModuleVersions.length === 0" class="empty-message">No selected module</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="button button-secondary" @click="closeVersionSettingsModal">Cancel</button>
+            <button type="button" class="button button-primary" @click="saveVersionSettingsModal">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module Versions Modal -->
+      <div class="card modal fade show" v-if="showModuleVersionsModal" style="display: block" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">{{ selectedModule ? selectedModule.name : '' }}</h5>
+              <button type="button" class="close" @click="closeModuleVersionsModal">
+                <span>&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="d-flex justify-content-between mb-3">
+                <h6 class="mb-0">List of versions</h6>
+                <button class="button button-primary" @click="showAddModuleVersionRow = true" :disabled="showAddModuleVersionRow">
+                  New Version
+                </button>
+              </div>
+              <table class="table table-hover">
+                <thead class="thead-light">
+                  <tr>
+                    <th>Version</th>
+                    <th>Notes</th>
+                    <th class="pl-5">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="moduleVersions.length === 0 && !showAddModuleVersionRow">
+                    <td colspan="5" class="text-center">No version available for this module</td>
+                  </tr>
+                  <tr v-for="(version, index) in moduleVersions" :key="index">
+                    <td>{{ version.version }}</td>
+                    <td class="text-truncate" style="max-width: 200px" :title="version.notes">
+                      {{ version.notes || '-' }}
+                    </td>
+                    <td>
+                      <div class="action-icons">
+                        <div class="icon-container edit-container" @click="editModuleVersion(version)" title="Modifier">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-pencil-fill"
+                            viewBox="0 0 16 16"
+                          >
+                            <path
+                              d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                            />
+                          </svg>
+                        </div>
+                        <div class="icon-container delete-container" @click="removeModuleVersion(index)" title="Supprimer">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-x"
+                            viewBox="0 0 16 16"
+                          >
+                            <path
+                              d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- Add new module version row -->
+                  <tr v-if="showAddModuleVersionRow" class="add-row">
+                    <td><input type="text" class="form-control-borderless" v-model="newModuleVersion.version" placeholder="Version" /></td>
+                    <td><input type="text" class="form-control-borderless" v-model="newModuleVersion.notes" placeholder="Notes" /></td>
+                    <td>
+                      <div class="action-icons">
+                        <div class="icon-container save-container" @click="saveNewModuleVersion" title="Enregistrer">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-check2"
+                            viewBox="0 0 16 16"
+                          >
+                            <path
+                              d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"
+                            />
+                          </svg>
+                        </div>
+                        <div class="icon-container cancel-container" @click="cancelNewModuleVersion" title="Annuler">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-x"
+                            viewBox="0 0 16 16"
+                          >
+                            <path
+                              d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <!-- Features Table -->
+              <div v-if="showFeaturesTable" class="mt-4">
+                <div class="d-flex justify-content-between mb-3">
+                  <h6 class="mb-0">Freatures for version {{ selectedModuleVersion.version }}</h6>
+                  <div>
+                    <button type="button" class="button button-primary" @click="showAddFeatureRow = true" :disabled="showAddFeatureRow">
+                      Add Feature
+                    </button>
+                    <button type="button" class="button button-secondary ml-2" @click="closeFeatureModule">x</button>
+                  </div>
+                </div>
+                <table class="table table-hover">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                      <th>Created</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="features.length === 0 && !showAddFeatureRow">
+                      <td colspan="4" class="text-center">No features available for this module version</td>
+                    </tr>
+                    <tr v-for="(feature, index) in features" :key="index">
+                      <td>
+                        <template v-if="feature.isEditing">
+                          <input type="text" class="form-control-borderless" v-model="feature.name" placeholder="Name" />
+                        </template>
+                        <template v-else>
+                          {{ feature.name }}
+                        </template>
+                      </td>
+                      <td>
+                        <template v-if="feature.isEditing">
+                          <input type="text" class="form-control-borderless" v-model="feature.description" placeholder="Description" />
+                        </template>
+                        <template v-else>
+                          {{ feature.description }}
+                        </template>
+                      </td>
+                      <td>{{ formatDate(feature.createDate) }}</td>
+                      <td>
+                        <div class="action-icons">
+                          <template v-if="feature.isEditing">
+                            <div class="icon-container save-container" @click="saveEditFeature(feature)" title="Enregistrer">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                class="bi bi-check2"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"
+                                />
+                              </svg>
+                            </div>
+                            <div class="icon-container cancel-container" @click="cancelEditFeature(feature)" title="Annuler">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                class="bi bi-x"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+                                />
+                              </svg>
+                            </div>
+                          </template>
+                          <template v-else>
+                            <div class="icon-container edit-container" @click="editFeature(feature)" title="Modifier">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                fill="currentColor"
+                                class="bi bi-pencil-fill"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                                />
+                              </svg>
+                            </div>
+                            <div class="icon-container delete-container" @click="removeFeature(index)" title="Supprimer">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                class="bi bi-x"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+                                />
+                              </svg>
+                            </div>
+                          </template>
+                        </div>
+                      </td>
+                    </tr>
+                    <!-- Add new feature row -->
+                    <tr v-if="showAddFeatureRow" class="add-row">
+                      <td><input type="text" class="form-control-borderless" v-model="newFeature.name" placeholder="Name" /></td>
+                      <td>
+                        <input type="text" class="form-control-borderless" v-model="newFeature.description" placeholder="Description" />
+                      </td>
+                      <td>{{ formatDate(newFeature.createDate) }}</td>
+                      <td>
+                        <div class="action-icons">
+                          <div class="icon-container save-container" @click="saveNewFeature" title="Enregistrer">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              fill="currentColor"
+                              class="bi bi-check2"
+                              viewBox="0 0 16 16"
+                            >
+                              <path
+                                d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"
+                              />
+                            </svg>
+                          </div>
+                          <div class="icon-container cancel-container" @click="cancelNewFeature" title="Annuler">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              fill="currentColor"
+                              class="bi bi-x"
+                              viewBox="0 0 16 16"
+                            >
+                              <path
+                                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
         </div>
-
-        <div class="modal-footer">
-          <button type="button" class="button button-secondary" @click="closeVersionSettingsModal">Cancel</button>
-          <button type="button" class="button button-primary" @click="saveVersionSettingsModal">Save</button>
-        </div>
       </div>
-    </div>
-
-    <!-- Module Versions Modal -->
-    <div class="card modal fade show" v-if="showModuleVersionsModal" style="display: block" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">{{ selectedModule ? selectedModule.name : '' }}</h5>
-            <button type="button" class="close" @click="closeModuleVersionsModal">
-              <span>&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="d-flex justify-content-between mb-3">
-              <h6 class="mb-0">List of versions</h6>
-              <button class="button button-primary" @click="showAddModuleVersionRow = true" :disabled="showAddModuleVersionRow">
-                New Version
+      <!-- Module Features Modal -->
+      <div class="card modal fade show" v-if="showModuleFeaturesModal" style="display: block" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Features</h5>
+              <button type="button" class="close" @click="closeModuleFeaturesModal">
+                <span>&times;</span>
               </button>
             </div>
-            <table class="table table-hover">
-              <thead class="thead-light">
-                <tr>
-                  <th>Version</th>
-                  <th>Date of creation</th>
-                  <th>Notes</th>
-                  <th>Features</th>
-                  <th class="pl-5">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="moduleVersions.length === 0 && !showAddModuleVersionRow">
-                  <td colspan="5" class="text-center">No version available for this module</td>
-                </tr>
-                <tr v-for="(version, index) in moduleVersions" :key="index">
-                  <td>{{ version.version }}</td>
-                  <td>{{ formatDate(version.createDate) }}</td>
-                  <td class="text-truncate" style="max-width: 200px" :title="version.notes">
-                    {{ version.notes || '-' }}
-                  </td>
-                  <td>
-                    <div
-                      class="alert alert-primary d-inline-flex align-items-center py-1 px-2 btn-sm"
-                      style="font-size: 0.9rem; line-height: 1; gap: 0.25rem; margin-top: 0px; margin-bottom: 0px"
-                      @click="openModuleVersionFeaturesTable(version)"
-                      title="Voir les features du module version"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        fill="currentColor"
-                        class="bi bi-layers"
-                        viewBox="0 0 512 512"
-                      >
-                        <path
-                          d="M345 39.1L472.8 168.4c52.4 53 52.4 138.2 0 191.2L360.8 472.9c-9.3 9.4-24.5 9.5-33.9 .2s-9.5-24.5-.2-33.9L438.6 325.9c33.9-34.3 33.9-89.4 0-123.7L310.9 72.9c-9.3-9.4-9.2-24.6 .2-33.9s24.6-9.2 33.9 .2zM0 229.5L0 80C0 53.5 21.5 32 48 32l149.5 0c17 0 33.3 6.7 45.3 18.7l168 168c25 25 25 65.5 0 90.5L277.3 442.7c-25 25-65.5 25-90.5 0l-168-168C6.7 262.7 0 246.5 0 229.5zM144 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"
-                        />
-                      </svg>
-                      Features
-                    </div>
-                  </td>
-                  <td>
-                    <div class="action-icons">
-                      <div class="icon-container edit-container" @click="editModuleVersion(version)" title="Modifier">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="currentColor"
-                          class="bi bi-pencil-fill"
-                          viewBox="0 0 16 16"
-                        >
-                          <path
-                            d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
-                          />
-                        </svg>
-                      </div>
-                      <div class="icon-container delete-container" @click="removeModuleVersion(index)" title="Supprimer">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="currentColor"
-                          class="bi bi-x"
-                          viewBox="0 0 16 16"
-                        >
-                          <path
-                            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-                <!-- Add new module version row -->
-                <tr v-if="showAddModuleVersionRow" class="add-row">
-                  <td><input type="text" class="form-control-borderless" v-model="newModuleVersion.version" placeholder="Version" /></td>
-                  <td><input type="date" class="form-control-borderless" v-model="newModuleVersion.createDate" placeholder="Date" /></td>
-                  <td><input type="text" class="form-control-borderless" v-model="newModuleVersion.notes" placeholder="Notes" /></td>
-                  <td></td>
-                  <td>
-                    <div class="action-icons">
-                      <div class="icon-container save-container" @click="saveNewModuleVersion" title="Enregistrer">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="currentColor"
-                          class="bi bi-check2"
-                          viewBox="0 0 16 16"
-                        >
-                          <path
-                            d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"
-                          />
-                        </svg>
-                      </div>
-                      <div class="icon-container cancel-container" @click="cancelNewModuleVersion" title="Annuler">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="currentColor"
-                          class="bi bi-x"
-                          viewBox="0 0 16 16"
-                        >
-                          <path
-                            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            <!-- Features Table -->
-            <div v-if="showFeaturesTable" class="mt-4">
+            <div class="modal-body">
               <div class="d-flex justify-content-between mb-3">
-                <h6 class="mb-0">Freatures for version {{ selectedModuleVersion.version }}</h6>
-                <div>
-                  <button type="button" class="button button-primary" @click="showAddFeatureRow = true" :disabled="showAddFeatureRow">
-                    Add Feature
-                  </button>
-                  <button type="button" class="button button-secondary ml-2" @click="closeFeatureModule">x</button>
-                </div>
+                <h6 class="mb-0"></h6>
+                <button class="button button-primary" @click="showAddFeatureRow = true" :disabled="showAddFeatureRow">Add Feature</button>
               </div>
               <table class="table table-hover">
                 <thead class="thead-light">
                   <tr>
                     <th>Name</th>
                     <th>Description</th>
-                    <th>Created</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -1524,7 +1573,6 @@
                         {{ feature.description }}
                       </template>
                     </td>
-                    <td>{{ formatDate(feature.createDate) }}</td>
                     <td>
                       <div class="action-icons">
                         <template v-if="feature.isEditing">
@@ -1596,7 +1644,6 @@
                     <td>
                       <input type="text" class="form-control-borderless" v-model="newFeature.description" placeholder="Description" />
                     </td>
-                    <td>{{ formatDate(newFeature.createDate) }}</td>
                     <td>
                       <div class="action-icons">
                         <div class="icon-container save-container" @click="saveNewFeature" title="Enregistrer">
@@ -1636,276 +1683,261 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Module Features Modal -->
-    <div class="card modal fade show" v-if="showModuleFeaturesModal" style="display: block" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Features</h5>
-            <button type="button" class="close" @click="closeModuleFeaturesModal">
-              <span>&times;</span>
-            </button>
+      <!-- Delete Confirmation Modal -->
+      <b-modal ref="removeEntity" id="removeEntity" centered title-class="text-danger">
+        <template #modal-title>
+          <div class="d-flex align-items-center">
+            <font-awesome-icon icon="exclamation-triangle" class="text-danger mr-2"></font-awesome-icon>
+            <span
+              id="sdiFrontendApp.product.delete.question"
+              data-cy="productDeleteDialogHeading"
+              v-text="t$('entity.delete.title')"
+              class="font-weight-bold"
+            ></span>
           </div>
-          <div class="modal-body">
-            <div class="d-flex justify-content-between mb-3">
-              <h6 class="mb-0">Features List</h6>
-              <button class="button button-primary" @click="showAddFeatureRow = true" :disabled="showAddFeatureRow">Add Feature</button>
+        </template>
+        <div class="modal-body">
+          <p id="jhi-delete-product-heading" class="mb-0" v-text="t$('sdiFrontendApp.product.delete.question', { id: removeId })"></p>
+        </div>
+        <template #modal-footer>
+          <div class="w-100">
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary" v-text="t$('entity.action.cancel')" @click="closeDialog()"></button>
+              <button
+                type="button"
+                class="btn btn-danger"
+                id="jhi-confirm-delete-product"
+                data-cy="entityConfirmDeleteButton"
+                v-text="t$('entity.action.delete')"
+                @click="removeProduct()"
+              ></button>
             </div>
-            <table class="table table-hover">
-              <thead class="thead-light">
-                <tr>
-                  <th>Name</th>
-                  <th>Description</th>
-                  <th>Created</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="features.length === 0 && !showAddFeatureRow">
-                  <td colspan="4" class="text-center">No features available for this module version</td>
-                </tr>
-                <tr v-for="(feature, index) in features" :key="index">
-                  <td>
-                    <template v-if="feature.isEditing">
-                      <input type="text" class="form-control-borderless" v-model="feature.name" placeholder="Name" />
-                    </template>
-                    <template v-else>
-                      {{ feature.name }}
-                    </template>
-                  </td>
-                  <td>
-                    <template v-if="feature.isEditing">
-                      <input type="text" class="form-control-borderless" v-model="feature.description" placeholder="Description" />
-                    </template>
-                    <template v-else>
-                      {{ feature.description }}
-                    </template>
-                  </td>
-                  <td>{{ formatDate(feature.createDate) }}</td>
-                  <td>
-                    <div class="action-icons">
-                      <template v-if="feature.isEditing">
-                        <div class="icon-container save-container" @click="saveEditFeature(feature)" title="Enregistrer">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-check2"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"
-                            />
-                          </svg>
-                        </div>
-                        <div class="icon-container cancel-container" @click="cancelEditFeature(feature)" title="Annuler">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-x"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
-                            />
-                          </svg>
-                        </div>
-                      </template>
-                      <template v-else>
-                        <div class="icon-container edit-container" @click="editFeature(feature)" title="Modifier">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            height="14"
-                            fill="currentColor"
-                            class="bi bi-pencil-fill"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
-                            />
-                          </svg>
-                        </div>
-                        <div class="icon-container delete-container" @click="removeFeature(index)" title="Supprimer">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-x"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
-                            />
-                          </svg>
-                        </div>
-                      </template>
-                    </div>
-                  </td>
-                </tr>
-                <!-- Add new feature row -->
-                <tr v-if="showAddFeatureRow" class="add-row">
-                  <td><input type="text" class="form-control-borderless" v-model="newFeature.name" placeholder="Name" /></td>
-                  <td><input type="text" class="form-control-borderless" v-model="newFeature.description" placeholder="Description" /></td>
-                  <td>{{ formatDate(newFeature.createDate) }}</td>
-                  <td>
-                    <div class="action-icons">
-                      <div class="icon-container save-container" @click="saveNewFeature" title="Enregistrer">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="currentColor"
-                          class="bi bi-check2"
-                          viewBox="0 0 16 16"
-                        >
-                          <path
-                            d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"
-                          />
-                        </svg>
-                      </div>
-                      <div class="icon-container cancel-container" @click="cancelNewFeature" title="Annuler">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="currentColor"
-                          class="bi bi-x"
-                          viewBox="0 0 16 16"
-                        >
-                          <path
-                            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
           </div>
+        </template>
+      </b-modal>
+
+      <!-- Version Delete Confirmation Modal -->
+      <b-modal ref="removeVersionEntity" id="removeVersionEntity" centered title-class="text-danger">
+        <template #modal-title>
+          <div class="d-flex align-items-center">
+            <font-awesome-icon icon="exclamation-triangle" class="text-danger mr-2"></font-awesome-icon>
+            <span
+              id="sdiFrontendApp.productVersion.delete.question"
+              data-cy="productVersionDeleteDialogHeading"
+              v-text="t$('entity.delete.title')"
+              class="font-weight-bold"
+            ></span>
+          </div>
+        </template>
+        <div class="modal-body">
+          <p
+            id="jhi-delete-productVersion-heading"
+            class="mb-0"
+            v-text="t$('sdiFrontendApp.productVersion.delete.question', { id: removeVersionId })"
+          ></p>
         </div>
-      </div>
+        <template #modal-footer>
+          <div class="w-100">
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary" v-text="t$('entity.action.cancel')" @click="closeVersionDialog()"></button>
+              <button
+                type="button"
+                class="btn btn-danger"
+                id="jhi-confirm-delete-productVersion"
+                data-cy="entityConfirmDeleteButton"
+                v-text="t$('entity.action.delete')"
+                @click="removeProductVersion()"
+              ></button>
+            </div>
+          </div>
+        </template>
+      </b-modal>
+
+      <!-- Module Delete Confirmation Modal -->
+      <b-modal ref="removeModuleEntity" id="removeModuleEntity" centered title-class="text-danger">
+        <template #modal-title>
+          <div class="d-flex align-items-center">
+            <font-awesome-icon icon="exclamation-triangle" class="text-danger mr-2"></font-awesome-icon>
+            <span
+              id="sdiFrontendApp.module.delete.question"
+              data-cy="moduleDeleteDialogHeading"
+              v-text="t$('entity.delete.title')"
+              class="font-weight-bold"
+            ></span>
+          </div>
+        </template>
+        <div class="modal-body">
+          <p id="jhi-delete-module-heading" class="mb-0" v-text="t$('sdiFrontendApp.module.delete.question', { id: removeModuleId })"></p>
+        </div>
+        <template #modal-footer>
+          <div class="w-100">
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary" v-text="t$('entity.action.cancel')" @click="closeModuleDialog()"></button>
+              <button
+                type="button"
+                class="btn btn-danger"
+                id="jhi-confirm-delete-module"
+                data-cy="entityConfirmDeleteButton"
+                v-text="t$('entity.action.delete')"
+                @click="removeModuleConfirm()"
+              ></button>
+            </div>
+          </div>
+        </template>
+      </b-modal>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <b-modal ref="removeEntity" id="removeEntity" centered title-class="text-danger">
-      <template #modal-title>
-        <div class="d-flex align-items-center">
-          <font-awesome-icon icon="exclamation-triangle" class="text-danger mr-2"></font-awesome-icon>
-          <span
-            id="sdiFrontendApp.product.delete.question"
-            data-cy="productDeleteDialogHeading"
-            v-text="t$('entity.delete.title')"
-            class="font-weight-bold"
-          ></span>
-        </div>
-      </template>
-      <div class="modal-body">
-        <p id="jhi-delete-product-heading" class="mb-0" v-text="t$('sdiFrontendApp.product.delete.question', { id: removeId })"></p>
-      </div>
-      <template #modal-footer>
-        <div class="w-100">
-          <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-secondary" v-text="t$('entity.action.cancel')" @click="closeDialog()"></button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              id="jhi-confirm-delete-product"
-              data-cy="entityConfirmDeleteButton"
-              v-text="t$('entity.action.delete')"
-              @click="removeProduct()"
-            ></button>
-          </div>
-        </div>
-      </template>
-    </b-modal>
-
-    <!-- Version Delete Confirmation Modal -->
-    <b-modal ref="removeVersionEntity" id="removeVersionEntity" centered title-class="text-danger">
-      <template #modal-title>
-        <div class="d-flex align-items-center">
-          <font-awesome-icon icon="exclamation-triangle" class="text-danger mr-2"></font-awesome-icon>
-          <span
-            id="sdiFrontendApp.productVersion.delete.question"
-            data-cy="productVersionDeleteDialogHeading"
-            v-text="t$('entity.delete.title')"
-            class="font-weight-bold"
-          ></span>
-        </div>
-      </template>
-      <div class="modal-body">
-        <p
-          id="jhi-delete-productVersion-heading"
-          class="mb-0"
-          v-text="t$('sdiFrontendApp.productVersion.delete.question', { id: removeVersionId })"
-        ></p>
-      </div>
-      <template #modal-footer>
-        <div class="w-100">
-          <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-secondary" v-text="t$('entity.action.cancel')" @click="closeVersionDialog()"></button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              id="jhi-confirm-delete-productVersion"
-              data-cy="entityConfirmDeleteButton"
-              v-text="t$('entity.action.delete')"
-              @click="removeProductVersion()"
-            ></button>
-          </div>
-        </div>
-      </template>
-    </b-modal>
-
-    <!-- Module Delete Confirmation Modal -->
-    <b-modal ref="removeModuleEntity" id="removeModuleEntity" centered title-class="text-danger">
-      <template #modal-title>
-        <div class="d-flex align-items-center">
-          <font-awesome-icon icon="exclamation-triangle" class="text-danger mr-2"></font-awesome-icon>
-          <span
-            id="sdiFrontendApp.module.delete.question"
-            data-cy="moduleDeleteDialogHeading"
-            v-text="t$('entity.delete.title')"
-            class="font-weight-bold"
-          ></span>
-        </div>
-      </template>
-      <div class="modal-body">
-        <p id="jhi-delete-module-heading" class="mb-0" v-text="t$('sdiFrontendApp.module.delete.question', { id: removeModuleId })"></p>
-      </div>
-      <template #modal-footer>
-        <div class="w-100">
-          <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-secondary" v-text="t$('entity.action.cancel')" @click="closeModuleDialog()"></button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              id="jhi-confirm-delete-module"
-              data-cy="entityConfirmDeleteButton"
-              v-text="t$('entity.action.delete')"
-              @click="removeModuleConfirm()"
-            ></button>
-          </div>
-        </div>
-      </template>
-    </b-modal>
+    <div class="section"></div>
+    <div class="section"></div>
+    <div class="section"></div>
   </div>
-
-  <div class="section"></div>
-  <div class="section"></div>
-  <div class="section"></div>
 </template>
 
 <script lang="ts" src="./product.component.ts"></script>
 
 <style scoped>
+/* Existing styles (unchanged, included for context) */
+.form-control-borderless {
+  display: block;
+  width: 100%;
+  height: calc(1.5em + 0.75rem + 2px);
+  padding: 0.375rem 0;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #ced4da;
+  border-radius: 0;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+}
+
+.form-control-borderless:focus {
+  outline: none;
+  box-shadow: none;
+  border-bottom: 2px solid #007bff;
+}
+
+.add-row {
+  background-color: rgba(0, 123, 255, 0.03);
+}
+
+/* New styles for logo input */
+.logo-input-container {
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+}
+
+.custom-file-upload {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-control-file {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.file-upload-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: calc(1.5em + 0.75rem + 2px);
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out,
+    background-color 0.15s ease-in-out;
+}
+
+.file-upload-label:hover {
+  background-color: #f8f9fa;
+  border-color: #b8c2cc;
+}
+
+.file-upload-label:focus-within {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+}
+
+.file-upload-text {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.upload-icon {
+  flex-shrink: 0;
+  color: #6c757d;
+}
+
+.form-text {
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.logo-preview {
+  margin-top: 0.5rem;
+}
+
+.logo-thumbnail {
+  max-width: 80px;
+  max-height: 80px;
+  object-fit: contain;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8f9fa;
+}
+
+/* Ensure consistency with other inputs */
+select.form-control-borderless {
+  padding: 0.375rem 0;
+  height: calc(1.5em + 0.75rem + 2px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1rem;
+  padding-right: 2rem;
+  appearance: none;
+}
+
+select.form-control-borderless:focus {
+  outline: none;
+  border-bottom: 2px solid #007bff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .file-upload-label {
+    font-size: 0.9rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .logo-thumbnail {
+    max-width: 60px;
+    max-height: 60px;
+  }
+}
 .component-info-s {
   display: flex;
   align-items: center;
@@ -2012,7 +2044,22 @@ tr.selected-row + .modules-row td {
 
 /* Surlignage de la rangée sélectionnée */
 tr.selected-row {
-  background-color: rgba(0, 123, 255, 0.05);
+  background-color: #e2e8f0; /* Darker gray for better contrast */
+  color: #1a202c; /* Darker text color for readability */
+  border-left: 4px solid #0c2d57; /* Add a left border for emphasis */
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+tr:not(.add-row):hover {
+  background-color: #f8f9fa;
+  transition: background-color 0.3s ease;
+}
+
+/* Ensure add-row has distinct styling */
+.add-row {
+  background-color: rgba(0, 123, 255, 0.03);
 }
 
 /* Ajustements pour la cohérence visuelle */
@@ -2149,7 +2196,7 @@ tr:not(.add-row):hover {
 .grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
+  gap: 0.7rem;
 }
 
 @media (min-width: 768px) {
@@ -2174,7 +2221,7 @@ tr:not(.add-row):hover {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid #f1f5f9;
-  background-color: #f8fafc;
+  background-color: #f4f5f6;
 }
 
 .card-title {
@@ -2674,5 +2721,38 @@ tr:not(.add-row):hover {
 
 .delete-container {
   color: #0c2d57;
+}
+
+/* Breadcrumb navigation */
+.breadcrumb-navigation {
+  padding: 0.5rem 0;
+}
+
+.breadcrumb-item {
+  font-size: 0.9rem;
+}
+
+.breadcrumb-item.active {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.breadcrumb-item.clickable {
+  color: #0c2d57;
+  cursor: pointer;
+}
+
+.breadcrumb-item.clickable:hover {
+  text-decoration: underline;
+}
+
+/* Product detail view transitions */
+.product-detail-view {
+  transition: all 2s ease;
+}
+
+/* Content transitions */
+.tab-content > div {
+  transition: all 2s ease;
 }
 </style>

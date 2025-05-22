@@ -7,13 +7,11 @@ import { useAlertService } from '@/shared/alert/alert.service';
 import ClientSizeService from '@/entities/client-size/client-size.service.ts';
 import ClientUpdate from '@/entities/client/client-update.vue';
 import ClientDetails from '@/entities/client/client-details.vue';
-import JhiUserManagementEdit from '@/admin/user-management/user-management-edit.component.ts';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'Client',
   components: {
-    JhiUserManagementEdit,
     ClientUpdate,
     ClientDetails,
   },
@@ -26,9 +24,9 @@ export default defineComponent({
     const alertService = inject('alertService', () => useAlertService(), true);
 
     const clients = ref([]);
-    const allClients = ref([]); // Pour stocker tous les clients non filtrés
-    const clientTypes = ref([]); // Pour les types de clients
-    const viewMode = ref('list'); // 'list' ou 'card'
+    const allClients = ref([]);
+    const clientTypes = ref([]);
+    const viewMode = ref('list');
     const searchTerm = ref('');
     const searchTimeout = ref(null);
 
@@ -79,7 +77,6 @@ export default defineComponent({
 
     const paginationInfo = computed(() => {
       if (totalItems.value === 0) return '0-0 / 0';
-
       const start = (currentPage.value - 1) * itemsPerPage.value + 1;
       const end = Math.min(start + itemsPerPage.value - 1, totalItems.value);
       return `${start}-${end} / ${totalItems.value}`;
@@ -128,7 +125,7 @@ export default defineComponent({
           );
         }
         updateTotalItems();
-        currentPage.value = 1; // Retour à la première page après une recherche
+        currentPage.value = 1;
       }, 300);
     };
 
@@ -149,7 +146,6 @@ export default defineComponent({
         const loadedClients = res.data;
         const clientsWithDetails = await Promise.all(
           loadedClients.map(async client => {
-            // Charger le size complet
             if (client.size?.id) {
               try {
                 client.size = await clientSizeService().find(client.size.id);
@@ -157,7 +153,6 @@ export default defineComponent({
                 console.error('Erreur de chargement du client size:', sizeError);
               }
             }
-            // Charger le type complet
             if (client.clientType?.id) {
               try {
                 client.clientType = await clientTypeService().find(client.clientType.id);
@@ -165,12 +160,12 @@ export default defineComponent({
                 console.error('Erreur de chargement du client type:', typeError);
               }
             }
-
             return client;
           }),
         );
 
         clients.value = clientsWithDetails;
+        allClients.value = clientsWithDetails;
       } catch (err) {
         alertService.showHttpError(err.response);
       } finally {
@@ -188,7 +183,6 @@ export default defineComponent({
           c.showDropdown = false;
         }
       });
-
       removeId.value = instance.id;
       removeEntity.value.show();
     };
@@ -202,12 +196,9 @@ export default defineComponent({
         await clientService().delete(removeId.value);
         const message = t$('sdiFrontendApp.client.deleted', { param: removeId.value }).toString();
         alertService.showInfo(message, { variant: 'danger' });
-
-        // Mettre à jour les listes
         clients.value = clients.value.filter(c => c.id !== removeId.value);
         allClients.value = allClients.value.filter(c => c.id !== removeId.value);
         updateTotalItems();
-
         removeId.value = null;
         closeDialog();
       } catch (error) {
@@ -215,20 +206,10 @@ export default defineComponent({
       }
     };
 
-    const toggleDropdown = client => {
-      clients.value.forEach(item => {
-        if (item.id !== client.id) {
-          item.showDropdown = false;
-        }
-      });
-      client.showDropdown = !client.showDropdown;
-    };
-
     watch(
       clients,
       () => {
         updateTotalItems();
-        // Si la page actuelle est supérieure au nombre total de pages, revenir à la dernière page
         if (currentPage.value > totalPages.value && totalPages.value > 0) {
           currentPage.value = totalPages.value;
         }
@@ -239,8 +220,6 @@ export default defineComponent({
     onMounted(async () => {
       await retrieveClientTypes();
       await retrieveClients();
-
-      // Fermer les dropdowns quand on clique ailleurs
       document.addEventListener('click', event => {
         if (!event.target.closest('.dropdown-menu-container')) {
           clients.value.forEach(item => {
@@ -268,9 +247,7 @@ export default defineComponent({
       prepareRemove,
       closeDialog,
       removeClient,
-      toggleDropdown,
       t$,
-      // Pagination
       currentPage,
       itemsPerPage,
       totalItems,
@@ -281,7 +258,6 @@ export default defineComponent({
       paginationInfo,
       goToNextPage,
       goToPrevPage,
-      // Recherche
       searchTerm,
       handleSearch,
       ...dataUtils,
@@ -298,7 +274,8 @@ export default defineComponent({
     },
     handleClientUpdated() {
       this.showEditModal = false;
-      this.retrieveClients();
+      this.showCreateModal = false; // Close both modals
+      window.location.reload(); // Reload the entire page
     },
   },
 });

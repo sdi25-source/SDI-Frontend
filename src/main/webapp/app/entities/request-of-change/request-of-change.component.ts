@@ -58,23 +58,20 @@ export default defineComponent({
     // State
     const showNewProductVersionPopup = ref(false);
 
+    const keywordInput = ref(''); // Champ temporaire pour la saisie
+    const keywordsList = ref<string[]>([]); // Liste des mots-clés sous forme de badges
+
     // Méthodes pour gérer le popup
     const openNewProductVersionPopup = () => {
       if (!selectedRequest.value) {
-        alertService.showError('Aucune demande sélectionnée');
-        return;
-      }
-
-      if (selectedRequest.value.status !== 'COMPLETED') {
-        alertService.showError("La demande doit être à l'état COMPLETED pour créer une nouvelle version du produit");
+        alertService.showError('No selected request');
         return;
       }
 
       if (!selectedRequest.value.productVersion || !selectedRequest.value.productVersion.product) {
-        alertService.showError('Impossible de créer une nouvelle version du produit : informations manquantes');
+        alertService.showError('Unable to create a new product version: missing information');
         return;
       }
-
       showNewProductVersionPopup.value = true;
     };
 
@@ -100,6 +97,11 @@ export default defineComponent({
       { label: 'Approved', value: 'APPROVED' },
       { label: 'Rejected', value: 'REJECTED' },
       { label: 'Completed', value: 'COMPLETED' },
+    ];
+
+    const typesRequest = [
+      { label: 'Internal', value: 'INTERNAL' },
+      { label: 'External', value: 'EXTERNAL' },
     ];
 
     // Computed
@@ -176,6 +178,7 @@ export default defineComponent({
           request.productVersion = productVersions.value.find(pv => pv.id === request.productVersion?.id);
         });
         filteredRequests.value = [...requestOfChanges.value];
+        console.log('result data', filteredRequests.value);
       } catch (err) {
         alertService.showHttpError(err.response);
       } finally {
@@ -216,8 +219,20 @@ export default defineComponent({
       router.push({ name: 'RequestOfChangeView', params: { requestOfChangeId: request.id } });
     };
 
-    const editRequest = request => {
+    const editRequest = async request => {
       newRequest.value = { ...request };
+      newRequest.value.type = request.type.value;
+      // S'assurer que les moduleVersions utilisent les références complètes
+      newRequest.value.moduleVersions = request.moduleVersions
+        ? request.moduleVersions.map(mv => {
+            const fullModuleVersion = moduleVersions.value.find(opt => opt.id === mv.id);
+            return fullModuleVersion ? fullModuleVersion : mv;
+          })
+        : [];
+      // Charger les moduleVersions pour la productVersion sélectionnée
+      if (newRequest.value.productVersion && newRequest.value.productVersion.id) {
+        await loadModuleVersionsForProductVersion(newRequest.value.productVersion.id);
+      }
       showCreateModal.value = true;
     };
 
@@ -285,6 +300,8 @@ export default defineComponent({
       newRequest.value.createDate = new Date().toISOString().split('T')[0];
       newRequest.value.moduleVersions = [];
       newRequest.value.done = false;
+      showCreateModal.value = true;
+      newRequest.value.type = 'EXTERNAL'; // Valeur par défaut
       showCreateModal.value = true;
     };
 
@@ -449,13 +466,19 @@ export default defineComponent({
         Array.isArray(newRequest.value.productVersion.moduleVersions) &&
         newRequest.value.productVersion.moduleVersions.length > 0
       ) {
-        console.log('Module versions disponibles:', newRequest.value.productVersion.moduleVersions);
+        // Enrichir les moduleVersions avec les données complètes
+        const enrichedModuleVersions = newRequest.value.productVersion.moduleVersions.map(mv => {
+          const full = moduleVersions.value.find(opt => opt.id === mv.id);
+          return full ? full : mv;
+        });
 
-        // Enrichir les moduleVersions avec les données complètes si nécessaire
-        // Cette opération ne doit pas être effectuée dans un computed car elle modifie l'état
-        // Déplacée dans une fonction séparée appelée lors du changement de productVersion
+        // S'assurer que les moduleVersions déjà sélectionnées sont marquées
+        newRequest.value.moduleVersions = newRequest.value.moduleVersions.map(selectedMv => {
+          const full = enrichedModuleVersions.find(opt => opt.id === selectedMv.id);
+          return full ? full : selectedMv;
+        });
 
-        return newRequest.value.productVersion.moduleVersions;
+        return enrichedModuleVersions;
       } else {
         console.log('Aucun moduleVersion trouvé pour cette version de produit');
         return [];
@@ -510,18 +533,17 @@ export default defineComponent({
     const watchProductVersionChange = () => {
       watch(
         () => newRequest.value.productVersion,
-        newValue => {
-          // Réinitialiser les moduleVersions sélectionnés lorsque la productVersion change
-          if (newValue) {
+        async newValue => {
+          if (newValue && newValue.id) {
+            // Charger les moduleVersions pour la nouvelle productVersion
+            await loadModuleVersionsForProductVersion(newValue.id);
+            // Conserver les moduleVersions déjà sélectionnées si elles sont valides
+            newRequest.value.moduleVersions = newRequest.value.moduleVersions.filter(mv =>
+              newValue.moduleVersions?.some(opt => opt.id === mv.id),
+            );
+          } else {
+            // Réinitialiser si aucune productVersion n'est sélectionnée
             newRequest.value.moduleVersions = [];
-
-            // Enrichir les moduleVersions si disponibles
-            enrichModuleVersions();
-
-            // Charger les moduleVersions associés à cette productVersion si nécessaire
-            if (newValue.id && (!newValue.moduleVersions || newValue.moduleVersions.length === 0)) {
-              loadModuleVersionsForProductVersion(newValue.id);
-            }
           }
         },
         { immediate: true },
@@ -531,7 +553,57 @@ export default defineComponent({
     // Appelez cette fonction dans le setup()
     watchProductVersionChange();
 
+    watch(
+      () => newRequest.value.keywords,
+      newValue => {
+        if (newValue) {
+          keywordsList.value = newValue
+            .split(',')
+            .map(word => word.trim())
+            .filter(word => word !== '');
+        } else {
+          keywordsList.value = [];
+        }
+      },
+      { immediate: true },
+    );
+
+    // Synchroniser newRequest.keywords avec la liste des badges
+    watch(
+      keywordsList,
+      newList => {
+        newRequest.value.keywords = newList.join(', ');
+      },
+      { deep: true },
+    );
+
+    // Ajouter un mot-clé
+    const addKeyword = () => {
+      if (keywordInput.value.trim()) {
+        keywordsList.value.push(keywordInput.value.trim());
+        keywordInput.value = ''; // Vider l'input après ajout
+      }
+    };
+
+    // Gérer l'entrée pour permettre l'ajout par virgule ou Entrée
+    const handleKeywordInput = event => {
+      if (event.key === ',') {
+        event.preventDefault();
+        addKeyword();
+      }
+    };
+
+    // Supprimer un mot-clé
+    const removeKeyword = index => {
+      keywordsList.value.splice(index, 1);
+    };
+
     return {
+      keywordInput,
+      keywordsList,
+      addKeyword,
+      handleKeywordInput,
+      removeKeyword,
       filteredModuleVersions,
       loadModuleVersionsForProductVersion,
       groupedProductVersions,
@@ -558,6 +630,7 @@ export default defineComponent({
       hoverStyle,
       activeStyle,
       statusTabs,
+      typesRequest,
       progressPercentage,
       retrieveRequestOfChanges,
       getRequestsByStatus,

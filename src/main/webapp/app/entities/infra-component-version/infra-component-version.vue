@@ -104,8 +104,6 @@
               <th scope="col" width="80"><span v-text="t$('global.field.id')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponentVersion.version')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponentVersion.description')"></span></th>
-              <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponentVersion.createDate')"></span></th>
-              <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponentVersion.updateDate')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponentVersion.infraComponent')"></span></th>
               <th scope="col" width="160" class="text-center">Actions</th>
             </tr>
@@ -139,22 +137,6 @@
                 </template>
                 <template v-else>
                   {{ infraComponentVersion.description }}
-                </template>
-              </td>
-              <td>
-                <template v-if="infraComponentVersion.isEditing">
-                  <input v-model="infraComponentVersion.createDate" type="date" class="form-control-borderless" />
-                </template>
-                <template v-else>
-                  {{ infraComponentVersion.createDate }}
-                </template>
-              </td>
-              <td>
-                <template v-if="infraComponentVersion.isEditing">
-                  <input v-model="infraComponentVersion.updateDate" type="date" class="form-control-borderless" />
-                </template>
-                <template v-else>
-                  {{ infraComponentVersion.updateDate }}
                 </template>
               </td>
               <td>
@@ -265,22 +247,6 @@
                   class="form-control-borderless"
                   v-model="newInfraComponentVersion.description"
                   placeholder="Description"
-                />
-              </td>
-              <td>
-                <input
-                  type="date"
-                  class="form-control-borderless"
-                  v-model="newInfraComponentVersion.createDate"
-                  placeholder="Date de création"
-                />
-              </td>
-              <td>
-                <input
-                  type="date"
-                  class="form-control-borderless"
-                  v-model="newInfraComponentVersion.updateDate"
-                  placeholder="Date de mise à jour"
                 />
               </td>
               <td>
@@ -416,14 +382,6 @@
                   <textarea v-model="infraComponentVersion.description" class="form-control" rows="3"></textarea>
                 </div>
                 <div class="form-group">
-                  <label>Date de création</label>
-                  <input v-model="infraComponentVersion.createDate" type="date" class="form-control" />
-                </div>
-                <div class="form-group">
-                  <label>Date de mise à jour</label>
-                  <input v-model="infraComponentVersion.updateDate" type="date" class="form-control" />
-                </div>
-                <div class="form-group">
                   <label>Composant d'infrastructure</label>
                   <select v-model="infraComponentVersion.infraComponent" class="form-control">
                     <option v-for="component in infraComponents" :key="component.id" :value="component">
@@ -445,14 +403,6 @@
                   <div class="info-row">
                     <span class="info-label">Description:</span>
                     <span class="info-value notes-text">{{ infraComponentVersion.description }}</span>
-                  </div>
-                  <div class="info-row">
-                    <span class="info-label">Date de création:</span>
-                    <span class="info-value">{{ infraComponentVersion.createDate }}</span>
-                  </div>
-                  <div class="info-row">
-                    <span class="info-label">Date de mise à jour:</span>
-                    <span class="info-value">{{ infraComponentVersion.updateDate }}</span>
                   </div>
                   <div class="info-row" v-if="infraComponentVersion.infraComponent">
                     <span class="info-label">Composant d'infrastructure:</span>
@@ -484,14 +434,6 @@
               <div class="form-group">
                 <label>Description</label>
                 <textarea v-model="newInfraComponentVersion.description" class="form-control" rows="3" placeholder="Description"></textarea>
-              </div>
-              <div class="form-group">
-                <label>Date de création</label>
-                <input v-model="newInfraComponentVersion.createDate" type="date" class="form-control" />
-              </div>
-              <div class="form-group">
-                <label>Date de mise à jour</label>
-                <input v-model="newInfraComponentVersion.updateDate" type="date" class="form-control" />
               </div>
               <div class="form-group">
                 <label>Composant d'infrastructure</label>

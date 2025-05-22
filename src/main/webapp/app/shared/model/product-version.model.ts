@@ -1,6 +1,7 @@
 import { type IProduct } from '@/shared/model/product.model';
 import { type IModuleVersion } from '@/shared/model/module-version.model';
 import { type IInfraComponentVersion } from '@/shared/model/infra-component-version.model';
+import type { IInfraComponent } from '@/shared/model/infra-component.model.ts';
 
 export interface IProductVersion {
   id?: number;
@@ -12,6 +13,7 @@ export interface IProductVersion {
   moduleVersions?: IModuleVersion[] | null;
   infraComponentVersions?: IInfraComponentVersion[] | null;
   root?: IProductVersion | null;
+  infraComponents?: IInfraComponent[] | null;
 }
 
 export class ProductVersion implements IProductVersion {
@@ -25,5 +27,6 @@ export class ProductVersion implements IProductVersion {
     public moduleVersions?: IModuleVersion[] | null,
     public infraComponentVersions?: IInfraComponentVersion[] | null,
     public root?: IProductVersion | null,
+    public infraComponents?: IInfraComponent[] | null,
   ) {}
 }

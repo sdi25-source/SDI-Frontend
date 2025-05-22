@@ -11,11 +11,18 @@ import useDataUtils from '@/shared/data/data-utils.service';
 import { useAlertService } from '@/shared/alert/alert.service';
 import ComponentTypeService from '@/entities/component-type/component-type.service.ts';
 import InfraComponentService from '@/entities/infra-component/infra-component.service.ts';
+import type { IInfraComponent } from '@/shared/model/infra-component.model.ts';
+import type { IComponentType } from '@/shared/model/component-type.model.ts';
+import CertificationService from '@/entities/certification/certification.service.ts';
+import type { ICertification } from '@/shared/model/certification.model.ts';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'Product',
   setup() {
+    // Breadcrumb navigation
+    const breadcrumb = ref([{ name: 'Products', id: null }]);
+
     const { t: t$ } = useI18n();
     const dataUtils = useDataUtils();
     const productService = inject('productService', () => new ProductService());
@@ -27,6 +34,7 @@ export default defineComponent({
     const componentTypeService = inject('componentTypeService', () => new ComponentTypeService());
     const infraComponentService = inject('infraComponentService', () => new InfraComponentService());
     const productLineService = inject('productLineService', () => new ProductLineService());
+    const certificationService = inject('certificationService', () => new CertificationService());
     const alertService = inject('alertService', () => useAlertService(), true);
 
     // Data
@@ -45,7 +53,7 @@ export default defineComponent({
     const selectedModule = ref(null);
     const showModuleVersionsModal = ref(false);
     const activeTabIndex = ref(0);
-    const tabs = ['Versions', 'Modules', 'Configuration'];
+    const tabs = ref(['Product Versions']);
     const tabRefs = reactive([]);
     const hoveredIndex = ref(null);
     const hoverStyle = ref({ left: '0px', width: '0px' });
@@ -66,17 +74,22 @@ export default defineComponent({
     const componentTypeOptions = ref<IComponentType[]>([]);
     const moduleOptions = ref([]);
     const moduleVersionOptions = ref([]);
+    const certificationsOptions = ref([]);
     const selectedProductLineIds = ref([]);
     const editProductLineIds = ref([]);
 
     // Product settings modal
     const showSettingsModal = ref(false);
+    const showCertificationsModal = ref(false);
     const showModuleSelector = ref(false);
+    const showCertificationSelector = ref(false);
     const showInfraSelector = ref(false);
     const selectedModuleVersionId = ref('');
+    const selectedCertificationId = ref('');
     const selectedInfraComponentId = ref('');
     const productInfraComponents = ref([]);
     const productModules = ref([]);
+    const productCertifications = ref([]);
 
     // Version settings modal
     const showVersionSettingsModal = ref(false);
@@ -110,6 +123,9 @@ export default defineComponent({
     const showAddFeatureRow = ref(false);
     const showModuleFeaturesModal = ref(false);
 
+    const selectedModuleId = ref('');
+    const filteredModuleVersionOptions = ref([]);
+
     // New item templates
     const newProduct = ref({
       name: '',
@@ -120,6 +136,7 @@ export default defineComponent({
       productLines: [],
       infraComponentVersions: [],
       modules: [],
+      certifications: [],
     });
 
     const newVersion = ref({
@@ -259,7 +276,7 @@ export default defineComponent({
           selectedVersion.value.moduleVersions?.map(mv => ({
             id: mv.id,
             name: mv.module?.name,
-            description: mv.module?.description,
+            description: mv.description,
             version: mv.version,
             module: mv.module,
             root: mv.root,
@@ -300,6 +317,15 @@ export default defineComponent({
         alertService.showHttpError(err.response);
       } finally {
         isFetching.value = false;
+      }
+    };
+
+    const retrieveCertifications = async () => {
+      try {
+        const res = await certificationService().retrieve();
+        certificationsOptions.value = res.data;
+      } catch (err) {
+        alertService.showHttpError(err.response);
       }
     };
 
@@ -449,8 +475,76 @@ export default defineComponent({
         selectedProduct.value = product;
         selectedVersion.value = null;
 
+        // Update breadcrumb
+        breadcrumb.value = [
+          { name: 'Products', id: null },
+          { name: product.name, id: product.id },
+        ];
+
         // Fetch product versions
         await fetchProductVersions(product.id);
+      }
+    };
+
+    // Select a version
+    const selectVersion = version => {
+      selectedVersion.value = version;
+      activeTabIndex.value = 0;
+
+      // Update breadcrumb
+      breadcrumb.value = [
+        { name: 'Products', id: null },
+        { name: version.product.name, id: version.product.id },
+        { name: `Version ${version.version}`, id: version.id },
+      ];
+
+      // Fetch module versions and infra component versions if needed
+      if (!version.moduleVersions || version.moduleVersions.length === 0) {
+        moduleVersionService()
+          .retrieve({ 'productVersionId.equals': version.id })
+          .then(
+            res => {
+              selectedVersion.value.moduleVersions = res.data;
+            },
+            err => {
+              console.error(err);
+            },
+          );
+      }
+
+      if (!version.infraComponentVersions || version.infraComponentVersions.length === 0) {
+        infraComponentVersionService()
+          .retrieve({ 'productVersionId.equals': version.id })
+          .then(
+            res => {
+              selectedVersion.value.infraComponentVersions = res.data;
+            },
+            err => {
+              console.error(err);
+            },
+          );
+      }
+    };
+
+    // Return to versions list
+    const returnToVersionsList = () => {
+      selectedVersion.value = null;
+
+      // Update breadcrumb
+      if (selectedProduct.value) {
+        breadcrumb.value = [
+          { name: 'Products', id: null },
+          { name: selectedProduct.value.name, id: selectedProduct.value.id },
+        ];
+      }
+    };
+
+    // Navigate to specific breadcrumb level
+    const navigateToBreadcrumb = index => {
+      if (index === 0) {
+        returnToProductList();
+      } else if (index === 1 && breadcrumb.value.length > 2) {
+        returnToVersionsList();
       }
     };
 
@@ -517,16 +611,24 @@ export default defineComponent({
 
     // Product settings methods
     const openSettingsModal = () => {
-      productInfraComponents.value = newProduct.value.infraComponentVersions || [];
       productModules.value = newProduct.value.modules || [];
       showSettingsModal.value = true;
     };
 
     const openProductSettings = product => {
       selectedProduct.value = product;
-      productInfraComponents.value = product.infraComponentVersions || [];
       productModules.value = product.modules || [];
       showSettingsModal.value = true;
+    };
+
+    const openCertifications = product => {
+      selectedProduct.value = product;
+      productCertifications.value = product.certifications || [];
+      showCertificationsModal.value = true;
+    };
+
+    const closeCertificationsModal = () => {
+      showCertificationsModal.value = false;
     };
 
     const closeSettingsModal = () => {
@@ -541,19 +643,34 @@ export default defineComponent({
       try {
         if (selectedProduct.value) {
           // Update existing product
-          selectedProduct.value.infraComponentVersions = productInfraComponents.value;
-          //   selectedProduct.value.infraComponentVersions.value.infraComponent = productInfraComponents.value.infraComponent.value;
-
           selectedProduct.value.modules = productModules.value;
+          selectedProduct.value.certifications = productCertifications.value;
           await productService().update(selectedProduct.value);
           await retrieveProducts();
         } else {
           // For new product
-          newProduct.value.infraComponentVersions = productInfraComponents.value;
           newProduct.value.modules = productModules.value;
+          newProduct.value.certifications = productCertifications.value;
         }
         closeSettingsModal();
-        alertService.showInfo('Configuration sauvegardée avec succès', { variant: 'success' });
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
+    };
+
+    const saveCertificationsModal = async () => {
+      try {
+        if (selectedProduct.value) {
+          // Update existing product
+          selectedProduct.value.modules = productModules.value;
+          selectedProduct.value.certifications = productCertifications.value;
+          await productService().update(selectedProduct.value);
+          await retrieveProducts();
+        } else {
+          newProduct.value.modules = productModules.value;
+          newProduct.value.certifications = productCertifications.value;
+        }
+        closeCertificationsModal();
       } catch (error) {
         alertService.showHttpError(error.response);
       }
@@ -578,19 +695,52 @@ export default defineComponent({
       showVersionSettingsModal.value = true;
     };
 
-    const openNewVersionSettings = () => {
-      // Utiliser les composants d'infrastructure du produit par défaut
-      versionInfraComponents.value = selectedProduct.value?.infraComponentVersions || [];
-      versionModuleVersions.value = [];
+    const openNewVersionSettings = async () => {
+      if (newVersion.value.root && newVersion.value.root.id) {
+        try {
+          // Fetch the root product version details
+          const rootVersion = await productVersionService().find(newVersion.value.root.id);
+
+          // Initialize with root's configuration
+          versionInfraComponents.value = rootVersion.infraComponentVersions
+            ? rootVersion.infraComponentVersions.map(icv => ({
+                ...icv,
+                id: icv.id,
+              }))
+            : [];
+
+          versionModuleVersions.value = rootVersion.moduleVersions
+            ? rootVersion.moduleVersions.map(mv => ({
+                ...mv,
+                id: mv.id,
+              }))
+            : [];
+        } catch (error) {
+          alertService.showHttpError(error.response);
+        }
+      } else {
+        // Initialize with empty arrays if no root is selected
+        versionInfraComponents.value = [];
+        versionModuleVersions.value = [];
+      }
       showVersionSettingsModal.value = true;
     };
 
     const closeVersionSettingsModal = () => {
+      // showVersionSettingsModal.value = false;
+      // showVersionModuleSelector.value = false;
+      // showVersionInfraSelector.value = false;
+      // selectedVersionModuleId.value = '';
+      // selectedVersionInfraComponentId.value = '';
+      // editingVersion.value = null;
+
       showVersionSettingsModal.value = false;
       showVersionModuleSelector.value = false;
       showVersionInfraSelector.value = false;
       selectedVersionModuleId.value = '';
       selectedVersionInfraComponentId.value = '';
+      selectedModuleId.value = ''; // Réinitialiser le module sélectionné
+      filteredModuleVersionOptions.value = []; // Réinitialiser les versions filtrées
       editingVersion.value = null;
     };
 
@@ -647,6 +797,23 @@ export default defineComponent({
       productModules.value.splice(index, 1);
     };
 
+    const addCertificationToProduct = () => {
+      if (!selectedCertificationId.value) return;
+
+      const certification = getCertificationById(selectedCertificationId.value);
+      if (certification) {
+        const exists = productCertifications.value.some(c => c.id === certification.id);
+        if (!exists) {
+          productCertifications.value.push(certification);
+        }
+        selectedCertificationId.value = '';
+      }
+    };
+
+    const removeCertificationFromProduct = index => {
+      productCertifications.value.splice(index, 1);
+    };
+
     const addInfraToProduct = () => {
       if (!selectedInfraComponentId.value) return;
 
@@ -664,16 +831,35 @@ export default defineComponent({
       productInfraComponents.value.splice(index, 1);
     };
 
+    // méthode pour récupérer les versions du module sélectionné
+    const fetchModuleVersionsForSelectedModule = async () => {
+      if (!selectedModuleId.value) {
+        filteredModuleVersionOptions.value = [];
+        selectedVersionModuleId.value = '';
+        return;
+      }
+
+      const res = await moduleVersionService().retrieve();
+      filteredModuleVersionOptions.value = res.data.filter(pv => pv.module?.id === selectedModuleId.value);
+
+      selectedVersionModuleId.value = '';
+
+      console.log('result', filteredModuleVersionOptions);
+    };
+
     const addModuleToVersion = () => {
       if (!selectedVersionModuleId.value) return;
 
-      const moduleVersion = getModuleVersionById(selectedVersionModuleId.value);
+      const moduleVersion = filteredModuleVersionOptions.value.find(mv => mv.id === Number.parseInt(selectedVersionModuleId.value));
       if (moduleVersion) {
         const exists = versionModuleVersions.value.some(mv => mv.id === moduleVersion.id);
         if (!exists) {
           versionModuleVersions.value.push(moduleVersion);
         }
+        // Réinitialiser les sélections
         selectedVersionModuleId.value = '';
+        selectedModuleId.value = '';
+        filteredModuleVersionOptions.value = [];
       }
     };
 
@@ -901,6 +1087,98 @@ export default defineComponent({
       }
     };
 
+    const handleNewImageUpload = event => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alertService.showInfo('Veuillez sélectionner une image valide', { variant: 'danger' });
+        return;
+      }
+
+      // Validate file size (e.g., max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        alertService.showInfo("L'image ne doit pas dépasser 5 Mo", { variant: 'danger' });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        newProduct.value.logo = reader.result; // Base64 string
+      };
+      reader.onerror = () => {
+        alertService.showInfo("Erreur lors du chargement de l'image", { variant: 'danger' });
+      };
+      reader.readAsDataURL(file);
+    };
+
+    const fetchLatestNonClientVersion = async () => {
+      try {
+        // Regular expression to match X.X.X format and exclude unNom_X.X.X
+        const versionRegex = /^\d+\.\d+\.\d+$/;
+        const clientVersionRegex = /^[a-zA-Z]+_\d+\.\d+\.\d+$/;
+
+        // Filter non-client versions (X.X.X) and exclude client versions (unNom_X.X.X)
+        const nonClientVersions = productVersions.value.filter(
+          pv => pv.version && versionRegex.test(pv.version) && !clientVersionRegex.test(pv.version),
+        );
+        console.log(nonClientVersions);
+        if (nonClientVersions.length === 0) {
+          return null; // No non-client versions found
+        }
+
+        // Sort versions by version number (semantic versioning)
+        nonClientVersions.sort((a, b) => {
+          const versionA = a.version.split('.').map(Number);
+          const versionB = b.version.split('.').map(Number);
+          for (let i = 0; i < 3; i++) {
+            if (versionA[i] !== versionB[i]) {
+              return versionB[i] - versionA[i]; // Descending order
+            }
+          }
+          return new Date(b.createDate) - new Date(a.createDate); // Fallback to creation date
+        });
+
+        // Return the latest version
+        return nonClientVersions[0];
+      } catch (error) {
+        alertService.showHttpError(error.response);
+        return null;
+      }
+    };
+
+    const incrementVersion = rootVersion => {
+      if (!rootVersion || !rootVersion.version) {
+        // If no root version exists, start with 1.0.0
+        return '1.0.0';
+      }
+      let [major, minor, patch] = rootVersion.version.split('.').map(Number);
+      // Increment patch; if it reaches 9, reset to 0 and increment minor
+      if (patch < 9) {
+        patch += 1;
+      } else {
+        patch = 0;
+        // If minor reaches 9, reset to 0 and increment major
+        if (minor < 9) {
+          minor += 1;
+        } else {
+          minor = 0;
+          major += 1;
+        }
+      }
+      // Return the new version string
+      return `${major}.${minor}.${patch}`;
+    };
+
+    const showAddVersionLigne = async () => {
+      showAddVersionRow.value = true;
+      const latestVersion = await fetchLatestNonClientVersion();
+      newVersion.value.root = latestVersion;
+      newVersion.value.version = incrementVersion(latestVersion);
+    };
+
     const updateTotalVersionItems = () => {
       if (productVersions.value) {
         totalVersionItems.value = productVersions.value.length;
@@ -916,20 +1194,18 @@ export default defineComponent({
       }
 
       try {
-        // Préparer les données pour l'API
+        // Prepare data for API
         const versionData = {
           ...newVersion.value,
           product: { id: selectedProduct.value.id },
-          infraComponentVersions: versionInfraComponents.value,
-          moduleVersions: versionModuleVersions.value,
+          infraComponentVersions: versionInfraComponents.value.map(icv => ({ id: icv.id })), // Send only IDs
+          moduleVersions: versionModuleVersions.value.map(mv => ({ id: mv.id })), // Send only IDs
         };
 
-        console.log(versionData);
-
-        // Créer la version
+        // Create the version
         await productVersionService().create(versionData);
 
-        // Réinitialiser le formulaire
+        // Reset the form
         showAddVersionRow.value = false;
         newVersion.value = {
           version: '',
@@ -941,8 +1217,10 @@ export default defineComponent({
           infraComponentVersions: [],
           root: null,
         };
+        versionInfraComponents.value = [];
+        versionModuleVersions.value = [];
 
-        // Rafraîchir les versions
+        // Refresh versions
         await fetchProductVersions(selectedProduct.value.id);
 
         alertService.showInfo('Version créée avec succès', { variant: 'success' });
@@ -967,9 +1245,38 @@ export default defineComponent({
       };
     };
 
+    const updateRootConfiguration = async () => {
+      if (newVersion.value.root && newVersion.value.root.id) {
+        try {
+          const rootVersion = await productVersionService().find(newVersion.value.root.id);
+          versionInfraComponents.value = rootVersion.infraComponentVersions
+            ? rootVersion.infraComponentVersions.map(icv => ({
+                ...icv,
+                id: icv.id,
+              }))
+            : [];
+          versionModuleVersions.value = rootVersion.moduleVersions
+            ? rootVersion.moduleVersions.map(mv => ({
+                ...mv,
+                id: mv.id,
+              }))
+            : [];
+        } catch (error) {
+          alertService.showHttpError(error.response);
+        }
+      } else {
+        versionInfraComponents.value = [];
+        versionModuleVersions.value = [];
+      }
+    };
+
     // Module methods
     const getModuleById = id => {
       return moduleOptions.value.find(module => module.id === Number.parseInt(id));
+    };
+
+    const getCertificationById = id => {
+      return certificationsOptions.value.find(cert => cert.id === Number.parseInt(id));
     };
 
     const getInfraComponentById = id => {
@@ -1471,6 +1778,7 @@ export default defineComponent({
       await fetchComponentTypes();
       await fetchModuleOptions();
       await fetchModuleVersionOptions();
+      await retrieveCertifications();
 
       // Initialize tabs
       nextTick(() => {
@@ -1495,14 +1803,53 @@ export default defineComponent({
 
     watch(selectedVersion, newVersion => {
       if (newVersion) {
+        // Update tabs when a version is selected
+        tabs.value = ['Modules Version', 'Configuration'];
         // Mettre à jour les configurations et modules en fonction de la version sélectionnée
         versionInfraComponents.value = newVersion.infraComponentVersions || [];
         versionModuleVersions.value = newVersion.moduleVersions || [];
-
-        // Passer à l'onglet Configuration
-        setActiveTabIndex(1);
+      } else {
+        // Reset tabs when no version is selected
+        tabs.value = ['Product Versions'];
       }
     });
+
+    // In the setup function, add a watch for newVersion.root
+    watch(
+      () => newVersion.value.root,
+      async newRoot => {
+        if (newRoot && newRoot.id) {
+          try {
+            // Fetch the root product version details
+            const rootVersion = await productVersionService().find(newRoot.id);
+
+            // Update versionInfraComponents and versionModuleVersions with root's configuration
+            versionInfraComponents.value = rootVersion.infraComponentVersions
+              ? rootVersion.infraComponentVersions.map(icv => ({
+                  ...icv,
+                  id: icv.id, // Ensure ID is included
+                }))
+              : [];
+
+            versionModuleVersions.value = rootVersion.moduleVersions
+              ? rootVersion.moduleVersions.map(mv => ({
+                  ...mv,
+                  id: mv.id, // Ensure ID is included
+                }))
+              : [];
+
+            alertService.showInfo('Configuration du root appliquée automatiquement', { variant: 'info' });
+          } catch (error) {
+            alertService.showHttpError(error.response);
+          }
+        } else {
+          // Reset configurations if no root is selected
+          versionInfraComponents.value = [];
+          versionModuleVersions.value = [];
+        }
+      },
+      { deep: true },
+    );
 
     const newModuleInSettingsModal = ref({
       name: '',
@@ -1588,8 +1935,14 @@ export default defineComponent({
         module: module ? { ...module } : null,
       };
     };
+
     return {
       t$,
+      handleNewImageUpload,
+      breadcrumb,
+      selectVersion,
+      navigateToBreadcrumb,
+      returnToVersionsList,
       getModuleVersionWithModuleCached,
       newModuleInSettingsModal,
       showNewModuleForm,
@@ -1626,16 +1979,20 @@ export default defineComponent({
       infraComponentOptions,
       componentTypeOptions,
       moduleOptions,
+      certificationsOptions,
       moduleVersionOptions,
       selectedProductLineIds,
       editProductLineIds,
       showSettingsModal,
       showModuleSelector,
+      showCertificationSelector,
       showInfraSelector,
       selectedModuleVersionId,
+      selectedCertificationId,
       selectedInfraComponentId,
       productInfraComponents,
       productModules,
+      productCertifications,
       showVersionSettingsModal,
       showVersionModuleSelector,
       showVersionInfraSelector,
@@ -1676,6 +2033,10 @@ export default defineComponent({
       versionPaginationInfo,
       getFilteredInfraComponents,
       getFilteredModules,
+      selectedModuleId,
+      filteredModuleVersionOptions,
+      fetchModuleVersionsForSelectedModule,
+      openVersionSettings,
       retrieveProducts,
       fetchProductLineOptions,
       fetchInfraComponentVersionOptions,
@@ -1698,14 +2059,19 @@ export default defineComponent({
       openSettingsModal,
       openProductSettings,
       closeSettingsModal,
+      openCertifications,
+      showCertificationsModal,
+      closeCertificationsModal,
       saveSettingsModal,
-      openVersionSettings,
+      saveCertificationsModal,
       openVersionSettingsFromEdit,
       openNewVersionSettings,
       closeVersionSettingsModal,
       saveVersionSettingsModal,
       addModuleToProduct,
+      addCertificationToProduct,
       removeModuleFromProduct,
+      removeCertificationFromProduct,
       addInfraToProduct,
       removeInfraFromProduct,
       addModuleToVersion,
@@ -1728,8 +2094,10 @@ export default defineComponent({
       closeVersionDialog,
       removeProductVersion,
       updateTotalVersionItems,
+      showAddVersionLigne,
       saveNewVersion,
       cancelNewVersion,
+      updateRootConfiguration,
       getModuleById,
       getInfraComponentById,
       getModuleVersionById,

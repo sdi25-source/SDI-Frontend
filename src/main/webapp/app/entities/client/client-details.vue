@@ -1,7 +1,7 @@
 <template>
   <div class="row justify-content-center">
-    <div class="col-8">
-      <div v-if="client" class="card border-0 rounded-3 p-4">
+    <div class="col-12 p-5">
+      <div v-if="client" class="card border-0">
         <div class="card-body p-0">
           <!-- User header with login and status -->
           <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
@@ -10,8 +10,8 @@
               :src="client.clientLogo"
               :alt="client.name + ' logo'"
               class="client-logo"
-              width="70"
-              height="70"
+              width="100"
+              height="100"
             />
             <span v-else>-</span>
           </div>
@@ -38,6 +38,12 @@
             </div>
             <div class="col-md-6 mb-3">
               <div class="detail-group">
+                <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.mainContactPhoneNumber')"></label>
+                <p class="mb-0 fw-medium">{{ client.mainContactPhoneNumber }}</p>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="detail-group">
                 <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.currentCardHolderNumber')"></label>
                 <p class="mb-0 fw-medium">{{ client.currentCardHolderNumber }}</p>
               </div>
@@ -56,12 +62,6 @@
             </div>
             <div class="col-md-6 mb-3">
               <div class="detail-group">
-                <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.mainContactPhoneNumber')"></label>
-                <p class="mb-0 fw-medium">{{ client.mainContactPhoneNumber }}</p>
-              </div>
-            </div>
-            <div class="col-md-6 mb-3">
-              <div class="detail-group">
                 <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.url')"></label>
                 <p class="mb-0 fw-medium">{{ client.url }}</p>
               </div>
@@ -74,7 +74,7 @@
             <p class="mb-0 text-muted">{{ client.notes }}</p>
           </div>
 
-          <div class="mb-4 pb-3 border-bottom">
+          <div class="mb-4 pb-3">
             <label class="fw-bold mb-2" v-text="t$('sdiFrontendApp.client.relatedInformation')"></label>
             <div class="row">
               <div class="col-md-4 mb-3">
@@ -119,8 +119,8 @@
 
 <style scoped>
 .client-logo {
-  max-width: 70px;
-  max-height: 40px;
+  max-width: 100px;
+  max-height: 100px;
   object-fit: contain;
   border-radius: 4px;
 }

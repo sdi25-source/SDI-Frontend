@@ -2,7 +2,6 @@
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="header-container w-100 px-4 d-flex align-items-center justify-content-between shadow">
       <router-link to="/" class="logo d-flex align-items-center me-auto me-xl-0">
-        <!--        <img src="../../../content/images/SDILogo.png" alt="Logo" class="logo-img" />-->
         <h1>
           <strong>{{ t$('global.title') }}</strong>
         </h1>
@@ -11,6 +10,23 @@
       <!-- Nav Menu -->
       <nav id="navmenu" class="navmenu pl-5 ml-5">
         <ul>
+          <!-- dashboards -->
+          <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'dash' }">
+            <a href="#" class="no-link-style"><span>Dashboards</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <div class="entities-menu-container">
+                <div class="entities-category">
+                  <b-dropdown-item to="">
+                    <span>Customers Dashboard</span>
+                  </b-dropdown-item>
+                  <b-dropdown-item to="">
+                    <span>Products Dashboard</span>
+                  </b-dropdown-item>
+                </div>
+              </div>
+            </ul>
+          </li>
+
           <!-- Clients -->
           <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'customer' }">
             <a href="#" class="no-link-style"
@@ -117,35 +133,35 @@
         {{ t$('global.menu.account.login') }}
       </router-link>
 
-      <div class="dropdown notification-dropdown" @click="toggleDropdown" v-if="authenticated">
-        <a href="#" class="notification-icon no-link-style">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-            <path
-              d="M448 64c0-17.7-14.3-32-32-32L32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32zm0 256c0-17.7-14.3-32-32-32L32 288c-17.7 0-32 14.3-32 32s14.3 32 32 32l384 0c17.7 0 32-14.3 32-32zM0 192c0 17.7 14.3 32 32 32l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 160c-17.7 0-32 14.3-32 32zM448 448c0-17.7-14.3-32-32-32L32 416c-17.7 0-32 14.3-32 32s14.3 32 32 32l384 0c17.7 0 32-14.3 32-32z"
-            />
-          </svg>
-        </a>
-        <ul v-if="dropdownOpen" class="notification-menu">
-          <li v-if="authenticated">
-            <router-link to="/account/settings" class="d-flex align-items-center gap-1 no-link-style">
-              <font-awesome-icon icon="wrench" />
-              <span>{{ t$('global.menu.account.settings') }}</span>
-            </router-link>
-          </li>
-          <li v-if="authenticated">
-            <router-link to="/account/password" class="d-flex align-items-center gap-1 no-link-style">
-              <font-awesome-icon icon="lock" />
-              <span>{{ t$('global.menu.account.password') }}</span>
-            </router-link>
-          </li>
-          <li v-if="authenticated">
-            <a href="#" @click.prevent="logout" class="d-flex align-items-center gap-1 no-link-style">
-              <font-awesome-icon icon="sign-out-alt" />
-              <span>{{ t$('global.menu.account.logout') }}</span>
+      <nav id="navmenu" class="navmenu pl-5 ml-5" v-if="authenticated">
+        <ul>
+          <li v-if="authenticated" class="dropdown">
+            <a href="#" class="no-link-style">
+              <i class="bi bi-list toggle-dropdown"></i>
             </a>
+            <ul class="dropdown-menu">
+              <li v-if="authenticated">
+                <router-link to="/account/settings" class="d-flex align-items-center gap-1 no-link-style">
+                  <font-awesome-icon icon="wrench" />
+                  <span>{{ t$('global.menu.account.settings') }}</span>
+                </router-link>
+              </li>
+              <li v-if="authenticated">
+                <router-link to="/account/password" class="d-flex align-items-center gap-1 no-link-style">
+                  <font-awesome-icon icon="lock" />
+                  <span>{{ t$('global.menu.account.password') }}</span>
+                </router-link>
+              </li>
+              <li v-if="authenticated">
+                <a href="#" @click.prevent="logout" class="d-flex align-items-center gap-1 no-link-style">
+                  <font-awesome-icon icon="sign-out-alt" />
+                  <span>{{ t$('global.menu.account.logout') }}</span>
+                </a>
+              </li>
+            </ul>
           </li>
         </ul>
-      </div>
+      </nav>
     </div>
   </header>
 </template>
@@ -153,11 +169,13 @@
 <script lang="ts" src="./jhi-navbar.component.ts"></script>
 
 <style scoped>
+/* General styles for links */
 .no-link-style {
-  text-decoration: none; /* Supprime la ligne en dessous */
-  color: inherit; /* Garde la couleur du texte comme le parent */
+  text-decoration: none;
+  color: inherit;
   outline: none;
 }
+
 .no-link-style:hover,
 .no-link-style:focus,
 .no-link-style:active {
@@ -165,57 +183,35 @@
   color: inherit;
 }
 
-/* Ajout du style pour le logo */
-.logo-img {
-  height: 180px; /* Logo plus grand pour correspondre à la hauteur du titre */
-  width: 60px;
-  margin-right: -10px; /* Espace plus petit entre le logo et le titre */
+/* Navigation menu container */
+.navmenu {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+/* Dropdown container */
+.dropdown {
+  position: relative;
   display: inline-block;
-  vertical-align: middle;
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 0;
-}
-
-.logo h1 {
-  margin-bottom: 0; /* Supprime la marge en bas du titre */
-  margin-left: 0; /* Supprime la marge à gauche du titre */
-  padding-left: 0; /* Supprime le padding à gauche du titre */
-  line-height: 1; /* Ajuste la hauteur de ligne */
-  display: inline-flex;
-  align-items: center;
-}
-
-.dropdown.active > a {
-  color: #0d83fd !important;
-  font-weight: 600;
-}
-
-.notification-icon svg {
-  width: 20px;
-  height: 20px;
-}
-
-/* Notifications Dropdown */
-.notification-dropdown {
-  position: relative;
+/* Toggle icon (bi-list) */
+.toggle-dropdown {
+  font-size: 1.2rem;
+  margin-left: 5px;
   cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-.notification-icon {
-  position: relative;
-  font-size: 19px;
-  color: #333;
-  text-decoration: none;
+.dropdown:hover .toggle-dropdown {
+  transform: rotate(90deg); /* Rotate icon on hover for visual feedback */
 }
 
-.notification-menu {
+/* Dropdown menu */
+.dropdown-menu {
   position: absolute;
-  top: 35px;
-  right: 0;
+  top: 100%;
+  right: 0; /* Default: align to the right of the toggle icon */
   width: 250px;
   background: white;
   border: 1px solid #ddd;
@@ -224,18 +220,72 @@
   padding: 10px 0;
   border-radius: 8px;
   z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease,
+    transform 0.2s ease;
 }
 
-.notification-menu li {
+/* Show dropdown on hover */
+.dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Dropdown menu items */
+.dropdown-menu li {
   padding: 10px 15px;
   border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
 }
 
-.notification-menu li:last-child {
+.dropdown-menu li:hover {
+  background-color: #f8fafc;
+}
+
+.dropdown-menu li:last-child {
   border-bottom: none;
 }
 
-/* Header container styles */
+.dropdown-menu a {
+  color: #333;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropdown-menu a:hover {
+  color: #0d83fd;
+}
+
+/* Responsive positioning for smaller screens */
+@media (max-width: 768px) {
+  .dropdown-menu {
+    right: auto;
+    left: 0; /* Align to the left on smaller screens to avoid right overflow */
+  }
+}
+
+/* Ensure visibility near right edge of viewport */
+@media (min-width: 769px) {
+  .dropdown-menu {
+    right: 0;
+    left: auto;
+  }
+
+  /* Flip to left for the last dropdown to avoid right-edge overflow */
+  .dropdown:last-child .dropdown-menu {
+    right: auto;
+    left: 0;
+  }
+}
+
+/* Additional styles from your full code to ensure consistency */
 .header-container {
   width: 90%;
   max-width: 1200px;
@@ -243,13 +293,7 @@
   padding: 0 10px;
 }
 
-/* Menu de navigation */
-#navmenu {
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-/* Style pour la liste des entités avec défilement interne */
+/* Style for the entities menu scroll (for other dropdowns) */
 .entities-menu-scroll {
   max-height: 300px;
   overflow-y: auto;
@@ -258,7 +302,6 @@
   padding-right: 5px;
 }
 
-/* Style pour la barre de défilement */
 .entities-menu-scroll::-webkit-scrollbar {
   width: 5px;
 }
@@ -277,7 +320,7 @@
   background: #555;
 }
 
-/* Media Queries pour des tailles d'écran spécifiques */
+/* Media queries for responsive header container */
 @media (max-width: 1200px) {
   .header-container {
     max-width: 95%;
@@ -295,7 +338,7 @@
     padding: 0 20px;
   }
 
-  #navmenu {
+  .navmenu {
     padding-left: 0;
     padding-right: 0;
   }

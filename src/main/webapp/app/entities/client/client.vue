@@ -68,7 +68,6 @@
           </button>
         </div>
         <div class="view-toggle ml-3">
-          <!--affichage sous form de list-->
           <button class="btn btn-light btn-sm" :class="{ active: viewMode === 'list' }" @click="viewMode = 'list'">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
               <path
@@ -93,12 +92,11 @@
             <tr>
               <th scope="col"><span v-text="t$('sdiFrontendApp.client.clientLogo')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.client.name')"></span></th>
-              <th scope="col"><span v-text="t$('sdiFrontendApp.client.code')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.client.mainContactName')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.client.mainContactEmail')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.client.mainContactPhoneNumber')"></span></th>
-              <!--              <th scope="col"><span v-text="t$('sdiFrontendApp.client.size')"></span></th>-->
               <th scope="col"><span v-text="t$('sdiFrontendApp.client.clientType')"></span></th>
+              <th scope="col"><span v-text="t$('sdiFrontendApp.client.size')"></span></th>
               <th scope="col" width="160" class="text-center">Actions</th>
             </tr>
           </thead>
@@ -116,18 +114,17 @@
                 <span v-else>-</span>
               </td>
               <td>{{ client.name }}</td>
-              <td>{{ client.code }}</td>
               <td>{{ client.mainContactName }}</td>
               <td>{{ client.mainContactEmail }}</td>
               <td>{{ client.mainContactPhoneNumber }}</td>
-              <!--              <td>-->
-              <!--                <div v-if="client.size">-->
-              <!--                  {{ client.size.sizeName }}-->
-              <!--                </div>-->
-              <!--              </td>-->
               <td>
                 <div v-if="client.clientType">
                   {{ client.clientType.type }}
+                </div>
+              </td>
+              <td>
+                <div v-if="client.size">
+                  {{ client.size.sizeName }}
                 </div>
               </td>
               <td class="text-center">
@@ -154,7 +151,7 @@
                       />
                     </svg>
                   </div>
-                  <div class="icon-container edit-container" @click="openDetailsModal(client.id)" title="Modifier">
+                  <div class="icon-container edit-container" @click="openDetailsModal(client.id)" title="Détails">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="26"
@@ -216,7 +213,7 @@
         <div class="modal-content">
           <div class="">
             <button type="button" class="close p-2 mr-4 mt-4" @click="showDetailseModal = false">
-              <span>&times;</span>
+              <span>×</span>
             </button>
           </div>
           <div class="scrollable-form">
@@ -234,9 +231,9 @@
             <div class="user-edit">
               <div class="user-form-container">
                 <button type="button" class="close" @click="showCreateModal = false">
-                  <span>&times;</span>
+                  <span>×</span>
                 </button>
-                <ClientUpdate @close="showCreateModal = false" />
+                <ClientUpdate @close="showCreateModal = false" @user-saved="handleClientUpdated" />
               </div>
             </div>
           </div>
@@ -252,9 +249,9 @@
             <div class="user-edit">
               <div class="user-form-container">
                 <button type="button" class="close" @click="showEditModal = false">
-                  <span>&times;</span>
+                  <span>×</span>
                 </button>
-                <ClientUpdate :client-id="selectedClientId" @close="showEditModal = false" @updated="handleClientUpdated" />
+                <ClientUpdate :client-id="selectedClientId" @close="showEditModal = false" @user-saved="handleClientUpdated" />
               </div>
             </div>
           </div>
@@ -271,7 +268,7 @@
 <script lang="ts" src="./client.component.ts"></script>
 
 <style scoped>
-/* Nouveaux styles pour l'effet de flou et d'ombre */
+/* Styles remain unchanged */
 .modal-backdrop-blur {
   position: fixed;
   top: 0;
@@ -322,9 +319,9 @@
   color: #343a40;
 }
 .scrollable-form {
-  max-height: 90vh;
+  max-height: 80vh;
   overflow-y: auto;
-  padding-right: 1rem;
+  padding-right: 0rem;
 }
 .welcome-title {
   font-size: 1.5rem;
@@ -478,7 +475,6 @@
   border-radius: 0.2rem;
 }
 
-/* Card View Styles */
 .card {
   background-color: white;
   border-radius: 10px;
@@ -576,7 +572,7 @@
   padding: 0;
   max-width: 100%;
 }
-/* Styles pour les formulaires dans les modals */
+
 .user-edit {
   padding: 0;
   background-color: transparent;

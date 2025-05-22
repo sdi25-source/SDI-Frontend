@@ -1,4 +1,4 @@
-import type { PropType } from 'vue';
+import { inject, type PropType } from 'vue';
 import { defineComponent, ref, reactive, computed, watch } from 'vue';
 import type { IRequestOfChange } from '@/shared/model/request-of-change.model';
 import type { IProductVersion } from '@/shared/model/product-version.model';
@@ -13,6 +13,7 @@ import FeatureService from '@/entities/feature/feature.service';
 import InfraComponentVersionService from '@/entities/infra-component-version/infra-component-version.service';
 import { useAlertService } from '@/shared/alert/alert.service';
 import RequestOfChangeService from '@/entities/request-of-change/request-of-change.service.ts';
+import ProductService from '@/entities/product/product.service.ts';
 
 export default defineComponent({
   name: 'NewProductVersionPopup',
@@ -30,6 +31,7 @@ export default defineComponent({
   emits: ['close', 'product-created'],
   setup(props, { emit }) {
     // Services
+    const productService = inject('productService', () => new ProductService());
     const productVersionService = new ProductVersionService();
     const requestOfChangeService = new RequestOfChangeService();
     const moduleVersionService = new ModuleVersionService();
@@ -93,23 +95,119 @@ export default defineComponent({
       { immediate: true },
     );
 
+    // Remove a module version from newProductVersion.moduleVersions
+    const removeModuleVersion = (index: number) => {
+      if (newProductVersion.moduleVersions) {
+        const moduleVersion = newProductVersion.moduleVersions[index];
+        if (!moduleVersion.isNewlyCreated) {
+          newProductVersion.moduleVersions.splice(index, 1);
+          // Clean up UI state
+          delete moduleVersionsUIState.value[index];
+          // Reindex UI state to maintain consistency
+          const updatedUIState: { [key: number]: { isEditing: boolean; showFeatures: boolean } } = {};
+          Object.keys(moduleVersionsUIState.value).forEach((key, i) => {
+            updatedUIState[i] = moduleVersionsUIState.value[parseInt(key)];
+          });
+          moduleVersionsUIState.value = updatedUIState;
+        }
+      }
+    };
+
+    const fetchLatestNonClientVersion = async () => {
+      try {
+        // Regular expression to match X.X.X format and exclude unNom_X.X.X
+        const versionRegex = /^\d+\.\d+\.\d+$/;
+        const clientVersionRegex = /^[a-zA-Z]+_\d+\.\d+\.\d+$/;
+
+        // Filter non-client versions (X.X.X) and exclude client versions (unNom_X.X.X)
+        const res = await productService().retrieve();
+        const nonClientVersions = res.data.value.filter(
+          pv => pv.version && versionRegex.test(pv.version) && !clientVersionRegex.test(pv.version),
+        );
+        console.log(nonClientVersions);
+        if (nonClientVersions.length === 0) {
+          return null; // No non-client versions found
+        }
+
+        // Sort versions by version number (semantic versioning)
+        nonClientVersions.sort((a, b) => {
+          const versionA = a.version.split('.').map(Number);
+          const versionB = b.version.split('.').map(Number);
+          for (let i = 0; i < 3; i++) {
+            if (versionA[i] !== versionB[i]) {
+              return versionB[i] - versionA[i]; // Descending order
+            }
+          }
+          return new Date(b.createDate) - new Date(a.createDate); // Fallback to creation date
+        });
+
+        // Return the latest version
+        return nonClientVersions[0];
+      } catch (error) {
+        alertService.showHttpError(error.response);
+        return null;
+      }
+    };
+
+    const incrementVersion = version => {
+      let [major, minor, patch] = version.split('.').map(Number);
+      // Increment patch; if it reaches 9, reset to 0 and increment minor
+      if (patch < 9) {
+        patch += 1;
+      } else {
+        patch = 0;
+        // If minor reaches 9, reset to 0 and increment major
+        if (minor < 9) {
+          minor += 1;
+        } else {
+          minor = 0;
+          major += 1;
+        }
+      }
+      // Return the new version string
+      return `${major}.${minor}.${patch}`;
+    };
+
     // Initialize data from request of change
     const initializeFromRequest = async (request: IRequestOfChange) => {
       if (!isDataValid.value) {
         console.warn('Request data is invalid, cannot initialize');
         return;
       }
-
       try {
         // Reset state
         currentStep.value = 1;
         moduleVersionsUIState.value = {};
 
-        // Generate version number based on client name and product version
-        if (request.client && request.client.name && request.productVersion && request.productVersion.version) {
-          newProductVersion.version = `${request.client.name}_${request.productVersion.version}`;
-        } else {
-          newProductVersion.version = `New_Version_${new Date().toISOString().slice(0, 10)}`;
+        if (request.type === 'EXTERNAL') {
+          // Generate version number based on client name and product version
+          if (request.client && request.client.name && request.productVersion && request.productVersion.version) {
+            const baseVersion = request.productVersion.version;
+            const clientName = request.client.name;
+
+            // Fetch existing product versions for this product and client to determine the increment
+            const productVersionsRes = await productVersionService.retrieve();
+            const existingVersions = productVersionsRes.data.filter(
+              pv => pv.product?.id === request.productVersion?.product?.id && pv.version.startsWith(`${clientName}_${baseVersion}`),
+            );
+
+            // Extract the highest increment number
+            let maxIncrement = 0;
+            existingVersions.forEach(pv => {
+              const match = pv.version.match(new RegExp(`^${clientName}_${baseVersion}\\.(\\d+)$`));
+              if (match) {
+                const increment = parseInt(match[1], 10);
+                if (increment > maxIncrement) {
+                  maxIncrement = increment;
+                }
+              }
+            });
+
+            // Set the new version with the next increment
+            newProductVersion.version = `${clientName}_${baseVersion}.${maxIncrement + 1}`;
+          }
+        } else if (request.type === 'INTERNAL') {
+          newProductVersion.version = incrementVersion(request.productVersion.version);
         }
 
         // Set product from request
@@ -141,19 +239,37 @@ export default defineComponent({
 
         // Prepare module versions in memory
         if (request.productVersion && request.productVersion.moduleVersions) {
-          const moduleIdsInRequest = request.moduleVersions?.map(mv => mv.module?.id).filter(id => id !== undefined) || [];
+          const moduleIdsInRequest = request.moduleVersions?.map(mv => mv.id).filter(id => id !== undefined) || [];
           const newModuleVersions: IModuleVersion[] = [];
 
           for (const moduleVersion of request.productVersion.moduleVersions) {
-            const isInRequest = moduleIdsInRequest.includes(moduleVersion.module?.id);
-
+            const isInRequest = moduleIdsInRequest.includes(moduleVersion.id);
             if (isInRequest) {
-              // Prepare a new version for this module in memory
+              // Generate module version name with client prefix
               let newVersionName = '';
-              if (request.client && request.client.name) {
-                newVersionName = `${request.client.name}_${moduleVersion.version}`;
-              } else {
-                newVersionName = `New_${moduleVersion.version}`;
+
+              if (request.type === 'EXTERNAL') {
+                if (request.client && request.client.name) {
+                  // Fetch existing module versions to determine increment
+                  const existingModuleVersions = availableModuleVersions.value.filter(
+                    mv => mv.id === moduleVersion.id && mv.version.startsWith(`${request.client.name}_${moduleVersion.version}`),
+                  );
+
+                  let maxModuleIncrement = 0;
+                  existingModuleVersions.forEach(mv => {
+                    const match = mv.version.match(new RegExp(`^${request.client.name}_${moduleVersion.version}\\.(\\d+)$`));
+                    if (match) {
+                      const increment = parseInt(match[1], 10);
+                      if (increment > maxModuleIncrement) {
+                        maxModuleIncrement = increment;
+                      }
+                    }
+                  });
+
+                  newVersionName = `${request.client.name}_${moduleVersion.version}.${maxModuleIncrement + 1}`;
+                }
+              } else if (request.type === 'INTERNAL') {
+                newVersionName = incrementVersion(moduleVersion.version);
               }
 
               const newModuleVersion: IModuleVersion = {
@@ -255,11 +371,11 @@ export default defineComponent({
     const getStepLabel = (step: number) => {
       switch (step) {
         case 1:
-          return 'Produit';
+          return 'Produit Version';
         case 2:
           return 'Configuration';
         case 3:
-          return 'Modules';
+          return 'Modules Version';
         case 4:
           return 'Confirmation';
         default:
@@ -388,7 +504,6 @@ export default defineComponent({
           const savedModuleVersions: IModuleVersion[] = [];
           for (const moduleVersion of newProductVersion.moduleVersions) {
             if (!moduleVersion.isNewlyCreated) {
-              // Existing module version, add as-is
               savedModuleVersions.push(moduleVersion);
               continue;
             }
@@ -439,7 +554,12 @@ export default defineComponent({
           const result = await productVersionService.create(productToSave);
           console.log(`Version produit créée avec ID: ${result.id}`);
 
-          const updatedRequest = { ...props.requestOfChange, done: true };
+          // Step 3: Update request status to APPROVED
+          const updatedRequest = {
+            ...props.requestOfChange,
+            status: 'COMPLETED',
+            done: true,
+          };
           const response = await requestOfChangeService.update(updatedRequest);
           console.log(`Update request: ${response.id}`);
 
@@ -449,7 +569,8 @@ export default defineComponent({
           }
 
           alertService.showInfo('Nouvelle version du produit créée avec succès', { variant: 'success' });
-          emit('product-created', result);
+          // Émettre l'événement avec la version du produit et la demande mise à jour
+          emit('product-created', { productVersion: result, updatedRequest: response });
           closeModal();
 
           // Delay page reload to allow the success message to be visible
@@ -483,6 +604,9 @@ export default defineComponent({
       newFeature,
       isDataValid,
       moduleVersionsUIState,
+      fetchLatestNonClientVersion,
+      removeModuleVersion,
+      incrementVersion,
       nextStep,
       prevStep,
       getStepLabel,

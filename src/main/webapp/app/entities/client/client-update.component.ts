@@ -7,7 +7,6 @@ import ClientService from './client.service';
 import useDataUtils from '@/shared/data/data-utils.service';
 import { useValidation } from '@/shared/composables';
 import { useAlertService } from '@/shared/alert/alert.service';
-
 import CountryService from '@/entities/country/country.service';
 import { type ICountry } from '@/shared/model/country.model';
 import ClientSizeService from '@/entities/client-size/client-size.service';
@@ -20,7 +19,6 @@ export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'ClientUpdate',
   props: {
-    // eslint-disable-next-line vue/require-default-prop
     clientId: {
       type: [Number, String],
       required: false,
@@ -30,21 +28,16 @@ export default defineComponent({
   setup(props, { emit }) {
     const clientService = inject('clientService', () => new ClientService());
     const alertService = inject('alertService', () => useAlertService(), true);
-
+    const { t: t$ } = useI18n();
     const client: Ref<IClient> = ref(new Client());
-    const logoPreview = ref(null);
-    const compressionInfo = ref('');
+    const logoPreview = ref<string | null>(null);
+    const logoSize = ref<number | null>(null);
 
     const countryService = inject('countryService', () => new CountryService());
-
     const countries: Ref<ICountry[]> = ref([]);
-
     const clientSizeService = inject('clientSizeService', () => new ClientSizeService());
-
     const clientSizes: Ref<IClientSize[]> = ref([]);
-
     const clientTypeService = inject('clientTypeService', () => new ClientTypeService());
-
     const clientTypes: Ref<IClientType[]> = ref([]);
     const isSaving = ref(false);
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'en'), true);
@@ -58,14 +51,13 @@ export default defineComponent({
       try {
         const res = await clientService().find(clientId);
         client.value = res;
-
-        // Si un logo existe déjà, le décompresser et l'afficher
         if (client.value.clientLogo) {
           try {
             logoPreview.value = decompressLogo(client.value.clientLogo);
+            logoSize.value = Math.round(client.value.clientLogo.length / 1024); // Taille en KB
           } catch (error) {
             console.error('Erreur lors de la décompression du logo:', error);
-            alertService.showError("Erreur lors de l'affichage du logo");
+            alertService.showError(t$('sdiFrontendApp.client.logoError').toString());
           }
         }
       } catch (error) {
@@ -99,129 +91,77 @@ export default defineComponent({
 
     const dataUtils = useDataUtils();
 
-    // Fonction pour compresser l'image
-    const compressImage = (file: File): Promise<string> => {
+    // Validation personnalisée pour le logo
+    const maxFileSize = (value: File | string): boolean => {
+      if (!value || typeof value === 'string') return true; // Pas de fichier ou déjà une chaîne
+      return value.size <= 2 * 1024 * 1024; // 2MB max
+    };
+
+    // Compression du logo
+    const compressLogo = (file: File): Promise<string> => {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.readAsDataURL(file);
-
         reader.onload = event => {
           const img = new Image();
-          img.src = event.target.result as string;
-
+          img.src = event.target?.result as string;
           img.onload = () => {
-            // Créer un canvas pour redimensionner l'image
             const canvas = document.createElement('canvas');
-            // Définir une taille maximale très petite pour tenir dans varchar(255)
-            const MAX_WIDTH = 50;
-            const MAX_HEIGHT = 50;
-
+            const ctx = canvas.getContext('2d')!;
+            const maxWidth = 300; // Largeur max pour compression
+            const maxHeight = 300; // Hauteur max pour compression
             let width = img.width;
             let height = img.height;
 
-            // Calculer les nouvelles dimensions en conservant le ratio
             if (width > height) {
-              if (width > MAX_WIDTH) {
-                height *= MAX_WIDTH / width;
-                width = MAX_WIDTH;
+              if (width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
               }
             } else {
-              if (height > MAX_HEIGHT) {
-                width *= MAX_HEIGHT / height;
-                height = MAX_HEIGHT;
+              if (height > maxHeight) {
+                width = Math.round((width * maxHeight) / height);
+                height = maxHeight;
               }
             }
 
             canvas.width = width;
             canvas.height = height;
-
-            const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
-
-            // Convertir en JPEG avec une qualité très basse pour réduire la taille
-            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.1);
-
-            // Calculer la taille approximative en caractères
-            const sizeInChars = Math.ceil(compressedDataUrl.length);
-            compressionInfo.value = `Image compressée: ${sizeInChars} caractères (max 255)`;
-
-            // Vérifier si l'image compressée est trop grande pour varchar(255)
-            if (sizeInChars > 255) {
-              reject(new Error(`L'image est trop grande (${sizeInChars} caractères) même après compression. Maximum: 255 caractères.`));
-              return;
-            }
-
-            resolve(compressedDataUrl);
+            resolve(canvas.toDataURL('image/jpeg', 0.7)); // Compression à 70%
           };
-
-          img.onerror = () => {
-            reject(new Error("Erreur lors du chargement de l'image"));
-          };
+          img.onerror = () => reject(new Error("Erreur lors du chargement de l'image"));
         };
-
-        reader.onerror = () => {
-          reject(new Error('Erreur lors de la lecture du fichier'));
-        };
+        reader.onerror = () => reject(new Error('Erreur lors de la lecture du fichier'));
+        reader.readAsDataURL(file);
       });
     };
 
-    // Fonction pour décompresser le logo (dans ce cas, simplement retourner la chaîne base64)
-    const decompressLogo = (compressedLogo: string): string => {
-      // Si le logo ne commence pas par "data:", on ajoute le préfixe data URL
-      if (!compressedLogo.startsWith('data:')) {
-        return `data:image/jpeg;base64,${compressedLogo}`;
-      }
-      return compressedLogo;
+    // Décompression du logo (conversion base64 vers URL affichable)
+    const decompressLogo = (base64: string): string => {
+      return base64.startsWith('data:image') ? base64 : `data:image/jpeg;base64,${base64}`;
     };
 
-    // Fonction appelée lors du changement de logo
-    const onLogoChange = async event => {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      try {
-        // Vérifier le type de fichier
-        if (!file.type.includes('image/')) {
-          alertService.showError('Le fichier doit être une image');
-          return;
+    // Gestion du changement de fichier
+    const onLogoChange = async (event: Event) => {
+      const input = event.target as HTMLInputElement;
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        try {
+          const compressedLogo = await compressLogo(file);
+          client.value.clientLogo = compressedLogo;
+          logoPreview.value = compressedLogo;
+          logoSize.value = Math.round(file.size / 1024); // Taille en KB
+          v$.value.clientLogo.$touch(); // Marquer le champ comme "touché"
+        } catch (error) {
+          console.error('Erreur lors de la compression du logo:', error);
+          alertService.showError(t$('sdiFrontendApp.client.logoError').toString());
         }
-
-        // Compresser l'image
-        const compressedImage = await compressImage(file);
-
-        // Mettre à jour le modèle avec l'image compressée
-        client.value.clientLogo = compressedImage;
-
-        // Afficher la prévisualisation (utiliser l'image non compressée pour la prévisualisation)
-        logoPreview.value = URL.createObjectURL(file);
-
-        // Marquer le champ comme modifié pour la validation
-        v$.value.clientLogo.$touch();
-      } catch (error) {
-        console.error('Erreur lors de la compression du fichier:', error);
-        alertService.showError(error.message || "Erreur lors du traitement de l'image");
       }
     };
 
-    // Fonction pour supprimer le logo
-    const removeLogo = () => {
-      client.value.clientLogo = null;
-      logoPreview.value = null;
-      compressionInfo.value = '';
-
-      // Réinitialiser le champ de fichier
-      const fileInput = document.getElementById('client-clientLogo') as HTMLInputElement;
-      if (fileInput) {
-        fileInput.value = '';
-      }
-    };
-
-    const { t: t$ } = useI18n();
     const validations = useValidation();
     const validationRules = {
-      clientLogo: {
-        maxLength: maxLength(255), // Ajouter une validation de longueur maximale
-      },
+      clientLogo: {},
       name: {
         required: validations.required(t$('entity.validation.required').toString()),
       },
@@ -259,6 +199,8 @@ export default defineComponent({
       clientService,
       alertService,
       client,
+      logoPreview,
+      logoSize,
       previousState,
       isSaving,
       currentLanguage,
@@ -266,17 +208,13 @@ export default defineComponent({
       clientSizes,
       clientTypes,
       cancel,
-      logoPreview,
-      compressionInfo,
       onLogoChange,
-      removeLogo,
       ...dataUtils,
       v$,
       t$,
     };
   },
 
-  created(): void {},
   methods: {
     save(): void {
       this.isSaving = true;
@@ -286,6 +224,8 @@ export default defineComponent({
           .then(param => {
             this.isSaving = false;
             this.alertService.showInfo(this.t$('sdiFrontendApp.client.updated', { param: param.id }));
+            this.$emit('user-saved', param);
+            this.$emit('close');
           })
           .catch(error => {
             this.isSaving = false;
@@ -297,6 +237,8 @@ export default defineComponent({
           .then(param => {
             this.isSaving = false;
             this.alertService.showSuccess(this.t$('sdiFrontendApp.client.created', { param: param.id }).toString());
+            this.$emit('user-saved', param);
+            this.$emit('close');
           })
           .catch(error => {
             this.isSaving = false;

@@ -207,6 +207,7 @@ entity RequestOfChange {
   description TextBlob
   createDate LocalDate
   updateDate LocalDate
+  done Boolean
 }
 
 enum RequestStatus {
@@ -221,26 +222,24 @@ relationship ManyToOne {
   ProductVersion{product(name)} to Product
   ModuleVersion{module(name)} to Module
   InfraComponentVersion{infraComponent(name)}  to InfraComponent
-
   ProductDeployementDetail{productDeployement(refContract)} to ProductDeployement
-
   RequestOfChange{productVersion(version)} to ProductVersion
   RequestOfChange{client(code)} to Client
+  ProductDeployement{product(name)} to Product
 
 }
 
 
 relationship ManyToMany {
-  Product {productLine} to ProductLine // un produitLine peut etre traité dans plusieurs produit et un produit peut traiter plusieurs productLine.
+  Product {productLine} to ProductLine
+  Product {certification} to Certification
   ProductVersion{moduleVersion} to ModuleVersion
   Product{module} to Module
   ModuleVersion{feature} to Feature
   ProductVersion{infraComponentVersion} to InfraComponentVersion
-  Product{infraComponentVersion} to InfraComponentVersion
-
+  ProductVersion{infraComponent} to InfraComponent
   ProductDeployementDetail{infraComponentVersion} to InfraComponentVersion
   ProductDeployementDetail{allowedModuleVersion} to ModuleVersion
-
   RequestOfChange{moduleVersion} to ModuleVersion
 }
 

@@ -1,5 +1,4 @@
 import { type IInfraComponent } from '@/shared/model/infra-component.model';
-import type { IComponentType } from '@/shared/model/component-type.model.ts';
 
 export interface IInfraComponentVersion {
   id?: number;

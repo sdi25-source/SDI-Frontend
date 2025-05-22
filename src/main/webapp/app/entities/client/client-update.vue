@@ -9,38 +9,28 @@
           </div>
           <div class="divider mt-3"></div>
           <div class="form-fields">
-            <!--            <div class="logo-upload-container">-->
-            <!--              <div class="input-with-validation">-->
-            <!--                <input-->
-            <!--                  type="file"-->
-            <!--                  id="client-clientLogo"-->
-            <!--                  name="clientLogo"-->
-            <!--                  data-cy="clientLogo"-->
-            <!--                  accept="image/*"-->
-            <!--                  class="form-control"-->
-            <!--                  @change="onLogoChange"-->
-            <!--                />-->
-            <!--                <span class="valid-check" v-if="v$.clientLogo.$anyDirty && !v$.clientLogo.$invalid">-->
-            <!--                  <font-awesome-icon icon="check" class="text-success" />-->
-            <!--                </span>-->
-            <!--              </div>-->
-
-            <!--              &lt;!&ndash; Prévisualisation du logo &ndash;&gt;-->
-            <!--              <div v-if="logoPreview" class="logo-preview mt-2">-->
-            <!--                <img :src="logoPreview" alt="Logo preview" class="preview-image" />-->
-            <!--                <button type="button" class="remove-logo-btn" @click="removeLogo">-->
-            <!--                  <font-awesome-icon icon="times" />-->
-            <!--                </button>-->
-            <!--              </div>-->
-
-            <!--              &lt;!&ndash; Informations sur la compression &ndash;&gt;-->
-            <!--              <div v-if="compressionInfo" class="compression-info mt-2">-->
-            <!--                <small class="text-muted">-->
-            <!--                  {{ compressionInfo }}-->
-            <!--                </small>-->
-            <!--              </div>-->
-            <!--            </div>-->
-
+            <div class="logo-upload-container">
+              <label class="label-c" v-text="t$('sdiFrontendApp.client.clientLogo')" for="client-clientLogo"></label>
+              <div class="input-with-validation">
+                <input
+                  type="file"
+                  id="client-clientLogo"
+                  name="clientLogo"
+                  data-cy="clientLogo"
+                  accept="image/*"
+                  class="form-control"
+                  @change="onLogoChange"
+                />
+                <span class="valid-check" v-if="v$.clientLogo.$anyDirty && !v$.clientLogo.$invalid">
+                  <font-awesome-icon icon="check" class="text-success" />
+                </span>
+              </div>
+              <div v-if="v$.clientLogo.$anyDirty && v$.clientLogo.$invalid">
+                <small class="form-text text-danger" v-for="error of v$.clientLogo.$errors" :key="error.$uid">
+                  {{ error.$message }}
+                </small>
+              </div>
+            </div>
             <div class="form-group">
               <label class="label-c" v-text="t$('sdiFrontendApp.client.name')" for="client-name"></label>
               <div class="input-with-validation">
@@ -62,22 +52,22 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label class="label-c" v-text="t$('sdiFrontendApp.client.code')" for="client-code"></label>
-              <div class="input-with-validation">
-                <b-form-input
-                  type="text"
-                  name="code"
-                  id="client-code"
-                  data-cy="code"
-                  :state="v$.code.$anyDirty ? !v$.code.$invalid : null"
-                  v-model="v$.code.$model"
-                ></b-form-input>
-                <span class="valid-check" v-if="v$.code.$anyDirty && !v$.code.$invalid">
-                  <font-awesome-icon icon="check" class="text-success" />
-                </span>
-              </div>
-            </div>
+            <!--            <div class="form-group">-->
+            <!--              <label class="label-c" v-text="t$('sdiFrontendApp.client.code')" for="client-code"></label>-->
+            <!--              <div class="input-with-validation">-->
+            <!--                <b-form-input-->
+            <!--                  type="text"-->
+            <!--                  name="code"-->
+            <!--                  id="client-code"-->
+            <!--                  data-cy="code"-->
+            <!--                  :state="v$.code.$anyDirty ? !v$.code.$invalid : null"-->
+            <!--                  v-model="v$.code.$model"-->
+            <!--                ></b-form-input>-->
+            <!--                <span class="valid-check" v-if="v$.code.$anyDirty && !v$.code.$invalid">-->
+            <!--                  <font-awesome-icon icon="check" class="text-success" />-->
+            <!--                </span>-->
+            <!--              </div>-->
+            <!--            </div>-->
 
             <div class="form-group">
               <label class="label-c" v-text="t$('sdiFrontendApp.client.mainContactName')" for="client-mainContactName"></label>
@@ -233,72 +223,6 @@
             </div>
 
             <div class="form-group">
-              <label class="label-c" v-text="t$('sdiFrontendApp.client.createDate')" for="client-createDate"></label>
-              <div class="input-with-validation">
-                <b-input-group>
-                  <b-input-group-prepend>
-                    <b-form-datepicker
-                      aria-controls="client-createDate"
-                      v-model="v$.createDate.$model"
-                      name="createDate"
-                      class="date-picker"
-                      :locale="currentLanguage"
-                      button-only
-                      today-button
-                      reset-button
-                      close-button
-                    >
-                    </b-form-datepicker>
-                  </b-input-group-prepend>
-                  <b-form-input
-                    id="client-createDate"
-                    data-cy="createDate"
-                    type="text"
-                    name="createDate"
-                    :state="v$.createDate.$anyDirty ? !v$.createDate.$invalid : null"
-                    v-model="v$.createDate.$model"
-                  />
-                </b-input-group>
-                <span class="valid-check" v-if="v$.createDate.$anyDirty && !v$.createDate.$invalid">
-                  <font-awesome-icon icon="check" class="text-success" />
-                </span>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="label-c" v-text="t$('sdiFrontendApp.client.updateDate')" for="client-updateDate"></label>
-              <div class="input-with-validation">
-                <b-input-group>
-                  <b-input-group-prepend>
-                    <b-form-datepicker
-                      aria-controls="client-updateDate"
-                      v-model="v$.updateDate.$model"
-                      name="updateDate"
-                      class="date-picker"
-                      :locale="currentLanguage"
-                      button-only
-                      today-button
-                      reset-button
-                      close-button
-                    >
-                    </b-form-datepicker>
-                  </b-input-group-prepend>
-                  <b-form-input
-                    id="client-updateDate"
-                    data-cy="updateDate"
-                    type="text"
-                    name="updateDate"
-                    :state="v$.updateDate.$anyDirty ? !v$.updateDate.$invalid : null"
-                    v-model="v$.updateDate.$model"
-                  />
-                </b-input-group>
-                <span class="valid-check" v-if="v$.updateDate.$anyDirty && !v$.updateDate.$invalid">
-                  <font-awesome-icon icon="check" class="text-success" />
-                </span>
-              </div>
-            </div>
-
-            <div class="form-group">
               <label class="label-c" v-text="t$('sdiFrontendApp.client.notes')" for="client-notes"></label>
               <div class="input-with-validation">
                 <b-form-input
@@ -381,6 +305,55 @@
 <script lang="ts" src="./client-update.component.ts"></script>
 
 <style scoped>
+.logo-upload-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.logo-preview {
+  position: relative;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.preview-image {
+  max-width: 150px;
+  max-height: 150px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 5px;
+  object-fit: contain;
+}
+
+.remove-logo-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.remove-logo-btn:hover {
+  background-color: #c82333;
+}
+
+.compression-info {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 5px;
+}
 .user-form-container {
   width: 100%;
   max-width: 100%;

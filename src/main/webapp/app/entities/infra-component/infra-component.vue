@@ -104,7 +104,6 @@
               <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponent.name')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponent.vendor')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponent.notes')"></span></th>
-              <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponent.createDate')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponent.componentType')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.versions')"></span></th>
               <th scope="col" width="160" class="text-center">Actions</th>
@@ -134,14 +133,6 @@
                 </template>
                 <template v-else>
                   {{ infraComponent.notes }}
-                </template>
-              </td>
-              <td>
-                <template v-if="infraComponent.isEditing">
-                  <input v-model="infraComponent.createDate" type="date" class="form-control-borderless" />
-                </template>
-                <template v-else>
-                  {{ infraComponent.createDate }}
                 </template>
               </td>
               <td>
@@ -239,9 +230,6 @@
               <td><input type="text" class="form-control-borderless" v-model="newInfraComponent.name" placeholder="Nom" /></td>
               <td><input type="text" class="form-control-borderless" v-model="newInfraComponent.vendor" placeholder="Fournisseur" /></td>
               <td><input type="text" class="form-control-borderless" v-model="newInfraComponent.notes" placeholder="Notes" /></td>
-              <td>
-                <input type="date" class="form-control-borderless" v-model="newInfraComponent.createDate" placeholder="Date de création" />
-              </td>
               <td>
                 <select v-model="newInfraComponent.componentType" class="form-control-borderless">
                   <option value="">-- Sélectionner un type --</option>
@@ -379,10 +367,6 @@
               <div class="mb-2">
                 <small class="text-muted">Notes:</small>
                 <p class="card-text text-truncate" :title="infraComponent.notes">{{ infraComponent.notes || 'N/A' }}</p>
-              </div>
-              <div class="mb-2">
-                <small class="text-muted">Date de création:</small>
-                <p class="card-text">{{ infraComponent.createDate || 'N/A' }}</p>
               </div>
               <div>
                 <small class="text-muted">Type de composant:</small>
@@ -560,8 +544,6 @@
                   <tr>
                     <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponentVersion.version')"></span></th>
                     <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponentVersion.description')"></span></th>
-                    <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponentVersion.createDate')"></span></th>
-                    <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponentVersion.updateDate')"></span></th>
                     <th scope="col" width="160" class="text-center">Actions</th>
                   </tr>
                 </thead>
@@ -581,22 +563,6 @@
                       </template>
                       <template v-else>
                         {{ version.description }}
-                      </template>
-                    </td>
-                    <td>
-                      <template v-if="version.isEditing">
-                        <input v-model="version.createDate" type="date" class="form-control-borderless" />
-                      </template>
-                      <template v-else>
-                        {{ version.createDate }}
-                      </template>
-                    </td>
-                    <td>
-                      <template v-if="version.isEditing">
-                        <input v-model="version.updateDate" type="date" class="form-control-borderless" />
-                      </template>
-                      <template v-else>
-                        {{ version.updateDate }}
                       </template>
                     </td>
                     <td class="text-center">
@@ -657,17 +623,6 @@
                     <td><input type="text" class="form-control-borderless" v-model="newVersion.version" placeholder="Version" /></td>
                     <td>
                       <input type="text" class="form-control-borderless" v-model="newVersion.description" placeholder="Description" />
-                    </td>
-                    <td>
-                      <input type="date" class="form-control-borderless" v-model="newVersion.createDate" placeholder="Date de création" />
-                    </td>
-                    <td>
-                      <input
-                        type="date"
-                        class="form-control-borderless"
-                        v-model="newVersion.updateDate"
-                        placeholder="Date de mise à jour"
-                      />
                     </td>
                     <td class="text-center">
                       <div class="action-icons">
@@ -766,14 +721,6 @@
                         <label>Description</label>
                         <textarea v-model="version.description" class="form-control" rows="3"></textarea>
                       </div>
-                      <div class="form-group">
-                        <label>Date de création</label>
-                        <input v-model="version.createDate" type="date" class="form-control" />
-                      </div>
-                      <div class="form-group">
-                        <label>Date de mise à jour</label>
-                        <input v-model="version.updateDate" type="date" class="form-control" />
-                      </div>
                       <div class="d-flex justify-content-end mt-3">
                         <button class="btn btn-sm btn-secondary mr-2" @click="cancelVersionEdit(version)">Annuler</button>
                         <button class="btn btn-sm btn-primary" @click="saveInfraComponentVersion(version)">Enregistrer</button>
@@ -788,14 +735,6 @@
                         <div class="info-row">
                           <span class="info-label">Description:</span>
                           <span class="info-value notes-text">{{ version.description }}</span>
-                        </div>
-                        <div class="info-row">
-                          <span class="info-label">Date de création:</span>
-                          <span class="info-value">{{ version.createDate }}</span>
-                        </div>
-                        <div class="info-row">
-                          <span class="info-label">Date de mise à jour:</span>
-                          <span class="info-value">{{ version.updateDate }}</span>
                         </div>
                       </div>
                     </template>
@@ -817,14 +756,6 @@
                     <div class="form-group">
                       <label>Description</label>
                       <textarea v-model="newVersion.description" class="form-control" rows="3" placeholder="Description"></textarea>
-                    </div>
-                    <div class="form-group">
-                      <label>Date de création</label>
-                      <input v-model="newVersion.createDate" type="date" class="form-control" />
-                    </div>
-                    <div class="form-group">
-                      <label>Date de mise à jour</label>
-                      <input v-model="newVersion.updateDate" type="date" class="form-control" />
                     </div>
                     <div class="d-flex justify-content-end mt-3">
                       <button class="btn btn-sm btn-secondary mr-2" @click="cancelNewVersion">Annuler</button>
