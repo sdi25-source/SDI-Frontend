@@ -104,8 +104,7 @@
           <thead class="thead-light">
             <tr>
               <th scope="col"><span v-text="t$('sdiFrontendApp.clientType.type')"></span></th>
-              <th scope="col"><span v-text="t$('sdiFrontendApp.clientType.createDate')"></span></th>
-              <th scope="col"><span v-text="t$('sdiFrontendApp.clientType.updateDate')"></span></th>
+
               <th scope="col"><span v-text="t$('sdiFrontendApp.clientType.notes')"></span></th>
               <th scope="col" width="160" class="text-center">Actions</th>
             </tr>
@@ -120,22 +119,7 @@
                   {{ clientType.type }}
                 </template>
               </td>
-              <td>
-                <template v-if="clientType.isEditing">
-                  <input v-model="clientType.createDate" type="date" class="form-control-borderless" />
-                </template>
-                <template v-else>
-                  {{ clientType.createDate }}
-                </template>
-              </td>
-              <td>
-                <template v-if="clientType.isEditing">
-                  <input v-model="clientType.updateDate" type="date" class="form-control-borderless" />
-                </template>
-                <template v-else>
-                  {{ clientType.updateDate }}
-                </template>
-              </td>
+
               <td class="text-truncate" style="max-width: 250px" :title="clientType.notes">
                 <template v-if="clientType.isEditing">
                   <input v-model="clientType.notes" type="text" class="form-control-borderless" />
@@ -202,12 +186,7 @@
             </tr>
             <tr v-if="showAddRow" class="add-row">
               <td><input type="text" class="form-control-borderless" v-model="newClientType.type" placeholder="Type" /></td>
-              <td>
-                <input type="date" class="form-control-borderless" v-model="newClientType.createDate" placeholder="Date de création" />
-              </td>
-              <td>
-                <input type="date" class="form-control-borderless" v-model="newClientType.updateDate" placeholder="Date de mise à jour" />
-              </td>
+
               <td><input type="text" class="form-control-borderless" v-model="newClientType.notes" placeholder="Notes" /></td>
               <td class="text-center">
                 <div class="action-icons">

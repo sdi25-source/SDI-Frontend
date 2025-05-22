@@ -87,6 +87,11 @@ export default defineComponent({
     const infraComponentVersionOptions: Ref<IInfraComponentVersion[]> = ref([])
     const selectedDetail = ref(null)
 
+    // Ajouter ces variables dans la section setup() du composant
+    const showModuleSettingsModal = ref(false)
+    const selectedModuleVersionId = ref('')
+    const selectedAllowedModuleVersions = ref([])
+
     // Computed properties pour la sélection
     const hasSelection = computed(() => selectedDetails.value.length > 0)
 
@@ -341,6 +346,37 @@ export default defineComponent({
       }
     }
 
+
+// Ajouter cette fonction dans la section "setup" de votre composant
+    const selectDetail = (detail) => {
+      // Inverser l'état de sélection du détail
+      detail.isSelected = !detail.isSelected;
+
+      // Si le détail est maintenant sélectionné, l'ajouter à la liste des détails sélectionnés
+      if (detail.isSelected) {
+        // Vérifier s'il n'est pas déjà dans la liste
+        const exists = selectedDetails.value.some((d) => d.id === detail.id);
+        if (!exists) {
+          selectedDetails.value.push(detail);
+        }
+      } else {
+        // Sinon, le retirer de la liste
+        selectedDetails.value = selectedDetails.value.filter((d) => d.id !== detail.id);
+      }
+
+      // Mettre à jour l'affichage des onglets
+      showTabs.value = selectedDetails.value.length > 0;
+
+      // Si on a des détails sélectionnés et qu'on est sur l'onglet modulesDeployement, charger les modules
+      if (selectedDetails.value.length > 0) {
+        // Définir l'onglet par défaut sur "modulesDeployement"
+        activeTab.value = 'modulesDeployement';
+
+        // Charger les modules de déploiement pour les détails sélectionnés
+        retrieveModuleDeployementsBySelectedDetails();
+      }
+    }
+
     const retrieveClients = async () => {
       try {
         const res = await clientService().retrieve()
@@ -448,8 +484,9 @@ export default defineComponent({
           createDate: productDeployment.createDate,
           updateDate: productDeployment.updateDate,
           notes: productDeployment.notes,
-          client: productDeployment.client,
-          product: productDeployment.product,
+          client: productDeployment.client ? {...productDeployment.client} : null,
+          product: productDeployment.product ? {...productDeployment.product} : null,
+          productId: productDeployment.product?.id ?? productDeployment.productId,
         }),
       )
       productDeployment.isEditing = true
@@ -509,7 +546,11 @@ export default defineComponent({
       productDeployment.updateDate = productDeployment.originalData.updateDate
       productDeployment.notes = productDeployment.originalData.notes
       productDeployment.client = productDeployment.originalData.client
+        ? {...productDeployment.originalData.client}
+        : null
       productDeployment.product = productDeployment.originalData.product
+        ? {...productDeployment.originalData.product}
+        : null
       productDeployment.isEditing = false
     }
 
@@ -1222,6 +1263,87 @@ export default defineComponent({
       })
     }
 
+    // Ajouter ces fonctions dans la section setup() du composant
+    const openModuleSettings = (detail) => {
+      selectedDetail.value = detail
+      selectedAllowedModuleVersions.value = detail.allowedModuleVersions || []
+      showModuleSettingsModal.value = true
+    }
+
+    const closeModuleSettingsModal = () => {
+      showModuleSettingsModal.value = false
+      selectedModuleVersionId.value = ''
+      selectedDetail.value = null
+    }
+
+    const getModuleVersionById = (id) => {
+      return moduleVersions.value.find(version => version.id === Number.parseInt(id))
+    }
+
+    const addModuleToDetail = () => {
+      if (!selectedModuleVersionId.value) return
+
+      const moduleVersion = getModuleVersionById(selectedModuleVersionId.value)
+      if (moduleVersion) {
+        const exists = selectedAllowedModuleVersions.value.some(mv => mv.id === moduleVersion.id)
+        if (!exists) {
+          selectedAllowedModuleVersions.value.push(moduleVersion)
+        }
+        selectedModuleVersionId.value = ''
+      }
+    }
+
+    const removeModuleFromDetail = (index) => {
+      selectedAllowedModuleVersions.value.splice(index, 1)
+    }
+
+    const saveModuleSettingsAndCreateDeployments = async () => {
+      try {
+        if (selectedDetail.value) {
+          // Mettre à jour le détail avec les modules autorisés sélectionnés
+          selectedDetail.value.allowedModuleVersions = [...selectedAllowedModuleVersions.value]
+
+          // Appeler l'API pour sauvegarder les modifications
+          await productDeployementDetailService().update(selectedDetail.value)
+
+          // Sélectionner le détail pour afficher les modules dans l'onglet
+          selectDetail(selectedDetail.value)
+
+          alertService.showInfo('Modules autorisés configurés avec succès', { variant: 'success' })
+        }
+        closeModuleSettingsModal()
+      } catch (error) {
+        alertService.showHttpError(error.response)
+      }
+    }
+
+    // Fonction pour récupérer tous les modules autorisés des détails sélectionnés
+    const getAllowedModulesFromSelectedDetails = () => {
+      if (selectedDetails.value.length === 0) {
+        return []
+      }
+
+      // Créer un ensemble pour stocker les modules uniques (par ID)
+      const uniqueModules = new Map()
+
+      // Parcourir tous les détails sélectionnés
+      selectedDetails.value.forEach(detail => {
+        // Si le détail a des modules autorisés
+        if (detail.allowedModuleVersions && detail.allowedModuleVersions.length > 0) {
+          // Ajouter chaque module à l'ensemble
+          detail.allowedModuleVersions.forEach(moduleVersion => {
+            // Utiliser l'ID comme clé pour éviter les doublons
+            if (moduleVersion && moduleVersion.id) {
+              uniqueModules.set(moduleVersion.id, moduleVersion)
+            }
+          })
+        }
+      })
+
+      // Convertir l'ensemble en tableau
+      return Array.from(uniqueModules.values())
+    }
+
     return {
       // État principal
       viewMode,
@@ -1342,6 +1464,20 @@ export default defineComponent({
       getInfraComponentById,
       addInfraToDetail,
       removeInfraFromDetail,
+      selectDetail,
+
+      // ... autres propriétés existantes
+      showModuleSettingsModal,
+      selectedModuleVersionId,
+      selectedAllowedModuleVersions,
+      openModuleSettings,
+      closeModuleSettingsModal,
+      getModuleVersionById,
+      addModuleToDetail,
+      removeModuleFromDetail,
+      saveModuleSettingsAndCreateDeployments,
+      // Ajouter cette ligne dans le return
+      getAllowedModulesFromSelectedDetails,
     }
   },
 })
