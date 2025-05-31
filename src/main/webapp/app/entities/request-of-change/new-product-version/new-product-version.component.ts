@@ -557,11 +557,12 @@ export default defineComponent({
           // Step 3: Update request status to APPROVED
           const updatedRequest = {
             ...props.requestOfChange,
+            productVersionResult: result,
             status: 'COMPLETED',
             done: true,
           };
           const response = await requestOfChangeService.update(updatedRequest);
-          console.log(`Update request: ${response.id}`);
+          console.log('Update request: ', response);
 
           // Complete
           if (loadingMessage) {

@@ -10,16 +10,18 @@
       <!-- Nav Menu -->
       <nav id="navmenu" class="navmenu pl-5 ml-5">
         <ul>
-          <!-- dashboards -->
+          <!-- dashboards && (hasAnyAuthority('ROLE_COMMERCIAL') || hasAnyAuthority('ROLE_ADMIN'))-->
           <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'dash' }">
             <a href="#" class="no-link-style"><span>Dashboards</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <div class="entities-menu-container">
                 <div class="entities-category">
-                  <b-dropdown-item to="">
+                  <b-dropdown-item to="dashClients">
                     <span>Customers Dashboard</span>
                   </b-dropdown-item>
-                  <b-dropdown-item to="">
+                </div>
+                <div class="entities-category">
+                  <b-dropdown-item to="dashProducts">
                     <span>Products Dashboard</span>
                   </b-dropdown-item>
                 </div>
@@ -141,15 +143,9 @@
             </a>
             <ul class="dropdown-menu">
               <li v-if="authenticated">
-                <router-link to="/account/settings" class="d-flex align-items-center gap-1 no-link-style">
-                  <font-awesome-icon icon="wrench" />
-                  <span>{{ t$('global.menu.account.settings') }}</span>
-                </router-link>
-              </li>
-              <li v-if="authenticated">
-                <router-link to="/account/password" class="d-flex align-items-center gap-1 no-link-style">
-                  <font-awesome-icon icon="lock" />
-                  <span>{{ t$('global.menu.account.password') }}</span>
+                <router-link to="/account/profile" class="d-flex align-items-center gap-1 no-link-style">
+                  <i class="nav-icon">👤</i>
+                  <span>{{ t$('global.menu.account.profile') }}</span>
                 </router-link>
               </li>
               <li v-if="authenticated">
@@ -169,7 +165,17 @@
 <script lang="ts" src="./jhi-navbar.component.ts"></script>
 
 <style scoped>
+.nav-icon {
+  font-size: 20px;
+  margin-right: 1px;
+  width: 24px;
+  text-align: center;
+}
 /* General styles for links */
+.entities-category .dropdown-item {
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
 .no-link-style {
   text-decoration: none;
   color: inherit;

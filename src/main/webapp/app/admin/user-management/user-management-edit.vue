@@ -4,9 +4,13 @@
       <form name="editForm" novalidate @submit.prevent="save()" v-if="userAccount">
         <div class="form-content">
           <div class="header">
+            <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="back-button" @click="previousState()">
+              <font-awesome-icon icon="arrow-left" />
+            </button>
             <h1 class="welcome-title" v-if="!userAccount.id" v-text="t$('userManagement.home.createUserTitle')"></h1>
             <h1 class="welcome-title" v-if="userAccount.id" v-text="t$('userManagement.home.updateUserTitle')"></h1>
           </div>
+
           <div class="divider mt-3"></div>
           <div class="form-fields">
             <div class="form-group">
@@ -144,7 +148,9 @@
               <div class="checkbox-group">
                 <div v-for="authority in authorities" :key="authority" class="profile-checkbox">
                   <b-form-checkbox :id="'authority-' + authority" :value="authority" v-model="userAccount.authorities">
-                    <span class="authority-label">{{ authority.replace('ROLE_', '') }}</span>
+                    <span class="authority-label">{{
+                      authority === 'ROLE_USER' ? 'DELIVERY MANAGER' : authority.replace('ROLE_', '')
+                    }}</span>
                   </b-form-checkbox>
                 </div>
               </div>
@@ -152,7 +158,7 @@
           </div>
           <div class="divider mt-3 mb-3"></div>
           <div class="action-buttons">
-            <button type="button" class="cancel-button" @click="cancel">
+            <button type="button" class="cancel-button" @click="previousState()">
               <font-awesome-icon icon="ban"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.cancel')"></span>
             </button>
             <button type="submit" :disabled="v$.userAccount.$invalid || isSaving" class="login-button">
@@ -192,8 +198,35 @@
 
 .user-form-container {
   width: 100%;
-  max-width: 100%;
-  padding: 0;
+  max-width: 750px;
+  padding: 24px 0;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  position: relative; /* Ajouté pour positionner le bouton de retour */
+}
+
+.back-button {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 8px;
+  background-color: #f8f9fa;
+  color: #6c757d;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.back-button:hover {
+  background-color: #e9ecef;
 }
 
 /* Form content */

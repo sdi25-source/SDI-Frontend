@@ -6,6 +6,7 @@ import UserManagementService from './user-management.service';
 import { type IUser, User } from '@/shared/model/user.model';
 import { useAlertService } from '@/shared/alert/alert.service';
 import languages from '@/shared/config/languages';
+import { useRoute, useRouter } from 'vue-router';
 
 const loginValidator = (value: string) => {
   if (!value) {
@@ -40,14 +41,9 @@ export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'JhiUserManagementEdit',
   validations,
-  props: {
-    userId: {
-      type: String,
-      required: false,
-    },
-  },
-  emits: ['close', 'user-saved'],
-  setup(props, { emit }) {
+  setup() {
+    const route = useRoute();
+    const router = useRouter();
     const alertService = inject('alertService', () => useAlertService(), true);
     const userManagementService = inject('userManagementService', () => new UserManagementService(), true);
 
@@ -55,6 +51,8 @@ export default defineComponent({
     const isSaving: Ref<boolean> = ref(false);
     const authorities: Ref<string[]> = ref([]);
     const i18n = useI18n(); // Initialize useI18n here
+
+    const previousState = () => router.go(-1);
 
     const initAuthorities = async () => {
       try {
@@ -79,31 +77,28 @@ export default defineComponent({
     // Initialiser les autorités
     onMounted(() => {
       initAuthorities();
-
-      // Charger l'utilisateur si un ID est fourni
-      if (props.userId) {
-        loadUser(props.userId);
-      }
     });
 
-    const cancel = () => {
-      emit('close');
-    };
-
+    const userId = route.params?.userId;
+    if (userId) {
+      loadUser(userId);
+    }
     const save = async () => {
       isSaving.value = true;
       try {
         let response;
         if (userAccount.value.id) {
           response = await userManagementService.update(userAccount.value);
+          this.isSaving = false;
+          previousState();
           alertService.showInfo(getToastMessageFromHeader(response));
         } else {
           response = await userManagementService.create(userAccount.value);
+          this.isSaving = false;
+          previousState();
           alertService.showSuccess(getToastMessageFromHeader(response));
         }
         isSaving.value = false;
-        emit('user-saved', response.data);
-        emit('close');
       } catch (error) {
         isSaving.value = false;
         alertService.showHttpError(error.response);
@@ -120,6 +115,7 @@ export default defineComponent({
 
     return {
       alertService,
+      previousState,
       userAccount,
       isSaving,
       authorities,
@@ -127,7 +123,6 @@ export default defineComponent({
       v$: useVuelidate(),
       languages: languages(),
       t$: i18n.t,
-      cancel,
       save,
       getToastMessageFromHeader,
     };

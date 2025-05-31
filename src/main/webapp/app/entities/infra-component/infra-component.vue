@@ -6,9 +6,10 @@
           @click="showAddRow = true"
           id="jh-create-entity"
           data-cy="entityCreateButton"
-          class="button button-primary btn-sm mr-3"
+          class="btn button-primary btn-sm mr-3 rounded-1"
           :disabled="showAddRow"
         >
+          <font-awesome-icon icon="plus"></font-awesome-icon>
           <span v-text="t$('global.new')"></span>
         </button>
         <h5 id="page-heading" class="m-0 font-weight-bold" data-cy="InfraComponentHeading">
@@ -68,30 +69,10 @@
             </svg>
           </button>
         </div>
-        <div class="view-toggle ml-3">
-          <button class="btn btn-light btn-sm" :class="{ active: viewMode === 'list' }" @click="viewMode = 'list'">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-              <path
-                fill-rule="evenodd"
-                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"
-              />
-            </svg>
-          </button>
-          <button class="btn btn-light btn-sm" :class="{ active: viewMode === 'card' }" @click="viewMode = 'card'">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="currentColor"
-              class="bi bi-grid-3x3-gap-fill"
-              viewBox="0 0 16 16"
-            >
-              <path
-                d="M1 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 12a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"
-              />
-            </svg>
-          </button>
-        </div>
+        <button class="btn btn-light btn-sm ml-3" @click="handleSyncList" :disabled="isFetching">
+          <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon>
+          <span v-text="t$('sdiFrontendApp.product.home.refreshListLabel')"></span>
+        </button>
       </div>
     </div>
 
@@ -105,7 +86,6 @@
               <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponent.vendor')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponent.notes')"></span></th>
               <th scope="col"><span v-text="t$('sdiFrontendApp.infraComponent.componentType')"></span></th>
-              <th scope="col"><span v-text="t$('sdiFrontendApp.versions')"></span></th>
               <th scope="col" width="160" class="text-center">Actions</th>
             </tr>
           </thead>
@@ -149,37 +129,11 @@
                   </div>
                 </template>
               </td>
-              <td>
-                <button
-                  class="alert alert-primary d-inline-flex align-items-center py-1 px-2 btn-sm"
-                  style="font-size: 0.9rem; line-height: 1; gap: 0.25rem; margin-top: 0px; margin-bottom: 0px"
-                  @click="openVersionsModal(infraComponent)"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    fill="currentColor"
-                    class="bi bi-layers"
-                    viewBox="0 0 512 512"
-                  >
-                    <path
-                      d="M345 39.1L472.8 168.4c52.4 53 52.4 138.2 0 191.2L360.8 472.9c-9.3 9.4-24.5 9.5-33.9 .2s-9.5-24.5-.2-33.9L438.6 325.9c33.9-34.3 33.9-89.4 0-123.7L310.9 72.9c-9.3-9.4-9.2-24.6 .2-33.9s24.6-9.2 33.9 .2zM0 229.5L0 80C0 53.5 21.5 32 48 32l149.5 0c17 0 33.3 6.7 45.3 18.7l168 168c25 25 25 65.5 0 90.5L277.3 442.7c-25 25-65.5 25-90.5 0l-168-168C6.7 262.7 0 246.5 0 229.5zM144 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"
-                    />
-                  </svg>
-                  Versions
-                </button>
-              </td>
               <td class="text-center">
                 <div class="btn-group">
                   <template v-if="infraComponent.isEditing">
                     <div class="icon-container save-container" @click="saveInfraComponent(infraComponent)" title="Enregistrer">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
-                        <path
-                          d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
-                          fill="currentColor"
-                        />
-                      </svg>
+                      <font-awesome-icon icon="save"></font-awesome-icon>
                     </div>
                     <div class="icon-container cancel-container" @click="cancelEdit(infraComponent)" title="Annuler">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
@@ -221,14 +175,32 @@
                           />
                         </svg>
                       </div>
+                      <div class="icon-container save-container" @click="openVersionsModal(infraComponent)" title="versions">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="icon"
+                        >
+                          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                          <polyline points="2 17 12 22 22 17"></polyline>
+                          <polyline points="2 12 12 17 22 12"></polyline>
+                        </svg>
+                      </div>
                     </div>
                   </template>
                 </div>
               </td>
             </tr>
             <tr v-if="showAddRow" class="add-row">
-              <td><input type="text" class="form-control-borderless" v-model="newInfraComponent.name" placeholder="Nom" /></td>
-              <td><input type="text" class="form-control-borderless" v-model="newInfraComponent.vendor" placeholder="Fournisseur" /></td>
+              <td><input type="text" class="form-control-borderless" v-model="newInfraComponent.name" placeholder="Name" /></td>
+              <td><input type="text" class="form-control-borderless" v-model="newInfraComponent.vendor" placeholder="Vendor" /></td>
               <td><input type="text" class="form-control-borderless" v-model="newInfraComponent.notes" placeholder="Notes" /></td>
               <td>
                 <select v-model="newInfraComponent.componentType" class="form-control-borderless">
@@ -238,16 +210,10 @@
                   </option>
                 </select>
               </td>
-              <td></td>
               <td class="text-center">
                 <div class="action-icons">
                   <div class="icon-container save-container" @click="saveNewInfraComponent" title="Enregistrer">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
-                      <path
-                        d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
-                        fill="currentColor"
-                      />
-                    </svg>
+                    <font-awesome-icon icon="save"></font-awesome-icon>
                   </div>
                   <div class="icon-container cancel-container" @click="cancelNewInfraComponent" title="Annuler">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
@@ -262,144 +228,6 @@
             </tr>
           </tbody>
         </table>
-      </div>
-    </div>
-
-    <!-- Card View -->
-    <div v-if="infraComponents && viewMode === 'card'" class="card-view-container">
-      <div class="row">
-        <div v-for="infraComponent in paginatedInfraComponents" :key="infraComponent.id" class="col-md-4 col-lg-3 mb-4">
-          <div class="card h-100 infra-component-card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <h6 class="mb-0 font-weight-bold">
-                <router-link class="text-primary" :to="{ name: 'InfraComponentView', params: { infraComponentId: infraComponent.id } }">
-                  #{{ infraComponent.id }}
-                </router-link>
-              </h6>
-              <div class="dropdown">
-                <button class="btn btn-sm btn-light" @click="toggleDropdown(infraComponent)">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    class="bi bi-three-dots-vertical"
-                    viewBox="0 0 16 16"
-                  >
-                    <path
-                      d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"
-                    />
-                  </svg>
-                </button>
-                <div class="dropdown-menu dropdown-menu-right" :class="{ show: infraComponent.showDropdown }">
-                  <a class="dropdown-item" @click="editInfraComponent(infraComponent)">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      class="bi bi-pencil-fill mr-2"
-                      viewBox="0 0 16 16"
-                    >
-                      <path
-                        d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
-                      />
-                    </svg>
-                    Modifier
-                  </a>
-                  <a class="dropdown-item" @click="prepareRemove(infraComponent)">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      class="bi bi-trash mr-2"
-                      viewBox="0 0 16 16"
-                    >
-                      <path
-                        d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
-                      />
-                      <path
-                        d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
-                      />
-                    </svg>
-                    Supprimer
-                  </a>
-                  <router-link class="dropdown-item" :to="{ name: 'InfraComponentView', params: { infraComponentId: infraComponent.id } }">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      class="bi bi-eye mr-2"
-                      viewBox="0 0 16 16"
-                    >
-                      <path
-                        d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"
-                      />
-                      <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
-                    </svg>
-                    Voir
-                  </router-link>
-                  <a class="dropdown-item" @click="openVersionsModal(infraComponent)">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      class="bi bi-layers mr-2"
-                      viewBox="0 0 16 16"
-                    >
-                      <path
-                        d="M8.235 1.559a.5.5 0 0 0-.47 0l-7.5 4a.5.5 0 0 0 0 .882L3.188 8 .264 9.559a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882L12.813 8l2.922-1.559a.5.5 0 0 0 0-.882l-7.5-4zm3.515 7.008L14.438 10 8 13.433 1.562 10 4.25 8.567l3.515 1.874a.5.5 0 0 0 .47 0l3.515-1.874zM8 9.433 1.562 6 8 2.567 14.438 6 8 9.433z"
-                      />
-                    </svg>
-                    Versions
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="mb-3">
-                <h5 class="card-title">{{ infraComponent.name }}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">{{ infraComponent.vendor }}</h6>
-              </div>
-              <div class="mb-2">
-                <small class="text-muted">Notes:</small>
-                <p class="card-text text-truncate" :title="infraComponent.notes">{{ infraComponent.notes || 'N/A' }}</p>
-              </div>
-              <div>
-                <small class="text-muted">Type de composant:</small>
-                <p class="card-text">
-                  <router-link
-                    v-if="infraComponent.componentType"
-                    :to="{ name: 'ComponentTypeView', params: { componentTypeId: infraComponent.componentType.id } }"
-                  >
-                    {{ infraComponent.componentType.type }}
-                  </router-link>
-                  <span v-else>N/A</span>
-                </p>
-              </div>
-              <div class="mt-3">
-                <button class="btn btn-info btn-sm w-100" @click="openVersionsModal(infraComponent)">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    class="bi bi-layers mr-1"
-                    viewBox="0 0 16 16"
-                  >
-                    <path
-                      d="M8.235 1.559a.5.5 0 0 0-.47 0l-7.5 4a.5.5 0 0 0 0 .882L3.188 8 .264 9.559a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882L12.813 8l2.922-1.559a.5.5 0 0 0 0-.882l-7.5-4zm3.515 7.008L14.438 10 8 13.433 1.562 10 4.25 8.567l3.515 1.874a.5.5 0 0 0 .47 0l3.515-1.874zM8 9.433 1.562 6 8 2.567 14.438 6 8 9.433z"
-                    />
-                  </svg>
-                  Gérer les versions
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -509,30 +337,10 @@
                   </svg>
                 </button>
               </div>
-              <div class="view-toggle ml-3">
-                <button class="btn btn-light btn-sm" :class="{ active: versionViewMode === 'list' }" @click="versionViewMode = 'list'">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-                    <path
-                      fill-rule="evenodd"
-                      d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"
-                    />
-                  </svg>
-                </button>
-                <button class="btn btn-light btn-sm" :class="{ active: versionViewMode === 'card' }" @click="versionViewMode = 'card'">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    class="bi bi-grid-3x3-gap-fill"
-                    viewBox="0 0 16 16"
-                  >
-                    <path
-                      d="M1 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 12a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"
-                    />
-                  </svg>
-                </button>
-              </div>
+              <button class="btn btn-light btn-sm ml-3" @click="handleSyncList" :disabled="isFetching">
+                <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon>
+                <span v-text="t$('sdiFrontendApp.product.home.refreshListLabel')"></span>
+              </button>
             </div>
           </div>
 
@@ -569,12 +377,7 @@
                       <div class="action-icons">
                         <template v-if="version.isEditing">
                           <div class="icon-container save-container" @click="saveInfraComponentVersion(version)" title="Enregistrer">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
-                              <path
-                                d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
-                                fill="currentColor"
-                              />
-                            </svg>
+                            <font-awesome-icon icon="save"></font-awesome-icon>
                           </div>
                           <div class="icon-container cancel-container" @click="cancelVersionEdit(version)" title="Annuler">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
@@ -627,12 +430,7 @@
                     <td class="text-center">
                       <div class="action-icons">
                         <div class="icon-container save-container" @click="saveNewVersion" title="Enregistrer">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
-                            <path
-                              d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
-                              fill="currentColor"
-                            />
-                          </svg>
+                          <font-awesome-icon icon="save"></font-awesome-icon>
                         </div>
                         <div class="icon-container cancel-container" @click="cancelNewVersion" title="Annuler">
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
@@ -647,123 +445,6 @@
                   </tr>
                 </tbody>
               </table>
-            </div>
-          </div>
-
-          <!-- Card View pour les versions -->
-          <div v-if="filteredVersions && versionViewMode === 'card'" class="card-view-container">
-            <div class="row">
-              <div v-for="version in paginatedVersions" :key="version.id" class="col-md-4 col-lg-3 mb-4">
-                <div class="card h-100 infra-component-version-card">
-                  <div class="card-header d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 font-weight-bold">
-                      <span class="text-primary">#{{ version.id }}</span>
-                    </h6>
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" @click="toggleVersionDropdown(version)">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="currentColor"
-                          class="bi bi-three-dots-vertical"
-                          viewBox="0 0 16 16"
-                        >
-                          <path
-                            d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"
-                          />
-                        </svg>
-                      </button>
-                      <div class="dropdown-menu dropdown-menu-right" :class="{ show: version.showDropdown }">
-                        <a class="dropdown-item" @click="editInfraComponentVersion(version)">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-pencil-fill mr-2"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
-                            />
-                          </svg>
-                          Modifier
-                        </a>
-                        <a class="dropdown-item" @click="prepareRemoveVersion(version)">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-trash mr-2"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
-                            />
-                            <path
-                              d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
-                            />
-                          </svg>
-                          Supprimer
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="card-body">
-                    <template v-if="version.isEditing">
-                      <div class="form-group">
-                        <label>Version</label>
-                        <input v-model="version.version" type="text" class="form-control" />
-                      </div>
-                      <div class="form-group">
-                        <label>Description</label>
-                        <textarea v-model="version.description" class="form-control" rows="3"></textarea>
-                      </div>
-                      <div class="d-flex justify-content-end mt-3">
-                        <button class="btn btn-sm btn-secondary mr-2" @click="cancelVersionEdit(version)">Annuler</button>
-                        <button class="btn btn-sm btn-primary" @click="saveInfraComponentVersion(version)">Enregistrer</button>
-                      </div>
-                    </template>
-                    <template v-else>
-                      <div class="infra-component-version-info">
-                        <div class="info-row">
-                          <span class="info-label">Version:</span>
-                          <span class="info-value">{{ version.version }}</span>
-                        </div>
-                        <div class="info-row">
-                          <span class="info-label">Description:</span>
-                          <span class="info-value notes-text">{{ version.description }}</span>
-                        </div>
-                      </div>
-                    </template>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Add new version card -->
-              <div v-if="showAddVersionRow" class="col-md-4 col-lg-3 mb-4">
-                <div class="card h-100 infra-component-version-card new-card">
-                  <div class="card-header d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 font-weight-bold text-primary">Nouvelle version</h6>
-                  </div>
-                  <div class="card-body">
-                    <div class="form-group">
-                      <label>Version</label>
-                      <input v-model="newVersion.version" type="text" class="form-control" placeholder="Version" />
-                    </div>
-                    <div class="form-group">
-                      <label>Description</label>
-                      <textarea v-model="newVersion.description" class="form-control" rows="3" placeholder="Description"></textarea>
-                    </div>
-                    <div class="d-flex justify-content-end mt-3">
-                      <button class="btn btn-sm btn-secondary mr-2" @click="cancelNewVersion">Annuler</button>
-                      <button class="btn btn-sm btn-primary" @click="saveNewVersion">Enregistrer</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

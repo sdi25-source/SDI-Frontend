@@ -32,7 +32,7 @@ export default defineComponent({
     const searchTimeout = ref(null);
 
     const currentPage = ref(1);
-    const itemsPerPage = ref(5);
+    const itemsPerPage = ref(10);
     const totalItems = ref(0);
 
     const isFetching = ref(false);
@@ -72,13 +72,13 @@ export default defineComponent({
       return `${start}-${end} / ${totalItems.value}`;
     });
 
-    const formatDate = (dateString) => {
+    const formatDate = dateString => {
       if (!dateString) return '';
       const date = new Date(dateString);
       return date.toLocaleDateString();
     };
 
-    const getCertificationStatus = (clientCertification) => {
+    const getCertificationStatus = clientCertification => {
       if (!clientCertification.certif || !clientCertification.certif.expireDate) return 'Non défini';
 
       const today = new Date();
@@ -99,7 +99,7 @@ export default defineComponent({
       return 'Valide';
     };
 
-    const getCertificationStatusClass = (clientCertification) => {
+    const getCertificationStatusClass = clientCertification => {
       const status = getCertificationStatus(clientCertification);
 
       if (status === 'Expiré') {
@@ -138,25 +138,22 @@ export default defineComponent({
       // Appliquer le filtre de recherche
       if (searchTerm.value.trim() !== '') {
         const searchLower = searchTerm.value.toLowerCase();
-        filtered = filtered.filter(cert =>
-          (cert.client && cert.client.name && cert.client.name.toLowerCase().includes(searchLower)) ||
-          (cert.certif && cert.certif.name && cert.certif.name.toLowerCase().includes(searchLower)) ||
-          (cert.notes && cert.notes.toLowerCase().includes(searchLower))
+        filtered = filtered.filter(
+          cert =>
+            (cert.client && cert.client.name && cert.client.name.toLowerCase().includes(searchLower)) ||
+            (cert.certif && cert.certif.name && cert.certif.name.toLowerCase().includes(searchLower)) ||
+            (cert.notes && cert.notes.toLowerCase().includes(searchLower)),
         );
       }
 
       // Appliquer le filtre client
       if (selectedClientFilter.value) {
-        filtered = filtered.filter(cert =>
-          cert.client && cert.client.id === selectedClientFilter.value.id
-        );
+        filtered = filtered.filter(cert => cert.client && cert.client.id === selectedClientFilter.value.id);
       }
 
       // Appliquer le filtre certification
       if (selectedCertificationFilter.value) {
-        filtered = filtered.filter(cert =>
-          cert.certif && cert.certif.id === selectedCertificationFilter.value.id
-        );
+        filtered = filtered.filter(cert => cert.certif && cert.certif.id === selectedCertificationFilter.value.id);
       }
 
       clientCertifications.value = filtered;
@@ -223,10 +220,9 @@ export default defineComponent({
     const removeClientCertification = async () => {
       try {
         await clientCertificationService().delete(removeId.value);
-        alertService.showInfo(
-          t$('sdiFrontendApp.clientCertification.deleted', { param: removeId.value }).toString(),
-          { variant: 'danger' }
-        );
+        alertService.showInfo(t$('sdiFrontendApp.clientCertification.deleted', { param: removeId.value }).toString(), {
+          variant: 'danger',
+        });
 
         clientCertifications.value = clientCertifications.value.filter(cert => cert.id !== removeId.value);
         allClientCertifications.value = allClientCertifications.value.filter(cert => cert.id !== removeId.value);
@@ -295,15 +291,17 @@ export default defineComponent({
 
     const editClientCertification = clientCertification => {
       clientCertifications.value.forEach(cert => (cert.showDropdown = false));
-      clientCertification.originalData = JSON.parse(JSON.stringify({
-        client: clientCertification.client,
-        certif: clientCertification.certif,
-        certification: clientCertification.certification,
-        certificationDate: clientCertification.certificationDate,
-        createDate: clientCertification.createDate,
-        updateDate: clientCertification.updateDate,
-        notes: clientCertification.notes
-      }));
+      clientCertification.originalData = JSON.parse(
+        JSON.stringify({
+          client: clientCertification.client,
+          certif: clientCertification.certif,
+          certification: clientCertification.certification,
+          certificationDate: clientCertification.certificationDate,
+          createDate: clientCertification.createDate,
+          updateDate: clientCertification.updateDate,
+          notes: clientCertification.notes,
+        }),
+      );
       clientCertification.isEditing = true;
     };
 
@@ -322,7 +320,7 @@ export default defineComponent({
           certificationDate: clientCertification.certificationDate,
           createDate: clientCertification.createDate,
           updateDate: new Date().toISOString().split('T')[0],
-          notes: clientCertification.notes
+          notes: clientCertification.notes,
         };
 
         const response = await clientCertificationService().update(toSend);
@@ -367,19 +365,19 @@ export default defineComponent({
       router.push({ name: 'ClientCertificationView', params: { clientCertificationId: clientCertification.id } });
     };
 
-    watch(clientCertifications, () => {
-      updateTotalItems();
-      if (currentPage.value > totalPages.value && totalPages.value > 0) {
-        currentPage.value = totalPages.value;
-      }
-    }, { deep: true });
+    watch(
+      clientCertifications,
+      () => {
+        updateTotalItems();
+        if (currentPage.value > totalPages.value && totalPages.value > 0) {
+          currentPage.value = totalPages.value;
+        }
+      },
+      { deep: true },
+    );
 
     onMounted(async () => {
-      await Promise.all([
-        retrieveClientCertifications(),
-        retrieveClients(),
-        retrieveCertifications()
-      ]);
+      await Promise.all([retrieveClientCertifications(), retrieveClients(), retrieveCertifications()]);
 
       document.addEventListener('click', event => {
         if (!event.target.closest('.dropdown-menu-container')) {

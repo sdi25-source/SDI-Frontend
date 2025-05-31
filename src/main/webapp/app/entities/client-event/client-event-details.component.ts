@@ -1,28 +1,23 @@
-import { type Ref, defineComponent, inject, ref } from 'vue';
+import { defineComponent, inject, ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute, useRouter } from 'vue-router';
-
-import ClientEventService from './client-event.service';
-import useDataUtils from '@/shared/data/data-utils.service';
-import { type IClientEvent } from '@/shared/model/client-event.model';
+import { useRouter, useRoute } from 'vue-router';
+import ClientEventService from '@/entities/client-event/client-event.service';
 import { useAlertService } from '@/shared/alert/alert.service';
+import type { IClientEvent } from '@/shared/model/client-event.model.ts';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'ClientEventDetails',
   setup() {
+    const { t: t$ } = useI18n();
+    const router = useRouter();
+    const route = useRoute();
     const clientEventService = inject('clientEventService', () => new ClientEventService());
     const alertService = inject('alertService', () => useAlertService(), true);
 
-    const dataUtils = useDataUtils();
+    const clientEvent = ref<IClientEvent | null>(null);
 
-    const route = useRoute();
-    const router = useRouter();
-
-    const previousState = () => router.go(-1);
-    const clientEvent: Ref<IClientEvent> = ref({});
-
-    const retrieveClientEvent = async clientEventId => {
+    const retrieveClientEvent = async (clientEventId: number) => {
       try {
         const res = await clientEventService().find(clientEventId);
         clientEvent.value = res;
@@ -31,18 +26,21 @@ export default defineComponent({
       }
     };
 
-    if (route.params?.clientEventId) {
-      retrieveClientEvent(route.params.clientEventId);
-    }
+    const previousState = () => {
+      router.go(-1);
+    };
+
+    onMounted(async () => {
+      const clientEventId = route.params?.clientEventId;
+      if (clientEventId) {
+        await retrieveClientEvent(Number(clientEventId));
+      }
+    });
 
     return {
-      alertService,
       clientEvent,
-
-      ...dataUtils,
-
+      t$,
       previousState,
-      t$: useI18n().t,
     };
   },
 });

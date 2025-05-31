@@ -14,6 +14,9 @@
       "delete": {
         "question": "Are you sure you want to delete Certification { id }?"
       },
+      "deleteVersion": {
+        "question": "Are you sure you want to delete Version { id }?"
+      },
       "detail": {
         "title": "Certification"
       },
@@ -23,7 +26,8 @@
       "createDate": "Create Date",
       "updateDate": "Update Date",
       "expireDate": "Expire Date",
-      "clientCertification": "Client Certification"
+      "clientCertification": "Client Certification",
+      "version": "Version"
     }
   }
 }

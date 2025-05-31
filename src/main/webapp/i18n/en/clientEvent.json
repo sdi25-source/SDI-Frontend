@@ -23,7 +23,9 @@
       "eventDate": "Event Date",
       "notes": "Notes",
       "client": "Client",
-      "clientEventType": "Client Event Type"
+      "clientEventType": "Client Event Type",
+      "selectClient": "Select a client",
+      "selectEventType": "Select an event type"
     }
   }
 }

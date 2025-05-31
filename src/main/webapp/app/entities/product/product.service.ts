@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { type IProduct } from '@/shared/model/product.model';
+import type { ProductOverview } from '@/shared/model/product-overview.model.ts';
 
 const baseApiUrl = 'api/products';
 
@@ -74,6 +75,19 @@ export default class ProductService {
     return new Promise<IProduct>((resolve, reject) => {
       axios
         .patch(`${baseApiUrl}/${entity.id}`, entity)
+        .then(res => {
+          resolve(res.data);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
+  public retrieveProductOverviews(): Promise<ProductOverview[]> {
+    return new Promise<ProductOverview[]>((resolve, reject) => {
+      axios
+        .get(`${baseApiUrl}/product-overviews`)
         .then(res => {
           resolve(res.data);
         })

@@ -15,6 +15,7 @@ import type { IInfraComponent } from '@/shared/model/infra-component.model.ts';
 import type { IComponentType } from '@/shared/model/component-type.model.ts';
 import CertificationService from '@/entities/certification/certification.service.ts';
 import type { ICertification } from '@/shared/model/certification.model.ts';
+import CertificationVersionService from '@/entities/certification/certification-version.service.ts';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -35,6 +36,7 @@ export default defineComponent({
     const infraComponentService = inject('infraComponentService', () => new InfraComponentService());
     const productLineService = inject('productLineService', () => new ProductLineService());
     const certificationService = inject('certificationService', () => new CertificationService());
+    const certificationVersionService = inject('certificationVersionService', () => new CertificationVersionService());
     const alertService = inject('alertService', () => useAlertService(), true);
 
     // Data
@@ -46,7 +48,7 @@ export default defineComponent({
     const searchTerm = ref('');
     const searchTimeout = ref(null);
     const currentPage = ref(1);
-    const itemsPerPage = ref(5);
+    const itemsPerPage = ref(10);
     const totalItems = ref(0);
     const selectedProduct = ref(null);
     const selectedVersion = ref(null);
@@ -75,6 +77,7 @@ export default defineComponent({
     const moduleOptions = ref([]);
     const moduleVersionOptions = ref([]);
     const certificationsOptions = ref([]);
+    const certificationsOptionsVersions = ref([]);
     const selectedProductLineIds = ref([]);
     const editProductLineIds = ref([]);
 
@@ -125,6 +128,8 @@ export default defineComponent({
 
     const selectedModuleId = ref('');
     const filteredModuleVersionOptions = ref([]);
+
+    const showAddModuleVersionForm = ref(false);
 
     // New item templates
     const newProduct = ref({
@@ -317,6 +322,15 @@ export default defineComponent({
         alertService.showHttpError(err.response);
       } finally {
         isFetching.value = false;
+      }
+    };
+
+    const retrieveCertificationsVersions = async () => {
+      try {
+        const res = await certificationVersionService().retrieve();
+        certificationsOptionsVersions.value = res.data;
+      } catch (err) {
+        alertService.showHttpError(err.response);
       }
     };
 
@@ -727,13 +741,6 @@ export default defineComponent({
     };
 
     const closeVersionSettingsModal = () => {
-      // showVersionSettingsModal.value = false;
-      // showVersionModuleSelector.value = false;
-      // showVersionInfraSelector.value = false;
-      // selectedVersionModuleId.value = '';
-      // selectedVersionInfraComponentId.value = '';
-      // editingVersion.value = null;
-
       showVersionSettingsModal.value = false;
       showVersionModuleSelector.value = false;
       showVersionInfraSelector.value = false;
@@ -1276,7 +1283,7 @@ export default defineComponent({
     };
 
     const getCertificationById = id => {
-      return certificationsOptions.value.find(cert => cert.id === Number.parseInt(id));
+      return certificationsOptionsVersions.value.find(cert => cert.id === Number.parseInt(id));
     };
 
     const getInfraComponentById = id => {
@@ -1346,42 +1353,6 @@ export default defineComponent({
     const cancelEditModuleVersion = version => {
       Object.assign(version, version.originalData);
       version.isEditing = false;
-    };
-
-    const saveNewModuleVersion = async () => {
-      if (!newModuleVersion.value.version || !selectedModule.value) {
-        alertService.showInfo('La version et le module sont requis', { variant: 'danger' });
-        return;
-      }
-
-      try {
-        // Prepare data for API
-        const versionData = {
-          ...newModuleVersion.value,
-          module: { id: selectedModule.value.id },
-        };
-
-        // Create the version
-        await moduleVersionService().create(versionData);
-
-        // Reset the form
-        showAddModuleVersionRow.value = false;
-        newModuleVersion.value = {
-          version: '',
-          createDate: new Date().toISOString().split('T')[0],
-          updateDate: new Date().toISOString().split('T')[0],
-          notes: '',
-          module: null,
-          features: [],
-        };
-
-        // Refresh versions
-        await fetchModuleVersions(selectedModule.value.id);
-
-        alertService.showInfo('Version du module créée avec succès', { variant: 'success' });
-      } catch (error) {
-        alertService.showHttpError(error.response);
-      }
     };
 
     const cancelNewModuleVersion = () => {
@@ -1576,11 +1547,132 @@ export default defineComponent({
       showFeaturesTable.value = true;
     };
 
-    // Modifiez la fonction openModuleFeaturesModal pour stocker correctement le moduleVersion sélectionné
+    // Add to methods
+    const toggleAddModuleVersionForm = () => {
+      showAddModuleVersionForm.value = !showAddModuleVersionForm.value;
+      if (!showAddModuleVersionForm.value) {
+        cancelAddModuleVersionForm();
+      }
+    };
+
+    const toggleAddModuleVersionRow = () => {
+      showAddModuleVersionRow.value = !showAddModuleVersionRow.value;
+      if (!showAddModuleVersionRow.value) {
+        cancelAddModuleVersionRow();
+      }
+    };
+
+    const saveNewModuleVersionAndAssign = async () => {
+      if (!newModuleVersion.value.version || !newModuleVersion.value.module || !selectedVersion.value) {
+        alertService.showInfo(t$('sdiFrontendApp.moduleVersion.requiredFields'), { variant: 'danger' });
+        return;
+      }
+
+      try {
+        // Prepare module version data
+        const versionData = {
+          ...newModuleVersion.value,
+          module: { id: newModuleVersion.value.module.id },
+          createDate: new Date().toISOString().split('T')[0],
+          updateDate: new Date().toISOString().split('T')[0],
+          features: [],
+        };
+
+        // Create the module version
+        const createdModuleVersion = await moduleVersionService().create(versionData);
+
+        // Update the product version with the new module version
+        const updatedModuleVersions = [...(selectedVersion.value.moduleVersions || []), { id: createdModuleVersion.id }];
+        const updatedVersion = {
+          ...selectedVersion.value,
+          moduleVersions: updatedModuleVersions,
+        };
+
+        await productVersionService().update(updatedVersion);
+
+        // Refresh module versions and product versions
+        await fetchModuleVersionOptions();
+        await fetchProductVersions(selectedProduct.value.id);
+
+        // Update selectedVersion to reflect changes
+        selectedVersion.value = productVersions.value.find(v => v.id === selectedVersion.value.id) || selectedVersion.value;
+
+        // Reset the form
+        showAddModuleVersionRow.value = false;
+        newModuleVersion.value = {
+          version: '',
+          createDate: new Date().toISOString().split('T')[0],
+          updateDate: new Date().toISOString().split('T')[0],
+          notes: '',
+          module: null,
+          features: [],
+        };
+
+        alertService.showInfo(t$('sdiFrontendApp.moduleVersion.createdAndAssigned'), { variant: 'success' });
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
+    };
+
+    const cancelAddModuleVersionRow = () => {
+      showAddModuleVersionRow.value = false;
+      newModuleVersion.value = {
+        version: '',
+        createDate: new Date().toISOString().split('T')[0],
+        updateDate: new Date().toISOString().split('T')[0],
+        notes: '',
+        module: null,
+        features: [],
+      };
+    };
+
+    const cancelAddModuleVersionForm = () => {
+      showAddModuleVersionForm.value = false;
+      newModuleVersion.value = {
+        version: '',
+        createDate: new Date().toISOString().split('T')[0],
+        updateDate: new Date().toISOString().split('T')[0],
+        notes: '',
+        module: null,
+        features: [],
+      };
+    };
+
+    // Update existing saveNewModuleVersion (if needed) to avoid duplication
+    const saveNewModuleVersion = async () => {
+      if (!newModuleVersion.value.version || !selectedModule.value) {
+        alertService.showInfo(t$('sdiFrontendApp.moduleVersion.requiredFields'), { variant: 'danger' });
+        return;
+      }
+
+      try {
+        const versionData = {
+          ...newModuleVersion.value,
+          module: { id: selectedModule.value.id },
+        };
+        await moduleVersionService().create(versionData);
+        showAddModuleVersionRow.value = false;
+        newModuleVersion.value = {
+          version: '',
+          createDate: new Date().toISOString().split('T')[0],
+          updateDate: new Date().toISOString().split('T')[0],
+          notes: '',
+          module: null,
+          features: [],
+        };
+        await fetchModuleVersions(selectedModule.value.id);
+        alertService.showInfo(t$('sdiFrontendApp.moduleVersion.created'), { variant: 'success' });
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
+    };
+
+    const moduleVersionSelected = ref(null);
     const openModuleFeaturesModal = async moduleVersion => {
       selectedModuleVersion.value = moduleVersion;
       // Assurez-vous que moduleVersion a un ID avant de l'utiliser
       if (moduleVersion && moduleVersion.id) {
+        moduleVersionSelected.value = getModuleVersionWithModuleCached(moduleVersion.id).module.name + ' - v' + moduleVersion.version;
         await fetchFeatures(moduleVersion.id);
       } else {
         features.value = []; // Réinitialiser les features si aucun ID valide
@@ -1779,6 +1871,7 @@ export default defineComponent({
       await fetchModuleOptions();
       await fetchModuleVersionOptions();
       await retrieveCertifications();
+      await retrieveCertificationsVersions();
 
       // Initialize tabs
       nextTick(() => {
@@ -1920,6 +2013,16 @@ export default defineComponent({
       };
     };
 
+    const getIfraComponentVersionWithInfraCached = infracomponenetVersionId => {
+      const infracomponenetVersion = infraComponentVersionOptions.value.find(ifc => ifc.id === infracomponenetVersionId);
+      if (!infracomponenetVersion) return null;
+      const infraComponent = infraComponentOptions.value.find(m => m.id === infracomponenetVersion.infraComponent?.id);
+      return {
+        ...infracomponenetVersion,
+        infraComponent: infraComponent ? { ...infraComponent } : null,
+      };
+    };
+
     const getModuleVersionWithModuleCached = moduleVersionId => {
       // 1. Trouver la version de module dans le cache
       const moduleVersion = moduleVersionOptions.value.find(mv => mv.id === moduleVersionId);
@@ -1936,14 +2039,42 @@ export default defineComponent({
       };
     };
 
+    const getCertificationCached = certificationVersionId => {
+      const certificationVersion = certificationsOptionsVersions.value.find(mv => mv.id === certificationVersionId);
+      console.log('1', certificationVersion);
+
+      if (!certificationVersion) return null;
+
+      const certification = certificationsOptions.value.find(m => m.id === certificationVersion.certification?.id);
+      console.log('2', certification);
+      return {
+        ...certificationVersion,
+        certification: certification ? { ...certification } : null,
+      };
+    };
+
+    const activeVersionSettingsSection = ref('configuration');
+    const showConfigurationSection = () => {
+      activeVersionSettingsSection.value = 'configuration';
+    };
+
+    const showModulesSection = () => {
+      activeVersionSettingsSection.value = 'modules';
+    };
+
     return {
       t$,
+      activeVersionSettingsSection,
+      showConfigurationSection,
+      showModulesSection,
       handleNewImageUpload,
       breadcrumb,
       selectVersion,
       navigateToBreadcrumb,
       returnToVersionsList,
+      getIfraComponentVersionWithInfraCached,
       getModuleVersionWithModuleCached,
+      getCertificationCached,
       newModuleInSettingsModal,
       showNewModuleForm,
       expandedVersions,
@@ -1980,6 +2111,7 @@ export default defineComponent({
       componentTypeOptions,
       moduleOptions,
       certificationsOptions,
+      certificationsOptionsVersions,
       moduleVersionOptions,
       selectedProductLineIds,
       editProductLineIds,
@@ -2006,6 +2138,7 @@ export default defineComponent({
       removeVersionEntity,
       currentVersionPage,
       itemsPerVersionPage,
+      moduleVersionSelected,
       totalVersionItems,
       moduleVersions,
       selectedModuleVersion,
@@ -2131,6 +2264,12 @@ export default defineComponent({
       returnToProductList,
       setHoveredIndex,
       setActiveTabIndex,
+      showAddModuleVersionForm,
+      toggleAddModuleVersionForm,
+      saveNewModuleVersionAndAssign,
+      cancelAddModuleVersionForm,
+      toggleAddModuleVersionRow,
+      cancelAddModuleVersionRow,
       dataUtils,
     };
   },

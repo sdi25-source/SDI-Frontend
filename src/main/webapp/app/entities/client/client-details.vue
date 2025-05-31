@@ -1,114 +1,141 @@
 <template>
-  <div class="row justify-content-center">
+  <div class="row justify-content-center p-lg-5">
     <div class="col-12 p-5">
       <div v-if="client" class="card border-0">
         <div class="card-body p-0">
-          <!-- User header with login and status -->
+          <!-- Header avec bouton retour, nom client et logo -->
           <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-            <img
-              v-if="client.clientLogo"
-              :src="client.clientLogo"
-              :alt="client.name + ' logo'"
-              class="client-logo"
-              width="100"
-              height="100"
-            />
-            <span v-else>-</span>
+            <div class="d-flex align-items-center">
+              <h2 class="client-name mb-0">{{ client.name }}</h2>
+            </div>
+            <img v-if="client.clientLogo" :src="client.clientLogo" :alt="client.name + ' logo'" class="client-logo" />
+            <span v-else class="text-muted">-</span>
           </div>
 
           <!-- User details in a modern grid -->
           <div class="row mb-4">
-            <div class="col-md-6 mb-3">
-              <div class="detail-group">
-                <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.name')"></label>
-                <p class="mb-0 fw-medium">{{ client.name }}</p>
-              </div>
-            </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-3 mb-3 pb-2">
               <div class="detail-group">
                 <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.mainContactName')"></label>
                 <p class="mb-0 fw-medium">{{ client.mainContactName }}</p>
               </div>
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-3 mb-3 pb-2">
               <div class="detail-group">
                 <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.mainContactEmail')"></label>
                 <p class="mb-0 fw-medium">{{ client.mainContactEmail }}</p>
               </div>
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-3 mb-3 pb-2">
               <div class="detail-group">
                 <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.mainContactPhoneNumber')"></label>
                 <p class="mb-0 fw-medium">{{ client.mainContactPhoneNumber }}</p>
               </div>
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-3 mb-3 pb-2">
+              <div class="detail-group">
+                <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.country')"></label>
+                <p class="mb-0 fw-medium">{{ client.country?.countryname }}</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3 pb-2">
               <div class="detail-group">
                 <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.currentCardHolderNumber')"></label>
                 <p class="mb-0 fw-medium">{{ client.currentCardHolderNumber }}</p>
               </div>
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-3 mb-3 pb-2">
               <div class="detail-group">
                 <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.currentBruncheNumber')"></label>
                 <p class="mb-0 fw-medium">{{ client.currentBruncheNumber }}</p>
               </div>
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-3 mb-3 pb-2">
               <div class="detail-group">
                 <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.currentCustomersNumber')"></label>
                 <p class="mb-0 fw-medium">{{ client.currentCustomersNumber }}</p>
               </div>
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-3 mb-3 pb-2">
               <div class="detail-group">
-                <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.url')"></label>
-                <p class="mb-0 fw-medium">{{ client.url }}</p>
+                <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.createDate')"></label>
+                <p class="mb-0 fw-medium">{{ client.createDate }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4 pb-3 border-bottom">
+            <div class="row">
+              <div class="col-md-4 mb-3 pb-2">
+                <div class="detail-group">
+                  <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.url')"></label>
+                  <p>
+                    <a :href="client.url" target="_blank" class="mb-0 fw-medium text-decoration-none text-break">
+                      {{ client.url }}
+                      <i class="ms-1 fas fa-external-link-alt"></i>
+                    </a>
+                  </p>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3 pb-2">
+                <div class="detail-group">
+                  <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.size')"></label>
+                  <p class="mb-0 fw-medium">
+                    {{ client.size?.sizeName }}
+                  </p>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3 pb-2">
+                <div class="detail-group">
+                  <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.clientType')"></label>
+                  <p class="mb-0 fw-medium">
+                    {{ client.clientType?.type }}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Notes section -->
-          <div class="mb-4 pb-3 border-bottom">
+          <div class="mb-4 pb-3">
             <label class="fw-bold mb-2" v-text="t$('sdiFrontendApp.client.notes')"></label>
             <p class="mb-0 text-muted">{{ client.notes }}</p>
           </div>
 
-          <div class="mb-4 pb-3">
-            <label class="fw-bold mb-2" v-text="t$('sdiFrontendApp.client.relatedInformation')"></label>
-            <div class="row">
-              <div class="col-md-4 mb-3">
-                <div class="detail-group">
-                  <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.country')"></label>
-                  <p class="mb-0 fw-medium">
-                    <router-link v-if="client.country" :to="{ name: 'CountryView', params: { countryId: client.country.id } }">
-                      {{ client.country.countryname }}
-                    </router-link>
-                  </p>
-                </div>
-              </div>
-              <div class="col-md-4 mb-3">
-                <div class="detail-group">
-                  <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.size')"></label>
-                  <p class="mb-0 fw-medium">
-                    <router-link v-if="client.size" :to="{ name: 'ClientSizeView', params: { clientSizeId: client.size.id } }">
-                      {{ client.size.sizeName }}
-                    </router-link>
-                  </p>
-                </div>
-              </div>
-              <div class="col-md-4 mb-3">
-                <div class="detail-group">
-                  <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.clientType')"></label>
-                  <p class="mb-0 fw-medium">
-                    <router-link v-if="client.clientType" :to="{ name: 'ClientTypeView', params: { clientTypeId: client.clientType.id } }">
-                      {{ client.clientType.type }}
-                    </router-link>
-                  </p>
-                </div>
-              </div>
-            </div>
+          <!-- Modal Footer with Buttons -->
+          <div class="modal-footer">
+            <button type="submit" @click.prevent="previousState()" class="button button-secondary" data-cy="entityDetailsBackButton">
+              <font-awesome-icon icon="arrow-left"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.back')"></span>
+            </button>
+            <router-link v-if="client.id" :to="{ name: 'ClientEdit', params: { clientId: client.id } }" custom v-slot="{ navigate }">
+              <button @click="navigate" class="button button-primary">
+                <font-awesome-icon icon="pencil-alt"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.edit')"></span>
+              </button>
+            </router-link>
+            <button v-if="client.id" @click="generateReport" class="button button-primary">
+              <i class="bi bi-file-pdf"></i>&nbsp;<span>Generate Report</span>
+            </button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PDF Modal -->
+    <div v-if="showPdfModal" class="pdf-modal">
+      <div class="pdf-modal-content">
+        <div class="pdf-modal-header">
+          <h5>Customer Report</h5>
+          <button @click="closePdfModal" class="close-button">&times;</button>
+        </div>
+        <div class="pdf-modal-body">
+          <iframe v-if="pdfUrl" :src="pdfUrl" class="pdf-iframe"></iframe>
+          <p v-else>Loading PDF...</p>
+        </div>
+        <div class="pdf-modal-footer">
+          <button @click="downloadPdf" class="button button-primary">
+            <font-awesome-icon icon="download"></font-awesome-icon>&nbsp;Download PDF
+          </button>
+          <button @click="closePdfModal" class="button button-secondary">Close</button>
         </div>
       </div>
     </div>
@@ -118,15 +145,339 @@
 <script lang="ts" src="./client-details.component.ts"></script>
 
 <style scoped>
-.client-logo {
-  max-width: 100px;
-  max-height: 100px;
-  object-fit: contain;
-  border-radius: 4px;
+/* Existing styles (unchanged) */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
 }
-.btn-color {
-  background-color: var(--accent-color);
-  border-color: var(--accent-color);
-  color: var(--contrast-color);
+
+.button-secondary {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.button-primary {
+  background-color: #0c2d57;
+  color: white;
+  border-color: #0c2d57;
+}
+
+/* PDF Modal Styles */
+.pdf-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.pdf-modal-content {
+  background-color: #fff;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 1000px;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pdf-modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pdf-modal-header h5 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.pdf-modal-body {
+  flex: 1;
+  padding: 1rem;
+  overflow: auto;
+}
+
+.pdf-iframe {
+  width: 100%;
+  height: 500px;
+  border: none;
+}
+
+.pdf-modal-footer {
+  padding: 1rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+/* Existing styles (unchanged, omitted for brevity) */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+}
+
+.button-secondary {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.button-primary {
+  background-color: #0c2d57;
+  color: white;
+  border-color: #0c2d57;
+}
+
+/* Bouton retour */
+.back-button {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 12px;
+  background-color: #f8f9fa;
+  color: #6c757d;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.back-button:hover {
+  background-color: #e9ecef;
+  transform: translateX(-2px);
+}
+
+/* Header avec nom client et logo */
+.client-header {
+  position: relative;
+  padding-top: 60px; /* Espace pour le bouton retour */
+}
+
+.client-name-section {
+  flex: 1;
+}
+
+.client-name {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #012970;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.client-subtitle {
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+.client-logo-section {
+  flex-shrink: 0;
+  margin-left: 2rem;
+}
+
+.client-logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  background-color: #fff;
+  padding: 8px;
+}
+
+.logo-placeholder {
+  width: 120px;
+  height: 120px;
+  border: 2px dashed #e2e8f0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+}
+
+/* Sections d'informations */
+.info-section {
+  margin-bottom: 2.5rem;
+}
+
+.section-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #012970;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* Cartes d'informations */
+.info-card {
+  background-color: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1.5rem;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  background-color: #fff;
+  border-color: #012970;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(1, 41, 112, 0.1);
+}
+
+.stats-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.info-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.info-value {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0;
+  word-break: break-word;
+}
+
+.stats-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #012970;
+}
+
+/* Liens */
+.info-link {
+  color: #012970;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.info-link:hover {
+  color: #4154f1;
+  text-decoration: underline;
+}
+
+.url-link {
+  color: #0d83fd;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.url-link:hover {
+  text-decoration: underline;
+}
+
+/* Section notes */
+.notes-card {
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 2rem;
+  border-left: 4px solid #012970;
+}
+
+.notes-content {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .client-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .client-name {
+    font-size: 2rem;
+  }
+
+  .client-logo-section {
+    margin-left: 0;
+  }
+
+  .client-logo,
+  .logo-placeholder {
+    width: 200px;
+    height: 200px;
+  }
+
+  .back-button {
+    left: 15px;
+    top: 15px;
+  }
+
+  .client-header {
+    padding-top: 70px;
+  }
+}
+
+@media (max-width: 576px) {
+  .client-name {
+    font-size: 1.8rem;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+  }
+
+  .info-card {
+    padding: 1rem;
+  }
+
+  .stats-number {
+    font-size: 1.5rem;
+  }
 }
 </style>

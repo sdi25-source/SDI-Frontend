@@ -1,10 +1,24 @@
 import axios from 'axios';
 
 import { type IClient } from '@/shared/model/client.model';
+import type { ClientOverview } from '@/shared/model/ClientOverview.model.ts';
 
 const baseApiUrl = 'api/clients';
 
 export default class ClientService {
+  public generateClientReport(id: number): Promise<Blob> {
+    return new Promise<Blob>((resolve, reject) => {
+      axios
+        .get(`${baseApiUrl}/report/${id}`, { responseType: 'blob' })
+        .then(res => {
+          resolve(res.data);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
   public find(id: number): Promise<IClient> {
     return new Promise<IClient>((resolve, reject) => {
       axios
@@ -74,6 +88,19 @@ export default class ClientService {
     return new Promise<IClient>((resolve, reject) => {
       axios
         .patch(`${baseApiUrl}/${entity.id}`, entity)
+        .then(res => {
+          resolve(res.data);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
+  public retrieveClientOverviews(): Promise<ClientOverview[]> {
+    return new Promise<ClientOverview[]>((resolve, reject) => {
+      axios
+        .get(`${baseApiUrl}/client-overviews`)
         .then(res => {
           resolve(res.data);
         })

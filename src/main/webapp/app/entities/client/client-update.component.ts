@@ -18,14 +18,7 @@ import { Client, type IClient } from '@/shared/model/client.model';
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'ClientUpdate',
-  props: {
-    clientId: {
-      type: [Number, String],
-      required: false,
-    },
-  },
-  emits: ['close', 'user-saved'],
-  setup(props, { emit }) {
+  setup() {
     const clientService = inject('clientService', () => new ClientService());
     const alertService = inject('alertService', () => useAlertService(), true);
     const { t: t$ } = useI18n();
@@ -65,8 +58,8 @@ export default defineComponent({
       }
     };
 
-    if (props.clientId) {
-      retrieveClient(props.clientId);
+    if (route.params?.clientId) {
+      retrieveClient(route.params.clientId);
     }
 
     const initRelationships = () => {
@@ -178,22 +171,15 @@ export default defineComponent({
       currentCustomersNumber: {},
       mainContactPhoneNumber: {},
       url: {},
-      industry: {},
       address: {},
       createDate: {},
       updateDate: {},
       notes: {},
-      productDeployements: {},
-      country: {},
       size: {},
       clientType: {},
-      certifs: {},
+      country: {},
     };
     const v$ = useVuelidate(validationRules, client as any);
-
-    const cancel = () => {
-      emit('close');
-    };
 
     return {
       clientService,
@@ -207,7 +193,6 @@ export default defineComponent({
       countries,
       clientSizes,
       clientTypes,
-      cancel,
       onLogoChange,
       ...dataUtils,
       v$,
@@ -218,14 +203,16 @@ export default defineComponent({
   methods: {
     save(): void {
       this.isSaving = true;
+      this.client.createDate = new Date().toISOString().split('T')[0];
+      this.client.updateDate = new Date().toISOString().split('T')[0];
+
       if (this.client.id) {
         this.clientService()
           .update(this.client)
           .then(param => {
             this.isSaving = false;
-            this.alertService.showInfo(this.t$('sdiFrontendApp.client.updated', { param: param.id }));
-            this.$emit('user-saved', param);
-            this.$emit('close');
+            this.previousState();
+            this.alertService.showInfo(this.t$('jhipsterApp.client.updated', { param: param.id }));
           })
           .catch(error => {
             this.isSaving = false;
@@ -236,9 +223,8 @@ export default defineComponent({
           .create(this.client)
           .then(param => {
             this.isSaving = false;
-            this.alertService.showSuccess(this.t$('sdiFrontendApp.client.created', { param: param.id }).toString());
-            this.$emit('user-saved', param);
-            this.$emit('close');
+            this.previousState();
+            this.alertService.showSuccess(this.t$('jhipsterApp.client.created', { param: param.id }).toString());
           })
           .catch(error => {
             this.isSaving = false;

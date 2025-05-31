@@ -20,7 +20,7 @@ export default defineComponent({
     const searchTimeout = ref(null);
 
     const currentPage = ref(1);
-    const itemsPerPage = ref(5);
+    const itemsPerPage = ref(10);
     const totalItems = ref(0);
 
     const isFetching = ref(false);
@@ -74,9 +74,7 @@ export default defineComponent({
         } else {
           const searchLower = searchTerm.value.toLowerCase();
           productLines.value = allProductLines.value.filter(pl =>
-            Object.values(pl).some(
-              val => typeof val === 'string' && val.toLowerCase().includes(searchLower)
-            )
+            Object.values(pl).some(val => typeof val === 'string' && val.toLowerCase().includes(searchLower)),
           );
         }
         updateTotalItems();
@@ -123,10 +121,7 @@ export default defineComponent({
     const removeProductLine = async () => {
       try {
         await productLineService().delete(removeId.value);
-        alertService.showInfo(
-          t$('sdiFrontendApp.productLine.deleted', { param: removeId.value }).toString(),
-          { variant: 'danger' }
-        );
+        alertService.showInfo(t$('sdiFrontendApp.productLine.deleted', { param: removeId.value }).toString(), { variant: 'danger' });
 
         productLines.value = productLines.value.filter(pl => pl.id !== removeId.value);
         allProductLines.value = allProductLines.value.filter(pl => pl.id !== removeId.value);
@@ -184,12 +179,14 @@ export default defineComponent({
 
     const editProductLine = productLine => {
       productLines.value.forEach(pl => (pl.showDropdown = false));
-      productLine.originalData = JSON.parse(JSON.stringify({
-        name: productLine.name,
-        createDate: productLine.createDate,
-        updateDate: productLine.updateDate,
-        notes: productLine.notes
-      }));
+      productLine.originalData = JSON.parse(
+        JSON.stringify({
+          name: productLine.name,
+          createDate: productLine.createDate,
+          updateDate: productLine.updateDate,
+          notes: productLine.notes,
+        }),
+      );
       productLine.isEditing = true;
     };
 
@@ -200,7 +197,7 @@ export default defineComponent({
           name: productLine.name,
           createDate: productLine.createDate,
           updateDate: new Date().toISOString().split('T')[0],
-          notes: productLine.notes
+          notes: productLine.notes,
         };
 
         const response = await productLineService().update(toSend);
@@ -238,12 +235,16 @@ export default defineComponent({
       productLine.showDropdown = !productLine.showDropdown;
     };
 
-    watch(productLines, () => {
-      updateTotalItems();
-      if (currentPage.value > totalPages.value && totalPages.value > 0) {
-        currentPage.value = totalPages.value;
-      }
-    }, { deep: true });
+    watch(
+      productLines,
+      () => {
+        updateTotalItems();
+        if (currentPage.value > totalPages.value && totalPages.value > 0) {
+          currentPage.value = totalPages.value;
+        }
+      },
+      { deep: true },
+    );
 
     onMounted(async () => {
       await retrieveProductLines();

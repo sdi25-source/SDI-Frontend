@@ -11,6 +11,7 @@
             class="btn btn-primary btn-sm mr-3 rounded-3"
             :disabled="showAddRow"
           >
+            <font-awesome-icon icon="plus"></font-awesome-icon>
             <span v-text="t$('global.new')"></span>
           </button>
           <h5 id="page-heading" class="m-0 font-weight-bold" data-cy="ProductDeploymentHeading">

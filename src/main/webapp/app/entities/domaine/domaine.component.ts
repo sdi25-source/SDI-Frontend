@@ -40,7 +40,7 @@ export default defineComponent({
     });
 
     const currentPage = ref(1);
-    const itemsPerPage = ref(5);
+    const itemsPerPage = ref(10);
     const totalItems = ref(0);
 
     const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
@@ -76,9 +76,7 @@ export default defineComponent({
         } else {
           const searchLower = searchTerm.value.toLowerCase();
           domaines.value = allDomaines.value.filter(pl =>
-            Object.values(pl).some(
-              val => typeof val === 'string' && val.toLowerCase().includes(searchLower)
-            )
+            Object.values(pl).some(val => typeof val === 'string' && val.toLowerCase().includes(searchLower)),
           );
         }
         updateTotalItems();
@@ -125,10 +123,7 @@ export default defineComponent({
     const removeDomaine = async () => {
       try {
         await domaineService().delete(removeId.value);
-        alertService.showInfo(
-          t$('sdiFrontendApp.domaine.deleted', { param: removeId.value }).toString(),
-          { variant: 'danger' }
-        );
+        alertService.showInfo(t$('sdiFrontendApp.domaine.deleted', { param: removeId.value }).toString(), { variant: 'danger' });
 
         domaines.value = domaines.value.filter(d => d.id !== removeId.value);
         allDomaines.value = allDomaines.value.filter(d => d.id !== removeId.value);
@@ -186,12 +181,14 @@ export default defineComponent({
 
     const editDomaine = domaine => {
       domaines.value.forEach(d => (d.showDropdown = false));
-      domaine.originalData = JSON.parse(JSON.stringify({
-        name: domaine.name,
-        createDate: domaine.createDate,
-        updateDate: domaine.updateDate,
-        notes: domaine.notes
-      }));
+      domaine.originalData = JSON.parse(
+        JSON.stringify({
+          name: domaine.name,
+          createDate: domaine.createDate,
+          updateDate: domaine.updateDate,
+          notes: domaine.notes,
+        }),
+      );
       domaine.isEditing = true;
     };
 
@@ -202,7 +199,7 @@ export default defineComponent({
           name: domaine.name,
           createDate: domaine.createDate,
           updateDate: new Date().toISOString().split('T')[0],
-          notes: domaine.notes
+          notes: domaine.notes,
         };
 
         const response = await domaineService().update(toSend);
@@ -241,12 +238,16 @@ export default defineComponent({
     };
 
     // Watchers
-    watch(domaines, () => {
-      updateTotalItems();
-      if (currentPage.value > totalPages.value && totalPages.value > 0) {
-        currentPage.value = totalPages.value;
-      }
-    }, { deep: true });
+    watch(
+      domaines,
+      () => {
+        updateTotalItems();
+        if (currentPage.value > totalPages.value && totalPages.value > 0) {
+          currentPage.value = totalPages.value;
+        }
+      },
+      { deep: true },
+    );
 
     // Lifecycle hooks
     onMounted(async () => {

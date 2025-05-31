@@ -14,6 +14,7 @@ export interface IRequestOfChange {
   createDate?: Date | null;
   updateDate?: Date | null;
   productVersion?: IProductVersion | null;
+  productVersionResult?: IProductVersion | null;
   client?: IClient | null;
   moduleVersions?: IModuleVersion[] | null;
   customisationLevel?: ICustomisationLevel | null;
@@ -31,6 +32,7 @@ export class RequestOfChange implements IRequestOfChange {
     public createDate?: Date | null,
     public updateDate?: Date | null,
     public productVersion?: IProductVersion | null,
+    public productVersionResult?: IProductVersion | null,
     public client?: IClient | null,
     public moduleVersions?: IModuleVersion[] | null,
     public customisationLevel?: ICustomisationLevel | null,

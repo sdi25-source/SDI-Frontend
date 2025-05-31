@@ -1,44 +1,55 @@
-import { type Ref, computed, defineComponent, inject, ref } from 'vue';
+import { type Ref, defineComponent, inject, onMounted, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useVuelidate } from '@vuelidate/core';
-
-import ClientEventService from './client-event.service';
-import useDataUtils from '@/shared/data/data-utils.service';
-import { useValidation } from '@/shared/composables';
-import { useAlertService } from '@/shared/alert/alert.service';
-
+import { required } from '@vuelidate/validators';
+import ClientEventService from '@/entities/client-event/client-event.service';
 import ClientService from '@/entities/client/client.service';
-import { type IClient } from '@/shared/model/client.model';
 import ClientEventTypeService from '@/entities/client-event-type/client-event-type.service';
-import { type IClientEventType } from '@/shared/model/client-event-type.model';
-import { ClientEvent, type IClientEvent } from '@/shared/model/client-event.model';
+import { useAlertService } from '@/shared/alert/alert.service';
+import type { IClientEvent } from '@/shared/model/client-event.model.ts';
+import { type IClient } from '@/shared/model/client.model.ts';
+import type { IClientEventType } from '@/shared/model/client-event-type.model.ts';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'ClientEventUpdate',
   setup() {
+    const { t: t$ } = useI18n();
+    const router = useRouter();
+    const route = useRoute();
     const clientEventService = inject('clientEventService', () => new ClientEventService());
+    const clientService = inject('clientService', () => new ClientService());
+    const clientEventTypeService = inject('clientEventTypeService', () => new ClientEventTypeService());
     const alertService = inject('alertService', () => useAlertService(), true);
 
-    const clientEvent: Ref<IClientEvent> = ref(new ClientEvent());
-
-    const clientService = inject('clientService', () => new ClientService());
-
-    const clients: Ref<IClient[]> = ref([]);
-
-    const clientEventTypeService = inject('clientEventTypeService', () => new ClientEventTypeService());
-
-    const clientEventTypes: Ref<IClientEventType[]> = ref([]);
+    const clientEvent = ref<IClientEvent>({
+      id: null,
+      event: '',
+      description: '',
+      eventDate: '',
+      notes: '',
+      client: null,
+      clientEventType: null,
+    });
+    const clients = ref<IClient[]>([]);
+    const clientEventTypes = ref<IClientEventType[]>([]);
     const isSaving = ref(false);
-    const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'en'), true);
+    const currentLanguage = ref('en');
 
-    const route = useRoute();
-    const router = useRouter();
+    // Validation rules
+    const rules = computed(() => ({
+      event: { required },
+      description: {},
+      eventDate: {},
+      notes: {},
+      client: {},
+      clientEventType: {},
+    }));
 
-    const previousState = () => router.go(-1);
+    const v$ = useVuelidate(rules, clientEvent);
 
-    const retrieveClientEvent = async clientEventId => {
+    const retrieveClientEvent = async (clientEventId: number) => {
       try {
         const res = await clientEventService().find(clientEventId);
         clientEvent.value = res;
@@ -47,85 +58,66 @@ export default defineComponent({
       }
     };
 
-    if (route.params?.clientEventId) {
-      retrieveClientEvent(route.params.clientEventId);
-    }
-
-    const initRelationships = () => {
-      clientService()
-        .retrieve()
-        .then(res => {
-          clients.value = res.data;
-        });
-      clientEventTypeService()
-        .retrieve()
-        .then(res => {
-          clientEventTypes.value = res.data;
-        });
+    const fetchClients = async () => {
+      try {
+        const res = await clientService().retrieve();
+        clients.value = res.data;
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
     };
 
-    initRelationships();
-
-    const dataUtils = useDataUtils();
-
-    const { t: t$ } = useI18n();
-    const validations = useValidation();
-    const validationRules = {
-      event: {
-        required: validations.required(t$('entity.validation.required').toString()),
-      },
-      description: {},
-      eventDate: {},
-      notes: {},
-      client: {},
-      clientEventType: {},
+    const fetchClientEventTypes = async () => {
+      try {
+        const res = await clientEventTypeService().retrieve();
+        clientEventTypes.value = res.data;
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
     };
-    const v$ = useVuelidate(validationRules, clientEvent as any);
-    v$.value.$validate();
+
+    const save = async () => {
+      isSaving.value = true;
+      clientEvent.value.eventDate = new Date().toISOString().split('T')[0];
+      try {
+        if (clientEvent.value.id) {
+          await clientEventService().update(clientEvent.value);
+          alertService.showInfo(t$('sdiFrontendApp.clientEvent.updated', { param: clientEvent.value.id }).toString());
+        } else {
+          await clientEventService().create(clientEvent.value);
+          alertService.showInfo(t$('sdiFrontendApp.clientEvent.created', { param: clientEvent.value.id }).toString());
+        }
+        previousState();
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      } finally {
+        isSaving.value = false;
+      }
+    };
+
+    const previousState = () => {
+      router.go(-1);
+    };
+
+    onMounted(async () => {
+      const clientEventId = route.params?.clientEventId;
+      if (clientEventId) {
+        await retrieveClientEvent(Number(clientEventId));
+      }
+      await fetchClients();
+      await fetchClientEventTypes();
+    });
 
     return {
-      clientEventService,
-      alertService,
       clientEvent,
-      previousState,
-      isSaving,
-      currentLanguage,
       clients,
       clientEventTypes,
-      ...dataUtils,
+      isSaving,
+      currentLanguage,
       v$,
       t$,
+      save,
+      previousState,
     };
-  },
-  created(): void {},
-  methods: {
-    save(): void {
-      this.isSaving = true;
-      if (this.clientEvent.id) {
-        this.clientEventService()
-          .update(this.clientEvent)
-          .then(param => {
-            this.isSaving = false;
-            this.previousState();
-            this.alertService.showInfo(this.t$('sdiFrontendApp.clientEvent.updated', { param: param.id }));
-          })
-          .catch(error => {
-            this.isSaving = false;
-            this.alertService.showHttpError(error.response);
-          });
-      } else {
-        this.clientEventService()
-          .create(this.clientEvent)
-          .then(param => {
-            this.isSaving = false;
-            this.previousState();
-            this.alertService.showSuccess(this.t$('sdiFrontendApp.clientEvent.created', { param: param.id }).toString());
-          })
-          .catch(error => {
-            this.isSaving = false;
-            this.alertService.showHttpError(error.response);
-          });
-      }
-    },
   },
 });

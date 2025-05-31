@@ -21,7 +21,7 @@ export default defineComponent({
 
     // Pagination
     const currentPage = ref(1);
-    const itemsPerPage = ref(5);
+    const itemsPerPage = ref(10);
     const totalItems = ref(0);
 
     const isFetching = ref(false);

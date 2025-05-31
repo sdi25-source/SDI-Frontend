@@ -39,6 +39,7 @@ export default defineComponent({
     const isSaving = ref(false);
     const showCreateModal = ref(false);
     const showModulesModal = ref(false);
+    const showDetailsModal = ref(false);
     const showDeleteModal = ref(false);
     const selectedRequest = ref(null);
     const selectedModuleRequest = ref(null);
@@ -248,6 +249,7 @@ export default defineComponent({
         if (matchedVersion) {
           request.productVersion.product = matchedVersion.product;
         }
+        request.productVersionResult = res.data.find(pv => pv.id === request.productVersionResult?.id);
 
         console.log(request.productVersion);
 
@@ -265,9 +267,19 @@ export default defineComponent({
       showModulesModal.value = true;
     };
 
+    const viewRequestDetails = request => {
+      selectedRequest.value = { ...request };
+      showDetailsModal.value = true;
+    };
+
     const closeModulesModal = () => {
       showModulesModal.value = false;
       selectedModuleRequest.value = null;
+    };
+
+    const closeDetailsModal = () => {
+      showDetailsModal.value = false;
+      selectedRequest.value = null;
     };
 
     const prepareRemove = request => {
@@ -313,6 +325,7 @@ export default defineComponent({
       isSaving.value = true;
 
       try {
+        newRequest.value.productVersionResult = newRequest.value.productVersion;
         newRequest.value.moduleVersions = newRequest.value.moduleVersions.map(mv => {
           const full = moduleVersions.value.find(opt => opt.id === mv.id);
           return full ? full : mv;
@@ -598,6 +611,33 @@ export default defineComponent({
       keywordsList.value.splice(index, 1);
     };
 
+    // Add this method inside the setup function
+    const removeModule = async moduleId => {
+      if (!selectedModuleRequest.value) return;
+
+      try {
+        // Filter out the module with the given moduleId
+        selectedModuleRequest.value.moduleVersions = selectedModuleRequest.value.moduleVersions.filter(module => module.id !== moduleId);
+
+        // Update the request in the backend
+        await requestOfChangeService.update(selectedModuleRequest.value);
+        alertService.showSuccess(t$('sdiFrontendApp.requestOfChange.moduleRemoved').toString());
+
+        // Optionally, update the local requestOfChanges to reflect the change
+        const updatedRequestIndex = requestOfChanges.value.findIndex(request => request.id === selectedModuleRequest.value.id);
+        if (updatedRequestIndex !== -1) {
+          requestOfChanges.value[updatedRequestIndex].moduleVersions = [...selectedModuleRequest.value.moduleVersions];
+        }
+
+        // If the selected request is the same as the module request, update it too
+        if (selectedRequest.value && selectedRequest.value.id === selectedModuleRequest.value.id) {
+          selectedRequest.value.moduleVersions = [...selectedModuleRequest.value.moduleVersions];
+        }
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
+    };
+
     return {
       keywordInput,
       keywordsList,
@@ -610,6 +650,7 @@ export default defineComponent({
       requestOfChanges,
       productVersions,
       clients,
+      removeModule,
       moduleVersions,
       customisationLevels,
       searchTerm,
@@ -618,6 +659,7 @@ export default defineComponent({
       isSaving,
       showCreateModal,
       showModulesModal,
+      showDetailsModal,
       showDeleteModal,
       selectedRequest,
       selectedModuleRequest,
@@ -643,9 +685,11 @@ export default defineComponent({
       deselectRequest,
       viewRequestModules,
       closeModulesModal,
+      closeDetailsModal,
       prepareRemove,
       closeDeleteModal,
       confirmDelete,
+      viewRequestDetails,
       openCreateRequestModal,
       closeCreateModal,
       saveNewRequest,

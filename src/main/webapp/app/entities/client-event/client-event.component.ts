@@ -1,6 +1,5 @@
-import { type Ref, defineComponent, inject, onMounted, ref } from 'vue';
+import { defineComponent, inject, onMounted, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-
 import ClientEventService from './client-event.service';
 import { type IClientEvent } from '@/shared/model/client-event.model';
 import useDataUtils from '@/shared/data/data-utils.service';
@@ -15,17 +14,99 @@ export default defineComponent({
     const clientEventService = inject('clientEventService', () => new ClientEventService());
     const alertService = inject('alertService', () => useAlertService(), true);
 
-    const clientEvents: Ref<IClientEvent[]> = ref([]);
+    const clientEvents = ref<IClientEvent[]>([]);
+    const allClientEvents = ref<IClientEvent[]>([]);
+    const searchTerm = ref('');
+    const searchTimeout = ref<NodeJS.Timeout | null>(null);
 
+    // Pagination
+    const currentPage = ref(1);
+    const itemsPerPage = ref(10);
+    const totalItems = ref(0);
     const isFetching = ref(false);
+    const removeId = ref<number | null>(null);
+    const removeEntity = ref<any>(null);
 
-    const clear = () => {};
+    // Computed properties for pagination
+    const paginatedClientEvents = computed(() => {
+      const start = (currentPage.value - 1) * itemsPerPage.value;
+      const end = start + itemsPerPage.value;
+      return clientEvents.value.slice(start, end);
+    });
 
+    const totalPages = computed(() => {
+      return Math.ceil(totalItems.value / itemsPerPage.value);
+    });
+
+    const isPrevDisabled = computed(() => {
+      return currentPage.value <= 1;
+    });
+
+    const isNextDisabled = computed(() => {
+      return currentPage.value >= totalPages.value;
+    });
+
+    const paginationInfo = computed(() => {
+      if (totalItems.value === 0) return '0-0 / 0';
+      const start = (currentPage.value - 1) * itemsPerPage.value + 1;
+      const end = Math.min(start + itemsPerPage.value - 1, totalItems.value);
+      return `${start}-${end} / ${totalItems.value}`;
+    });
+
+    // Pagination methods
+    const goToNextPage = () => {
+      if (!isNextDisabled.value) {
+        currentPage.value++;
+      }
+    };
+
+    const goToPrevPage = () => {
+      if (!isPrevDisabled.value) {
+        currentPage.value--;
+      }
+    };
+
+    const updateTotalItems = () => {
+      if (clientEvents.value) {
+        totalItems.value = clientEvents.value.length;
+      } else {
+        totalItems.value = 0;
+      }
+    };
+
+    // Search method
+    const handleSearch = () => {
+      if (searchTimeout.value) {
+        clearTimeout(searchTimeout.value);
+      }
+
+      searchTimeout.value = setTimeout(() => {
+        if (searchTerm.value.trim() === '') {
+          clientEvents.value = [...allClientEvents.value];
+        } else {
+          const searchTermLower = searchTerm.value.toLowerCase();
+          clientEvents.value = allClientEvents.value.filter(
+            event =>
+              (event.event && event.event.toLowerCase().includes(searchTermLower)) ||
+              (event.description && event.description.toLowerCase().includes(searchTermLower)) ||
+              (event.notes && event.notes.toLowerCase().includes(searchTermLower)) ||
+              (event.client?.code && event.client.code.toLowerCase().includes(searchTermLower)) ||
+              (event.clientEventType?.type && event.clientEventType.type.toLowerCase().includes(searchTermLower)),
+          );
+        }
+        updateTotalItems();
+        currentPage.value = 1;
+      }, 300);
+    };
+
+    // Fetch client events
     const retrieveClientEvents = async () => {
       isFetching.value = true;
       try {
         const res = await clientEventService().retrieve();
         clientEvents.value = res.data;
+        allClientEvents.value = res.data;
+        updateTotalItems();
       } catch (err) {
         alertService.showHttpError(err.response);
       } finally {
@@ -37,43 +118,71 @@ export default defineComponent({
       retrieveClientEvents();
     };
 
-    onMounted(async () => {
-      await retrieveClientEvents();
-    });
-
-    const removeId: Ref<number> = ref(null);
-    const removeEntity = ref<any>(null);
     const prepareRemove = (instance: IClientEvent) => {
       removeId.value = instance.id;
       removeEntity.value.show();
     };
+
     const closeDialog = () => {
       removeEntity.value.hide();
+      removeId.value = null;
     };
+
     const removeClientEvent = async () => {
       try {
         await clientEventService().delete(removeId.value);
         const message = t$('sdiFrontendApp.clientEvent.deleted', { param: removeId.value }).toString();
         alertService.showInfo(message, { variant: 'danger' });
+        clientEvents.value = clientEvents.value.filter(c => c.id !== removeId.value);
+        allClientEvents.value = allClientEvents.value.filter(c => c.id !== removeId.value);
+        updateTotalItems();
         removeId.value = null;
-        retrieveClientEvents();
         closeDialog();
       } catch (error) {
         alertService.showHttpError(error.response);
       }
     };
 
+    // Watch for changes in clientEvents to update pagination
+    watch(
+      clientEvents,
+      () => {
+        updateTotalItems();
+        if (currentPage.value > totalPages.value && totalPages.value > 0) {
+          currentPage.value = totalPages.value;
+        }
+      },
+      { deep: true },
+    );
+
+    onMounted(async () => {
+      await retrieveClientEvents();
+    });
+
     return {
       clientEvents,
-      handleSyncList,
+      allClientEvents,
       isFetching,
-      retrieveClientEvents,
-      clear,
       removeId,
       removeEntity,
+      searchTerm,
+      searchTimeout,
+      currentPage,
+      itemsPerPage,
+      totalItems,
+      paginatedClientEvents,
+      totalPages,
+      isPrevDisabled,
+      isNextDisabled,
+      paginationInfo,
+      handleSyncList,
+      retrieveClientEvents,
       prepareRemove,
       closeDialog,
       removeClientEvent,
+      handleSearch,
+      goToNextPage,
+      goToPrevPage,
       t$,
       ...dataUtils,
     };

@@ -2,7 +2,7 @@
   "sdiFrontendApp": {
     "domaine": {
       "home": {
-        "title": "Domaines",
+        "title": "Domains",
         "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Domaine",
         "createOrEditLabel": "Create or edit a Domaine",

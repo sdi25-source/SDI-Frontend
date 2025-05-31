@@ -126,9 +126,18 @@
         </div>
         <div class="col-md-4">
           <button class="btn btn-outline-secondary btn-block" @click="resetFilters">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle mr-1" viewBox="0 0 16 16">
-              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-              <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-x-circle mr-1"
+              viewBox="0 0 16 16"
+            >
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+              <path
+                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+              />
             </svg>
             Réinitialiser
           </button>
@@ -141,64 +150,165 @@
       <div class="table-responsive">
         <table class="table table-hover mb-0" aria-describedby="clientCertifications">
           <thead class="thead-light">
-          <tr>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.clientCertification.client')"></span></th>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.clientCertification.certif')"></span></th>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.clientCertification.certificationDate')"></span></th>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.clientCertification.notes')"></span></th>
-            <th scope="col" width="160" class="text-center">Actions</th>
-          </tr>
+            <tr>
+              <th scope="col"><span v-text="t$('sdiFrontendApp.clientCertification.client')"></span></th>
+              <th scope="col"><span v-text="t$('sdiFrontendApp.clientCertification.certif')"></span></th>
+              <th scope="col"><span v-text="t$('sdiFrontendApp.clientCertification.certificationDate')"></span></th>
+              <th scope="col"><span v-text="t$('sdiFrontendApp.clientCertification.notes')"></span></th>
+              <th scope="col" width="160" class="text-center">Actions</th>
+            </tr>
           </thead>
           <tbody>
-          <tr v-for="clientCertification in paginatedClientCertifications" :key="clientCertification.id" data-cy="entityTable" class="align-middle">
-            <td>
-              <template v-if="clientCertification.isEditing">
-                <select v-model="clientCertification.client" class="form-control-borderless">
+            <tr
+              v-for="clientCertification in paginatedClientCertifications"
+              :key="clientCertification.id"
+              data-cy="entityTable"
+              class="align-middle"
+            >
+              <td>
+                <template v-if="clientCertification.isEditing">
+                  <select v-model="clientCertification.client" class="form-control-borderless">
+                    <option v-for="client in clients" :key="client.id" :value="client">
+                      {{ client.name }}
+                    </option>
+                  </select>
+                </template>
+                <template v-else>
+                  <router-link
+                    v-if="clientCertification.client"
+                    :to="{ name: 'ClientView', params: { clientId: clientCertification.client.id } }"
+                  >
+                    {{ clientCertification.client.name }}
+                  </router-link>
+                </template>
+              </td>
+              <td>
+                <template v-if="clientCertification.isEditing">
+                  <select v-model="clientCertification.certif" class="form-control-borderless">
+                    <option v-for="certification in certifications" :key="certification.id" :value="certification">
+                      {{ certification.name }}
+                    </option>
+                  </select>
+                </template>
+                <template v-else>
+                  <router-link
+                    v-if="clientCertification.certif"
+                    :to="{ name: 'CertificationView', params: { certificationId: clientCertification.certif.id } }"
+                  >
+                    {{ clientCertification.certif.name }}
+                  </router-link>
+                </template>
+              </td>
+              <td>
+                <template v-if="clientCertification.isEditing">
+                  <input v-model="clientCertification.certificationDate" type="date" class="form-control-borderless" />
+                </template>
+                <template v-else>
+                  {{ formatDate(clientCertification.certificationDate) }}
+                </template>
+              </td>
+              <td class="text-truncate" style="max-width: 250px" :title="clientCertification.notes">
+                <template v-if="clientCertification.isEditing">
+                  <input v-model="clientCertification.notes" type="text" class="form-control-borderless" />
+                </template>
+                <template v-else>
+                  {{ clientCertification.notes }}
+                </template>
+              </td>
+              <td class="text-center">
+                <div class="btn-group">
+                  <template v-if="clientCertification.isEditing">
+                    <div class="icon-container save-container" @click="saveClientCertification(clientCertification)" title="Enregistrer">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
+                        <path
+                          d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </div>
+                    <div class="icon-container cancel-container" @click="cancelEdit(clientCertification)" title="Annuler">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
+                        <path
+                          d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="action-icons">
+                      <div class="icon-container edit-container" @click="editClientCertification(clientCertification)" title="Modifier">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          class="bi bi-pencil-fill"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                          />
+                        </svg>
+                      </div>
+                      <div class="icon-container delete-container" @click="prepareRemove(clientCertification)" title="Supprimer">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="26"
+                          height="26"
+                          fill="currentColor"
+                          class="bi bi-x"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      </div>
+                      <div class="icon-container view-container" @click="viewClientCertification(clientCertification)" title="Voir">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          class="bi bi-eye"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"
+                          />
+                          <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                        </svg>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </td>
+            </tr>
+
+            <tr v-if="showAddRow" class="add-row">
+              <td>
+                <select v-model="newClientCertification.client" class="form-control-borderless">
+                  <option value="">Sélectionner un client</option>
                   <option v-for="client in clients" :key="client.id" :value="client">
                     {{ client.name }}
                   </option>
                 </select>
-              </template>
-              <template v-else>
-                <router-link v-if="clientCertification.client" :to="{ name: 'ClientView', params: { clientId: clientCertification.client.id } }">
-                  {{ clientCertification.client.name }}
-                </router-link>
-              </template>
-            </td>
-            <td>
-              <template v-if="clientCertification.isEditing">
-                <select v-model="clientCertification.certif" class="form-control-borderless">
+              </td>
+              <td>
+                <select v-model="newClientCertification.certif" class="form-control-borderless">
+                  <option value="">Sélectionner une certification</option>
                   <option v-for="certification in certifications" :key="certification.id" :value="certification">
                     {{ certification.name }}
                   </option>
                 </select>
-              </template>
-              <template v-else>
-                <router-link v-if="clientCertification.certif" :to="{ name: 'CertificationView', params: { certificationId: clientCertification.certif.id } }">
-                  {{ clientCertification.certif.name }}
-                </router-link>
-              </template>
-            </td>
-            <td>
-              <template v-if="clientCertification.isEditing">
-                <input v-model="clientCertification.certificationDate" type="date" class="form-control-borderless" />
-              </template>
-              <template v-else>
-                {{ formatDate(clientCertification.certificationDate) }}
-              </template>
-            </td>
-            <td class="text-truncate" style="max-width: 250px" :title="clientCertification.notes">
-              <template v-if="clientCertification.isEditing">
-                <input v-model="clientCertification.notes" type="text" class="form-control-borderless" />
-              </template>
-              <template v-else>
-                {{ clientCertification.notes }}
-              </template>
-            </td>
-            <td class="text-center">
-              <div class="btn-group">
-                <template v-if="clientCertification.isEditing">
-                  <div class="icon-container save-container" @click="saveClientCertification(clientCertification)" title="Enregistrer">
+              </td>
+              <td><input type="date" class="form-control-borderless" v-model="newClientCertification.certificationDate" /></td>
+              <td><input type="text" class="form-control-borderless" v-model="newClientCertification.notes" placeholder="Notes" /></td>
+              <td class="text-center">
+                <div class="action-icons">
+                  <div class="icon-container save-container" @click="saveNewClientCertification" title="Enregistrer">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
                       <path
                         d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
@@ -206,7 +316,7 @@
                       />
                     </svg>
                   </div>
-                  <div class="icon-container cancel-container" @click="cancelEdit(clientCertification)" title="Annuler">
+                  <div class="icon-container cancel-container" @click="cancelNewClientCertification" title="Annuler">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
                       <path
                         d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
@@ -214,99 +324,9 @@
                       />
                     </svg>
                   </div>
-                </template>
-                <template v-else>
-                  <div class="action-icons">
-                    <div class="icon-container edit-container" @click="editClientCertification(clientCertification)" title="Modifier">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-pencil-fill"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
-                        />
-                      </svg>
-                    </div>
-                    <div class="icon-container delete-container" @click="prepareRemove(clientCertification)" title="Supprimer">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="26"
-                        height="26"
-                        fill="currentColor"
-                        class="bi bi-x"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    </div>
-                    <div class="icon-container view-container" @click="viewClientCertification(clientCertification)" title="Voir">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-eye"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"
-                        />
-                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
-                      </svg>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </td>
-          </tr>
-
-          <tr v-if="showAddRow" class="add-row">
-            <td>
-              <select v-model="newClientCertification.client" class="form-control-borderless">
-                <option value="">Sélectionner un client</option>
-                <option v-for="client in clients" :key="client.id" :value="client">
-                  {{ client.name }}
-                </option>
-              </select>
-            </td>
-            <td>
-              <select v-model="newClientCertification.certif" class="form-control-borderless">
-                <option value="">Sélectionner une certification</option>
-                <option v-for="certification in certifications" :key="certification.id" :value="certification">
-                  {{ certification.name }}
-                </option>
-              </select>
-            </td>
-            <td><input type="date" class="form-control-borderless" v-model="newClientCertification.certificationDate" /></td>
-            <td><input type="text" class="form-control-borderless" v-model="newClientCertification.notes" placeholder="Notes" /></td>
-            <td class="text-center">
-              <div class="action-icons">
-                <div class="icon-container save-container" @click="saveNewClientCertification" title="Enregistrer">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
-                    <path
-                      d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
-                      fill="currentColor"
-                    />
-                  </svg>
                 </div>
-                <div class="icon-container cancel-container" @click="cancelNewClientCertification" title="Annuler">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
-                    <path
-                      d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </td>
-          </tr>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -319,7 +339,10 @@
           <div class="card h-100 client-certification-card">
             <div class="card-header d-flex justify-content-between align-items-center">
               <h6 class="mb-0 font-weight-bold">
-                <router-link class="text-primary" :to="{ name: 'ClientCertificationView', params: { clientCertificationId: clientCertification.id } }">
+                <router-link
+                  class="text-primary"
+                  :to="{ name: 'ClientCertificationView', params: { clientCertificationId: clientCertification.id } }"
+                >
                   #{{ clientCertification.id }}
                 </router-link>
               </h6>
@@ -372,7 +395,10 @@
                     </svg>
                     Supprimer
                   </a>
-                  <router-link class="dropdown-item" :to="{ name: 'ClientCertificationView', params: { clientCertificationId: clientCertification.id } }">
+                  <router-link
+                    class="dropdown-item"
+                    :to="{ name: 'ClientCertificationView', params: { clientCertificationId: clientCertification.id } }"
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -427,7 +453,10 @@
                   <div class="info-row">
                     <span class="info-label">Client:</span>
                     <span class="info-value">
-                      <router-link v-if="clientCertification.client" :to="{ name: 'ClientView', params: { clientId: clientCertification.client.id } }">
+                      <router-link
+                        v-if="clientCertification.client"
+                        :to="{ name: 'ClientView', params: { clientId: clientCertification.client.id } }"
+                      >
                         {{ clientCertification.client.name }}
                       </router-link>
                     </span>
@@ -435,7 +464,10 @@
                   <div class="info-row">
                     <span class="info-label">Certification:</span>
                     <span class="info-value">
-                      <router-link v-if="clientCertification.certif" :to="{ name: 'CertificationView', params: { certificationId: clientCertification.certif.id } }">
+                      <router-link
+                        v-if="clientCertification.certif"
+                        :to="{ name: 'CertificationView', params: { certificationId: clientCertification.certif.id } }"
+                      >
                         {{ clientCertification.certif.name }}
                       </router-link>
                     </span>
@@ -520,7 +552,11 @@
         </div>
       </template>
       <div class="modal-body">
-        <p id="jhi-delete-clientCertification-heading" class="mb-0" v-text="t$('sdiFrontendApp.clientCertification.delete.question', { id: removeId })"></p>
+        <p
+          id="jhi-delete-clientCertification-heading"
+          class="mb-0"
+          v-text="t$('sdiFrontendApp.clientCertification.delete.question', { id: removeId })"
+        ></p>
       </div>
       <template #modal-footer>
         <div class="w-100">
@@ -545,9 +581,7 @@
   <section class="section"></section>
 </template>
 
-<script lang="ts" src="./client-certification.component.ts">
-
-</script>
+<script lang="ts" src="./client-certification.component.ts"></script>
 
 <style scoped>
 .button {

@@ -2,7 +2,8 @@ import { type Ref, defineComponent, inject, onMounted, ref, computed, watch } fr
 import { useI18n } from 'vue-i18n';
 
 import CertificationService from './certification.service';
-import { type ICertification } from '@/shared/model/certification.model';
+import CertificationVersionService from './certification-version.service';
+import { type ICertification, type ICertificationVersion } from '@/shared/model/certification.model';
 import { useAlertService } from '@/shared/alert/alert.service';
 
 export default defineComponent({
@@ -11,6 +12,7 @@ export default defineComponent({
   setup() {
     const { t: t$ } = useI18n();
     const certificationService = inject('certificationService', () => new CertificationService());
+    const certificationVersionService = inject('certificationVersionService', () => new CertificationVersionService());
     const alertService = inject('alertService', () => useAlertService(), true);
 
     const certifications: Ref<ICertification[]> = ref([]);
@@ -37,6 +39,33 @@ export default defineComponent({
       expireDate: '',
     });
 
+    // Variables pour le modal des versions
+    const versionsModal = ref(null);
+    const selectedCertification = ref(null);
+    const certificationVersions = ref([]);
+    const allCertificationVersions = ref([]);
+    const filteredVersions = ref([]);
+    const versionViewMode = ref('list');
+    const versionSearchTerm = ref('');
+    const versionSearchTimeout = ref(null);
+    const isVersionFetching = ref(false);
+    const showAddVersionRow = ref(false);
+    const removeVersionId = ref(null);
+    const removeVersionEntity = ref(null);
+
+    // Pagination des versions
+    const versionCurrentPage = ref(1);
+    const versionItemsPerPage = ref(5);
+    const versionTotalItems = ref(0);
+
+    const newVersion = ref({
+      version: '',
+      description: '',
+      createDate: new Date().toISOString().split('T')[0],
+      expireDate: null,
+      certification: null,
+    });
+
     const paginatedCertifications = computed(() => {
       const start = (currentPage.value - 1) * itemsPerPage.value;
       const end = start + itemsPerPage.value;
@@ -55,7 +84,33 @@ export default defineComponent({
       return `${start}-${end} / ${totalItems.value}`;
     });
 
-    const formatDate = (dateString) => {
+    // Computed properties pour la pagination des versions
+    const paginatedVersions = computed(() => {
+      const start = (versionCurrentPage.value - 1) * versionItemsPerPage.value;
+      const end = start + versionItemsPerPage.value;
+      return filteredVersions.value.slice(start, end);
+    });
+
+    const versionTotalPages = computed(() => {
+      return Math.ceil(versionTotalItems.value / versionItemsPerPage.value);
+    });
+
+    const isVersionPrevDisabled = computed(() => {
+      return versionCurrentPage.value <= 1;
+    });
+
+    const isVersionNextDisabled = computed(() => {
+      return versionCurrentPage.value >= versionTotalPages.value;
+    });
+
+    const versionPaginationInfo = computed(() => {
+      if (versionTotalItems.value === 0) return '0-0 / 0';
+      const start = (versionCurrentPage.value - 1) * versionItemsPerPage.value + 1;
+      const end = Math.min(start + versionItemsPerPage.value - 1, versionTotalItems.value);
+      return `${start}-${end} / ${versionTotalItems.value}`;
+    });
+
+    const formatDate = dateString => {
       if (!dateString) return '';
       const date = new Date(dateString);
       return date.toLocaleDateString();
@@ -73,6 +128,27 @@ export default defineComponent({
       totalItems.value = certifications.value?.length || 0;
     };
 
+    // Méthodes de pagination pour les versions
+    const goToVersionNextPage = () => {
+      if (!isVersionNextDisabled.value) {
+        versionCurrentPage.value++;
+      }
+    };
+
+    const goToVersionPrevPage = () => {
+      if (!isVersionPrevDisabled.value) {
+        versionCurrentPage.value--;
+      }
+    };
+
+    const updateVersionTotalItems = () => {
+      if (filteredVersions.value) {
+        versionTotalItems.value = filteredVersions.value.length;
+      } else {
+        versionTotalItems.value = 0;
+      }
+    };
+
     const handleSearch = () => {
       if (searchTimeout.value) clearTimeout(searchTimeout.value);
       searchTimeout.value = setTimeout(() => {
@@ -80,13 +156,36 @@ export default defineComponent({
           certifications.value = [...allCertifications.value];
         } else {
           const searchLower = searchTerm.value.toLowerCase();
-          certifications.value = allCertifications.value.filter(cert =>
-            (cert.name && cert.name.toLowerCase().includes(searchLower)) ||
-            (cert.description && cert.description.toLowerCase().includes(searchLower))
+          certifications.value = allCertifications.value.filter(
+            cert =>
+              (cert.name && cert.name.toLowerCase().includes(searchLower)) ||
+              (cert.description && cert.description.toLowerCase().includes(searchLower)),
           );
         }
         updateTotalItems();
         currentPage.value = 1;
+      }, 300);
+    };
+
+    // Méthode de recherche pour les versions
+    const handleVersionSearch = () => {
+      if (versionSearchTimeout.value) {
+        clearTimeout(versionSearchTimeout.value);
+      }
+
+      versionSearchTimeout.value = setTimeout(() => {
+        if (versionSearchTerm.value.trim() === '') {
+          filteredVersions.value = [...certificationVersions.value];
+        } else {
+          const searchTermLower = versionSearchTerm.value.toLowerCase();
+          filteredVersions.value = certificationVersions.value.filter(
+            version =>
+              (version.version && version.version.toLowerCase().includes(searchTermLower)) ||
+              (version.description && version.description.toLowerCase().includes(searchTermLower)),
+          );
+        }
+        updateVersionTotalItems();
+        versionCurrentPage.value = 1;
       }, 300);
     };
 
@@ -129,10 +228,7 @@ export default defineComponent({
     const removeCertification = async () => {
       try {
         await certificationService().delete(removeId.value);
-        alertService.showInfo(
-          t$('sdiFrontendApp.certification.deleted', { param: removeId.value }).toString(),
-          { variant: 'danger' }
-        );
+        alertService.showInfo(t$('sdiFrontendApp.certification.deleted', { param: removeId.value }).toString(), { variant: 'danger' });
 
         certifications.value = certifications.value.filter(cert => cert.id !== removeId.value);
         allCertifications.value = allCertifications.value.filter(cert => cert.id !== removeId.value);
@@ -192,13 +288,15 @@ export default defineComponent({
 
     const editCertification = certification => {
       certifications.value.forEach(cert => (cert.showDropdown = false));
-      certification.originalData = JSON.parse(JSON.stringify({
-        name: certification.name,
-        description: certification.description,
-        createDate: certification.createDate,
-        updateDate: certification.updateDate,
-        expireDate: certification.expireDate
-      }));
+      certification.originalData = JSON.parse(
+        JSON.stringify({
+          name: certification.name,
+          description: certification.description,
+          createDate: certification.createDate,
+          updateDate: certification.updateDate,
+          expireDate: certification.expireDate,
+        }),
+      );
       certification.isEditing = true;
     };
 
@@ -215,7 +313,7 @@ export default defineComponent({
           description: certification.description,
           createDate: certification.createDate,
           updateDate: new Date().toISOString().split('T')[0],
-          expireDate: certification.expireDate
+          expireDate: certification.expireDate,
         };
 
         const response = await certificationService().update(toSend);
@@ -254,18 +352,230 @@ export default defineComponent({
       certification.showDropdown = !certification.showDropdown;
     };
 
-    watch(certifications, () => {
-      updateTotalItems();
-      if (currentPage.value > totalPages.value && totalPages.value > 0) {
-        currentPage.value = totalPages.value;
+    // Méthodes pour le modal des versions
+    const openVersionsModal = async certification => {
+      selectedCertification.value = certification;
+
+      // Réinitialiser les variables de pagination et de recherche
+      versionCurrentPage.value = 1;
+      versionSearchTerm.value = '';
+
+      // Récupérer les versions pour cette certification
+      await retrieveVersionsForCertification(certification.id);
+
+      // Initialiser la nouvelle version avec la certification sélectionnée
+      newVersion.value = {
+        version: '',
+        description: '',
+        createDate: new Date().toISOString().split('T')[0],
+        updateDate: new Date().toISOString().split('T')[0],
+        certification: certification,
+      };
+
+      // Ouvrir le modal
+      versionsModal.value.show();
+    };
+
+    const closeVersionsModal = () => {
+      versionsModal.value.hide();
+      showAddVersionRow.value = false;
+    };
+
+    const retrieveVersionsForCertification = async certificationId => {
+      isVersionFetching.value = true;
+      try {
+        // Récupérer toutes les versions
+        const res = await certificationVersionService().retrieve();
+
+        // Filtrer les versions pour cette certification
+        const certVersions = res.data
+          .filter(version => version.certification && version.certification.id === certificationId)
+          .map(version => ({
+            ...version,
+            isEditing: false,
+            showDropdown: false,
+            originalData: { ...version },
+          }));
+
+        certificationVersions.value = certVersions;
+        allCertificationVersions.value = [...certVersions];
+        filteredVersions.value = [...certVersions];
+        updateVersionTotalItems();
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      } finally {
+        isVersionFetching.value = false;
       }
-    }, { deep: true });
+    };
+
+    const editCertificationVersion = version => {
+      certificationVersions.value.forEach(v => {
+        if (v.showDropdown) {
+          v.showDropdown = false;
+        }
+      });
+
+      version.originalData = { ...version };
+      version.isEditing = true;
+    };
+
+    const saveCertificationVersion = async version => {
+      try {
+        const dataToSend = {
+          id: version.id,
+          version: version.version,
+          description: version.description,
+          createDate: version.createDate,
+          updateDate: version.updateDate,
+          certification: version.certification,
+        };
+
+        const response = await certificationVersionService().update(dataToSend);
+
+        const updatedVersion = {
+          ...response,
+          isEditing: false,
+          showDropdown: false,
+          originalData: { ...response },
+        };
+
+        const updateInList = (list, updatedItem) => {
+          const index = list.findIndex(item => item.id === updatedItem.id);
+          if (index !== -1) {
+            list[index] = updatedItem;
+          }
+        };
+
+        updateInList(certificationVersions.value, updatedVersion);
+        updateInList(allCertificationVersions.value, updatedVersion);
+        updateInList(filteredVersions.value, updatedVersion);
+
+        alertService.showInfo('Version mise à jour avec succès.', { variant: 'success' });
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
+    };
+
+    const cancelVersionEdit = version => {
+      Object.assign(version, version.originalData);
+      version.isEditing = false;
+    };
+
+    const saveNewVersion = async () => {
+      if (!newVersion.value.version) {
+        alertService.showInfo('Le champ version est requis.', { variant: 'danger' });
+        return;
+      }
+
+      try {
+        const response = await certificationVersionService().create(newVersion.value);
+        const addedVersion = {
+          ...response,
+          isEditing: false,
+          showDropdown: false,
+          originalData: { ...response },
+        };
+
+        certificationVersions.value.push(addedVersion);
+        allCertificationVersions.value.push(addedVersion);
+        filteredVersions.value.push(addedVersion);
+        updateVersionTotalItems();
+
+        showAddVersionRow.value = false;
+        newVersion.value = {
+          version: '',
+          description: '',
+          createDate: new Date().toISOString().split('T')[0],
+          updateDate: new Date().toISOString().split('T')[0],
+          certification: selectedCertification.value,
+        };
+
+        alertService.showInfo('Version ajoutée avec succès.', { variant: 'success' });
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
+    };
+
+    const cancelNewVersion = () => {
+      showAddVersionRow.value = false;
+      newVersion.value = {
+        version: '',
+        description: '',
+        createDate: new Date().toISOString().split('T')[0],
+        updateDate: new Date().toISOString().split('T')[0],
+        certification: selectedCertification.value,
+      };
+    };
+
+    const prepareRemoveVersion = version => {
+      certificationVersions.value.forEach(v => {
+        if (v.showDropdown) {
+          v.showDropdown = false;
+        }
+      });
+
+      removeVersionId.value = version.id;
+      removeVersionEntity.value.show();
+    };
+
+    const closeVersionDialog = () => {
+      removeVersionEntity.value.hide();
+    };
+
+    const removeCertificationVersion = async () => {
+      try {
+        await certificationVersionService().delete(removeVersionId.value);
+        const message = t$('sdiFrontendApp.certificationVersion.deleted', { param: removeVersionId.value }).toString();
+        alertService.showInfo(message, { variant: 'danger' });
+
+        const removeFromList = (list, id) => {
+          return list.filter(item => item.id !== id);
+        };
+
+        certificationVersions.value = removeFromList(certificationVersions.value, removeVersionId.value);
+        allCertificationVersions.value = removeFromList(allCertificationVersions.value, removeVersionId.value);
+        filteredVersions.value = removeFromList(filteredVersions.value, removeVersionId.value);
+        updateVersionTotalItems();
+
+        removeVersionId.value = null;
+        closeVersionDialog();
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
+    };
+
+    watch(
+      certifications,
+      () => {
+        updateTotalItems();
+        if (currentPage.value > totalPages.value && totalPages.value > 0) {
+          currentPage.value = totalPages.value;
+        }
+      },
+      { deep: true },
+    );
+
+    watch(
+      filteredVersions,
+      () => {
+        updateVersionTotalItems();
+        if (versionCurrentPage.value > versionTotalPages.value && versionTotalPages.value > 0) {
+          versionCurrentPage.value = versionTotalPages.value;
+        }
+      },
+      { deep: true },
+    );
 
     onMounted(async () => {
       await retrieveCertifications();
+      versionsModal.value = ref('versionsModal');
+      removeEntity.value = ref('removeEntity');
+      removeVersionEntity.value = ref('removeVersionEntity');
+
       document.addEventListener('click', event => {
         if (!event.target.closest('.dropdown-menu-container')) {
           certifications.value.forEach(cert => (cert.showDropdown = false));
+          certificationVersions.value.forEach(item => (item.showDropdown = false));
         }
       });
     });
@@ -289,7 +599,6 @@ export default defineComponent({
       saveCertification,
       cancelEdit,
       toggleDropdown,
-      clear,
       t$,
       currentPage,
       itemsPerPage,
@@ -304,6 +613,38 @@ export default defineComponent({
       searchTerm,
       handleSearch,
       formatDate,
+      // Modal versions
+      versionsModal,
+      selectedCertification,
+      openVersionsModal,
+      closeVersionsModal,
+      versionViewMode,
+      filteredVersions,
+      paginatedVersions,
+      versionSearchTerm,
+      handleVersionSearch,
+      isVersionFetching,
+      versionCurrentPage,
+      versionItemsPerPage,
+      versionTotalItems,
+      versionTotalPages,
+      isVersionPrevDisabled,
+      isVersionNextDisabled,
+      versionPaginationInfo,
+      goToVersionNextPage,
+      goToVersionPrevPage,
+      showAddVersionRow,
+      newVersion,
+      saveNewVersion,
+      cancelNewVersion,
+      editCertificationVersion,
+      saveCertificationVersion,
+      cancelVersionEdit,
+      prepareRemoveVersion,
+      removeVersionId,
+      removeVersionEntity,
+      closeVersionDialog,
+      removeCertificationVersion,
     };
   },
 });

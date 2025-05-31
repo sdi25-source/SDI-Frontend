@@ -23,7 +23,8 @@
       "createDate": "Create Date",
       "updateDate": "Update Date",
       "expireDate": "Expire Date",
-      "clientCertification": "Client Certification"
+      "clientCertification": "Client Certification",
+      "version": "Version"
     }
   }
 }

@@ -12,7 +12,7 @@
       "updated": "A Client is updated with identifier { param }",
       "deleted": "A Client is deleted with identifier { param }",
       "delete": {
-        "question": "Are you sure you want to delete Client { id }?"
+        "question": "Are you sure you want to delete this Client { id }?"
       },
       "detail": {
         "title": "Client"
@@ -36,11 +36,14 @@
       "countryName": "Country Name",
       "region": "Region",
       "productDeployement": "Product Deployement",
-      "size": "Size",
+      "size": "Client Size",
       "clientType": "Client Type",
       "certif": "Certif",
       "country": "Country",
-      "relatedInformation": "Releted Information"
+      "relatedInformation": "Releted Information",
+      "selectCountry": "Select a country",
+      "selectType": "Select a Type",
+      "selectSize": "Select a Size"
     }
   }
 }

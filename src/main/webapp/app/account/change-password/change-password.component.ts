@@ -6,6 +6,7 @@ import axios from 'axios';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
+  name: 'PasswordSettings',
   validations() {
     return {
       resetPassword: {
@@ -60,11 +61,25 @@ export default defineComponent({
           .then(() => {
             this.success = 'OK';
             this.error = null;
+            this.resetPassword = {
+              currentPassword: null,
+              newPassword: null,
+              confirmPassword: null,
+            };
           })
           .catch(() => {
             this.success = null;
             this.error = 'ERROR';
           });
+      }
+    },
+    closeAlert(alertType: string): void {
+      if (alertType === 'success') {
+        this.success = null;
+      } else if (alertType === 'error') {
+        this.error = null;
+      } else if (alertType === 'doNotMatch') {
+        this.doNotMatch = null;
       }
     },
   },

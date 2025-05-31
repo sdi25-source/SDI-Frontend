@@ -5,16 +5,10 @@ import ClientTypeService from '../client-type/client-type.service';
 import useDataUtils from '@/shared/data/data-utils.service';
 import { useAlertService } from '@/shared/alert/alert.service';
 import ClientSizeService from '@/entities/client-size/client-size.service.ts';
-import ClientUpdate from '@/entities/client/client-update.vue';
-import ClientDetails from '@/entities/client/client-details.vue';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'Client',
-  components: {
-    ClientUpdate,
-    ClientDetails,
-  },
   setup() {
     const { t: t$ } = useI18n();
     const dataUtils = useDataUtils();
@@ -32,7 +26,7 @@ export default defineComponent({
 
     // Pagination
     const currentPage = ref(1);
-    const itemsPerPage = ref(5);
+    const itemsPerPage = ref(10);
     const totalItems = ref(0);
 
     const isFetching = ref(false);
@@ -166,6 +160,7 @@ export default defineComponent({
 
         clients.value = clientsWithDetails;
         allClients.value = clientsWithDetails;
+        console.log(allClients.value);
       } catch (err) {
         alertService.showHttpError(err.response);
       } finally {
@@ -271,11 +266,6 @@ export default defineComponent({
     openEditModal(id) {
       this.selectedClientId = id;
       this.showEditModal = true;
-    },
-    handleClientUpdated() {
-      this.showEditModal = false;
-      this.showCreateModal = false; // Close both modals
-      window.location.reload(); // Reload the entire page
     },
   },
 });

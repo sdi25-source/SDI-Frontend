@@ -22,7 +22,7 @@ export default defineComponent({
     const searchTimeout = ref(null);
 
     const currentPage = ref(1);
-    const itemsPerPage = ref(5);
+    const itemsPerPage = ref(10);
     const totalItems = ref(0);
 
     const isFetching = ref(false);
@@ -56,32 +56,10 @@ export default defineComponent({
       return `${start}-${end} / ${totalItems.value}`;
     });
 
-    const formatDate = (dateString) => {
+    const formatDate = dateString => {
       if (!dateString) return '';
       const date = new Date(dateString);
       return date.toLocaleDateString();
-    };
-
-    const getEventTypeClass = (type) => {
-      if (!type) return '';
-
-      const typeLower = type.toLowerCase();
-
-      if (typeLower.includes('meeting') || typeLower.includes('réunion')) {
-        return 'type-meeting';
-      } else if (typeLower.includes('call') || typeLower.includes('appel')) {
-        return 'type-call';
-      } else if (typeLower.includes('email') || typeLower.includes('mail')) {
-        return 'type-email';
-      } else if (typeLower.includes('visit') || typeLower.includes('visite')) {
-        return 'type-visit';
-      } else if (typeLower.includes('demo') || typeLower.includes('présentation')) {
-        return 'type-demo';
-      } else if (typeLower.includes('follow') || typeLower.includes('suivi')) {
-        return 'type-followup';
-      } else {
-        return 'type-other';
-      }
     };
 
     const goToNextPage = () => {
@@ -103,9 +81,10 @@ export default defineComponent({
           clientEventTypes.value = [...allClientEventTypes.value];
         } else {
           const searchLower = searchTerm.value.toLowerCase();
-          clientEventTypes.value = allClientEventTypes.value.filter(type =>
-            (type.type && type.type.toLowerCase().includes(searchLower)) ||
-            (type.description && type.description.toLowerCase().includes(searchLower))
+          clientEventTypes.value = allClientEventTypes.value.filter(
+            type =>
+              (type.type && type.type.toLowerCase().includes(searchLower)) ||
+              (type.description && type.description.toLowerCase().includes(searchLower)),
           );
         }
         updateTotalItems();
@@ -152,10 +131,7 @@ export default defineComponent({
     const removeClientEventType = async () => {
       try {
         await clientEventTypeService().delete(removeId.value);
-        alertService.showInfo(
-          t$('sdiFrontendApp.clientEventType.deleted', { param: removeId.value }).toString(),
-          { variant: 'danger' }
-        );
+        alertService.showInfo(t$('sdiFrontendApp.clientEventType.deleted', { param: removeId.value }).toString(), { variant: 'danger' });
 
         clientEventTypes.value = clientEventTypes.value.filter(type => type.id !== removeId.value);
         allClientEventTypes.value = allClientEventTypes.value.filter(type => type.id !== removeId.value);
@@ -195,7 +171,7 @@ export default defineComponent({
           updateDate: new Date().toISOString().split('T')[0],
         };
 
-        alertService.showAlert('Type d\'événement ajouté avec succès.', 'success', { variant: 'success' });
+        alertService.showAlert("Type d'événement ajouté avec succès.", 'success', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       }
@@ -213,12 +189,14 @@ export default defineComponent({
 
     const editClientEventType = clientEventType => {
       clientEventTypes.value.forEach(type => (type.showDropdown = false));
-      clientEventType.originalData = JSON.parse(JSON.stringify({
-        type: clientEventType.type,
-        description: clientEventType.description,
-        createDate: clientEventType.createDate,
-        updateDate: clientEventType.updateDate,
-      }));
+      clientEventType.originalData = JSON.parse(
+        JSON.stringify({
+          type: clientEventType.type,
+          description: clientEventType.description,
+          createDate: clientEventType.createDate,
+          updateDate: clientEventType.updateDate,
+        }),
+      );
       clientEventType.isEditing = true;
     };
 
@@ -251,7 +229,7 @@ export default defineComponent({
         const allIndex = allClientEventTypes.value.findIndex(type => type.id === clientEventType.id);
         if (allIndex !== -1) allClientEventTypes.value.splice(allIndex, 1, updated);
 
-        alertService.showAlert('Type d\'événement mis à jour avec succès.', 'success', { variant: 'success' });
+        alertService.showAlert("Type d'événement mis à jour avec succès.", 'success', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       }
@@ -276,12 +254,16 @@ export default defineComponent({
       router.push({ name: 'ClientEventTypeView', params: { clientEventTypeId: clientEventType.id } });
     };
 
-    watch(clientEventTypes, () => {
-      updateTotalItems();
-      if (currentPage.value > totalPages.value && totalPages.value > 0) {
-        currentPage.value = totalPages.value;
-      }
-    }, { deep: true });
+    watch(
+      clientEventTypes,
+      () => {
+        updateTotalItems();
+        if (currentPage.value > totalPages.value && totalPages.value > 0) {
+          currentPage.value = totalPages.value;
+        }
+      },
+      { deep: true },
+    );
 
     onMounted(async () => {
       await retrieveClientEventTypes();
@@ -327,7 +309,6 @@ export default defineComponent({
       searchTerm,
       handleSearch,
       formatDate,
-      getEventTypeClass,
     };
   },
 });

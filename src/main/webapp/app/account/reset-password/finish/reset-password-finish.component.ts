@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useVuelidate } from '@vuelidate/core';
 import { maxLength, minLength, required, sameAs } from '@vuelidate/validators';
 import type LoginService from '@/account/login.service';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -31,6 +32,7 @@ export default defineComponent({
   setup() {
     const loginService = inject<LoginService>('loginService');
 
+    const router = useRouter();
     const doNotMatch: Ref<string> = ref(null);
     const success: Ref<string> = ref(null);
     const error: Ref<string> = ref(null);
@@ -40,9 +42,10 @@ export default defineComponent({
       newPassword: null,
       confirmPassword: null,
     });
+    const isLoading: Ref<boolean> = ref(false); // Ajout de la variable isLoading
 
     const openLogin = () => {
-      loginService.openLogin();
+      router.push('/login');
     };
 
     return {
@@ -53,26 +56,31 @@ export default defineComponent({
       keyMissing,
       key,
       resetAccount,
+      isLoading,
       v$: useVuelidate(),
       t$: useI18n().t,
     };
   },
   methods: {
     finishReset() {
+      this.isLoading = true; // Activer le spinner
       this.doNotMatch = null;
       this.success = null;
       this.error = null;
       if (this.resetAccount.newPassword !== this.resetAccount.confirmPassword) {
         this.doNotMatch = 'ERROR';
+        this.isLoading = false;
       } else {
         return axios
           .post('api/account/reset-password/finish', { key: this.key, newPassword: this.resetAccount.newPassword })
           .then(() => {
             this.success = 'OK';
+            this.isLoading = false;
           })
           .catch(() => {
             this.success = null;
             this.error = 'ERROR';
+            this.isLoading = false;
           });
       }
     },

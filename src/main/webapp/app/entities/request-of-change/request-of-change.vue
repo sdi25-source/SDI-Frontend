@@ -9,6 +9,7 @@
           data-cy="entityCreateButton"
           class="btn button-primary btn-sm mr-3 rounded-1"
         >
+          <font-awesome-icon icon="plus"></font-awesome-icon>
           <span v-text="t$('global.new')"></span>
         </button>
         <h5 id="page-heading" class="m-0 font-weight-bold" data-cy="RequestOfChangeHeading">
@@ -103,9 +104,8 @@
                     <th scope="col"><span v-text="t$('sdiFrontendApp.requestOfChange.client')"></span></th>
                     <th scope="col"><span v-text="t$('sdiFrontendApp.requestOfChange.productVersion')"></span></th>
                     <th scope="col"><span>Request Type</span></th>
-                    <th scope="col"><span>Modules affect</span></th>
                     <th scope="col"><span v-text="t$('sdiFrontendApp.requestOfChange.createDate')"></span></th>
-                    <th scope="col" width="160" class="text-center">Actions</th>
+                    <th scope="col" class="text-center"><span>Actions</span></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -144,29 +144,6 @@
                         {{ request.type }}
                       </div>
                     </td>
-
-                    <td>
-                      <div
-                        class="alert alert-primary d-inline-flex align-items-center py-1 px-2 btn-sm"
-                        style="font-size: 0.9rem; line-height: 1; gap: 0.25rem; margin-top: 0px; margin-bottom: 0px; cursor: pointer"
-                        @click="viewRequestModules(request)"
-                        title="Voir les modules"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="14"
-                          height="14"
-                          fill="currentColor"
-                          class="bi bi-layers"
-                          viewBox="0 0 512 512"
-                        >
-                          <path
-                            d="M345 39.1L472.8 168.4c52.4 53 52.4 138.2 0 191.2L360.8 472.9c-9.3 9.4-24.5 9.5-33.9 .2s-9.5-24.5-.2-33.9L438.6 325.9c33.9-34.3 33.9-89.4 0-123.7L310.9 72.9c-9.3-9.4-9.2-24.6 .2-33.9s24.6-9.2 33.9 .2zM0 229.5L0 80C0 53.5 21.5 32 48 32l149.5 0c17 0 33.3 6.7 45.3 18.7l168 168c25 25 25 65.5 0 90.5L277.3 442.7c-25 25-65.5 25-90.5 0l-168-168C6.7 262.7 0 246.5 0 229.5zM144 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"
-                          />
-                        </svg>
-                        Modules
-                      </div>
-                    </td>
                     <td>{{ formatDate(request.createDate) }}</td>
                     <td class="text-center">
                       <div class="action-icons">
@@ -184,6 +161,9 @@
                             />
                           </svg>
                         </div>
+                        <div class="icon-container view-container" data-cy="entityDetailsButton" @click="viewRequestDetails(request)">
+                          <font-awesome-icon icon="eye" style="font-size: 0.8rem"></font-awesome-icon>
+                        </div>
                         <div class="icon-container delete-container" @click="prepareRemove(request)" title="Supprimer">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -198,6 +178,26 @@
                               fill="currentColor"
                             />
                           </svg>
+                        </div>
+                        <div
+                          class="alert alert-primary d-inline-flex align-items-center py-1 px-2 btn-sm"
+                          style="font-size: 0.9rem; line-height: 1; gap: 0.25rem; margin-top: 0px; margin-bottom: 0px; cursor: pointer"
+                          @click="viewRequestModules(request)"
+                          title="Voir les modules"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            fill="currentColor"
+                            class="bi bi-layers"
+                            viewBox="0 0 512 512"
+                          >
+                            <path
+                              d="M345 39.1L472.8 168.4c52.4 53 52.4 138.2 0 191.2L360.8 472.9c-9.3 9.4-24.5 9.5-33.9 .2s-9.5-24.5-.2-33.9L438.6 325.9c33.9-34.3 33.9-89.4 0-123.7L310.9 72.9c-9.3-9.4-9.2-24.6 .2-33.9s24.6-9.2 33.9 .2zM0 229.5L0 80C0 53.5 21.5 32 48 32l149.5 0c17 0 33.3 6.7 45.3 18.7l168 168c25 25 25 65.5 0 90.5L277.3 442.7c-25 25-65.5 25-90.5 0l-168-168C6.7 262.7 0 246.5 0 229.5zM144 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"
+                            />
+                          </svg>
+                          Modules
                         </div>
                       </div>
                     </td>
@@ -227,7 +227,7 @@
                 d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"
               />
             </svg>
-            <span v-text="t$('sdiFrontendApp.requestOfChange.back')"></span>
+            <span>Hide</span>
           </button>
         </div>
         <div class="card-body">
@@ -343,7 +343,7 @@
 
           <!-- Request Details -->
           <div class="row g-0 p-3">
-            <div class="col-lg-12">
+            <div class="col-lg-12" v-if="selectedRequest.status === 'PENDING'">
               <div class="p-3">
                 <div class="mb-4 d-flex justify-content-between align-items-start">
                   <div class="flex-grow-1">
@@ -382,10 +382,6 @@
                     <p class="mb-3">{{ selectedRequest.type }}</p>
                   </div>
                 </div>
-                <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.status')"></h6>
-                <div :class="['status-badge', getStatusColorClass(selectedRequest.status)]">
-                  {{ getStatusText(selectedRequest.status) }}
-                </div>
 
                 <!-- Modules affectés -->
                 <div class="modules-section mt-4">
@@ -401,8 +397,142 @@
                           :key="module.id"
                           class="badge bg-light text-dark p-2 rounded-pill"
                         >
-                          {{ module.module ? module.module.name : 'N/A' }} <span class="text-muted">{{ ' - ' }}{{ module.version }}</span>
+                          {{ module.module ? module.module.name : 'N/A' }} <span class="text-muted">{{ ' - v ' }}{{ module.version }}</span>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-12" v-if="selectedRequest.status === 'APPROVED'">
+              <div class="p-3">
+                <div class="alert alert-success text-center mb-5">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="currentColor"
+                    class="bi bi-check-circle mr-2"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                    <path
+                      d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"
+                    />
+                  </svg>
+                  <span v-text="t$('sdiFrontendApp.requestOfChange.requestApproved')"></span>
+                </div>
+
+                <!-- Request Details -->
+                <div class="row mb-4">
+                  <div class="col-md-6">
+                    <h6 class="text-muted mb-2 small">Product Version</h6>
+                    <p class="mb-0">
+                      {{ selectedRequest.productVersion?.product?.name }}{{ ' - '
+                      }}{{ selectedRequest.productVersion ? selectedRequest.productVersion.version : '-' }}
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.customisationLevel')"></h6>
+                    <p class="mb-3 badge bg-light text-dark p-2 rounded-pill">
+                      {{ selectedRequest.customisationLevel ? selectedRequest.customisationLevel.level : '-' }}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Modules affectés -->
+                <div class="modules-section mt-4">
+                  <h6 class="text-muted mb-3 small" v-text="t$('sdiFrontendApp.requestOfChange.moduleVersion')"></h6>
+                  <div class="card">
+                    <div class="card-body">
+                      <div v-if="!selectedRequest.moduleVersions || selectedRequest.moduleVersions.length === 0" class="text-center py-3">
+                        <span class="text-muted" v-text="t$('sdiFrontendApp.requestOfChange.noModules')"></span>
+                      </div>
+                      <div v-else class="d-flex flex-wrap gap-2">
+                        <div
+                          v-for="module in selectedRequest.moduleVersions"
+                          :key="module.id"
+                          class="badge bg-light text-dark p-2 rounded-pill"
+                        >
+                          {{ module.module ? module.module.name : 'N/A' }} <span class="text-muted">{{ ' - v ' }}{{ module.version }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-12" v-if="selectedRequest.status === 'COMPLETED'">
+              <div class="p-3">
+                <div class="alert alert-success mb-4 d-flex align-items-center">
+                  <i class="fas fa-check-circle me-3" style="font-size: 1.5rem"></i>
+                  <div>
+                    <h6 class="mb-1">Processes completed successfully</h6>
+                    <p class="mb-0 text-muted">This request was completed and the customized product was created.</p>
+                  </div>
+                </div>
+
+                <div class="modules-section mt-4">
+                  <h6 class="text-muted mb-3 small">Customary product created</h6>
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="card-body">
+                        <p class="mb-2">
+                          <span>Basic Product :</span>
+                          <span class="badge bg-light text-dark p-2 rounded-pill">
+                            {{ selectedRequest.productVersion?.product?.name }}
+                            <span class="text-muted"
+                              >{{ ' - v ' }}{{ selectedRequest.productVersion ? selectedRequest.productVersion.version : '-' }}</span
+                            >
+                          </span>
+                        </p>
+                        <p class="mb-2">
+                          <span>Personalized version :</span>
+                          <span class="badge bg-light text-dark p-2 rounded-pill">
+                            {{ selectedRequest.productVersionResult?.product?.name }}
+                            <span class="text-muted"
+                              >{{ ' - v '
+                              }}{{ selectedRequest.productVersionResult ? selectedRequest.productVersionResult.version : '-' }}</span
+                            >
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-12" v-if="selectedRequest.status === 'REJECTED'">
+              <div class="p-3">
+                <div class="modules-section">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="alert text-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          fill="#dc3545"
+                          class="bi bi-x-circle mr-2"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                          <path
+                            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+                          />
+                        </svg>
+                        <span class="text-red" v-text="t$('sdiFrontendApp.requestOfChange.requestRejected')"></span>
+                        <p class="mt-2 mb-0 text-red">
+                          <span v-text="t$('sdiFrontendApp.requestOfChange.customizationNotApplicable')"></span>
+                          <strong
+                            >{{ selectedRequest.productVersion?.product?.name }}{{ ' - v '
+                            }}{{ selectedRequest.productVersion ? selectedRequest.productVersion.version : '-' }}</strong
+                          >
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -471,24 +601,6 @@
                   <polyline points="22 4 12 14.01 9 11.01"></polyline></svg
                 ><span v-text="t$('sdiFrontendApp.requestOfChange.AddNewProduct')"></span>
               </button>
-            </div>
-            <div v-if="selectedRequest.status === 'COMPLETED'">
-              <div class="alert alert-success d-inline-flex align-items-center py-1 px-2 btn-sm">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                  class="bi bi-check-circle mr-1"
-                  viewBox="0 0 16 16"
-                >
-                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                  <path
-                    d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"
-                  />
-                </svg>
-                New product version already created
-              </div>
             </div>
             <div v-if="selectedRequest.status === 'REJECTED'">
               <button class="button button-secondary btn-sm rounded-2" @click="changeRequestStatus('PENDING')">
@@ -774,9 +886,108 @@
               <div
                 v-for="module in selectedModuleRequest.moduleVersions"
                 :key="module.id"
-                class="badge bg-light text-dark p-2 rounded-pill"
+                class="badge bg-light text-dark p-2 rounded-pill position-relative"
               >
-                {{ module.module ? module.module.name : 'N/A' }} <span class="text-muted">{{ ' - ' }}{{ module.version }}</span>
+                {{ module.module ? module.module.name : 'N/A' }} <span class="text-muted">{{ ' - v ' }}{{ module.version }}</span>
+                <span class="remove-module-icon" @click="removeModule(module.id)" title="Supprimer le module">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                    <path
+                      d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- details Modal -->
+    <div class="modal-backdrop" v-if="showDetailsModal" @click="closeDetailsModal"></div>
+    <div class="modal-container" v-if="showDetailsModal" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Request Details</h5>
+          <button type="button" class="close-button" @click="closeDetailsModal" aria-label="Fermer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              class="icon"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="col-lg-12">
+            <div class="p-3">
+              <div class="mb-4 d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.description')"></h6>
+                  <p class="mb-0">{{ selectedRequest.description || ' ' }}</p>
+                </div>
+                <div class="ms-4 text-end">
+                  <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.createDate')"></h6>
+                  <div
+                    class="alert alert-secondary d-inline-flex align-items-center py-1 px-2 btn-sm"
+                    style="font-size: 0.9rem; line-height: 1; gap: 0.25rem; margin-top: 0px; margin-bottom: 0px"
+                  >
+                    {{ formatDate(selectedRequest.createDate) }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Request Details -->
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.client')"></h6>
+                  <p class="mb-3">{{ selectedRequest.client ? selectedRequest.client.name : '-' }}</p>
+
+                  <h6 class="text-muted mb-2 small">Product Version</h6>
+                  <p class="mb-0">
+                    {{ selectedRequest.productVersion?.product?.name }}{{ ' - v '
+                    }}{{ selectedRequest.productVersion ? selectedRequest.productVersion.version : '-' }}
+                  </p>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.customisationLevel')"></h6>
+                  <p class="mb-3 badge bg-light text-dark p-2 rounded-pill">
+                    {{ selectedRequest.customisationLevel ? selectedRequest.customisationLevel.level : '-' }}
+                  </p>
+                  <h6 class="text-muted mb-2 small">Request Type</h6>
+                  <p class="mb-3">{{ selectedRequest.type }}</p>
+                </div>
+              </div>
+
+              <!-- Modules affectés -->
+              <div class="modules-section mt-4">
+                <h6 class="text-muted mb-3 small" v-text="t$('sdiFrontendApp.requestOfChange.moduleVersion')"></h6>
+                <div class="card">
+                  <div class="card-body">
+                    <div v-if="!selectedRequest.moduleVersions || selectedRequest.moduleVersions.length === 0" class="text-center py-3">
+                      <span class="text-muted" v-text="t$('sdiFrontendApp.requestOfChange.noModule')"></span>
+                    </div>
+                    <div v-else class="d-flex flex-wrap gap-2">
+                      <div
+                        v-for="module in selectedRequest.moduleVersions"
+                        :key="module.id"
+                        class="badge bg-light text-dark p-2 rounded-pill"
+                      >
+                        {{ module.module ? module.module.name : 'N/A' }} <span class="text-muted">{{ ' - v ' }}{{ module.version }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -866,6 +1077,26 @@
 <script lang="ts" src="./request-of-change.component.ts"></script>
 
 <style scoped>
+.remove-module-icon {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  cursor: pointer;
+  background-color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+}
+
+.remove-module-icon:hover {
+  background-color: #dc3545;
+  color: #fff;
+}
 .badge-container {
   min-height: 30px;
   padding: 5px;

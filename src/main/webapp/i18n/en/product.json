@@ -27,6 +27,42 @@
       "module": "Module",
       "infraComponentVersion": "Infra Component Version",
       "config": "Configuaration"
+    },
+    "moduleVersion": {
+      "home": {
+        "title": "Module Versions"
+      },
+      "add": "Add Module Version",
+      "module": "Module",
+      "version": "Version",
+      "versionPlaceholder": "e.g., 1.0.0",
+      "notes": "Notes",
+      "notesPlaceholder": "Enter notes",
+      "features": "Features",
+      "viewFeatures": "View features of this module version",
+      "noModules": "No module available for this version",
+      "requiredFields": "Module and version are required",
+      "createdAndAssigned": "Module version created and assigned to product version"
+    },
+    "productVersion": {
+      "backToVersions": "Back to versions"
+    }
+  },
+  "global": {
+    "form": {
+      "selectModulePlaceholder": "Select a module",
+      "required": "This field is required"
+    },
+    "table": {
+      "actions": "Actions"
+    }
+  },
+  "entity": {
+    "action": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete"
     }
   }
 }

@@ -13,6 +13,7 @@ export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'App',
   components: {
+    Ribbon,
 
     'jhi-navbar': JhiNavbar,
     'login-form': LoginForm,

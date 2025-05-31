@@ -1,6 +1,11 @@
 {
   "sdiFrontendApp": {
     "requestOfChange": {
+      "requestRejected": "This request has been rejected.",
+      "customizationNotApplicable": "The customization cannot be applied to ",
+      "requestApproved": "This request has been accepted.",
+      "approvedExplanation": "The customization has been approved for",
+      "noModules": "No modules affected",
       "home": {
         "title": "Request Of Changes",
         "refreshListLabel": "Refresh list",

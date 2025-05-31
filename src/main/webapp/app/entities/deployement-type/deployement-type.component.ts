@@ -24,7 +24,7 @@ export default defineComponent({
     const searchTimeout = ref(null);
 
     const currentPage = ref(1);
-    const itemsPerPage = ref(5);
+    const itemsPerPage = ref(10);
     const totalItems = ref(0);
 
     const isFetching = ref(false);
@@ -37,7 +37,7 @@ export default defineComponent({
       type: '',
       notes: '',
       createDate: new Date().toISOString().split('T')[0],
-      updateDate: new Date().toISOString().split('T')[0]
+      updateDate: new Date().toISOString().split('T')[0],
     });
 
     const paginatedDeployementTypes = computed(() => {
@@ -78,9 +78,7 @@ export default defineComponent({
         } else {
           const searchLower = searchTerm.value.toLowerCase();
           deployementTypes.value = allDeployementTypes.value.filter(dt =>
-            Object.values(dt).some(
-              val => typeof val === 'string' && val.toLowerCase().includes(searchLower)
-            )
+            Object.values(dt).some(val => typeof val === 'string' && val.toLowerCase().includes(searchLower)),
           );
         }
         updateTotalItems();
@@ -131,10 +129,7 @@ export default defineComponent({
     const removeDeployementType = async () => {
       try {
         await deployementTypeService().delete(removeId.value);
-        alertService.showInfo(
-          t$('sdiFrontendApp.deployementType.deleted', { param: removeId.value }).toString(),
-          { variant: 'danger' }
-        );
+        alertService.showInfo(t$('sdiFrontendApp.deployementType.deleted', { param: removeId.value }).toString(), { variant: 'danger' });
 
         deployementTypes.value = deployementTypes.value.filter(dt => dt.id !== removeId.value);
         allDeployementTypes.value = allDeployementTypes.value.filter(dt => dt.id !== removeId.value);
@@ -171,7 +166,7 @@ export default defineComponent({
           type: '',
           notes: '',
           createDate: new Date().toISOString().split('T')[0],
-          updateDate: new Date().toISOString().split('T')[0]
+          updateDate: new Date().toISOString().split('T')[0],
         };
 
         alertService.showAlert('Type de déploiement ajouté avec succès.', 'success', { variant: 'success' });
@@ -186,18 +181,20 @@ export default defineComponent({
         type: '',
         notes: '',
         createDate: new Date().toISOString().split('T')[0],
-        updateDate: new Date().toISOString().split('T')[0]
+        updateDate: new Date().toISOString().split('T')[0],
       };
     };
 
     const editDeployementType = deployementType => {
       deployementTypes.value.forEach(dt => (dt.showDropdown = false));
-      deployementType.originalData = JSON.parse(JSON.stringify({
-        type: deployementType.type,
-        notes: deployementType.notes,
-        createDate: deployementType.createDate,
-        updateDate: deployementType.updateDate
-      }));
+      deployementType.originalData = JSON.parse(
+        JSON.stringify({
+          type: deployementType.type,
+          notes: deployementType.notes,
+          createDate: deployementType.createDate,
+          updateDate: deployementType.updateDate,
+        }),
+      );
       deployementType.isEditing = true;
     };
 
@@ -213,7 +210,7 @@ export default defineComponent({
           type: deployementType.type,
           notes: deployementType.notes,
           createDate: deployementType.createDate,
-          updateDate: new Date().toISOString().split('T')[0]
+          updateDate: new Date().toISOString().split('T')[0],
         };
 
         const response = await deployementTypeService().update(toSend);
@@ -255,12 +252,16 @@ export default defineComponent({
       router.push({ name: 'DeployementTypeView', params: { deployementTypeId: deployementType.id } });
     };
 
-    watch(deployementTypes, () => {
-      updateTotalItems();
-      if (currentPage.value > totalPages.value && totalPages.value > 0) {
-        currentPage.value = totalPages.value;
-      }
-    }, { deep: true });
+    watch(
+      deployementTypes,
+      () => {
+        updateTotalItems();
+        if (currentPage.value > totalPages.value && totalPages.value > 0) {
+          currentPage.value = totalPages.value;
+        }
+      },
+      { deep: true },
+    );
 
     onMounted(async () => {
       await retrieveDeployementTypes();

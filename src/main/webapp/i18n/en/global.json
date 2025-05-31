@@ -58,7 +58,8 @@
         "login": "Sign in",
         "logout": "Sign out",
         "register": "Register",
-        "profil": "Profil"
+        "profil": "Profil",
+        "profile": "Profile"
       },
       "admin": {
         "main": "Administration",

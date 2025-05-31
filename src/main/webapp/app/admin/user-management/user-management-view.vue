@@ -1,10 +1,17 @@
 <template>
-  <div v-if="user" class="card-body">
+  <div v-if="user" class="card-body pt-lg-5 container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+      <div class="d-flex align-items-center">
+        <h2 class="client-name mb-0">{{ user.firstName }}{{ ' ' }}{{ user.lastName }}</h2>
+      </div>
+      <span class="text-muted">
+        <span v-if="user.activated" class="badge bg-success text-white">Activated</span>
+        <span v-else class="badge bg-danger text-white">disabled</span>
+      </span>
+    </div>
+
     <!-- Informations principales -->
-    <h6 class="section-title">General information</h6>
-    <span v-if="user.activated" class="badge bg-success text-white">Activated</span>
-    <span v-else class="badge bg-danger text-white">disabled</span>
-    <div class="row">
+    <div class="row pt-3">
       <div class="col-md-6">
         <div class="info-group">
           <label class="info-label">Login</label>
@@ -20,17 +27,21 @@
     </div>
 
     <!-- Profils -->
-    <h6 class="section-title pt-3">User profiles</h6>
-    <div class="info-group">
-      <div class="info-value">
-        <span v-for="authority in user.authorities" :key="authority" class="badge bg-info-subtle text-dark rounded-1 me-2 mb-2">
-          {{ authority === 'ROLE_USER' ? 'MANAGER' : authority.replace('ROLE_', '') }}
-        </span>
+    <h6 class="section-title pt-5">User profiles</h6>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="info-group">
+          <div class="info-value">
+            <span v-for="authority in user.authorities" :key="authority" class="badge bg-info-subtle text-dark rounded-1 me-2 mb-2">
+              {{ authority === 'ROLE_USER' ? 'DELIVERY MANAGER' : authority.replace('ROLE_', '') }}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Dates -->
-    <h6 class="section-title pt-3">Time information</h6>
+    <h6 class="section-title pt-5">Time information</h6>
     <div class="row">
       <div class="col-md-6">
         <div class="info-group">
@@ -45,12 +56,50 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal Footer with Buttons -->
+    <div class="modal-footer">
+      <button type="submit" @click.prevent="previousState()" class="button button-secondary" data-cy="entityDetailsBackButton">
+        <font-awesome-icon icon="arrow-left"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.back')"></span>
+      </button>
+      <router-link :to="{ name: 'JhiUserEdit', params: { userId: user.login } }" custom v-slot="{ navigate }">
+        <button @click="navigate" class="button button-primary">
+          <font-awesome-icon icon="pencil-alt"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.edit')"></span>
+        </button>
+      </router-link>
+    </div>
   </div>
+  <div class="section"></div>
+  <div class="section"></div>
 </template>
 
 <script lang="ts" src="./user-management-view.component.ts"></script>
 
 <style scoped>
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+}
+
+.button-secondary {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.button-primary {
+  background-color: #0c2d57;
+  color: white;
+  border-color: #0c2d57;
+}
+
 .user-details.card {
   border: 1px solid rgba(0, 0, 0, 0.125);
   border-radius: 0.375rem;

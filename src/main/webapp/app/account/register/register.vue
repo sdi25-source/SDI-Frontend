@@ -278,12 +278,12 @@
 
 .login-form-container {
   flex: 1;
-  max-width: 470px;
+  max-width: 570px;
   display: flex;
   flex-direction: column;
   gap: 24px;
   padding: 24px;
-  margin-left: 100px;
+  margin-left: 200px;
 }
 
 /* Form content */

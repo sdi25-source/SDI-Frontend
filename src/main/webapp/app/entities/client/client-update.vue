@@ -1,16 +1,19 @@
 <template>
-  <div class="user-edit p-5">
-    <div class="user-form-container">
+  <div class="client-edit">
+    <div class="client-form-container border-5">
       <form name="editForm" novalidate @submit.prevent="save()">
         <div class="form-content">
           <div class="header">
+            <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="back-button" @click="previousState()">
+              <font-awesome-icon icon="arrow-left" />
+            </button>
             <h1 class="welcome-title" v-if="!client.id">New Client</h1>
             <h1 class="welcome-title" v-if="client.id">Update Client</h1>
           </div>
-          <div class="divider mt-3"></div>
+          <div class="divider mt-2"></div>
           <div class="form-fields">
             <div class="logo-upload-container">
-              <label class="label-c" v-text="t$('sdiFrontendApp.client.clientLogo')" for="client-clientLogo"></label>
+              <label class="label-c mb-2" v-text="t$('sdiFrontendApp.client.clientLogo')" for="client-clientLogo"></label>
               <div class="input-with-validation">
                 <input
                   type="file"
@@ -52,22 +55,22 @@
               </div>
             </div>
 
-            <!--            <div class="form-group">-->
-            <!--              <label class="label-c" v-text="t$('sdiFrontendApp.client.code')" for="client-code"></label>-->
-            <!--              <div class="input-with-validation">-->
-            <!--                <b-form-input-->
-            <!--                  type="text"-->
-            <!--                  name="code"-->
-            <!--                  id="client-code"-->
-            <!--                  data-cy="code"-->
-            <!--                  :state="v$.code.$anyDirty ? !v$.code.$invalid : null"-->
-            <!--                  v-model="v$.code.$model"-->
-            <!--                ></b-form-input>-->
-            <!--                <span class="valid-check" v-if="v$.code.$anyDirty && !v$.code.$invalid">-->
-            <!--                  <font-awesome-icon icon="check" class="text-success" />-->
-            <!--                </span>-->
-            <!--              </div>-->
-            <!--            </div>-->
+            <div class="form-group">
+              <label class="label-c" v-text="t$('sdiFrontendApp.client.code')" for="client-code"></label>
+              <div class="input-with-validation">
+                <b-form-input
+                  type="text"
+                  name="code"
+                  id="client-code"
+                  data-cy="code"
+                  :state="v$.code.$anyDirty ? !v$.code.$invalid : null"
+                  v-model="v$.code.$model"
+                ></b-form-input>
+                <span class="valid-check" v-if="v$.code.$anyDirty && !v$.code.$invalid">
+                  <font-awesome-icon icon="check" class="text-success" />
+                </span>
+              </div>
+            </div>
 
             <div class="form-group">
               <label class="label-c" v-text="t$('sdiFrontendApp.client.mainContactName')" for="client-mainContactName"></label>
@@ -223,67 +226,62 @@
             </div>
 
             <div class="form-group">
+              <label class="label-c" v-text="t$('sdiFrontendApp.client.country')"></label>
+              <select v-model="client.country" class="form-control" :id="'country-select'">
+                <option value="" disabled selected v-text="t$('sdiFrontendApp.client.selectCountry')"></option>
+                <option v-for="country in countries" :key="country.id" :value="country">
+                  {{ country.countryname }}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="label-c" v-text="t$('sdiFrontendApp.client.size')"></label>
+              <select v-model="client.size" class="form-control" id="size-select">
+                <option value="" disabled selected v-text="t$('sdiFrontendApp.client.selectSize')"></option>
+                <option v-for="size in clientSizes" :key="size.id" :value="size">
+                  {{ size.sizeName }}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="label-c" v-text="t$('sdiFrontendApp.client.clientType')"></label>
+              <select v-model="client.clientType" class="form-control" id="client-type-select">
+                <option value="" disabled selected v-text="t$('sdiFrontendApp.client.selectType')"></option>
+                <option v-for="clientType in clientTypes" :key="clientType.id" :value="clientType">
+                  {{ clientType.type }}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
               <label class="label-c" v-text="t$('sdiFrontendApp.client.notes')" for="client-notes"></label>
               <div class="input-with-validation">
-                <b-form-input
+                <textarea
                   type="text"
                   name="notes"
                   id="client-notes"
                   data-cy="notes"
+                  style="width: 800px; height: 100px; border-color: #e2e8f0; border-radius: 6px"
                   :state="v$.notes.$anyDirty ? !v$.notes.$invalid : null"
                   v-model="v$.notes.$model"
-                ></b-form-input>
+                ></textarea>
                 <span class="valid-check" v-if="v$.notes.$anyDirty && !v$.notes.$invalid">
                   <font-awesome-icon icon="check" class="text-success" />
                 </span>
               </div>
             </div>
-
-            <div class="form-group">
-              <label class="label-c" v-text="t$('sdiFrontendApp.client.country')"></label>
-              <div class="checkbox-group">
-                <div v-for="country in countries" :key="country.id" class="profile-checkbox">
-                  <input
-                    :id="'country-' + country.id"
-                    :value="client.country && country.id === client.country.id ? client.country : country"
-                    v-model="client.country"
-                    type="radio"
-                  /><span class="authority-label">{{ country.countryname }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="label-c" v-text="t$('sdiFrontendApp.client.size')"></label>
-              <div class="checkbox-group">
-                <div v-for="size in clientSizes" :key="size.id" class="profile-checkbox">
-                  <input
-                    :id="'size-' + size.id"
-                    :value="client.size && size.id === client.size.id ? client.size : size"
-                    v-model="client.size"
-                    type="radio"
-                  /><span class="authority-label">{{ size.sizeName }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="label-c" v-text="t$('sdiFrontendApp.client.clientType')"></label>
-              <div class="checkbox-group">
-                <div v-for="clientType in clientTypes" :key="clientType.id" class="profile-checkbox">
-                  <input
-                    :id="'size-' + clientType.id"
-                    :value="client.clientType && clientType.id === client.clientType.id ? client.clientType : clientType"
-                    v-model="client.clientType"
-                    type="radio"
-                  /><span class="authority-label">{{ clientType.type }}</span>
-                </div>
-              </div>
-            </div>
           </div>
           <div class="divider mt-3 mb-3"></div>
           <div class="action-buttons">
-            <button type="button" class="cancel-button" @click="cancel">
+            <button
+              type="button"
+              id="cancel-save"
+              data-cy="entityCreateCancelButton"
+              class="button button-secondary pl-2 pr-2"
+              @click="previousState()"
+            >
               <font-awesome-icon icon="ban"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.cancel')"></span>
             </button>
             <button
@@ -291,7 +289,7 @@
               id="save-entity"
               data-cy="entityCreateSaveButton"
               :disabled="v$.$invalid || isSaving"
-              class="login-button"
+              class="login-button button button-primary"
             >
               <font-awesome-icon icon="save"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.save')"></span>
             </button>
@@ -305,61 +303,29 @@
 <script lang="ts" src="./client-update.component.ts"></script>
 
 <style scoped>
-.logo-upload-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.logo-preview {
-  position: relative;
-  display: inline-block;
-  margin-top: 10px;
-}
-
-.preview-image {
-  max-width: 150px;
-  max-height: 150px;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
-  padding: 5px;
-  object-fit: contain;
-}
-
-.remove-logo-btn {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
+.button {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s;
   cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
 }
 
-.remove-logo-btn:hover {
-  background-color: #c82333;
+.button-secondary {
+  background-color: #6c757d;
+  color: #fff;
 }
 
-.compression-info {
-  font-size: 0.75rem;
-  color: #6c757d;
-  margin-top: 5px;
+.button-primary {
+  background-color: #0c2d57;
+  color: white;
+  border-color: #0c2d57;
 }
-.user-form-container {
-  width: 100%;
-  max-width: 100%;
-  padding: 0;
-}
-
 .label-c {
   color: #012970ff;
   font-weight: 500;
@@ -379,13 +345,13 @@
   background-color: #ffffff;
   color: #333333;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  padding: 0;
+  padding: 40px 20px;
 }
 
 .client-form-container {
   width: 100%;
-  max-width: 100%;
-  padding: 0;
+  max-width: 750px;
+  padding: 24px 0;
 }
 
 /* Form content */
@@ -402,6 +368,25 @@
   align-items: center;
   gap: 8px;
   text-align: center;
+  position: relative; /* Ajouté pour positionner le bouton de retour */
+}
+
+.back-button {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 8px;
+  background-color: #f8f9fa;
+  color: #6c757d;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.back-button:hover {
+  background-color: #e9ecef;
 }
 
 .welcome-title {
@@ -450,8 +435,7 @@ label {
   align-items: center;
 }
 
-.input-with-validation .b-form-input,
-.input-with-validation input[type='file'] {
+.input-with-validation .b-form-input {
   width: 100%;
 }
 
@@ -466,50 +450,12 @@ label {
   color: #28a745 !important;
 }
 
-/* Logo preview styling */
-.logo-upload-container {
-  width: 100%;
-}
-
-.logo-preview {
-  position: relative;
-  display: inline-block;
-  margin-top: 10px;
-}
-
-.preview-image {
-  max-width: 150px;
-  max-height: 150px;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
-  padding: 5px;
-}
-
-.remove-logo-btn {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-/* Compression info styling */
-.compression-info {
-  font-size: 0.75rem;
-  color: #6c757d;
-}
-
-/* Custom BS Form elements styling */
+/* Form control elements styling */
 .form-control,
-.custom-select {
+.b-form-select,
+.date-picker,
+.b-form-textarea,
+.b-form-input {
   padding: 10px 12px;
   height: auto;
   border: 1px solid #e2e8f0;
@@ -521,35 +467,24 @@ label {
 }
 
 .form-control:focus,
-.custom-select:focus {
+.b-form-select:focus,
+.date-picker:focus,
+.b-form-textarea:focus,
+.b-form-input:focus {
   border-color: #94a3b8;
   box-shadow: 0 0 0 1px #94a3b8;
 }
 
-/* Checkbox group styling */
-.checkbox-group {
+/* Date picker styling */
+.b-input-group {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 10px;
-  max-height: 200px;
-  overflow-y: auto;
-  background-color: #f8f9fa;
+  width: 100%;
 }
 
-.profile-checkbox {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1px;
-  margin-left: 39px;
-}
-
-.authority-label {
-  font-size: 14px;
-  color: #333;
-  margin-left: 5px;
+.date-picker {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: none;
 }
 
 /* Validation */
@@ -557,23 +492,6 @@ label {
   color: #dc3545 !important;
   font-size: 0.75rem;
   margin-top: 4px;
-}
-
-.form-text.text-muted {
-  color: #6c757d;
-  font-size: 0.75rem;
-  margin-top: 4px;
-}
-
-/* Checkbox styling */
-.custom-checkbox {
-  margin: 10px 0;
-}
-
-.custom-checkbox label {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
 }
 
 /* Button styling */
@@ -625,7 +543,7 @@ button {
 /* For responsive design */
 @media (max-width: 768px) {
   .client-form-container {
-    padding: 0;
+    padding: 15px;
   }
 
   .action-buttons {
@@ -635,6 +553,10 @@ button {
   .login-button,
   .cancel-button {
     width: 100%;
+  }
+
+  .back-button {
+    left: 10px;
   }
 }
 </style>

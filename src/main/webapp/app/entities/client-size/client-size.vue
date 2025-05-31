@@ -6,9 +6,10 @@
           @click="showAddRow = true"
           id="jh-create-entity"
           data-cy="entityCreateButton"
-          class="button button-primary btn-sm mr-3"
+          class="btn button-primary btn-sm mr-3 rounded-1"
           :disabled="showAddRow"
         >
+          <font-awesome-icon icon="plus"></font-awesome-icon>
           <span v-text="t$('global.new')"></span>
         </button>
         <h5 id="page-heading" class="m-0 font-weight-bold" data-cy="ClientSizeHeading">
@@ -68,6 +69,10 @@
             </svg>
           </button>
         </div>
+        <button class="btn btn-light btn-sm ml-3" @click="handleSyncList" :disabled="isFetching">
+          <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon>
+          <span v-text="t$('sdiFrontendApp.product.home.refreshListLabel')"></span>
+        </button>
       </div>
     </div>
 
@@ -113,12 +118,7 @@
                 <div class="btn-group">
                   <template v-if="clientSize.isEditing">
                     <div class="icon-container save-container" @click="saveClientSize(clientSize)" title="Enregistrer">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
-                        <path
-                          d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
-                          fill="currentColor"
-                        />
-                      </svg>
+                      <font-awesome-icon icon="save"></font-awesome-icon>
                     </div>
                     <div class="icon-container cancel-container" @click="cancelEdit(clientSize)" title="Annuler">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
@@ -166,7 +166,7 @@
               </td>
             </tr>
             <tr v-if="showAddRow" class="add-row">
-              <td><input type="text" class="form-control-borderless" v-model="newClientSize.sizeName" placeholder="Nom" /></td>
+              <td><input type="text" class="form-control-borderless" v-model="newClientSize.sizeName" placeholder="Name" /></td>
               <td><input type="text" class="form-control-borderless" v-model="newClientSize.sizeCode" placeholder="Code" /></td>
               <td>
                 <input type="text" class="form-control-borderless" v-model="newClientSize.sizeDescription" placeholder="Description" />
@@ -174,12 +174,7 @@
               <td class="text-center">
                 <div class="action-icons">
                   <div class="icon-container save-container" @click="saveNewClientSize" title="Enregistrer">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
-                      <path
-                        d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
-                        fill="currentColor"
-                      />
-                    </svg>
+                    <font-awesome-icon icon="save"></font-awesome-icon>
                   </div>
                   <div class="icon-container cancel-container" @click="cancelNewClientSize" title="Annuler">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">

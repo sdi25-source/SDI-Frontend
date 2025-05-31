@@ -2,7 +2,7 @@
   <div class="dashboard-content pt-lg-5">
     <div class="dashboard-header"></div>
     <!-- Products Overview Section -->
-    <div class="dashboard-section">
+    <div class="dashboard-section shadow">
       <div class="section-header">
         <h2>Products Overview</h2>
         <div class="scroll-controls">
@@ -42,7 +42,6 @@
 <script lang="ts" src="./dashProducts.component.ts"></script>
 
 <style scoped>
-/* Dashboard Styles */
 .dashboard-content {
   flex: 1;
   margin-left: 20px;
@@ -56,7 +55,6 @@
   margin-bottom: 20px;
 }
 
-/* Dashboard Section Styles */
 .dashboard-section {
   background-color: #fff;
   border-radius: 8px;
@@ -78,7 +76,6 @@
   font-weight: 600;
 }
 
-/* Scroll Controls */
 .scroll-controls {
   display: flex;
   gap: 10px;
@@ -112,7 +109,6 @@
   font-size: 16px;
 }
 
-/* Horizontal Scroll Container */
 .horizontal-scroll-container {
   overflow-x: auto;
   overflow-y: hidden;
@@ -139,7 +135,6 @@
   background: #999;
 }
 
-/* Product Cards Styles */
 .product-cards {
   display: flex;
   gap: 15px;
@@ -201,42 +196,26 @@
   font-weight: 500;
 }
 
-.product-status.payment {
+.product-status.low-deployments {
   background-color: #e6f7ee;
   color: #0ca678;
 }
 
-.product-status.portal {
-  background-color: #e0f7fa;
-  color: #0288d1;
-}
-
-.product-status.booking {
+.product-status.medium-deployments {
   background-color: #fff9db;
   color: #f59f00;
 }
 
-.product-status.analytics {
+.product-status.high-deployments {
+  background-color: #e0f7fa;
+  color: #0288d1;
+}
+
+.product-status.very-high-deployments {
   background-color: #e7f5ff;
   color: #1c7ed6;
 }
 
-.product-status.mobile {
-  background-color: #f3e5f5;
-  color: #9c27b0;
-}
-
-.product-status.security {
-  background-color: #fce4ec;
-  color: #e91e63;
-}
-
-.product-status.inventory {
-  background-color: #e8f5e8;
-  color: #4caf50;
-}
-
-/* Responsive Design */
 @media (max-width: 768px) {
   .product-card {
     min-width: 250px;

@@ -1,6 +1,6 @@
 import { type Ref, defineComponent, inject, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import UserManagementService from './user-management.service';
 import { useDateFormat } from '@/shared/composables';
@@ -9,15 +9,9 @@ import { useAlertService } from '@/shared/alert/alert.service';
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'JhiUserManagementView',
-  props: {
-    userId: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: ['close', 'updated'],
-  setup(props, { emit }) {
+  setup() {
     const route = useRoute();
+    const router = useRouter();
     const { formatDateLong: formatDate } = useDateFormat();
 
     const alertService = inject('alertService', () => useAlertService(), true);
@@ -34,12 +28,15 @@ export default defineComponent({
       }
     }
 
-    loadUser(props.userId);
+    const previousState = () => router.go(-1);
+
+    loadUser(route.params?.userId);
 
     return {
       formatDate,
       alertService,
       userManagementService,
+      previousState,
       user,
       t$: useI18n().t,
     };
