@@ -18,13 +18,20 @@
         <div class="horizontal-scroll-container" ref="scrollContainer" @scroll="checkScrollPosition">
           <div class="product-cards">
             <div class="product-card" v-for="product in products" :key="product.id">
+              <i class="bi bi-arrow-up-right card-arrow" @click="selectProduct(product)"></i>
               <div class="product-icon">
                 <i :class="product.icon"></i>
               </div>
               <div class="product-info">
                 <h4>{{ product.name }}</h4>
-                <p>{{ product.versions }} versions • {{ product.modules }} modules</p>
-                <div class="product-status" :class="product.badgeClass">Deploy {{ product.deploiements }} times</div>
+                <p>Last version {{ latestVersions.get(product.name)?.version || 'N/A' }}</p>
+                <p>
+                  {{ moduleVersionCounts.get(product.name) || 0 }} modules • {{ totalFeaturesPerProduct.get(product.name) || 0 }} features
+                </p>
+                <div class="product-status" :class="product.badgeClass">
+                  Deploy {{ totalDeployementsPerProduct.get(product.name) || 0 }} times
+                </div>
+                <div class="product-status customer ml-2">{{ product.clients || 0 }} Customer</div>
               </div>
             </div>
           </div>
@@ -32,9 +39,47 @@
       </div>
     </div>
 
-    <div class="section"></div>
-    <div class="section"></div>
-    <div class="section"></div>
+    <!-- Dashboard Content - Conditional Display -->
+    <div class="dashboard-content">
+      <div v-if="!selectedProduct" class="section d-flex justify-content-center align-items-center" style="height: 60vh">
+        <img src="../../../../content/images/Dataanalysis.svg" width="600" height="500" />
+      </div>
+
+      <!-- Charts Section -->
+      <div v-else class="charts-section">
+        <div class="charts-header d-flex justify-content-between align-items-center mb-4">
+          <h3>{{ selectedProduct.name }} - Analytics Dashboard</h3>
+          <button @click="closeCharts" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i> Close</button>
+        </div>
+
+        <div class="row">
+          <!-- Left Chart - Clients Distribution -->
+          <div class="col-md-6">
+            <div class="chart-container">
+              <h4 class="chart-title">
+                Clients Distribution by Module Deployments (Latest Version:
+                {{ latestVersions.get(selectedProduct.name)?.version || 'N/A' }})
+              </h4>
+              <div class="chart-wrapper">
+                <canvas ref="clientsChart" width="400" height="400"></canvas>
+              </div>
+              <div v-if="clientsChartData.labels.length === 0" class="no-data-message">No client data available for the latest version</div>
+            </div>
+          </div>
+
+          <!-- Right Chart - Product Versions -->
+          <div class="col-md-6">
+            <div class="chart-container">
+              <h4 class="chart-title">Module Evolution by Product Version</h4>
+              <div class="chart-wrapper">
+                <canvas ref="versionsChart" width="400" height="400"></canvas>
+              </div>
+              <div v-if="versionsChartData.labels.length === 0" class="no-data-message">No version data available</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="section"></div>
   </div>
 </template>
@@ -154,11 +199,12 @@
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;
+  position: relative;
 }
 
 .product-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .product-icon {
@@ -196,6 +242,11 @@
   font-weight: 500;
 }
 
+.product-status.customer {
+  background-color: #e9ebf6;
+  color: #95a0f4;
+}
+
 .product-status.low-deployments {
   background-color: #e6f7ee;
   color: #0ca678;
@@ -216,6 +267,68 @@
   color: #1c7ed6;
 }
 
+.card-arrow {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.8rem;
+  color: #0c2d57;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.card-arrow:hover {
+  color: #1c7ed6;
+}
+
+/* Charts Styles */
+.charts-section {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.charts-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #0c2d57;
+}
+
+.chart-container {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-title {
+  margin: 0 0 15px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0c2d57;
+  text-align: center;
+}
+
+.chart-wrapper {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+.no-data-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #777;
+  font-style: italic;
+}
+
 @media (max-width: 768px) {
   .product-card {
     min-width: 250px;
@@ -230,6 +343,17 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+  }
+
+  .charts-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 10px;
+  }
+
+  .chart-container {
+    height: 400px;
+    margin-bottom: 20px;
   }
 }
 
@@ -259,6 +383,15 @@
 
   .product-status {
     font-size: 11px;
+  }
+
+  .chart-container {
+    height: 350px;
+    padding: 15px;
+  }
+
+  .chart-title {
+    font-size: 14px;
   }
 }
 </style>

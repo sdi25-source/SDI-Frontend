@@ -1,10 +1,25 @@
 import axios from 'axios';
 
 import { type IProductDeployementDetail } from '@/shared/model/product-deployement-detail.model';
+import type { UnwrapRef } from 'vue';
+import type { IProductVersion } from '@/shared/model/product-version.model.ts';
 
 const baseApiUrl = 'api/product-deployement-details';
 
 export default class ProductDeployementDetailService {
+  public findByProductVersion(idPV: UnwrapRef<IProductVersion['id']> | undefined): Promise<IProductDeployementDetail> {
+    return new Promise<IProductDeployementDetail>((resolve, reject) => {
+      axios
+        .get(`${baseApiUrl}/productVersion/${idPV}`)
+        .then(res => {
+          resolve(res.data);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
   public find(id: number): Promise<IProductDeployementDetail> {
     return new Promise<IProductDeployementDetail>((resolve, reject) => {
       axios

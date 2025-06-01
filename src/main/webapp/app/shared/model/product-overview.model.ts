@@ -4,5 +4,5 @@ export interface ProductOverview {
   icon: string;
   versions: number;
   modules: number;
-  deploiements: number;
+  clients: number;
 }

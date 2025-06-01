@@ -19,6 +19,8 @@
         <div class="horizontal-scroll-container" ref="scrollContainer" @scroll="checkScrollPosition">
           <div class="module-grid-horizontal">
             <div class="module-card" v-for="client in clients" :key="client.id">
+              <i class="bi bi-arrow-up-right card-arrow" @click="selectClient(client)"></i>
+
               <div class="module-header">
                 <div class="module-icon">
                   <i :class="client.icon"></i>
@@ -47,16 +49,92 @@
         </div>
       </div>
     </div>
+
+    <!-- Dashboard Content - Conditional Display -->
+    <div class="dashboard-content">
+      <div v-if="!selectedClient" class="section d-flex justify-content-center align-items-center" style="height: 60vh">
+        <img src="../../../../content/images/Dataanalysis.svg" width="600" height="500" />
+      </div>
+
+      <!-- Charts Section -->
+      <div v-else class="charts-section">
+        <div class="charts-header d-flex justify-content-between align-items-center mb-4">
+          <h3>{{ selectedClient.name }} - Analytics Dashboard</h3>
+          <button @click="closeCharts" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i> Close</button>
+        </div>
+
+        <div class="row">
+          <!-- Left Chart - Product Deployments Distribution -->
+          <div class="col-md-6">
+            <div class="chart-container">
+              <h4 class="chart-title">Product Deployments Distribution</h4>
+              <div class="chart-wrapper">
+                <canvas ref="productDeploymentsChart" width="400" height="400"></canvas>
+              </div>
+              <div v-if="productDeploymentsChartData.labels && productDeploymentsChartData.labels.length === 0" class="no-data-message">
+                No product deployment data available
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Chart - Request of Changes by Month and Level -->
+          <div class="col-md-6">
+            <div class="chart-container">
+              <h4 class="chart-title">Request of Changes by Customization Level</h4>
+              <div class="chart-wrapper">
+                <canvas ref="requestChangesChart" width="400" height="400"></canvas>
+              </div>
+              <div v-if="!requestChangesChartData.datasets || requestChangesChartData.datasets.length === 0" class="no-data-message">
+                No request of changes data available
+              </div>
+
+              <!-- Legend for customization levels -->
+              <div class="customization-legend mt-3">
+                <div class="legend-item">
+                  <span class="legend-color basic"></span>
+                  <span class="legend-text">Basic</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color intermediate"></span>
+                  <span class="legend-text">Intermediate</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color advanced"></span>
+                  <span class="legend-text">Advanced</span>
+                </div>
+              </div>
+
+              <!-- Summary Stats -->
+              <div class="request-stats mt-3">
+                <div class="stats-grid">
+                  <div class="stat-item">
+                    <span class="stat-number">{{ totalRequests.basic }}</span>
+                    <span class="stat-label">Basic Requests</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-number">{{ totalRequests.intermediate }}</span>
+                    <span class="stat-label">Intermediate</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-number">{{ totalRequests.advanced }}</span>
+                    <span class="stat-label">Advanced Requests</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="section"></div>
-  <div class="section"></div>
-  <div class="section"></div>
+
   <div class="section"></div>
 </template>
 
 <script lang="ts" src="./dashClients.component.ts"></script>
 
 <style scoped>
+/* Existing styles... */
 .module-badge.default {
   background-color: #f0f0f0;
   color: #333;
@@ -65,37 +143,31 @@
   background-color: #e6f7ee;
   color: #0ca678;
 }
-
 .module-badge.insurance {
   background-color: #e0f7fa;
   color: #0288d1;
 }
-
 .module-badge.security {
   background-color: #fff9db;
   color: #f59f00;
 }
-
 .module-badge.analytics {
   background-color: #e7f5ff;
   color: #1c7ed6;
 }
-
 .module-badge.communication {
   background-color: #f3e5f5;
   color: #9c27b0;
 }
-
 .module-badge.health {
   background-color: #fce4ec;
   color: #e91e63;
 }
-
 .module-badge.logistics {
   background-color: #e8f5e8;
   color: #4caf50;
 }
-/* Dashboard Styles */
+
 .dashboard-content {
   flex: 1;
   margin-left: 20px;
@@ -109,7 +181,20 @@
   margin-bottom: 20px;
 }
 
-/* Dashboard Section Styles */
+.card-arrow {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.8rem;
+  color: #0c2d57;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.card-arrow:hover {
+  color: #1c7ed6;
+}
+
 .dashboard-section {
   background-color: #fff;
   border-radius: 8px;
@@ -131,7 +216,6 @@
   font-weight: 600;
 }
 
-/* Scroll Controls */
 .scroll-controls {
   display: flex;
   gap: 10px;
@@ -165,7 +249,6 @@
   font-size: 16px;
 }
 
-/* Horizontal Scroll Container */
 .horizontal-scroll-container {
   overflow-x: auto;
   overflow-y: hidden;
@@ -192,7 +275,6 @@
   background: #999;
 }
 
-/* Module Grid Horizontal */
 .module-grid-horizontal {
   display: flex;
   gap: 15px;
@@ -210,6 +292,7 @@
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;
+  position: relative;
 }
 
 .module-card:hover {
@@ -254,36 +337,6 @@
   font-weight: 500;
 }
 
-.module-badge.finance {
-  background-color: #e6f7ee;
-  color: #0ca678;
-}
-
-.module-badge.security {
-  background-color: #fff9db;
-  color: #f59f00;
-}
-
-.module-badge.analytics {
-  background-color: #e7f5ff;
-  color: #1c7ed6;
-}
-
-.module-badge.communication {
-  background-color: #f3e5f5;
-  color: #9c27b0;
-}
-
-.module-badge.storage {
-  background-color: #fce4ec;
-  color: #e91e63;
-}
-
-.module-badge.integration {
-  background-color: #e8f5e8;
-  color: #4caf50;
-}
-
 .module-stats {
   display: flex;
   justify-content: space-between;
@@ -308,6 +361,125 @@
   margin-top: 2px;
 }
 
+.charts-section {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.charts-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #0c2d57;
+}
+
+.chart-container {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-title {
+  margin: 0 0 15px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0c2d57;
+  text-align: center;
+}
+
+.chart-wrapper {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+.no-data-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #777;
+  font-style: italic;
+}
+
+/* Customization Legend */
+.customization-legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+}
+
+.legend-color.basic {
+  background-color: rgba(255, 193, 7, 0.8);
+}
+
+.legend-color.intermediate {
+  background-color: rgba(40, 167, 69, 0.8);
+}
+
+.legend-color.advanced {
+  background-color: rgba(220, 53, 69, 0.8);
+}
+
+.legend-text {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Request Stats */
+.request-stats {
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 10px;
+  background-color: white;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+.stat-number {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0c2d57;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #666;
+  font-weight: 500;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .module-card {
@@ -322,6 +494,26 @@
   .section-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 10px;
+  }
+
+  .charts-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 10px;
+  }
+
+  .chart-container {
+    height: 400px;
+    margin-bottom: 20px;
+  }
+
+  .customization-legend {
+    gap: 10px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
     gap: 10px;
   }
 }
@@ -348,6 +540,20 @@
 
   .stat-value {
     font-size: 16px;
+  }
+
+  .chart-container {
+    height: 350px;
+    padding: 15px;
+  }
+
+  .chart-title {
+    font-size: 14px;
+  }
+
+  .customization-legend {
+    flex-direction: column;
+    gap: 5px;
   }
 }
 </style>
