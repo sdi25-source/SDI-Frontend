@@ -32,7 +32,7 @@ export default defineComponent({
     },
   },
   compatConfig: { MODE: 3 },
-  name: "ProductDeployment",
+  name: "ProductDeploymentRedesigned",
   setup() {
     const { t: t$ } = useI18n()
     const router = useRouter()
@@ -921,34 +921,36 @@ export default defineComponent({
 
       console.log("ProductVersion sélectionné:", selectedDetail.value.productVersion)
 
+      // Créer un cache des modules complets pour éviter la perte de données
+      const moduleCache = new Map()
+
+      // Remplir le cache avec tous les modules disponibles
+      allModules.value.forEach((module) => {
+        moduleCache.set(module.id, module)
+      })
+
       // Vérifier si le productVersion a des moduleVersions
       if (
         !selectedDetail.value.productVersion.moduleVersions ||
-        selectedDetail.value.productVersion.moduleVersions.length === 0
+        !selectedDetail.value.productVersion.moduleVersions.length === 0
       ) {
         console.log("Aucun moduleVersions trouvé dans productVersion, recherche directe...")
 
-        // Si le productVersion n'a pas de moduleVersions, chercher dans tous les moduleVersions
-        // ceux qui sont associés à ce productVersion
         return moduleVersions.value
           .filter((mv) => {
             return mv.productVersion && mv.productVersion.id === selectedDetail.value.productVersion.id
           })
           .map((mv) => {
-            // S'assurer que le module est bien présent
+            // Enrichir avec les données du cache
             if (!mv.module || !mv.module.name) {
-              // Essayer de trouver le module correspondant
               const moduleId = mv.moduleId || (mv.module && mv.module.id)
-              if (moduleId) {
-                const fullModule = allModules.value.find((m) => m.id === moduleId)
-                if (fullModule) {
-                  mv.module = fullModule
-                }
+              if (moduleId && moduleCache.has(moduleId)) {
+                mv.module = { ...moduleCache.get(moduleId) }
               }
             }
             return mv
           })
-          .filter((mv) => mv.module && mv.module.name) // Filtrer ceux qui ont un nom de module
+          .filter((mv) => mv.module && mv.module.name)
       }
 
       console.log(
@@ -956,35 +958,36 @@ export default defineComponent({
         selectedDetail.value.productVersion.moduleVersions.length,
       )
 
-      // Si le productVersion a des moduleVersions, les utiliser
       return selectedDetail.value.productVersion.moduleVersions
         .map((mv) => {
-          // Trouver le module complet dans moduleVersions (qui contient les données complètes)
+          // Trouver la version complète dans le cache
           const fullModuleVersion = moduleVersions.value.find((fullMv) => fullMv.id === mv.id)
 
           if (fullModuleVersion) {
+            // Assurer la persistance des données du module
+            if (!fullModuleVersion.module || !fullModuleVersion.module.name) {
+              const moduleId = fullModuleVersion.moduleId || (fullModuleVersion.module && fullModuleVersion.module.id)
+              if (moduleId && moduleCache.has(moduleId)) {
+                fullModuleVersion.module = { ...moduleCache.get(moduleId) }
+              }
+            }
             return {
               ...fullModuleVersion,
-              // S'assurer que le module est bien présent
               module: fullModuleVersion.module || mv.module,
             }
           }
 
-          // Si on ne trouve pas dans le cache, essayer d'enrichir avec les données disponibles
+          // Si pas trouvé dans le cache, enrichir les données existantes
           if (!mv.module || !mv.module.name) {
-            // Essayer de trouver le module correspondant
             const moduleId = mv.moduleId || (mv.module && mv.module.id)
-            if (moduleId) {
-              const fullModule = allModules.value.find((m) => m.id === moduleId)
-              if (fullModule) {
-                mv.module = fullModule
-              }
+            if (moduleId && moduleCache.has(moduleId)) {
+              mv.module = { ...moduleCache.get(moduleId) }
             }
           }
 
           return mv
         })
-        .filter((mv) => mv.module && mv.module.name) // Filtrer ceux qui ont un nom de module
+        .filter((mv) => mv.module && mv.module.name)
     }
 
     // Ajouter cette fonction pour charger les modules versions pour un productVersion spécifique
@@ -1123,12 +1126,25 @@ export default defineComponent({
     const saveModuleSettingsAndCreateDeployments = async () => {
       try {
         if (selectedDetail.value) {
-          selectedDetail.value.allowedModuleVersions = [...selectedAllowedModuleVersions.value]
-          await productDeployementDetailService().update(selectedDetail.value)
+          // Créer une copie profonde pour éviter les références perdues
+          const enrichedModuleVersions = selectedAllowedModuleVersions.value.map((mv) => ({
+            ...mv,
+            module: mv.module ? { ...mv.module } : null,
+          }))
+
+          selectedDetail.value.allowedModuleVersions = enrichedModuleVersions
+
+          // Sauvegarder avec toutes les relations
+          const detailToSave = {
+            ...selectedDetail.value,
+            allowedModuleVersions: enrichedModuleVersions,
+          }
+
+          await productDeployementDetailService().update(detailToSave)
 
           // Créer automatiquement les modules de déploiement
-          for (let i = 0; i < selectedAllowedModuleVersions.value.length; i++) {
-            const moduleVersion = selectedAllowedModuleVersions.value[i]
+          for (let i = 0; i < enrichedModuleVersions.length; i++) {
+            const moduleVersion = enrichedModuleVersions[i]
             const code = `MD ${i + 1}`
 
             const newModuleDeployement = {
@@ -1140,6 +1156,12 @@ export default defineComponent({
             }
 
             await moduleDeployementService().create(newModuleDeployement)
+          }
+
+          // Mettre à jour le cache local
+          const detailIndex = productDeployementDetails.value.findIndex((d) => d.id === selectedDetail.value.id)
+          if (detailIndex !== -1) {
+            productDeployementDetails.value[detailIndex].allowedModuleVersions = enrichedModuleVersions
           }
 
           alertService.showInfo("Modules autorisés configurés et déploiements créés avec succès", {

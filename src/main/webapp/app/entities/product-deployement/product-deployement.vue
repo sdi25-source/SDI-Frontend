@@ -267,7 +267,7 @@
                 <div class="d-flex justify-content-between mb-3">
                   <h6 class="mb-0">Détails des déploiements</h6>
                   <button class="btn btn-sm btn-dark rounded-1" @click="showAddDetailRow = true" :disabled="showAddDetailRow">
-                    Add
+                    ADD
                   </button>
                 </div>
                 <table class="table table-hover">
@@ -472,9 +472,9 @@
       </div>
     </div>
 
-    <!-- Module Settings Modal -->
+    <!-- Module Settings Modal - Style élégant comme Product Version parameters -->
     <div class="modal-backdrop" v-if="showModuleSettingsModal" @click="closeModuleSettingsModal"></div>
-    <div class="modal-container" v-if="showModuleSettingsModal" role="dialog" aria-modal="true">
+    <div class="modal-container elegant-modal" v-if="showModuleSettingsModal" role="dialog" aria-modal="true">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Configuration des modules autorisés</h5>
@@ -486,80 +486,91 @@
           </button>
         </div>
 
-        <div class="modal-body">
-          <div v-if="selectedDetail">
-            <h6 class="mb-3">Détail: {{ selectedDetail.productVersion ? selectedDetail.productVersion.version : '' }}</h6>
-
-            <div class="mb-4">
-              <h6 class="mb-2">Modules autorisés</h6>
-
-              <!-- Sélection des modules versions -->
-              <div class="row mb-3">
-                <div class="col-md-12">
-                  <label class="form-label">Module Version</label>
-                  <select v-model="selectedModuleVersionId" class="form-control">
-                    <option value="">Sélectionner un module version</option>
-                    <option v-for="moduleVersion in getModuleVersionsForSelectedProduct()" :key="moduleVersion.id" :value="moduleVersion.id">
-                      {{ moduleVersion.module?.name }} - {{ moduleVersion.version }}
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-dark btn-sm" @click="addModuleToDetail" :disabled="!selectedModuleVersionId">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
-                  </svg>
-                  ADD
-                </button>
-              </div>
-
-              <div class="table-responsive">
-                <table class="table table-sm table-bordered">
-                  <thead class="thead-light">
-                  <tr>
-                    <th>Module</th>
-                    <th>Version</th>
-                    <th width="80" class="text-center">Actions</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr v-for="(moduleVersion, index) in selectedAllowedModuleVersions" :key="index">
-                    <td>{{ moduleVersion.module?.name }}</td>
-                    <td>{{ moduleVersion.version }}</td>
-                    <td class="text-center">
-                      <button class="btn btn-sm btn-outline-danger" @click="removeModuleFromDetail(index)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                          <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
-                          <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
-                        </svg>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr v-if="selectedAllowedModuleVersions.length === 0">
-                    <td colspan="3" class="text-center py-3">
-                      <p class="text-muted mb-0">Aucun module autorisé ajouté</p>
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
+        <!-- Tabs Header -->
+        <div class="tabs-header position-relative">
+          <div class="tabs-list pt-2">
+            <div class="tab-item active">
+              <div class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Modules Version</span>
               </div>
             </div>
           </div>
         </div>
+
+        <div class="modal-body">
+          <div v-if="selectedDetail">
+            <h6 class="mb-3">Détail: {{ selectedDetail.productVersion ? selectedDetail.productVersion.version : '' }}</h6>
+
+            <!-- Modules Section -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                  <span>Modules autorisés</span>
+                </div>
+                <button class="button button-primary" @click="showModuleSelector = !showModuleSelector">
+                  {{ showModuleSelector ? 'Close' : 'Add' }}
+                </button>
+              </div>
+
+              <div class="card-body">
+                <div v-if="showModuleSelector" class="selector-container">
+                  <div class="select-wrapper">
+                    <select v-model="selectedModuleVersionId" class="select">
+                      <option value="">Sélectionner un module version</option>
+                      <option v-for="moduleVersion in getModuleVersionsForSelectedProduct()" :key="moduleVersion.id" :value="moduleVersion.id">
+                        {{ moduleVersion.module?.name }} - {{ moduleVersion.version }}
+                      </option>
+                    </select>
+                  </div>
+                  <button class="button button-success" @click="addModuleToDetail" :disabled="!selectedModuleVersionId">Add</button>
+                </div>
+
+                <ul class="component-list scroll-container">
+                  <li v-for="(moduleVersion, index) in selectedAllowedModuleVersions" :key="index" class="component-item">
+                    <div class="component-info">
+                    <span class="component-name">
+                      {{ moduleVersion.module?.name }}
+                      <span class="component-version">{{ moduleVersion.version }}</span>
+                    </span>
+                    </div>
+                    <div class="action-buttons">
+                      <button class="button-icon" @click="removeModuleFromDetail(index)" aria-label="Supprimer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    </div>
+                  </li>
+                  <li v-if="selectedAllowedModuleVersions.length === 0" class="empty-message">Aucun module autorisé ajouté</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="closeModuleSettingsModal">Annuler</button>
-          <button type="button" class="btn btn-dark" @click="saveModuleSettingsAndCreateDeployments">
-            Enregistrer et créer les déploiements
-          </button>
+          <button type="button" class="button button-secondary" @click="closeModuleSettingsModal">Cancel</button>
+          <button type="button" class="button button-primary" @click="saveModuleSettingsAndCreateDeployments">Save</button>
         </div>
       </div>
     </div>
 
-    <!-- Detail Info Modal -->
+    <!-- Detail Info Modal - Large width -->
     <div class="modal-backdrop" v-if="showDetailInfoModal" @click="closeDetailInfoModal"></div>
-    <div class="modal-container" v-if="showDetailInfoModal" role="dialog" aria-modal="true">
+    <div class="modal-container large-modal" v-if="showDetailInfoModal" role="dialog" aria-modal="true">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Informations du déploiement</h5>
@@ -572,57 +583,57 @@
         </div>
 
         <div class="modal-body" v-if="selectedDetailInfo">
-          <!-- Header with Client, Product, Notes -->
-          <div class="detail-header">
-            <div class="header-item">
-              <span class="header-label">Client:</span>
+          <!-- Header with Client, Product, Notes - Style like the image -->
+          <div class="detail-header-elegant">
+            <div class="header-row">
+              <span class="header-label">CLIENT:</span>
               <span class="header-value">{{ selectedProductDeployment?.client?.name || 'N/A' }}</span>
             </div>
-            <div class="header-item">
-              <span class="header-label">Produit:</span>
+            <div class="header-row">
+              <span class="header-label">PRODUIT:</span>
               <span class="header-value">{{ selectedProductDeployment?.product?.name || 'N/A' }}</span>
             </div>
-            <div class="header-item">
-              <span class="header-label">Notes:</span>
+            <div class="header-row">
+              <span class="header-label">DEPLOIYEMENT:</span>
               <span class="header-value">{{ selectedDetailInfo.notes || 'Aucune note' }}</span>
             </div>
           </div>
 
-          <div class="info-grid">
-            <div class="info-section">
-              <h6 class="section-title">Informations du déploiement</h6>
-              <div class="info-row">
-                <span class="info-label">Type de déploiement:</span>
-                <span class="info-value">
+          <div class="info-grid-elegant">
+            <div class="info-section-elegant">
+              <h6 class="section-title-elegant">Informations du déploiement</h6>
+              <div class="info-row-elegant">
+                <span class="info-label-elegant">Type de déploiement:</span>
+                <span class="info-value-elegant">
                 <span class="badge badge-dark">{{ selectedDetailInfo.deployementType ? selectedDetailInfo.deployementType.type : 'N/A' }}</span>
               </span>
               </div>
-              <div class="info-row">
-                <span class="info-label">Version du produit:</span>
-                <span class="info-value">
+              <div class="info-row-elegant">
+                <span class="info-label-elegant">Version du produit:</span>
+                <span class="info-value-elegant">
                 <span class="badge badge-secondary">{{ selectedDetailInfo.productVersion ? selectedDetailInfo.productVersion.version : 'N/A' }}</span>
               </span>
               </div>
             </div>
 
-            <div class="info-section">
-              <h6 class="section-title">Dates</h6>
-              <div class="info-row">
-                <span class="info-label">Date de début:</span>
-                <span class="info-value">{{ formatDate(selectedDetailInfo.startDeployementDate) || 'Non définie' }}</span>
+            <div class="info-section-elegant">
+              <h6 class="section-title-elegant">Dates</h6>
+              <div class="info-row-elegant">
+                <span class="info-label-elegant">Date de début:</span>
+                <span class="info-value-elegant">{{ formatDate(selectedDetailInfo.startDeployementDate) || 'Non définie' }}</span>
               </div>
-              <div class="info-row">
-                <span class="info-label">Date de fin:</span>
-                <span class="info-value">{{ formatDate(selectedDetailInfo.endDeployementDate) || 'Non définie' }}</span>
+              <div class="info-row-elegant">
+                <span class="info-label-elegant">Date de fin:</span>
+                <span class="info-value-elegant">{{ formatDate(selectedDetailInfo.endDeployementDate) || 'Non définie' }}</span>
               </div>
             </div>
 
-            <div class="info-section" v-if="selectedDetailInfo.allowedModuleVersions && selectedDetailInfo.allowedModuleVersions.length > 0">
-              <h6 class="section-title">Modules autorisés</h6>
-              <div class="modules-list">
-                <div v-for="moduleVersion in selectedDetailInfo.allowedModuleVersions" :key="moduleVersion.id" class="module-item">
-                  <span class="module-name">{{ moduleVersion.module?.name }}</span>
-                  <span class="module-version badge badge-primary">{{ moduleVersion.version }}</span>
+            <div class="info-section-elegant" v-if="selectedDetailInfo.allowedModuleVersions && selectedDetailInfo.allowedModuleVersions.length > 0">
+              <h6 class="section-title-elegant">Modules autorisés</h6>
+              <div class="modules-list-elegant">
+                <div v-for="moduleVersion in selectedDetailInfo.allowedModuleVersions" :key="moduleVersion.id" class="module-item-elegant">
+                  <span class="module-name-elegant">{{ moduleVersion.module?.name }}</span>
+                  <span class="module-version-elegant badge badge-primary">{{ moduleVersion.version }}</span>
                 </div>
               </div>
             </div>
@@ -1043,9 +1054,21 @@
   z-index: 1001;
   width: 90%;
   max-width: 900px;
-  max-height: 90vh;
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
+}
+
+/* Large modal for detail view */
+.large-modal {
+  width: 95%;
+  max-width: 1200px;
+  max-height: 85vh;
+}
+
+/* Elegant modal for module settings */
+.elegant-modal {
+  max-width: 800px;
 }
 
 .modal-content {
@@ -1055,7 +1078,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
+  max-height: 85vh;
 }
 
 .modal-header {
@@ -1159,6 +1182,330 @@
   color: #374151;
 }
 
+/* Elegant modal styles - inspired by Product Version parameters */
+.card {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #f1f5f9;
+  background-color: #f4f5f6;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.card-body {
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+}
+
+.button-primary {
+  background-color: #1e40af;
+  color: white;
+  border-color: #1e40af;
+}
+
+.button-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.button-secondary {
+  background-color: #f1f5f9;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+
+.button-secondary:hover {
+  background-color: #e2e8f0;
+}
+
+.button-success {
+  background-color: #10b981;
+  color: white;
+  border-color: #10b981;
+}
+
+.button-success:hover {
+  background-color: #059669;
+}
+
+.button-success:disabled {
+  background-color: #d1d5db;
+  border-color: #d1d5db;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.375rem;
+  border-radius: 6px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.button-icon:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.selector-container {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.select-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background-color: white;
+  color: #0f172a;
+  font-size: 0.875rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1rem;
+  padding-right: 2rem;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #1e40af;
+  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2);
+}
+
+.component-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.component-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border-radius: 6px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+}
+
+.component-item:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.component-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.component-name {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.component-version {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.empty-message {
+  padding: 1rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  border: 1px dashed #e2e8f0;
+}
+
+.scroll-container {
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+/* Elegant detail header styles */
+.detail-header-elegant {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 100px;
+  opacity: 0.9;
+}
+
+.header-value {
+  font-weight: 600;
+  font-size: 1.1rem;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  flex: 1;
+}
+
+/* Elegant info grid styles */
+.info-grid-elegant {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.info-section-elegant {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.section-title-elegant {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 0.5rem;
+}
+
+.info-row-elegant {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.info-row-elegant:last-child {
+  border-bottom: none;
+}
+
+.info-label-elegant {
+  font-weight: 500;
+  color: #6c757d;
+  min-width: 150px;
+}
+
+.info-value-elegant {
+  color: #343a40;
+  text-align: right;
+  flex: 1;
+}
+
+.modules-list-elegant {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.module-item-elegant {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+}
+
+.module-name-elegant {
+  font-weight: 500;
+  color: #343a40;
+}
+
+.module-version-elegant {
+  font-size: 0.75rem;
+}
+
+.icon-save,
+.icon-cancel {
+  width: 16px;
+  height: 16px;
+}
+
+/* Date formatting */
+.date-display {
+  font-family: 'Courier New', monospace;
+  font-weight: 500;
+}
+
 /* Info modal styles */
 .info-grid {
   display: flex;
@@ -1228,54 +1575,5 @@
 
 .module-version {
   font-size: 0.75rem;
-}
-
-.icon-save,
-.icon-cancel {
-  width: 16px;
-  height: 16px;
-}
-
-/* Detail header styles */
-.detail-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.header-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.header-label {
-  font-weight: 700;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  min-width: 80px;
-  opacity: 0.9;
-}
-
-.header-value {
-  font-weight: 600;
-  font-size: 1.1rem;
-  background: rgba(255, 255, 255, 0.15);
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  backdrop-filter: blur(10px);
-  flex: 1;
-}
-
-/* Date formatting */
-.date-display {
-  font-family: 'Courier New', monospace;
-  font-weight: 500;
 }
 </style>
