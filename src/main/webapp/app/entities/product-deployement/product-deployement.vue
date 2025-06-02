@@ -1,24 +1,22 @@
 <template>
   <div class="product-deployment-container section pt-5">
-    <!-- Vue principale des déploiements -->
-    <div v-if="!selectedProductDeployment">
-      <div class="navigation-bar d-flex align-items-center justify-content-between mb-4">
-        <div class="d-flex align-items-center">
-          <button
-            @click="showAddRow = true"
-            id="jh-create-entity"
-            data-cy="entityCreateButton"
-            class="btn btn-primary btn-sm mr-3 rounded-3"
-            :disabled="showAddRow"
-          >
-            <font-awesome-icon icon="plus"></font-awesome-icon>
-            <span v-text="t$('global.new')"></span>
-          </button>
-          <h5 id="page-heading" class="m-0 font-weight-bold" data-cy="ProductDeploymentHeading">
-            <span v-text="t$('sdiFrontendApp.productDeployement.home.title')" id="product-deployment-heading"></span>
-            <font-awesome-icon icon="cog" class="text-secondary ml-2" style="font-size: 0.8em"></font-awesome-icon>
-          </h5>
-        </div>
+    <!-- Navigation Bar -->
+    <div class="navigation-bar d-flex align-items-center justify-content-between mb-4">
+      <div class="d-flex align-items-center">
+        <button
+          @click="showAddRow = true"
+          id="jh-create-entity"
+          data-cy="entityCreateButton"
+          class="btn btn-dark btn-sm mr-3 rounded-1"
+          :disabled="showAddRow"
+        >
+          <span v-text="t$('global.new')"></span>
+        </button>
+        <h5 id="page-heading" class="m-0 font-weight-bold" data-cy="ProductDeploymentHeading">
+          <span v-text="t$('sdiFrontendApp.productDeployement.home.title')" id="product-deployment-heading"></span>
+          <font-awesome-icon icon="cog" class="text-secondary ml-2" style="font-size: 0.8em"></font-awesome-icon>
+        </h5>
+      </div>
 
       <!-- Search Bar -->
       <div class="search-container col-md-4">
@@ -233,7 +231,7 @@
               </span>
                 <span class="mx-2 text-muted">/</span>
                 <span class="breadcrumb-item active">
-                {{ selectedProductDeployment.refContract }} - {{ selectedProductDeployment.client?.name }}
+                {{ selectedProductDeployment.product?.name }} - {{ selectedProductDeployment.client?.name }}
               </span>
               </div>
             </div>
@@ -269,7 +267,7 @@
                 <div class="d-flex justify-content-between mb-3">
                   <h6 class="mb-0">Détails des déploiements</h6>
                   <button class="btn btn-sm btn-dark rounded-1" @click="showAddDetailRow = true" :disabled="showAddDetailRow">
-                    ADD
+                    Add
                   </button>
                 </div>
                 <table class="table table-hover">
