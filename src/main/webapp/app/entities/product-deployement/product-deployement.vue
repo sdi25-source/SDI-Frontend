@@ -507,7 +507,9 @@
 
                     <!-- Add new detail row -->
                     <tr v-if="showAddDetailRow" class="add-row">
-                      <td><input type="text" class="form-control" v-model="newProductDeployementDetail.notes" placeholder="Notes" /></td>
+                      <td>
+                        <input type="text" class="form-control" v-model="newProductDeployementDetail.notes" placeholder="Deployement" />
+                      </td>
                       <td>
                         <input type="date" class="form-control" v-model="newProductDeployementDetail.startDeployementDate" />
                       </td>
@@ -563,6 +565,7 @@
                         </div>
                       </td>
                     </tr>
+
                     <!-- Message if no data -->
                     <tr v-if="productDeployementDetails.length === 0 && !showAddDetailRow">
                       <td colspan="6" class="text-center py-4">
