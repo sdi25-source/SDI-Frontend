@@ -34,8 +34,8 @@
             </div>
             <div class="col-md-3 mb-3 pb-2">
               <div class="detail-group">
-                <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.country')"></label>
-                <p class="mb-0 fw-medium">{{ client.country?.countryname }}</p>
+                <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.address')"></label>
+                <p class="mb-0 fw-medium">{{ client.address }}</p>
               </div>
             </div>
             <div class="col-md-3 mb-3 pb-2">
@@ -107,7 +107,12 @@
             <button type="submit" @click.prevent="previousState()" class="button button-secondary" data-cy="entityDetailsBackButton">
               <font-awesome-icon icon="arrow-left"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.back')"></span>
             </button>
-            <router-link v-if="client.id" :to="{ name: 'ClientEdit', params: { clientId: client.id } }" custom v-slot="{ navigate }">
+            <router-link
+              v-if="client.id && hasAnyAuthority('ROLE_COMMERCIAL')"
+              :to="{ name: 'ClientEdit', params: { clientId: client.id } }"
+              custom
+              v-slot="{ navigate }"
+            >
               <button @click="navigate" class="button button-primary">
                 <font-awesome-icon icon="pencil-alt"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.edit')"></span>
               </button>

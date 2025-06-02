@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, computed, reactive, nextTick, inject, watch } from 'vue';
+import { type Ref, defineComponent, ref, onMounted, computed, reactive, nextTick, inject, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { RequestOfChange } from '@/shared/model/request-of-change.model';
@@ -11,6 +11,7 @@ import CustomisationLevelService from '@/entities/customisation-level/customisat
 import { useAlertService } from '@/shared/alert/alert.service';
 import type { IModuleVersion } from '@/shared/model/module-version.model.ts';
 import NewProductVersionPopup from './new-product-version/new-product-version-popup.vue';
+import type AccountService from '@/account/account.service.ts';
 
 export default defineComponent({
   name: 'RequestOfChangeManager',
@@ -26,6 +27,8 @@ export default defineComponent({
     const moduleVersionService = new ModuleVersionService();
     const customisationLevelService = new CustomisationLevelService();
     const alertService = useAlertService();
+    const accountService = inject<AccountService>('accountService');
+    const hasAnyAuthorityValues: Ref<any> = ref({});
 
     // Data
     const requestOfChanges = ref<RequestOfChange[]>([]);
@@ -708,6 +711,18 @@ export default defineComponent({
       selectRequest,
       t$,
       RequestStatus,
+      accountService,
+      hasAnyAuthorityValues,
     };
+  },
+  methods: {
+    hasAnyAuthority(authorities: any): boolean {
+      this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then(value => {
+        if (this.hasAnyAuthorityValues[authorities] !== value) {
+          this.hasAnyAuthorityValues = { ...this.hasAnyAuthorityValues, [authorities]: value };
+        }
+      });
+      return this.hasAnyAuthorityValues[authorities] ?? false;
+    },
   },
 });

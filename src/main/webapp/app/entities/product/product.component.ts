@@ -1,4 +1,4 @@
-import { defineComponent, inject, onMounted, ref, reactive, computed, watch, nextTick } from 'vue';
+import { type Ref, defineComponent, inject, onMounted, ref, reactive, computed, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ProductService from './product.service';
 import ProductVersionService from '@/entities/product-version/product-version.service';
@@ -16,6 +16,7 @@ import type { IComponentType } from '@/shared/model/component-type.model.ts';
 import CertificationService from '@/entities/certification/certification.service.ts';
 import type { ICertification } from '@/shared/model/certification.model.ts';
 import CertificationVersionService from '@/entities/certification/certification-version.service.ts';
+import type AccountService from '@/account/account.service.ts';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -37,9 +38,11 @@ export default defineComponent({
     const productLineService = inject('productLineService', () => new ProductLineService());
     const certificationService = inject('certificationService', () => new CertificationService());
     const certificationVersionService = inject('certificationVersionService', () => new CertificationVersionService());
+    const accountService = inject<AccountService>('accountService');
     const alertService = inject('alertService', () => useAlertService(), true);
 
     // Data
+    const hasAnyAuthorityValues: Ref<any> = ref({});
     const products = ref([]);
     const allProducts = ref([]);
     const isFetching = ref(false);
@@ -2064,6 +2067,8 @@ export default defineComponent({
 
     return {
       t$,
+      accountService,
+      hasAnyAuthorityValues,
       activeVersionSettingsSection,
       showConfigurationSection,
       showModulesSection,
@@ -2272,5 +2277,15 @@ export default defineComponent({
       cancelAddModuleVersionRow,
       dataUtils,
     };
+  },
+  methods: {
+    hasAnyAuthority(authorities: any): boolean {
+      this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then(value => {
+        if (this.hasAnyAuthorityValues[authorities] !== value) {
+          this.hasAnyAuthorityValues = { ...this.hasAnyAuthorityValues, [authorities]: value };
+        }
+      });
+      return this.hasAnyAuthorityValues[authorities] ?? false;
+    },
   },
 });

@@ -3,7 +3,13 @@
     <div class="navigation-bar d-flex align-items-center justify-content-between mb-4">
       <div class="d-flex align-items-center">
         <router-link :to="{ name: 'ClientEventCreate' }" custom v-slot="{ navigate }">
-          <button @click="navigate" id="jh-create-entity" data-cy="entityCreateButton" class="btn button-primary btn-sm mr-3 rounded-1">
+          <button
+            @click="navigate"
+            id="jh-create-entity"
+            data-cy="entityCreateButton"
+            class="btn button-primary btn-sm mr-3 rounded-1"
+            v-if="hasAnyAuthority('ROLE_COMMERCIAL')"
+          >
             <font-awesome-icon icon="plus"></font-awesome-icon>
             <span v-text="t$('global.new')"></span>
           </button>
@@ -106,7 +112,12 @@
 
               <td class="text-center">
                 <div class="action-icons">
-                  <router-link :to="{ name: 'ClientEventEdit', params: { clientEventId: clientEvent.id } }" custom v-slot="{ navigate }">
+                  <router-link
+                    :to="{ name: 'ClientEventEdit', params: { clientEventId: clientEvent.id } }"
+                    custom
+                    v-slot="{ navigate }"
+                    v-if="hasAnyAuthority('ROLE_COMMERCIAL')"
+                  >
                     <div @click="navigate" class="icon-container edit-container" data-cy="entityEditButton">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -132,6 +143,7 @@
                     @click="prepareRemove(clientEvent)"
                     title="Supprimer"
                     data-cy="entityDeleteButton"
+                    v-if="hasAnyAuthority('ROLE_COMMERCIAL')"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                       <path

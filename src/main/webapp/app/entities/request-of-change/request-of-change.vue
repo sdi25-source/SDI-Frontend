@@ -8,6 +8,7 @@
           id="jh-create-entity"
           data-cy="entityCreateButton"
           class="btn button-primary btn-sm mr-3 rounded-1"
+          v-if="hasAnyAuthority('ROLE_COMMERCIAL')"
         >
           <font-awesome-icon icon="plus"></font-awesome-icon>
           <span v-text="t$('global.new')"></span>
@@ -147,7 +148,12 @@
                     <td>{{ formatDate(request.createDate) }}</td>
                     <td class="text-center">
                       <div class="action-icons">
-                        <div class="icon-container edit-container" @click="editRequest(request)" title="Modifier">
+                        <div
+                          class="icon-container edit-container"
+                          @click="editRequest(request)"
+                          title="Modifier"
+                          v-if="hasAnyAuthority('ROLE_COMMERCIAL')"
+                        >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="14"
@@ -164,7 +170,12 @@
                         <div class="icon-container view-container" data-cy="entityDetailsButton" @click="viewRequestDetails(request)">
                           <font-awesome-icon icon="eye" style="font-size: 0.8rem"></font-awesome-icon>
                         </div>
-                        <div class="icon-container delete-container" @click="prepareRemove(request)" title="Supprimer">
+                        <div
+                          class="icon-container delete-container"
+                          @click="prepareRemove(request)"
+                          title="Supprimer"
+                          v-if="hasAnyAuthority('ROLE_COMMERCIAL')"
+                        >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="20"
@@ -184,6 +195,7 @@
                           style="font-size: 0.9rem; line-height: 1; gap: 0.25rem; margin-top: 0px; margin-bottom: 0px; cursor: pointer"
                           @click="viewRequestModules(request)"
                           title="Voir les modules"
+                          v-if="hasAnyAuthority('ROLE_COMMERCIAL')"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -543,7 +555,7 @@
 
           <!-- Action Buttons -->
           <div class="d-flex justify-content-end p-3">
-            <div v-if="selectedRequest.status === 'PENDING'">
+            <div v-if="selectedRequest.status === 'PENDING' && hasAnyAuthority('ROLE_USER')">
               <button class="button button-primary btn-sm rounded-2 mr-2" @click="changeRequestStatus('APPROVED')">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -582,7 +594,7 @@
                 <span v-text="t$('sdiFrontendApp.requestOfChange.Rejeter')"></span>
               </button>
             </div>
-            <div v-if="selectedRequest.status === 'APPROVED'">
+            <div v-if="selectedRequest.status === 'APPROVED' && hasAnyAuthority('ROLE_USER')">
               <button v-if="selectedRequest" class="button button-primary btn-sm rounded-2" @click="openNewProductVersionPopup">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -602,7 +614,7 @@
                 ><span v-text="t$('sdiFrontendApp.requestOfChange.AddNewProduct')"></span>
               </button>
             </div>
-            <div v-if="selectedRequest.status === 'REJECTED'">
+            <div v-if="selectedRequest.status === 'REJECTED' && hasAnyAuthority('ROLE_USER')">
               <button class="button button-secondary btn-sm rounded-2" @click="changeRequestStatus('PENDING')">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

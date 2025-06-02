@@ -1,9 +1,10 @@
-import { defineComponent, inject, ref, onMounted } from 'vue';
+import { type Ref, defineComponent, inject, ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
 import ClientEventService from '@/entities/client-event/client-event.service';
 import { useAlertService } from '@/shared/alert/alert.service';
 import type { IClientEvent } from '@/shared/model/client-event.model.ts';
+import type AccountService from '@/account/account.service.ts';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -16,6 +17,8 @@ export default defineComponent({
     const alertService = inject('alertService', () => useAlertService(), true);
 
     const clientEvent = ref<IClientEvent | null>(null);
+    const accountService = inject<AccountService>('accountService');
+    const hasAnyAuthorityValues: Ref<any> = ref({});
 
     const retrieveClientEvent = async (clientEventId: number) => {
       try {
@@ -41,6 +44,18 @@ export default defineComponent({
       clientEvent,
       t$,
       previousState,
+      accountService,
+      hasAnyAuthorityValues,
     };
+  },
+  methods: {
+    hasAnyAuthority(authorities: any): boolean {
+      this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then(value => {
+        if (this.hasAnyAuthorityValues[authorities] !== value) {
+          this.hasAnyAuthorityValues = { ...this.hasAnyAuthorityValues, [authorities]: value };
+        }
+      });
+      return this.hasAnyAuthorityValues[authorities] ?? false;
+    },
   },
 });

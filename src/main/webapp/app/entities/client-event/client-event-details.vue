@@ -82,7 +82,7 @@
               custom
               v-slot="{ navigate }"
             >
-              <button @click="navigate" class="button button-primary">
+              <button @click="navigate" class="button button-primary" v-if="hasAnyAuthority('ROLE_COMMERCIAL')">
                 <font-awesome-icon icon="pencil-alt"></font-awesome-icon>
                 <span v-text="t$('entity.action.edit')"></span>
               </button>
