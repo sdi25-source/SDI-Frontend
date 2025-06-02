@@ -154,12 +154,8 @@ export default defineComponent({
 
           console.log('Client found:', clientName);
 
-          // Count module deployments for this specific product deployment detail
-          const moduleDeploymentsForDetail = moduleDeployments.filter(
-            moduleDeployment => moduleDeployment.productDeployementDetail?.id === detail.id,
-          );
-
-          const moduleCount = moduleDeploymentsForDetail.length;
+          const moduleCount = detail.allowedModuleVersions?.length;
+          console.log('moduleCount', moduleCount);
 
           if (clientModuleCount.has(clientName)) {
             clientModuleCount.set(clientName, clientModuleCount.get(clientName)! + moduleCount);

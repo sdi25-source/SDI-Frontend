@@ -514,33 +514,6 @@ export default defineComponent({
         { name: version.product.name, id: version.product.id },
         { name: `Version ${version.version}`, id: version.id },
       ];
-
-      // Fetch module versions and infra component versions if needed
-      if (!version.moduleVersions || version.moduleVersions.length === 0) {
-        moduleVersionService()
-          .retrieve({ 'productVersionId.equals': version.id })
-          .then(
-            res => {
-              selectedVersion.value.moduleVersions = res.data;
-            },
-            err => {
-              console.error(err);
-            },
-          );
-      }
-
-      if (!version.infraComponentVersions || version.infraComponentVersions.length === 0) {
-        infraComponentVersionService()
-          .retrieve({ 'productVersionId.equals': version.id })
-          .then(
-            res => {
-              selectedVersion.value.infraComponentVersions = res.data;
-            },
-            err => {
-              console.error(err);
-            },
-          );
-      }
     };
 
     // Return to versions list
@@ -1187,6 +1160,8 @@ export default defineComponent({
       const latestVersion = await fetchLatestNonClientVersion();
       newVersion.value.root = latestVersion;
       newVersion.value.version = incrementVersion(latestVersion);
+      newVersion.moduleVersions = [];
+      newVersion.infraComponentVersions = [];
     };
 
     const updateTotalVersionItems = () => {

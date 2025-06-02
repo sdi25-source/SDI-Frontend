@@ -341,28 +341,13 @@ export default defineComponent({
             };
 
             // Catégoriser en fonction du niveau - avec des règles plus flexibles
-            if (
-              customizationLevel.includes('basic') ||
-              customizationLevel === 'basic' ||
-              customizationLevel.includes('low') ||
-              customizationLevel.includes('simple')
-            ) {
+            if (customizationLevel.includes('basic')) {
               basicPoints.push(point);
               totalBasic++;
-            } else if (
-              customizationLevel.includes('intermediate') ||
-              customizationLevel === 'intermediate' ||
-              customizationLevel.includes('medium') ||
-              customizationLevel.includes('standard')
-            ) {
+            } else if (customizationLevel === 'intermediate') {
               intermediatePoints.push(point);
               totalIntermediate++;
-            } else if (
-              customizationLevel.includes('advanced') ||
-              customizationLevel === 'advanced' ||
-              customizationLevel.includes('high') ||
-              customizationLevel.includes('complex')
-            ) {
+            } else if (customizationLevel === 'advanced') {
               advancedPoints.push(point);
               totalAdvanced++;
             } else {

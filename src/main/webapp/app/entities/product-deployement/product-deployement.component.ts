@@ -1,430 +1,422 @@
-"use client"
+import { type Ref, defineComponent, inject, onMounted, ref, computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
-import { type Ref, defineComponent, inject, onMounted, ref, computed, watch } from "vue"
-import { useI18n } from "vue-i18n"
-import { useRouter } from "vue-router"
-
-import ProductDeploymentService from "./product-deployement.service"
-import ProductDeployementDetailService from "../product-deployement-detail/product-deployement-detail.service"
-import ClientService from "../client/client.service"
-import DeployementTypeService from "../deployement-type/deployement-type.service"
-import ProductVersionService from "../product-version/product-version.service"
-import type { IProductDeployment } from "@/shared/model/product-deployement.model"
-import type { IProductDeployementDetail } from "@/shared/model/product-deployement-detail.model"
-import type { IClient } from "@/shared/model/client.model"
-import { useAlertService } from "@/shared/alert/alert.service"
-import ProductService from "../product/product.service"
-import ModuleDeployementService from "../module-deployement/module-deployement.service"
-import ModuleVersionService from "../module-version/module-version.service"
-import ModuleService from "../module/module.service"
-import type { IModule } from "@/shared/model/module.model"
-import type { IModuleVersion } from "@/shared/model/module-version.model"
-import InfraComponentVersionService from "../infra-component-version/infra-component-version.service"
-import InfraComponentService from "../infra-component/infra-component.service"
+import ProductDeploymentService from './product-deployement.service';
+import ProductDeployementDetailService from '../product-deployement-detail/product-deployement-detail.service';
+import ClientService from '../client/client.service';
+import DeployementTypeService from '../deployement-type/deployement-type.service';
+import ProductVersionService from '../product-version/product-version.service';
+import type { IProductDeployment } from '@/shared/model/product-deployement.model';
+import type { IProductDeployementDetail } from '@/shared/model/product-deployement-detail.model';
+import type { IClient } from '@/shared/model/client.model';
+import { useAlertService } from '@/shared/alert/alert.service';
+import ProductService from '../product/product.service';
+import ModuleDeployementService from '../module-deployement/module-deployement.service';
+import ModuleVersionService from '../module-version/module-version.service';
+import ModuleService from '../module/module.service';
+import type { IModule } from '@/shared/model/module.model';
+import type { IModuleVersion } from '@/shared/model/module-version.model';
+import InfraComponentVersionService from '../infra-component-version/infra-component-version.service';
+import InfraComponentService from '../infra-component/infra-component.service';
+import type AccountService from '@/account/account.service.ts';
 
 export default defineComponent({
   computed: {
     IProductDeployementDetail() {
-      return this.IProductDeployementDetail
+      return this.IProductDeployementDetail;
     },
     IProductDeployment() {
-      return this.IProductDeployment
+      return this.IProductDeployment;
     },
   },
   compatConfig: { MODE: 3 },
-  name: "ProductDeploymentRedesigned",
+  name: 'ProductDeploymentRedesigned',
   setup() {
-    const { t: t$ } = useI18n()
-    const router = useRouter()
-    const productDeploymentService = inject("productDeploymentService", () => new ProductDeploymentService())
-    const productDeployementDetailService = inject(
-      "productDeployementDetailService",
-      () => new ProductDeployementDetailService(),
-    )
-    const clientService = inject("clientService", () => new ClientService())
-    const deployementTypeService = inject("deployementTypeService", () => new DeployementTypeService())
-    const productVersionService = inject("productVersionService", () => new ProductVersionService())
-    const alertService = inject("alertService", () => useAlertService(), true)
-    const productService = inject("productService", () => new ProductService())
-    const moduleDeployementService = inject("moduleDeployementService", () => new ModuleDeployementService())
-    const moduleVersionService = inject("moduleVersionService", () => new ModuleVersionService())
-    const moduleService = inject("moduleService", () => new ModuleService())
-    const infraComponentVersionService = inject(
-      "infraComponentVersionService",
-      () => new InfraComponentVersionService(),
-    )
-    const infraComponentService = inject("infraComponentService", () => new InfraComponentService())
+    const { t: t$ } = useI18n();
+    const router = useRouter();
+    const productDeploymentService = inject('productDeploymentService', () => new ProductDeploymentService());
+    const productDeployementDetailService = inject('productDeployementDetailService', () => new ProductDeployementDetailService());
+    const clientService = inject('clientService', () => new ClientService());
+    const deployementTypeService = inject('deployementTypeService', () => new DeployementTypeService());
+    const productVersionService = inject('productVersionService', () => new ProductVersionService());
+    const alertService = inject('alertService', () => useAlertService(), true);
+    const productService = inject('productService', () => new ProductService());
+    const moduleDeployementService = inject('moduleDeployementService', () => new ModuleDeployementService());
+    const moduleVersionService = inject('moduleVersionService', () => new ModuleVersionService());
+    const moduleService = inject('moduleService', () => new ModuleService());
+    const accountService = inject<AccountService>('accountService');
+    const hasAnyAuthorityValues: Ref<any> = ref({});
+
+    const infraComponentVersionService = inject('infraComponentVersionService', () => new InfraComponentVersionService());
+    const infraComponentService = inject('infraComponentService', () => new InfraComponentService());
 
     // État principal
-    const productDeployments: Ref<IProductDeployment[]> = ref([])
-    const allProductDeployments: Ref<IProductDeployment[]> = ref([])
-    const clients: Ref<IClient[]> = ref([])
-    const products: Ref<any[]> = ref([])
-    const viewMode = ref("list")
-    const searchTerm = ref("")
-    const searchTimeout = ref(null)
-    const selectedClientFilter = ref(null)
-    const selectedProductFilter = ref(null)
+    const productDeployments: Ref<IProductDeployment[]> = ref([]);
+    const allProductDeployments: Ref<IProductDeployment[]> = ref([]);
+    const clients: Ref<IClient[]> = ref([]);
+    const products: Ref<any[]> = ref([]);
+    const viewMode = ref('list');
+    const searchTerm = ref('');
+    const searchTimeout = ref(null);
+    const selectedClientFilter = ref(null);
+    const selectedProductFilter = ref(null);
 
     // Pagination pour la liste principale
-    const currentPage = ref(1)
-    const itemsPerPage = ref(5)
-    const totalItems = ref(0)
+    const currentPage = ref(1);
+    const itemsPerPage = ref(5);
+    const totalItems = ref(0);
 
-    const isFetching = ref(false)
-    const showAddRow = ref(false)
+    const isFetching = ref(false);
+    const showAddRow = ref(false);
 
-    const removeId: Ref<number> = ref(null)
-    const removeEntity = ref<any>(null)
+    const removeId: Ref<number> = ref(null);
+    const removeEntity = ref<any>(null);
 
     // État pour la sélection et les onglets - MODIFIÉ pour le nouveau design
-    const selectedProductDeployment = ref(null)
-    const showModuleSettingsModal = ref(false)
-    const selectedDetail = ref(null)
-    const selectedModuleVersionId = ref("")
-    const selectedAllowedModuleVersions = ref([])
+    const selectedProductDeployment = ref(null);
+    const showModuleSettingsModal = ref(false);
+    const selectedDetail = ref(null);
+    const selectedModuleVersionId = ref('');
+    const selectedAllowedModuleVersions = ref([]);
 
     const newProductDeployment = ref({
-      refContract: "",
-      createDate: new Date().toISOString().split("T")[0],
-      updateDate: new Date().toISOString().split("T")[0],
-      notes: "",
+      refContract: '',
+      createDate: new Date().toISOString().split('T')[0],
+      updateDate: new Date().toISOString().split('T')[0],
+      notes: '',
       client: null,
       product: null,
-    })
+    });
 
     // État pour les détails
-    const productDeployementDetails: Ref<IProductDeployementDetail[]> = ref([])
-    const allProductDeployementDetails = ref([])
-    const deployementTypes = ref([])
-    const productVersions = ref([])
-    const moduleVersions = ref([])
-    const detailSearchTerm = ref("")
-    const detailSearchTimeout = ref(null)
-    const showAddDetailRow = ref(false)
-    const removeDetailId = ref(null)
-    const removeDetailEntity = ref<any>(null)
+    const productDeployementDetails: Ref<IProductDeployementDetail[]> = ref([]);
+    const allProductDeployementDetails = ref([]);
+    const deployementTypes = ref([]);
+    const productVersions = ref([]);
+    const moduleVersions = ref([]);
+    const detailSearchTerm = ref('');
+    const detailSearchTimeout = ref(null);
+    const showAddDetailRow = ref(false);
+    const removeDetailId = ref(null);
+    const removeDetailEntity = ref<any>(null);
 
     // Pagination pour les détails
-    const detailCurrentPage = ref(1)
-    const detailItemsPerPage = ref(10)
-    const detailTotalItems = ref(0)
+    const detailCurrentPage = ref(1);
+    const detailItemsPerPage = ref(10);
+    const detailTotalItems = ref(0);
 
     const newProductDeployementDetail = ref({
-      startDeployementDate: new Date().toISOString().split("T")[0],
-      endDeployementDate: "",
-      notes: "",
+      startDeployementDate: new Date().toISOString().split('T')[0],
+      endDeployementDate: '',
+      notes: '',
       productDeployement: null,
       deployementType: null,
       productVersion: null,
       infraComponentVersions: [],
       allowedModuleVersions: [],
       isSelected: false,
-    })
+    });
 
     // Variables pour la sélection séparée des modules
-    const selectedModuleId = ref("")
-    const selectedVersionId = ref("")
-    const filteredModules: Ref<IModule[]> = ref([])
-    const availableVersionsForSelectedModule: Ref<IModuleVersion[]> = ref([])
-    const allModules: Ref<IModule[]> = ref([])
+    const selectedModuleId = ref('');
+    const selectedVersionId = ref('');
+    const filteredModules: Ref<IModule[]> = ref([]);
+    const availableVersionsForSelectedModule: Ref<IModuleVersion[]> = ref([]);
+    const allModules: Ref<IModule[]> = ref([]);
 
     // Variables pour les onglets
-    const activeTab = ref("deployements")
+    const activeTab = ref('deployements');
 
     // Variables pour les popups d'information
-    const showDetailInfoModal = ref(false)
-    const selectedDetailInfo = ref(null)
-    const showInfraInfoModal = ref(false)
-    const selectedInfraInfo = ref(null)
+    const showDetailInfoModal = ref(false);
+    const selectedDetailInfo = ref(null);
+    const showInfraInfoModal = ref(false);
+    const selectedInfraInfo = ref(null);
 
     // Variables pour l'infrastructure
-    const infraComponentVersions = ref([])
+    const infraComponentVersions = ref([]);
 
     // Computed properties pour la liste principale
     const paginatedProductDeployments = computed(() => {
-      const start = (currentPage.value - 1) * itemsPerPage.value
-      const end = start + itemsPerPage.value
-      return productDeployments.value.slice(start, end)
-    })
+      const start = (currentPage.value - 1) * itemsPerPage.value;
+      const end = start + itemsPerPage.value;
+      return productDeployments.value.slice(start, end);
+    });
 
-    const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value))
+    const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
 
-    const isPrevDisabled = computed(() => currentPage.value <= 1)
-    const isNextDisabled = computed(() => currentPage.value >= totalPages.value)
+    const isPrevDisabled = computed(() => currentPage.value <= 1);
+    const isNextDisabled = computed(() => currentPage.value >= totalPages.value);
 
     const paginationInfo = computed(() => {
-      if (totalItems.value === 0) return "0-0 / 0"
-      const start = (currentPage.value - 1) * itemsPerPage.value + 1
-      const end = Math.min(start + itemsPerPage.value - 1, totalItems.value)
-      return `${start}-${end} / ${totalItems.value}`
-    })
+      if (totalItems.value === 0) return '0-0 / 0';
+      const start = (currentPage.value - 1) * itemsPerPage.value + 1;
+      const end = Math.min(start + itemsPerPage.value - 1, totalItems.value);
+      return `${start}-${end} / ${totalItems.value}`;
+    });
 
     // Computed properties pour les détails
     const paginatedProductDeployementDetails = computed(() => {
-      const start = (detailCurrentPage.value - 1) * detailItemsPerPage.value
-      const end = start + detailItemsPerPage.value
-      return productDeployementDetails.value.slice(start, end)
-    })
+      const start = (detailCurrentPage.value - 1) * detailItemsPerPage.value;
+      const end = start + detailItemsPerPage.value;
+      return productDeployementDetails.value.slice(start, end);
+    });
 
-    const detailTotalPages = computed(() => Math.ceil(detailTotalItems.value / detailItemsPerPage.value))
+    const detailTotalPages = computed(() => Math.ceil(detailTotalItems.value / detailItemsPerPage.value));
 
-    const isDetailPrevDisabled = computed(() => detailCurrentPage.value <= 1)
-    const isDetailNextDisabled = computed(() => detailCurrentPage.value >= detailTotalPages.value)
+    const isDetailPrevDisabled = computed(() => detailCurrentPage.value <= 1);
+    const isDetailNextDisabled = computed(() => detailCurrentPage.value >= detailTotalPages.value);
 
     const detailPaginationInfo = computed(() => {
-      if (detailTotalItems.value === 0) return "0-0 / 0"
-      const start = (detailCurrentPage.value - 1) * detailItemsPerPage.value + 1
-      const end = Math.min(start + detailItemsPerPage.value - 1, detailTotalItems.value)
-      return `${start}-${end} / ${detailTotalItems.value}`
-    })
+      if (detailTotalItems.value === 0) return '0-0 / 0';
+      const start = (detailCurrentPage.value - 1) * detailItemsPerPage.value + 1;
+      const end = Math.min(start + detailItemsPerPage.value - 1, detailTotalItems.value);
+      return `${start}-${end} / ${detailTotalItems.value}`;
+    });
 
     // NOUVELLE FONCTION - Toggle selection comme dans Product
-    const toggleProductDeploymentSelection = (productDeployment) => {
+    const toggleProductDeploymentSelection = productDeployment => {
       if (selectedProductDeployment.value && selectedProductDeployment.value.id === productDeployment.id) {
         // Si on clique sur le même déploiement, on le désélectionne
-        selectedProductDeployment.value = null
-        productDeployementDetails.value = []
-        allProductDeployementDetails.value = []
+        selectedProductDeployment.value = null;
+        productDeployementDetails.value = [];
+        allProductDeployementDetails.value = [];
       } else {
         // Sélectionner le nouveau déploiement
         selectedProductDeployment.value = {
           ...productDeployment,
           productId: productDeployment.product ? productDeployment.product.id : productDeployment.productId,
-        }
+        };
 
         // Initialiser le nouveau détail avec le déploiement sélectionné
         newProductDeployementDetail.value.productDeployement = {
           id: productDeployment.id,
           refContract: productDeployment.refContract,
-        }
+        };
 
         // Charger les détails du déploiement
-        loadDeploymentDetails()
+        loadDeploymentDetails();
       }
-    }
+    };
 
     // NOUVELLE FONCTION - Retour à la liste
     const returnToProductDeploymentList = () => {
-      selectedProductDeployment.value = null
-      productDeployementDetails.value = []
-      allProductDeployementDetails.value = []
-      showAddDetailRow.value = false
-    }
+      selectedProductDeployment.value = null;
+      productDeployementDetails.value = [];
+      allProductDeployementDetails.value = [];
+      showAddDetailRow.value = false;
+    };
 
     // NOUVELLE FONCTION - Charger les détails du déploiement
     const loadDeploymentDetails = async () => {
       try {
-        await retrieveDeployementTypes()
-        await retrieveProductVersions()
-        await retrieveProductDeployementDetails()
-        await retrieveModuleVersions()
-        await retrieveAllModulesForProductVersion()
-        await retrieveInfraComponentVersionsWithRelations() // Utiliser la nouvelle fonction
+        await retrieveDeployementTypes();
+        await retrieveProductVersions();
+        await retrieveProductDeployementDetails();
+        await retrieveModuleVersions();
+        await retrieveAllModulesForProductVersion();
+        await retrieveInfraComponentVersionsWithRelations(); // Utiliser la nouvelle fonction
       } catch (error) {
-        console.error("Error loading deployment details:", error)
+        console.error('Error loading deployment details:', error);
       }
-    }
+    };
 
     // Fonctions pour la liste principale
     const goToNextPage = () => {
-      if (!isNextDisabled.value) currentPage.value++
-    }
+      if (!isNextDisabled.value) currentPage.value++;
+    };
 
     const goToPrevPage = () => {
-      if (!isPrevDisabled.value) currentPage.value--
-    }
+      if (!isPrevDisabled.value) currentPage.value--;
+    };
 
     const updateTotalItems = () => {
-      totalItems.value = productDeployments.value?.length || 0
-    }
+      totalItems.value = productDeployments.value?.length || 0;
+    };
 
     const applyFilters = () => {
-      productDeployments.value = [...allProductDeployments.value]
+      productDeployments.value = [...allProductDeployments.value];
 
-      if (searchTerm.value.trim() !== "") {
-        const searchLower = searchTerm.value.toLowerCase()
-        productDeployments.value = productDeployments.value.filter((pd) => {
+      if (searchTerm.value.trim() !== '') {
+        const searchLower = searchTerm.value.toLowerCase();
+        productDeployments.value = productDeployments.value.filter(pd => {
           return (
             (pd.refContract && pd.refContract.toLowerCase().includes(searchLower)) ||
             (pd.notes && pd.notes.toLowerCase().includes(searchLower)) ||
             (pd.client && pd.client.name && pd.client.name.toLowerCase().includes(searchLower))
-          )
-        })
+          );
+        });
       }
 
       if (selectedClientFilter.value) {
-        productDeployments.value = productDeployments.value.filter(
-          (pd) => pd.client && pd.client.id === selectedClientFilter.value.id,
-        )
+        productDeployments.value = productDeployments.value.filter(pd => pd.client && pd.client.id === selectedClientFilter.value.id);
       }
 
       if (selectedProductFilter.value) {
         productDeployments.value = productDeployments.value.filter(
-          (pd) =>
-            (pd.product && pd.product.id === selectedProductFilter.value.id) ||
-            pd.productId === selectedProductFilter.value.id,
-        )
+          pd => (pd.product && pd.product.id === selectedProductFilter.value.id) || pd.productId === selectedProductFilter.value.id,
+        );
       }
 
-      updateTotalItems()
-      currentPage.value = 1
-    }
+      updateTotalItems();
+      currentPage.value = 1;
+    };
 
     const handleSearch = () => {
-      if (searchTimeout.value) clearTimeout(searchTimeout.value)
+      if (searchTimeout.value) clearTimeout(searchTimeout.value);
       searchTimeout.value = setTimeout(() => {
-        applyFilters()
-      }, 300)
-    }
+        applyFilters();
+      }, 300);
+    };
 
     const resetFilters = () => {
-      searchTerm.value = ""
-      selectedClientFilter.value = null
-      selectedProductFilter.value = null
-      productDeployments.value = [...allProductDeployments.value]
-      updateTotalItems()
-      currentPage.value = 1
-    }
+      searchTerm.value = '';
+      selectedClientFilter.value = null;
+      selectedProductFilter.value = null;
+      productDeployments.value = [...allProductDeployments.value];
+      updateTotalItems();
+      currentPage.value = 1;
+    };
 
     const retrieveProducts = async () => {
       try {
-        const res = await productService().retrieve()
-        products.value = res.data
+        const res = await productService().retrieve();
+        products.value = res.data;
       } catch (err) {
-        alertService.showHttpError(err.response)
+        alertService.showHttpError(err.response);
       }
-    }
+    };
 
     const retrieveProductDeployments = async () => {
-      isFetching.value = true
+      isFetching.value = true;
       try {
-        const res = await productDeploymentService().retrieve()
-        const deployments = res.data.map((pd) => ({
+        const res = await productDeploymentService().retrieve();
+        const deployments = res.data.map(pd => ({
           ...pd,
           isEditing: false,
           showDropdown: false,
           originalData: JSON.parse(JSON.stringify(pd)),
-        }))
+        }));
 
         for (const deployment of deployments) {
           if (deployment.productId) {
-            const product = products.value.find((p) => p.id === deployment.productId)
+            const product = products.value.find(p => p.id === deployment.productId);
             if (product) {
-              deployment.productName = product.name
+              deployment.productName = product.name;
             }
           }
         }
 
-        productDeployments.value = deployments
-        allProductDeployments.value = [...productDeployments.value]
-        updateTotalItems()
+        productDeployments.value = deployments;
+        allProductDeployments.value = [...productDeployments.value];
+        updateTotalItems();
       } catch (err) {
-        alertService.showHttpError(err.response)
+        alertService.showHttpError(err.response);
       } finally {
-        isFetching.value = false
+        isFetching.value = false;
       }
-    }
+    };
 
     const retrieveClients = async () => {
       try {
-        const res = await clientService().retrieve()
-        clients.value = res.data
+        const res = await clientService().retrieve();
+        clients.value = res.data;
       } catch (err) {
-        alertService.showHttpError(err.response)
+        alertService.showHttpError(err.response);
       }
-    }
+    };
 
-    const handleSyncList = () => retrieveProductDeployments()
+    const handleSyncList = () => retrieveProductDeployments();
 
     const prepareRemove = (instance: IProductDeployment) => {
-      removeId.value = instance.id
-      removeEntity.value.show()
-    }
+      removeId.value = instance.id;
+      removeEntity.value.show();
+    };
 
-    const closeDialog = () => removeEntity.value.hide()
+    const closeDialog = () => removeEntity.value.hide();
 
     const removeProductDeployment = async () => {
       try {
-        await productDeploymentService().delete(removeId.value)
-        alertService.showInfo(t$("sdiFrontendApp.productDeployment.deleted", { param: removeId.value }).toString(), {
-          variant: "danger",
-        })
+        await productDeploymentService().delete(removeId.value);
+        alertService.showInfo(t$('sdiFrontendApp.productDeployment.deleted', { param: removeId.value }).toString(), {
+          variant: 'danger',
+        });
 
-        productDeployments.value = productDeployments.value.filter((pd) => pd.id !== removeId.value)
-        allProductDeployments.value = allProductDeployments.value.filter((pd) => pd.id !== removeId.value)
-        updateTotalItems()
+        productDeployments.value = productDeployments.value.filter(pd => pd.id !== removeId.value);
+        allProductDeployments.value = allProductDeployments.value.filter(pd => pd.id !== removeId.value);
+        updateTotalItems();
 
-        removeId.value = null
-        closeDialog()
+        removeId.value = null;
+        closeDialog();
       } catch (error) {
-        alertService.showHttpError(error.response)
+        alertService.showHttpError(error.response);
       }
-    }
+    };
 
     const saveNewProductDeployment = async () => {
       if (!newProductDeployment.value.refContract) {
-        alertService.showAlert("Le champ référence contrat est requis.", "danger")
-        return
+        alertService.showAlert('Le champ référence contrat est requis.', 'danger');
+        return;
       }
 
       if (!newProductDeployment.value.client) {
-        alertService.showAlert("Le champ client est requis.", "danger")
-        return
+        alertService.showAlert('Le champ client est requis.', 'danger');
+        return;
       }
 
       if (!newProductDeployment.value.product) {
-        alertService.showAlert("Le champ produit est requis.", "danger")
-        return
+        alertService.showAlert('Le champ produit est requis.', 'danger');
+        return;
       }
 
       try {
         const toSend = {
           ...newProductDeployment.value,
           productId: newProductDeployment.value.product ? newProductDeployment.value.product.id : null,
-        }
+        };
 
-        const response = await productDeploymentService().create(toSend)
+        const response = await productDeploymentService().create(toSend);
         const added = {
           ...response,
           isEditing: false,
           showDropdown: false,
           originalData: JSON.parse(JSON.stringify(response)),
-        }
+        };
 
-        productDeployments.value.push(added)
-        allProductDeployments.value.push(added)
-        updateTotalItems()
+        productDeployments.value.push(added);
+        allProductDeployments.value.push(added);
+        updateTotalItems();
 
-        showAddRow.value = false
+        showAddRow.value = false;
         newProductDeployment.value = {
-          refContract: "",
-          createDate: new Date().toISOString().split("T")[0],
-          updateDate: new Date().toISOString().split("T")[0],
-          notes: "",
+          refContract: '',
+          createDate: new Date().toISOString().split('T')[0],
+          updateDate: new Date().toISOString().split('T')[0],
+          notes: '',
           client: null,
           product: null,
-        }
+        };
 
-        alertService.showAlert("Déploiement ajouté avec succès.", "success", { variant: "success" })
+        alertService.showAlert('Déploiement ajouté avec succès.', 'success', { variant: 'success' });
       } catch (error) {
-        alertService.showHttpError(error.response)
+        alertService.showHttpError(error.response);
       }
-    }
+    };
 
     const cancelNewProductDeployment = () => {
-      showAddRow.value = false
+      showAddRow.value = false;
       newProductDeployment.value = {
-        refContract: "",
-        createDate: new Date().toISOString().split("T")[0],
-        updateDate: new Date().toISOString().split("T")[0],
-        notes: "",
+        refContract: '',
+        createDate: new Date().toISOString().split('T')[0],
+        updateDate: new Date().toISOString().split('T')[0],
+        notes: '',
         client: null,
         product: null,
-      }
-    }
+      };
+    };
 
-    const editProductDeployment = (productDeployment) => {
+    const editProductDeployment = productDeployment => {
       productDeployment.originalData = JSON.parse(
         JSON.stringify({
           refContract: productDeployment.refContract,
@@ -435,24 +427,24 @@ export default defineComponent({
           product: productDeployment.product ? { ...productDeployment.product } : null,
           productId: productDeployment.product?.id ?? productDeployment.productId,
         }),
-      )
-      productDeployment.isEditing = true
-    }
+      );
+      productDeployment.isEditing = true;
+    };
 
-    const saveProductDeployment = async (productDeployment) => {
+    const saveProductDeployment = async productDeployment => {
       if (!productDeployment.refContract) {
-        alertService.showAlert("Le champ référence contrat est requis.", "danger")
-        return
+        alertService.showAlert('Le champ référence contrat est requis.', 'danger');
+        return;
       }
 
       if (!productDeployment.client) {
-        alertService.showAlert("Le champ client est requis.", "danger")
-        return
+        alertService.showAlert('Le champ client est requis.', 'danger');
+        return;
       }
 
       if (!productDeployment.product) {
-        alertService.showAlert("Le champ produit est requis.", "danger")
-        return
+        alertService.showAlert('Le champ produit est requis.', 'danger');
+        return;
       }
 
       try {
@@ -460,90 +452,80 @@ export default defineComponent({
           id: productDeployment.id,
           refContract: productDeployment.refContract,
           createDate: productDeployment.createDate,
-          updateDate: new Date().toISOString().split("T")[0],
+          updateDate: new Date().toISOString().split('T')[0],
           notes: productDeployment.notes,
           client: productDeployment.client,
           product: productDeployment.product,
           productId: productDeployment.product ? productDeployment.product.id : null,
-        }
+        };
 
-        const response = await productDeploymentService().update(toSend)
+        const response = await productDeploymentService().update(toSend);
         const updated = {
           ...response,
           isEditing: false,
           showDropdown: false,
           originalData: JSON.parse(JSON.stringify(response)),
-        }
+        };
 
-        const index = productDeployments.value.findIndex((pd) => pd.id === productDeployment.id)
-        if (index !== -1) productDeployments.value.splice(index, 1, updated)
+        const index = productDeployments.value.findIndex(pd => pd.id === productDeployment.id);
+        if (index !== -1) productDeployments.value.splice(index, 1, updated);
 
-        const allIndex = allProductDeployments.value.findIndex((pd) => pd.id === productDeployment.id)
-        if (allIndex !== -1) allProductDeployments.value.splice(allIndex, 1, updated)
+        const allIndex = allProductDeployments.value.findIndex(pd => pd.id === productDeployment.id);
+        if (allIndex !== -1) allProductDeployments.value.splice(allIndex, 1, updated);
 
-        alertService.showAlert("Déploiement mis à jour avec succès.", "success", { variant: "success" })
+        alertService.showAlert('Déploiement mis à jour avec succès.', 'success', { variant: 'success' });
       } catch (error) {
-        alertService.showHttpError(error.response)
+        alertService.showHttpError(error.response);
       }
-    }
+    };
 
-    const cancelEdit = (productDeployment) => {
-      productDeployment.refContract = productDeployment.originalData.refContract
-      productDeployment.createDate = productDeployment.originalData.createDate
-      productDeployment.updateDate = productDeployment.originalData.updateDate
-      productDeployment.notes = productDeployment.originalData.notes
-      productDeployment.client = productDeployment.originalData.client
-        ? { ...productDeployment.originalData.client }
-        : null
-      productDeployment.product = productDeployment.originalData.product
-        ? { ...productDeployment.originalData.product }
-        : null
-      productDeployment.isEditing = false
-    }
+    const cancelEdit = productDeployment => {
+      productDeployment.refContract = productDeployment.originalData.refContract;
+      productDeployment.createDate = productDeployment.originalData.createDate;
+      productDeployment.updateDate = productDeployment.originalData.updateDate;
+      productDeployment.notes = productDeployment.originalData.notes;
+      productDeployment.client = productDeployment.originalData.client ? { ...productDeployment.originalData.client } : null;
+      productDeployment.product = productDeployment.originalData.product ? { ...productDeployment.originalData.product } : null;
+      productDeployment.isEditing = false;
+    };
 
     // Fonctions pour les détails
     const goToDetailNextPage = () => {
-      if (!isDetailNextDisabled.value) detailCurrentPage.value++
-    }
+      if (!isDetailNextDisabled.value) detailCurrentPage.value++;
+    };
 
     const goToDetailPrevPage = () => {
-      if (!isDetailPrevDisabled.value) detailCurrentPage.value--
-    }
+      if (!isDetailPrevDisabled.value) detailCurrentPage.value--;
+    };
 
     const updateDetailTotalItems = () => {
-      detailTotalItems.value = productDeployementDetails.value?.length || 0
-    }
+      detailTotalItems.value = productDeployementDetails.value?.length || 0;
+    };
 
     const handleDetailSearch = () => {
-      if (detailSearchTimeout.value) clearTimeout(detailSearchTimeout.value)
+      if (detailSearchTimeout.value) clearTimeout(detailSearchTimeout.value);
       detailSearchTimeout.value = setTimeout(() => {
-        if (detailSearchTerm.value.trim() === "") {
-          productDeployementDetails.value = [...allProductDeployementDetails.value]
+        if (detailSearchTerm.value.trim() === '') {
+          productDeployementDetails.value = [...allProductDeployementDetails.value];
         } else {
-          const searchLower = detailSearchTerm.value.toLowerCase()
-          productDeployementDetails.value = allProductDeployementDetails.value.filter((detail) => {
+          const searchLower = detailSearchTerm.value.toLowerCase();
+          productDeployementDetails.value = allProductDeployementDetails.value.filter(detail => {
             return (
               (detail.notes && detail.notes.toLowerCase().includes(searchLower)) ||
-              (detail.deployementType &&
-                detail.deployementType.type &&
-                detail.deployementType.type.toLowerCase().includes(searchLower)) ||
-              (detail.productVersion &&
-                detail.productVersion.version &&
-                detail.productVersion.version.toLowerCase().includes(searchLower))
-            )
-          })
+              (detail.deployementType && detail.deployementType.type && detail.deployementType.type.toLowerCase().includes(searchLower)) ||
+              (detail.productVersion && detail.productVersion.version && detail.productVersion.version.toLowerCase().includes(searchLower))
+            );
+          });
         }
-        updateDetailTotalItems()
-        detailCurrentPage.value = 1
-      }, 300)
-    }
+        updateDetailTotalItems();
+        detailCurrentPage.value = 1;
+      }, 300);
+    };
 
-    const findDetailsByProductDeployementId = async (id) => {
+    const findDetailsByProductDeployementId = async id => {
       try {
-        const response = await productDeployementDetailService().retrieve()
-        const filteredDetails = response.data.filter(
-          (detail) => detail.productDeployement && detail.productDeployement.id === id,
-        )
+        const response = await productDeployementDetailService().retrieve();
+        const filteredDetails = response.data.filter(detail => detail.productDeployement && detail.productDeployement.id === id);
 
         return {
           data: filteredDetails,
@@ -551,136 +533,132 @@ export default defineComponent({
           statusText: response.statusText,
           headers: response.headers,
           config: response.config,
-        }
+        };
       } catch (error) {
-        console.error(`Erreur lors de la récupération des détails pour le déploiement ${id}:`, error)
-        throw error
+        console.error(`Erreur lors de la récupération des détails pour le déploiement ${id}:`, error);
+        throw error;
       }
-    }
+    };
 
     const retrieveProductDeployementDetails = async () => {
       try {
         if (selectedProductDeployment.value) {
-          const res = await findDetailsByProductDeployementId(selectedProductDeployment.value.id)
+          const res = await findDetailsByProductDeployementId(selectedProductDeployment.value.id);
           productDeployementDetails.value = res.data.map(
-            (detail) =>
+            detail =>
               ({
                 ...detail,
                 isSelected: false,
                 isEditing: false,
                 originalData: JSON.parse(JSON.stringify(detail)),
               }) as IProductDeployementDetail,
-          )
+          );
 
-          allProductDeployementDetails.value = [...productDeployementDetails.value]
-          updateDetailTotalItems()
+          allProductDeployementDetails.value = [...productDeployementDetails.value];
+          updateDetailTotalItems();
         }
       } catch (err) {
-        alertService.showHttpError(err.response)
+        alertService.showHttpError(err.response);
       }
-    }
+    };
 
     const retrieveDeployementTypes = async () => {
       try {
-        const res = await deployementTypeService().retrieve()
-        deployementTypes.value = res.data
+        const res = await deployementTypeService().retrieve();
+        deployementTypes.value = res.data;
       } catch (err) {
-        alertService.showHttpError(err.response)
+        alertService.showHttpError(err.response);
       }
-    }
+    };
 
     const retrieveProductVersions = async () => {
       try {
-        const res = await productVersionService().retrieve()
-        const allVersions = res.data
+        const res = await productVersionService().retrieve();
+        const allVersions = res.data;
 
         if (selectedProductDeployment.value && selectedProductDeployment.value.productId) {
           productVersions.value = allVersions.filter(
-            (version) => version.product && version.product.id === selectedProductDeployment.value.productId,
-          )
+            version => version.product && version.product.id === selectedProductDeployment.value.productId,
+          );
         } else {
-          productVersions.value = allVersions
+          productVersions.value = allVersions;
         }
       } catch (err) {
-        alertService.showHttpError(err.response)
+        alertService.showHttpError(err.response);
       }
-    }
+    };
 
     const retrieveModuleVersions = async () => {
       try {
-        const res = await moduleVersionService().retrieve()
-        moduleVersions.value = res.data
+        const res = await moduleVersionService().retrieve();
+        moduleVersions.value = res.data;
       } catch (err) {
-        alertService.showHttpError(err.response)
+        alertService.showHttpError(err.response);
       }
-    }
+    };
 
-    const getFilteredProductVersions = (productId) => {
-      if (!productId) return productVersions.value
-      return productVersions.value.filter((version) => version.product && version.product.id === productId)
-    }
+    const getFilteredProductVersions = productId => {
+      if (!productId) return productVersions.value;
+      return productVersions.value.filter(version => version.product && version.product.id === productId);
+    };
 
-    const prepareRemoveDetail = (instance) => {
-      removeDetailId.value = instance.id
-      removeDetailEntity.value.show()
-    }
+    const prepareRemoveDetail = instance => {
+      removeDetailId.value = instance.id;
+      removeDetailEntity.value.show();
+    };
 
-    const closeDetailDialog = () => removeDetailEntity.value.hide()
+    const closeDetailDialog = () => removeDetailEntity.value.hide();
 
     const removeProductDeployementDetail = async () => {
       try {
-        await productDeployementDetailService().delete(removeDetailId.value)
-        alertService.showInfo("Détail supprimé avec succès", { variant: "success" })
+        await productDeployementDetailService().delete(removeDetailId.value);
+        alertService.showInfo('Détail supprimé avec succès', { variant: 'success' });
 
-        productDeployementDetails.value = productDeployementDetails.value.filter(
-          (detail) => detail.id !== removeDetailId.value,
-        )
-        allProductDeployementDetails.value = allProductDeployementDetails.value.filter(
-          (detail) => detail.id !== removeDetailId.value,
-        )
-        updateDetailTotalItems()
+        productDeployementDetails.value = productDeployementDetails.value.filter(detail => detail.id !== removeDetailId.value);
+        allProductDeployementDetails.value = allProductDeployementDetails.value.filter(detail => detail.id !== removeDetailId.value);
+        updateDetailTotalItems();
 
-        removeDetailId.value = null
-        closeDetailDialog()
+        removeDetailId.value = null;
+        closeDetailDialog();
       } catch (error) {
-        alertService.showHttpError(error.response)
+        alertService.showHttpError(error.response);
       }
-    }
+    };
 
     const saveNewProductDeployementDetail = async () => {
       if (!newProductDeployementDetail.value.deployementType) {
-        alertService.showAlert("Le champ type de déploiement est requis.", "danger")
-        return
+        alertService.showAlert('Le champ type de déploiement est requis.', 'danger');
+        return;
       }
 
       if (!newProductDeployementDetail.value.productVersion) {
-        alertService.showAlert("Le champ version du produit est requis.", "danger")
-        return
+        alertService.showAlert('Le champ version du produit est requis.', 'danger');
+        return;
       }
 
       try {
         newProductDeployementDetail.value.productDeployement = {
           id: selectedProductDeployment.value.id,
           refContract: selectedProductDeployment.value.refContract,
-        }
+        };
 
-        const response = await productDeployementDetailService().create(newProductDeployementDetail.value)
+        const response = await productDeployementDetailService().create(newProductDeployementDetail.value);
         const added = {
           ...response,
           isSelected: false,
           isEditing: false,
           originalData: JSON.parse(JSON.stringify(response)),
-        }
+        };
 
-        productDeployementDetails.value.push(added)
-        allProductDeployementDetails.value.push(added)
-        updateDetailTotalItems()
+        productDeployementDetails.value.push(added);
+        allProductDeployementDetails.value.push(added);
+        updateDetailTotalItems();
 
-        showAddDetailRow.value = false
+        showAddDetailRow.value = false;
         newProductDeployementDetail.value = {
-          startDeployementDate: new Date().toISOString().split("T")[0],
-          endDeployementDate: "",
-          notes: "",
+          startDeployementDate: new Date().toISOString().split('T')[0],
+          endDeployementDate: '',
+          notes: '',
           productDeployement: {
             id: selectedProductDeployment.value.id,
             refContract: selectedProductDeployment.value.refContract,
@@ -690,35 +668,35 @@ export default defineComponent({
           infraComponentVersions: [],
           allowedModuleVersions: [],
           isSelected: false,
-        }
+        };
 
-        alertService.showAlert("Détail ajouté avec succès.", "success", { variant: "success" })
+        alertService.showAlert('Détail ajouté avec succès.', 'success', { variant: 'success' });
       } catch (error) {
-        alertService.showHttpError(error.response)
+        alertService.showHttpError(error.response);
       }
-    }
+    };
 
     const cancelNewProductDeployementDetail = () => {
-      showAddDetailRow.value = false
+      showAddDetailRow.value = false;
       newProductDeployementDetail.value = {
-        startDeployementDate: new Date().toISOString().split("T")[0],
-        endDeployementDate: "",
-        notes: "",
+        startDeployementDate: new Date().toISOString().split('T')[0],
+        endDeployementDate: '',
+        notes: '',
         productDeployement: selectedProductDeployment.value
           ? {
-            id: selectedProductDeployment.value.id,
-            refContract: selectedProductDeployment.value.refContract,
-          }
+              id: selectedProductDeployment.value.id,
+              refContract: selectedProductDeployment.value.refContract,
+            }
           : null,
         deployementType: null,
         productVersion: null,
         infraComponentVersions: [],
         allowedModuleVersions: [],
         isSelected: false,
-      }
-    }
+      };
+    };
 
-    const editProductDeployementDetail = (detail) => {
+    const editProductDeployementDetail = detail => {
       detail.originalData = JSON.parse(
         JSON.stringify({
           startDeployementDate: detail.startDeployementDate,
@@ -729,19 +707,19 @@ export default defineComponent({
           isSelected: detail.isSelected,
           infraComponentVersions: detail.infraComponentVersions || [],
         }),
-      )
-      detail.isEditing = true
-    }
+      );
+      detail.isEditing = true;
+    };
 
-    const saveProductDeployementDetail = async (detail) => {
+    const saveProductDeployementDetail = async detail => {
       if (!detail.deployementType) {
-        alertService.showAlert("Le champ type de déploiement est requis.", "danger")
-        return
+        alertService.showAlert('Le champ type de déploiement est requis.', 'danger');
+        return;
       }
 
       if (!detail.productVersion) {
-        alertService.showAlert("Le champ version du produit est requis.", "danger")
-        return
+        alertService.showAlert('Le champ version du produit est requis.', 'danger');
+        return;
       }
 
       try {
@@ -755,472 +733,464 @@ export default defineComponent({
           productVersion: detail.productVersion,
           infraComponentVersions: detail.infraComponentVersions || [],
           allowedModuleVersions: detail.allowedModuleVersions || [],
-        }
+        };
 
-        const response = await productDeployementDetailService().update(toSend)
+        const response = await productDeployementDetailService().update(toSend);
         const updated = {
           ...response,
           isSelected: detail.isSelected,
           isEditing: false,
           originalData: null,
-        }
+        };
 
-        const index = productDeployementDetails.value.findIndex((d) => d.id === detail.id)
-        if (index !== -1) productDeployementDetails.value.splice(index, 1, updated)
+        const index = productDeployementDetails.value.findIndex(d => d.id === detail.id);
+        if (index !== -1) productDeployementDetails.value.splice(index, 1, updated);
 
-        const allIndex = allProductDeployementDetails.value.findIndex((d) => d.id === detail.id)
-        if (allIndex !== -1) allProductDeployementDetails.value.splice(allIndex, 1, updated)
+        const allIndex = allProductDeployementDetails.value.findIndex(d => d.id === detail.id);
+        if (allIndex !== -1) allProductDeployementDetails.value.splice(allIndex, 1, updated);
 
-        alertService.showAlert("Détail mis à jour avec succès.", "success", { variant: "success" })
+        alertService.showAlert('Détail mis à jour avec succès.', 'success', { variant: 'success' });
       } catch (error) {
-        alertService.showHttpError(error.response)
+        alertService.showHttpError(error.response);
       }
-    }
+    };
 
-    const cancelEditDetail = (detail) => {
-      detail.startDeployementDate = detail.originalData.startDeployementDate
-      detail.endDeployementDate = detail.originalData.endDeployementDate
-      detail.notes = detail.originalData.notes
-      detail.deployementType = detail.originalData.deployementType
-      detail.productVersion = detail.originalData.productVersion
-      detail.isSelected = detail.originalData.isSelected
-      detail.infraComponentVersions = detail.originalData.infraComponentVersions || []
-      detail.isEditing = false
-    }
+    const cancelEditDetail = detail => {
+      detail.startDeployementDate = detail.originalData.startDeployementDate;
+      detail.endDeployementDate = detail.originalData.endDeployementDate;
+      detail.notes = detail.originalData.notes;
+      detail.deployementType = detail.originalData.deployementType;
+      detail.productVersion = detail.originalData.productVersion;
+      detail.isSelected = detail.originalData.isSelected;
+      detail.infraComponentVersions = detail.originalData.infraComponentVersions || [];
+      detail.isEditing = false;
+    };
 
     // Récupérer tous les modules
     const retrieveAllModules = async () => {
       try {
-        const res = await moduleService().retrieve()
-        allModules.value = res.data
-        filterModulesByProduct()
+        const res = await moduleService().retrieve();
+        allModules.value = res.data;
+        filterModulesByProduct();
       } catch (err) {
-        alertService.showHttpError(err.response)
+        alertService.showHttpError(err.response);
       }
-    }
+    };
 
     // Récupérer tous les modules versions pour le productversion
     const retrieveAllModulesForProductVersion = async () => {
       try {
         // Récupérer tous les modules versions disponibles
-        const res = await moduleVersionService().retrieve()
-        allModules.value = res.data
+        const res = await moduleVersionService().retrieve();
+        allModules.value = res.data;
 
         // Plus de filtrage par produit - on récupère tout
-        filteredModules.value = allModules.value
+        filteredModules.value = allModules.value;
       } catch (err) {
-        alertService.showHttpError(err.response)
+        alertService.showHttpError(err.response);
       }
-    }
+    };
 
     // Filtrer les modules par produit
     const filterModulesByProduct = () => {
       if (selectedProductDeployment.value && selectedProductDeployment.value.productId) {
-        filteredModules.value = allModules.value.filter(
-          (module) => module.productId === selectedProductDeployment.value.productId,
-        )
+        filteredModules.value = allModules.value.filter(module => module.productId === selectedProductDeployment.value.productId);
       } else {
-        filteredModules.value = allModules.value
+        filteredModules.value = allModules.value;
       }
-    }
+    };
 
     // Récupérer les composants d'infrastructure avec toutes les relations
     const retrieveInfraComponentVersionsWithRelations = async () => {
       try {
-        const res = await infraComponentVersionService().retrieve()
-        infraComponentVersions.value = res.data
+        const res = await infraComponentVersionService().retrieve();
+        infraComponentVersions.value = res.data;
 
         // Enrichir chaque infraComponentVersion avec les données complètes de infraComponent
         for (const icv of infraComponentVersions.value) {
           if (icv.infraComponent && icv.infraComponent.id && !icv.infraComponent.name) {
             // Si on a seulement l'ID, récupérer les données complètes
             try {
-              const infraComponentRes = await infraComponentService().find(icv.infraComponent.id)
-              icv.infraComponent = infraComponentRes
+              const infraComponentRes = await infraComponentService().find(icv.infraComponent.id);
+              icv.infraComponent = infraComponentRes;
             } catch (error) {
-              console.warn(`Could not fetch infraComponent ${icv.infraComponent.id}:`, error)
+              console.warn(`Could not fetch infraComponent ${icv.infraComponent.id}:`, error);
             }
           }
         }
       } catch (err) {
-        alertService.showHttpError(err.response)
+        alertService.showHttpError(err.response);
       }
-    }
+    };
 
     // Quand un module est sélectionné, charger ses versions
     const onModuleChange = () => {
-      selectedVersionId.value = ""
+      selectedVersionId.value = '';
       if (selectedModuleId.value) {
         availableVersionsForSelectedModule.value = moduleVersions.value.filter(
-          (version) => version.module && version.module.id === Number.parseInt(selectedModuleId.value),
-        )
+          version => version.module && version.module.id === Number.parseInt(selectedModuleId.value),
+        );
       } else {
-        availableVersionsForSelectedModule.value = []
+        availableVersionsForSelectedModule.value = [];
       }
-    }
+    };
 
     // Ajouter le module et version sélectionnés
     const addModuleVersionToDetail = () => {
-      if (!selectedModuleId.value || !selectedVersionId.value) return
+      if (!selectedModuleId.value || !selectedVersionId.value) return;
 
-      const moduleVersion = moduleVersions.value.find((mv) => mv.id === Number.parseInt(selectedVersionId.value))
+      const moduleVersion = moduleVersions.value.find(mv => mv.id === Number.parseInt(selectedVersionId.value));
       if (moduleVersion) {
-        const exists = selectedAllowedModuleVersions.value.some((mv) => mv.id === moduleVersion.id)
+        const exists = selectedAllowedModuleVersions.value.some(mv => mv.id === moduleVersion.id);
         if (!exists) {
-          selectedAllowedModuleVersions.value.push(moduleVersion)
+          selectedAllowedModuleVersions.value.push(moduleVersion);
         }
         // Réinitialiser les sélections
-        selectedModuleId.value = ""
-        selectedVersionId.value = ""
-        availableVersionsForSelectedModule.value = []
+        selectedModuleId.value = '';
+        selectedVersionId.value = '';
+        availableVersionsForSelectedModule.value = [];
       }
-    }
+    };
 
     // Fonctions pour les modules
-    const openModuleSettingsBase = async (detail) => {
-      selectedDetail.value = detail
-      selectedAllowedModuleVersions.value = detail.allowedModuleVersions || []
+    const openModuleSettingsBase = async detail => {
+      selectedDetail.value = detail;
+      selectedAllowedModuleVersions.value = detail.allowedModuleVersions || [];
 
       // Charger les modules si pas encore fait
       if (allModules.value.length === 0) {
-        await retrieveAllModules()
+        await retrieveAllModules();
       } else {
-        filterModulesByProduct()
+        filterModulesByProduct();
       }
 
-      showModuleSettingsModal.value = true
-    }
+      showModuleSettingsModal.value = true;
+    };
 
     // Fonctions pour les popups d'information
-    const viewDetailInfo = (detail) => {
-      selectedDetailInfo.value = detail
-      showDetailInfoModal.value = true
-    }
+    const viewDetailInfo = detail => {
+      selectedDetailInfo.value = detail;
+      showDetailInfoModal.value = true;
+    };
 
     const closeDetailInfoModal = () => {
-      showDetailInfoModal.value = false
-      selectedDetailInfo.value = null
-    }
+      showDetailInfoModal.value = false;
+      selectedDetailInfo.value = null;
+    };
 
-    const viewInfraComponentInfo = (infraComponent) => {
-      selectedInfraInfo.value = infraComponent
-      showInfraInfoModal.value = true
-    }
+    const viewInfraComponentInfo = infraComponent => {
+      selectedInfraInfo.value = infraComponent;
+      showInfraInfoModal.value = true;
+    };
 
     const closeInfraInfoModal = () => {
-      showInfraInfoModal.value = false
-      selectedInfraInfo.value = null
-    }
+      showInfraInfoModal.value = false;
+      selectedInfraInfo.value = null;
+    };
 
     // Récupérer les modules versions depuis le productVersion sélectionné et les enrichir
     const getModuleVersionsForSelectedProduct = () => {
       if (!selectedDetail.value || !selectedDetail.value.productVersion) {
-        console.log("Pas de détail ou de productVersion sélectionné")
-        return []
+        console.log('Pas de détail ou de productVersion sélectionné');
+        return [];
       }
 
-      console.log("ProductVersion sélectionné:", selectedDetail.value.productVersion)
+      console.log('ProductVersion sélectionné:', selectedDetail.value.productVersion);
 
       // Créer un cache des modules complets pour éviter la perte de données
-      const moduleCache = new Map()
+      const moduleCache = new Map();
 
       // Remplir le cache avec tous les modules disponibles
-      allModules.value.forEach((module) => {
-        moduleCache.set(module.id, module)
-      })
+      allModules.value.forEach(module => {
+        moduleCache.set(module.id, module);
+      });
 
       // Vérifier si le productVersion a des moduleVersions
-      if (
-        !selectedDetail.value.productVersion.moduleVersions ||
-        !selectedDetail.value.productVersion.moduleVersions.length === 0
-      ) {
-        console.log("Aucun moduleVersions trouvé dans productVersion, recherche directe...")
+      if (!selectedDetail.value.productVersion.moduleVersions || !selectedDetail.value.productVersion.moduleVersions.length === 0) {
+        console.log('Aucun moduleVersions trouvé dans productVersion, recherche directe...');
 
         return moduleVersions.value
-          .filter((mv) => {
-            return mv.productVersion && mv.productVersion.id === selectedDetail.value.productVersion.id
+          .filter(mv => {
+            return mv.productVersion && mv.productVersion.id === selectedDetail.value.productVersion.id;
           })
-          .map((mv) => {
+          .map(mv => {
             // Enrichir avec les données du cache
             if (!mv.module || !mv.module.name) {
-              const moduleId = mv.moduleId || (mv.module && mv.module.id)
+              const moduleId = mv.moduleId || (mv.module && mv.module.id);
               if (moduleId && moduleCache.has(moduleId)) {
-                mv.module = { ...moduleCache.get(moduleId) }
+                mv.module = { ...moduleCache.get(moduleId) };
               }
             }
-            return mv
+            return mv;
           })
-          .filter((mv) => mv.module && mv.module.name)
+          .filter(mv => mv.module && mv.module.name);
       }
 
-      console.log(
-        "ModuleVersions trouvés dans productVersion:",
-        selectedDetail.value.productVersion.moduleVersions.length,
-      )
+      console.log('ModuleVersions trouvés dans productVersion:', selectedDetail.value.productVersion.moduleVersions.length);
 
       return selectedDetail.value.productVersion.moduleVersions
-        .map((mv) => {
+        .map(mv => {
           // Trouver la version complète dans le cache
-          const fullModuleVersion = moduleVersions.value.find((fullMv) => fullMv.id === mv.id)
+          const fullModuleVersion = moduleVersions.value.find(fullMv => fullMv.id === mv.id);
 
           if (fullModuleVersion) {
             // Assurer la persistance des données du module
             if (!fullModuleVersion.module || !fullModuleVersion.module.name) {
-              const moduleId = fullModuleVersion.moduleId || (fullModuleVersion.module && fullModuleVersion.module.id)
+              const moduleId = fullModuleVersion.moduleId || (fullModuleVersion.module && fullModuleVersion.module.id);
               if (moduleId && moduleCache.has(moduleId)) {
-                fullModuleVersion.module = { ...moduleCache.get(moduleId) }
+                fullModuleVersion.module = { ...moduleCache.get(moduleId) };
               }
             }
             return {
               ...fullModuleVersion,
               module: fullModuleVersion.module || mv.module,
-            }
+            };
           }
 
           // Si pas trouvé dans le cache, enrichir les données existantes
           if (!mv.module || !mv.module.name) {
-            const moduleId = mv.moduleId || (mv.module && mv.module.id)
+            const moduleId = mv.moduleId || (mv.module && mv.module.id);
             if (moduleId && moduleCache.has(moduleId)) {
-              mv.module = { ...moduleCache.get(moduleId) }
+              mv.module = { ...moduleCache.get(moduleId) };
             }
           }
 
-          return mv
+          return mv;
         })
-        .filter((mv) => mv.module && mv.module.name)
-    }
+        .filter(mv => mv.module && mv.module.name);
+    };
 
     // Ajouter cette fonction pour charger les modules versions pour un productVersion spécifique
-    const loadModuleVersionsForProductVersion = async (productVersionId) => {
-      if (!productVersionId) return []
+    const loadModuleVersionsForProductVersion = async productVersionId => {
+      if (!productVersionId) return [];
 
       try {
-        console.log("Chargement des modules versions pour productVersion:", productVersionId)
+        console.log('Chargement des modules versions pour productVersion:', productVersionId);
 
         // Récupérer la version du produit complète avec ses relations
-        const productVersionResponse = await productVersionService().find(productVersionId)
+        const productVersionResponse = await productVersionService().find(productVersionId);
 
         if (productVersionResponse && selectedDetail.value) {
           // Mettre à jour le productVersion dans le détail sélectionné avec la version complète
-          selectedDetail.value.productVersion = productVersionResponse
+          selectedDetail.value.productVersion = productVersionResponse;
 
-          console.log("ProductVersion chargé avec ses relations:", productVersionResponse)
+          console.log('ProductVersion chargé avec ses relations:', productVersionResponse);
 
           // Si le productVersion a des moduleVersions, les utiliser directement
           if (productVersionResponse.moduleVersions && productVersionResponse.moduleVersions.length > 0) {
-            console.log("ModuleVersions trouvés dans la réponse:", productVersionResponse.moduleVersions.length)
-            return productVersionResponse.moduleVersions
+            console.log('ModuleVersions trouvés dans la réponse:', productVersionResponse.moduleVersions.length);
+            return productVersionResponse.moduleVersions;
           }
         }
 
         // Si on n'a pas trouvé de moduleVersions dans le productVersion,
         // chercher tous les moduleVersions qui sont associés à ce productVersion
-        const moduleVersionsResponse = await moduleVersionService().retrieve()
+        const moduleVersionsResponse = await moduleVersionService().retrieve();
         const filteredModuleVersions = moduleVersionsResponse.data.filter(
-          (mv) => mv.productVersion && mv.productVersion.id === productVersionId,
-        )
+          mv => mv.productVersion && mv.productVersion.id === productVersionId,
+        );
 
-        console.log("ModuleVersions filtrés par productVersion:", filteredModuleVersions.length)
+        console.log('ModuleVersions filtrés par productVersion:', filteredModuleVersions.length);
 
         // Enrichir les moduleVersions avec leurs modules
         for (const mv of filteredModuleVersions) {
           if (mv.moduleId && (!mv.module || !mv.module.name)) {
             try {
-              const moduleResponse = await moduleService().find(mv.moduleId)
-              mv.module = moduleResponse
+              const moduleResponse = await moduleService().find(mv.moduleId);
+              mv.module = moduleResponse;
             } catch (error) {
-              console.warn(`Impossible de charger le module ${mv.moduleId}:`, error)
+              console.warn(`Impossible de charger le module ${mv.moduleId}:`, error);
             }
           }
         }
 
-        return filteredModuleVersions
+        return filteredModuleVersions;
       } catch (error) {
-        console.error("Erreur lors du chargement des modules versions:", error)
-        alertService.showHttpError(error.response)
-        return []
+        console.error('Erreur lors du chargement des modules versions:', error);
+        alertService.showHttpError(error.response);
+        return [];
       }
-    }
+    };
 
     // Modifier la fonction openModuleSettings pour charger les modules versions
-    const openModuleSettings = async (detail) => {
-      selectedDetail.value = detail
-      selectedAllowedModuleVersions.value = detail.allowedModuleVersions || []
+    const openModuleSettings = async detail => {
+      selectedDetail.value = detail;
+      selectedAllowedModuleVersions.value = detail.allowedModuleVersions || [];
 
       try {
         // Charger les modules versions pour le productVersion sélectionné
         if (detail.productVersion && detail.productVersion.id) {
-          await loadModuleVersionsForProductVersion(detail.productVersion.id)
+          await loadModuleVersionsForProductVersion(detail.productVersion.id);
 
           // Rafraîchir la liste des modules versions disponibles
-          const availableModules = getModuleVersionsForSelectedProduct()
-          console.log("Modules versions disponibles:", availableModules.length)
+          const availableModules = getModuleVersionsForSelectedProduct();
+          console.log('Modules versions disponibles:', availableModules.length);
 
           if (availableModules.length === 0) {
-            alertService.showAlert("Aucun module version disponible pour cette version de produit.", "warning")
+            alertService.showAlert('Aucun module version disponible pour cette version de produit.', 'warning');
           }
         } else {
-          alertService.showAlert("Aucune version de produit sélectionnée.", "warning")
+          alertService.showAlert('Aucune version de produit sélectionnée.', 'warning');
         }
       } catch (error) {
-        console.error("Erreur lors de l'ouverture des paramètres de module:", error)
-        alertService.showHttpError(error.response)
+        console.error("Erreur lors de l'ouverture des paramètres de module:", error);
+        alertService.showHttpError(error.response);
       }
 
-      showModuleSettingsModal.value = true
-    }
+      showModuleSettingsModal.value = true;
+    };
 
     // Récupérer les infraComponentVersions depuis le productVersion sélectionné et les enrichir
     const getInfraComponentVersionsForSelectedProduct = () => {
       // Trouver la version du produit correspondant au déploiement sélectionné
-      const productVersion = productVersions.value.find(
-        (pv) => pv.product && pv.product.id === selectedProductDeployment.value?.productId,
-      )
+      const productVersion = productVersions.value.find(pv => pv.product && pv.product.id === selectedProductDeployment.value?.productId);
 
       if (!productVersion || !productVersion.infraComponentVersions) {
-        return []
+        return [];
       }
 
       // Enrichir chaque infraComponentVersion avec les données complètes
       return productVersion.infraComponentVersions
-        .map((icv) => {
+        .map(icv => {
           // Trouver la version complète dans infraComponentVersions (cache global)
-          const fullInfraComponentVersion = infraComponentVersions.value.find((fullIcv) => fullIcv.id === icv.id)
+          const fullInfraComponentVersion = infraComponentVersions.value.find(fullIcv => fullIcv.id === icv.id);
 
           if (fullInfraComponentVersion && fullInfraComponentVersion.infraComponent) {
-            return fullInfraComponentVersion
+            return fullInfraComponentVersion;
           }
 
           // Si pas trouvé dans le cache, essayer de construire à partir des données disponibles
           return {
             ...icv,
             infraComponent: icv.infraComponent || null,
-          }
+          };
         })
-        .filter((icv) => icv.infraComponent && icv.infraComponent.name) // Filtrer ceux qui ont un nom
-    }
+        .filter(icv => icv.infraComponent && icv.infraComponent.name); // Filtrer ceux qui ont un nom
+    };
 
-    const getModuleVersionById = (id) => {
+    const getModuleVersionById = id => {
       // Utiliser la fonction enrichie pour récupérer les modules
-      const availableModules = getModuleVersionsForSelectedProduct()
-      return availableModules.find((version) => version.id === Number.parseInt(id))
-    }
+      const availableModules = getModuleVersionsForSelectedProduct();
+      return availableModules.find(version => version.id === Number.parseInt(id));
+    };
 
     const addModuleToDetail = () => {
-      if (!selectedModuleVersionId.value) return
+      if (!selectedModuleVersionId.value) return;
 
-      const moduleVersion = getModuleVersionById(selectedModuleVersionId.value)
+      const moduleVersion = getModuleVersionById(selectedModuleVersionId.value);
       if (moduleVersion) {
-        const exists = selectedAllowedModuleVersions.value.some((mv) => mv.id === moduleVersion.id)
+        const exists = selectedAllowedModuleVersions.value.some(mv => mv.id === moduleVersion.id);
         if (!exists) {
-          selectedAllowedModuleVersions.value.push(moduleVersion)
+          selectedAllowedModuleVersions.value.push(moduleVersion);
         }
-        selectedModuleVersionId.value = ""
+        selectedModuleVersionId.value = '';
       }
-    }
+    };
 
-    const removeModuleFromDetail = (index) => {
-      selectedAllowedModuleVersions.value.splice(index, 1)
-    }
+    const removeModuleFromDetail = index => {
+      selectedAllowedModuleVersions.value.splice(index, 1);
+    };
 
     const saveModuleSettingsAndCreateDeployments = async () => {
       try {
         if (selectedDetail.value) {
           // Créer une copie profonde pour éviter les références perdues
-          const enrichedModuleVersions = selectedAllowedModuleVersions.value.map((mv) => ({
+          const enrichedModuleVersions = selectedAllowedModuleVersions.value.map(mv => ({
             ...mv,
             module: mv.module ? { ...mv.module } : null,
-          }))
+          }));
 
-          selectedDetail.value.allowedModuleVersions = enrichedModuleVersions
+          selectedDetail.value.allowedModuleVersions = enrichedModuleVersions;
 
           // Sauvegarder avec toutes les relations
           const detailToSave = {
             ...selectedDetail.value,
             allowedModuleVersions: enrichedModuleVersions,
-          }
+          };
 
-          await productDeployementDetailService().update(detailToSave)
+          await productDeployementDetailService().update(detailToSave);
 
           // Créer automatiquement les modules de déploiement
           for (let i = 0; i < enrichedModuleVersions.length; i++) {
-            const moduleVersion = enrichedModuleVersions[i]
-            const code = `MD ${i + 1}`
+            const moduleVersion = enrichedModuleVersions[i];
+            const code = `MD ${i + 1}`;
 
             const newModuleDeployement = {
               code: code,
               notes: `Module déployé: ${moduleVersion.module?.name}`,
-              createDate: new Date().toISOString().split("T")[0],
+              createDate: new Date().toISOString().split('T')[0],
               moduleVersion: moduleVersion,
               productDeployementDetail: selectedDetail.value,
-            }
+            };
 
-            await moduleDeployementService().create(newModuleDeployement)
+            await moduleDeployementService().create(newModuleDeployement);
           }
 
           // Mettre à jour le cache local
-          const detailIndex = productDeployementDetails.value.findIndex((d) => d.id === selectedDetail.value.id)
+          const detailIndex = productDeployementDetails.value.findIndex(d => d.id === selectedDetail.value.id);
           if (detailIndex !== -1) {
-            productDeployementDetails.value[detailIndex].allowedModuleVersions = enrichedModuleVersions
+            productDeployementDetails.value[detailIndex].allowedModuleVersions = enrichedModuleVersions;
           }
 
-          alertService.showInfo("Modules autorisés configurés et déploiements créés avec succès", {
-            variant: "success",
-          })
+          alertService.showInfo('Modules autorisés configurés et déploiements créés avec succès', {
+            variant: 'success',
+          });
         }
-        closeModuleSettingsModal()
+        closeModuleSettingsModal();
       } catch (error) {
-        alertService.showHttpError(error.response)
+        alertService.showHttpError(error.response);
       }
-    }
+    };
 
     const closeModuleSettingsModal = () => {
-      showModuleSettingsModal.value = false
-      selectedDetail.value = null
-      selectedAllowedModuleVersions.value = []
-    }
+      showModuleSettingsModal.value = false;
+      selectedDetail.value = null;
+      selectedAllowedModuleVersions.value = [];
+    };
 
     // Fonction pour formater les dates
-    const formatDate = (dateString) => {
-      if (!dateString) return "Non définie"
-      const date = new Date(dateString)
-      return date.toLocaleDateString("fr-FR", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      })
-    }
+    const formatDate = dateString => {
+      if (!dateString) return 'Non définie';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+    };
 
     // Watchers
     watch(
       productDeployments,
       () => {
-        updateTotalItems()
+        updateTotalItems();
         if (currentPage.value > totalPages.value && totalPages.value > 0) {
-          currentPage.value = totalPages.value
+          currentPage.value = totalPages.value;
         }
       },
       { deep: true },
-    )
+    );
 
     watch(
       productDeployementDetails,
       () => {
-        updateDetailTotalItems()
+        updateDetailTotalItems();
         if (detailCurrentPage.value > detailTotalPages.value && detailTotalPages.value > 0) {
-          detailCurrentPage.value = detailTotalPages.value
+          detailCurrentPage.value = detailTotalPages.value;
         }
       },
       { deep: true },
-    )
+    );
 
     onMounted(async () => {
-      await retrieveClients()
-      await retrieveProducts()
-      await retrieveProductDeployments()
-    })
+      await retrieveClients();
+      await retrieveProducts();
+      await retrieveProductDeployments();
+    });
 
     return {
+      accountService,
+      hasAnyAuthorityValues,
       // État principal
       viewMode,
       showAddRow,
@@ -1343,6 +1313,16 @@ export default defineComponent({
       formatDate,
       getModuleVersionsForSelectedProduct,
       getInfraComponentVersionsForSelectedProduct,
-    }
+    };
   },
-})
+  methods: {
+    hasAnyAuthority(authorities: any): boolean {
+      this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then(value => {
+        if (this.hasAnyAuthorityValues[authorities] !== value) {
+          this.hasAnyAuthorityValues = { ...this.hasAnyAuthorityValues, [authorities]: value };
+        }
+      });
+      return this.hasAnyAuthorityValues[authorities] ?? false;
+    },
+  },
+});
