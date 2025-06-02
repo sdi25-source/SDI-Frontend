@@ -1,9 +1,10 @@
-import { defineComponent, inject, onMounted, ref, computed, watch } from 'vue';
+import { type Ref, defineComponent, inject, onMounted, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ClientEventService from './client-event.service';
 import { type IClientEvent } from '@/shared/model/client-event.model';
 import useDataUtils from '@/shared/data/data-utils.service';
 import { useAlertService } from '@/shared/alert/alert.service';
+import type AccountService from '@/account/account.service.ts';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -13,6 +14,9 @@ export default defineComponent({
     const dataUtils = useDataUtils();
     const clientEventService = inject('clientEventService', () => new ClientEventService());
     const alertService = inject('alertService', () => useAlertService(), true);
+    const accountService = inject<AccountService>('accountService');
+
+    const hasAnyAuthorityValues: Ref<any> = ref({});
 
     const clientEvents = ref<IClientEvent[]>([]);
     const allClientEvents = ref<IClientEvent[]>([]);
@@ -183,8 +187,20 @@ export default defineComponent({
       handleSearch,
       goToNextPage,
       goToPrevPage,
+      accountService,
+      hasAnyAuthorityValues,
       t$,
       ...dataUtils,
     };
+  },
+  methods: {
+    hasAnyAuthority(authorities: any): boolean {
+      this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then(value => {
+        if (this.hasAnyAuthorityValues[authorities] !== value) {
+          this.hasAnyAuthorityValues = { ...this.hasAnyAuthorityValues, [authorities]: value };
+        }
+      });
+      return this.hasAnyAuthorityValues[authorities] ?? false;
+    },
   },
 });

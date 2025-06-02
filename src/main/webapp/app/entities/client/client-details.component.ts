@@ -6,6 +6,7 @@ import ClientService from './client.service';
 import useDataUtils from '@/shared/data/data-utils.service';
 import { type IClient } from '@/shared/model/client.model';
 import { useAlertService } from '@/shared/alert/alert.service';
+import type AccountService from '@/account/account.service.ts';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -13,11 +14,13 @@ export default defineComponent({
   setup() {
     const clientService = inject('clientService', () => new ClientService());
     const alertService = inject('alertService', () => useAlertService(), true);
+    const accountService = inject<AccountService>('accountService');
 
     const dataUtils = useDataUtils();
 
     const route = useRoute();
     const router = useRouter();
+    const hasAnyAuthorityValues: Ref<any> = ref({});
 
     const previousState = () => router.go(-1);
     const client: Ref<IClient> = ref({});
@@ -75,8 +78,20 @@ export default defineComponent({
       pdfUrl,
       closePdfModal,
       downloadPdf,
+      accountService,
+      hasAnyAuthorityValues,
       ...dataUtils,
       t$: useI18n().t,
     };
+  },
+  methods: {
+    hasAnyAuthority(authorities: any): boolean {
+      this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then(value => {
+        if (this.hasAnyAuthorityValues[authorities] !== value) {
+          this.hasAnyAuthorityValues = { ...this.hasAnyAuthorityValues, [authorities]: value };
+        }
+      });
+      return this.hasAnyAuthorityValues[authorities] ?? false;
+    },
   },
 });

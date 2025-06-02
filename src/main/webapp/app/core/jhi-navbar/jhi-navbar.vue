@@ -60,7 +60,7 @@
           </li>
 
           <!-- parameters -->
-          <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'parameters' }">
+          <li v-if="authenticated && hasAnyAuthority('ROLE_ADMIN')" class="dropdown" :class="{ active: activeMenu === 'parameters' }">
             <a href="#" class="no-link-style"
               ><span>{{ t$('global.menu.entities.parameters') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
             ></a>

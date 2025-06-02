@@ -1,10 +1,11 @@
-import { defineComponent, inject, onMounted, ref, computed, watch } from 'vue';
+import { type Ref, defineComponent, inject, onMounted, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ClientService from './client.service';
 import ClientTypeService from '../client-type/client-type.service';
 import useDataUtils from '@/shared/data/data-utils.service';
 import { useAlertService } from '@/shared/alert/alert.service';
 import ClientSizeService from '@/entities/client-size/client-size.service.ts';
+import type AccountService from '@/account/account.service.ts';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -15,8 +16,10 @@ export default defineComponent({
     const clientService = inject('clientService', () => new ClientService());
     const clientTypeService = inject('clientTypeService', () => new ClientTypeService());
     const clientSizeService = inject('clientSizeService', () => new ClientSizeService());
+    const accountService = inject<AccountService>('accountService');
     const alertService = inject('alertService', () => useAlertService(), true);
 
+    const hasAnyAuthorityValues: Ref<any> = ref({});
     const clients = ref([]);
     const allClients = ref([]);
     const clientTypes = ref([]);
@@ -255,6 +258,8 @@ export default defineComponent({
       goToPrevPage,
       searchTerm,
       handleSearch,
+      accountService,
+      hasAnyAuthorityValues,
       ...dataUtils,
     };
   },
@@ -266,6 +271,14 @@ export default defineComponent({
     openEditModal(id) {
       this.selectedClientId = id;
       this.showEditModal = true;
+    },
+    hasAnyAuthority(authorities: any): boolean {
+      this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then(value => {
+        if (this.hasAnyAuthorityValues[authorities] !== value) {
+          this.hasAnyAuthorityValues = { ...this.hasAnyAuthorityValues, [authorities]: value };
+        }
+      });
+      return this.hasAnyAuthorityValues[authorities] ?? false;
     },
   },
 });

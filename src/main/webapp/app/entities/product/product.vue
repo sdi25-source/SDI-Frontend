@@ -9,6 +9,7 @@
           data-cy="entityCreateButton"
           class="btn button-primary btn-sm mr-3 rounded-1"
           :disabled="showAddRow"
+          v-if="hasAnyAuthority('ROLE_USER')"
         >
           <font-awesome-icon icon="plus"></font-awesome-icon>
           <span v-text="t$('global.new')"></span>
@@ -174,7 +175,12 @@
                     </div>
                   </template>
                   <template v-else>
-                    <div class="icon-container edit-container" @click="editProduct(product)" title="Modifier">
+                    <div
+                      class="icon-container edit-container"
+                      @click="editProduct(product)"
+                      title="Modifier"
+                      v-if="hasAnyAuthority('ROLE_USER')"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="14"
@@ -188,7 +194,12 @@
                         />
                       </svg>
                     </div>
-                    <div class="icon-container delete-container" @click="prepareRemove(product)" title="Supprimer">
+                    <div
+                      class="icon-container delete-container"
+                      @click="prepareRemove(product)"
+                      title="Supprimer"
+                      v-if="hasAnyAuthority('ROLE_USER')"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="20"
@@ -418,6 +429,7 @@
                     data-cy="entityCreateButton"
                     class="btn btn-sm btn-primary btn-sm mr-3 rounded-1"
                     :disabled="showAddVersionRow"
+                    v-if="hasAnyAuthority('ROLE_USER')"
                   >
                     <font-awesome-icon icon="plus"></font-awesome-icon>
                     <span> New Version</span>
@@ -514,7 +526,12 @@
                             </div>
                           </template>
                           <template v-else>
-                            <div class="icon-container edit-container" @click="editVersion(version)" title="Modifier">
+                            <div
+                              class="icon-container edit-container"
+                              @click="editVersion(version)"
+                              title="Modifier"
+                              v-if="hasAnyAuthority('ROLE_USER')"
+                            >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="14"
@@ -528,7 +545,12 @@
                                 />
                               </svg>
                             </div>
-                            <div class="icon-container delete-container" @click="prepareRemoveVersion(version)" title="Supprimer">
+                            <div
+                              class="icon-container delete-container"
+                              @click="prepareRemoveVersion(version)"
+                              title="Supprimer"
+                              v-if="hasAnyAuthority('ROLE_USER')"
+                            >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="20"
@@ -648,7 +670,12 @@
                       </svg>
                       {{ t$('sdiFrontendApp.productVersion.backToVersions') }}
                     </button>
-                    <button class="btn btn-sm btn-primary rounded-1" @click="toggleAddModuleVersionRow" :disabled="showAddModuleVersionRow">
+                    <button
+                      class="btn btn-sm btn-primary rounded-1"
+                      @click="toggleAddModuleVersionRow"
+                      :disabled="showAddModuleVersionRow"
+                      v-if="hasAnyAuthority('ROLE_USER')"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="16"
@@ -689,7 +716,7 @@
                       </td>
                       <td>
                         <div class="action-icons pr-lg-5 mr-lg-5">
-                          <div class="icon-container edit-container" :title="t$('entity.action.edit')">
+                          <div class="icon-container edit-container" :title="t$('entity.action.edit')" v-if="hasAnyAuthority('ROLE_USER')">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="14"
@@ -703,7 +730,11 @@
                               />
                             </svg>
                           </div>
-                          <div class="icon-container delete-container" :title="t$('entity.action.delete')">
+                          <div
+                            class="icon-container delete-container"
+                            :title="t$('entity.action.delete')"
+                            v-if="hasAnyAuthority('ROLE_USER')"
+                          >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="20"
@@ -911,6 +942,7 @@
                   class="button"
                   :class="{ 'button-primary': !showCertificationSelector, 'button-secondary': showCertificationSelector }"
                   @click="showCertificationSelector = !showCertificationSelector"
+                  v-if="hasAnyAuthority('ROLE_USER')"
                 >
                   {{ showCertificationSelector ? 'Close' : 'Add' }}
                 </button>
@@ -934,7 +966,7 @@
                       <tr>
                         <th scope="col" class="pl-5">Name</th>
                         <th>Version</th>
-                        <th scope="col" class="pl-2">Actions</th>
+                        <th scope="col" class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -942,7 +974,7 @@
                       <tr v-for="(cert, index) in productCertifications" :key="index">
                         <td class="pl-5">{{ getCertificationCached(cert.id).certification.name }}</td>
                         <td>{{ cert.version }}</td>
-                        <td class="pl-2">
+                        <td class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">
                           <button class="button-icon" @click="removeCertificationFromProduct(index)" aria-label="Supprimer">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -973,8 +1005,12 @@
           </div>
 
           <div class="modal-footer">
-            <button type="button" class="button button-secondary" @click="closeCertificationsModal">Cancel</button>
-            <button type="button" class="button button-primary" @click="saveCertificationsModal">Save</button>
+            <button type="button" class="button button-secondary" @click="closeCertificationsModal" v-if="hasAnyAuthority('ROLE_USER')">
+              Cancel
+            </button>
+            <button type="button" class="button button-primary" @click="saveCertificationsModal" v-if="hasAnyAuthority('ROLE_USER')">
+              Save
+            </button>
           </div>
         </div>
       </div>
@@ -1032,6 +1068,7 @@
                   class="button"
                   :class="{ 'button-primary': !showModuleSelector, 'button-secondary': showModuleSelector }"
                   @click="showModuleSelector = !showModuleSelector"
+                  v-if="hasAnyAuthority('ROLE_USER')"
                 >
                   {{ showModuleSelector ? 'Close' : 'Add' }}
                 </button>
@@ -1087,20 +1124,20 @@
                     <button class="button button-primary btn-sm" @click="addNewModuleFromSettingsModal">Add</button>
                   </div>
                 </div>
-                <div style="max-height: 400px; overflow-y: auto">
+                <div style="max-height: 300px; overflow-y: auto">
                   <table class="table table-hover" style="line-height: 0.1">
                     <thead>
                       <tr>
                         <th scope="col" class="pl-5">Name</th>
                         <th></th>
-                        <th scope="col" class="pl-2">Actions</th>
+                        <th scope="col" class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
                       </tr>
                     </thead>
                     <tbody v-for="(module, index) in productModules" :key="index">
                       <tr>
                         <td class="pl-5">{{ module.name }}</td>
                         <td></td>
-                        <td class="pl-2">
+                        <td class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">
                           <button class="button-icon" @click="removeModuleFromProduct(index)" aria-label="Supprimer">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -1131,8 +1168,10 @@
           </div>
 
           <div class="modal-footer">
-            <button type="button" class="button button-secondary" @click="closeSettingsModal">Cancel</button>
-            <button type="button" class="button button-primary" @click="saveSettingsModal">Save</button>
+            <button type="button" class="button button-secondary" @click="closeSettingsModal" v-if="hasAnyAuthority('ROLE_USER')">
+              Cancel
+            </button>
+            <button type="button" class="button button-primary" @click="saveSettingsModal" v-if="hasAnyAuthority('ROLE_USER')">Save</button>
           </div>
         </div>
       </div>
@@ -1227,6 +1266,7 @@
                   class="button"
                   :class="{ 'button-primary': !showVersionInfraSelector, 'button-secondary': showVersionInfraSelector }"
                   @click="showVersionInfraSelector = !showVersionInfraSelector"
+                  v-if="hasAnyAuthority('ROLE_USER')"
                 >
                   {{ showVersionInfraSelector ? 'Close' : 'Add' }}
                 </button>
@@ -1252,7 +1292,12 @@
                         <span class="component-version">{{ component.version }}</span></span
                       >
                     </div>
-                    <button class="button-icon" @click="removeInfraFromVersion(index)" aria-label="Supprimer">
+                    <button
+                      class="button-icon"
+                      @click="removeInfraFromVersion(index)"
+                      aria-label="Supprimer"
+                      v-if="hasAnyAuthority('ROLE_USER')"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="18"
@@ -1282,6 +1327,7 @@
                   class="button"
                   :class="{ 'button-primary': !showVersionModuleSelector, 'button-secondary': showVersionModuleSelector }"
                   @click="showVersionModuleSelector = !showVersionModuleSelector"
+                  v-if="hasAnyAuthority('ROLE_USER')"
                 >
                   {{ showModuleSelector ? 'Close' : 'Add' }}
                 </button>
@@ -1318,7 +1364,12 @@
                       >
                     </div>
                     <div class="action-buttons">
-                      <button class="button-icon" @click="removeModuleFromVersion(index)" aria-label="Supprimer">
+                      <button
+                        class="button-icon"
+                        @click="removeModuleFromVersion(index)"
+                        aria-label="Supprimer"
+                        v-if="hasAnyAuthority('ROLE_USER')"
+                      >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="18"
@@ -1344,8 +1395,12 @@
           </div>
 
           <div class="modal-footer">
-            <button type="button" class="button button-secondary" @click="closeVersionSettingsModal">Cancel</button>
-            <button type="button" class="button button-primary" @click="saveVersionSettingsModal">Save</button>
+            <button type="button" class="button button-secondary" @click="closeVersionSettingsModal" v-if="hasAnyAuthority('ROLE_USER')">
+              Cancel
+            </button>
+            <button type="button" class="button button-primary" @click="saveVersionSettingsModal" v-if="hasAnyAuthority('ROLE_USER')">
+              Save
+            </button>
           </div>
         </div>
       </div>
@@ -1459,7 +1514,7 @@
               <!-- Features Table -->
               <div v-if="showFeaturesTable" class="mt-4">
                 <div class="d-flex justify-content-between mb-3">
-                  <h6 class="mb-0">Freatures for version {{ selectedModuleVersion.version }}</h6>
+                  <h6 class="mb-0">Features for version {{ selectedModuleVersion.version }}</h6>
                   <div>
                     <button type="button" class="button button-primary" @click="showAddFeatureRow = true" :disabled="showAddFeatureRow">
                       Add Feature
@@ -1623,14 +1678,21 @@
             <div class="modal-body">
               <div class="d-flex justify-content-between mb-3">
                 <h6 class="mb-0">{{ moduleVersionSelected }}</h6>
-                <button class="button button-primary" @click="showAddFeatureRow = true" :disabled="showAddFeatureRow">Add Feature</button>
+                <button
+                  class="button button-primary"
+                  @click="showAddFeatureRow = true"
+                  :disabled="showAddFeatureRow"
+                  v-if="hasAnyAuthority('ROLE_USER')"
+                >
+                  Add Feature
+                </button>
               </div>
               <table class="table table-hover">
                 <thead class="thead-light">
                   <tr>
                     <th>Name</th>
                     <th>Description</th>
-                    <th>Actions</th>
+                    <th v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1654,7 +1716,7 @@
                         {{ feature.description }}
                       </template>
                     </td>
-                    <td>
+                    <td v-if="hasAnyAuthority('ROLE_USER')">
                       <div class="action-icons">
                         <template v-if="feature.isEditing">
                           <div class="icon-container save-container" @click="saveEditFeature(feature)" title="Enregistrer">
@@ -1779,7 +1841,7 @@
           </div>
         </template>
         <div class="modal-body">
-          <p id="jhi-delete-product-heading" class="mb-0" v-text="t$('sdiFrontendApp.product.delete.question', { id: removeId })"></p>
+          <p id="jhi-delete-product-heading" class="mb-0" v-text="t$('sdiFrontendApp.product.delete.question', {})"></p>
         </div>
         <template #modal-footer>
           <div class="w-100">
