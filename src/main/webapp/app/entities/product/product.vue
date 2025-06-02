@@ -2861,7 +2861,7 @@ tr:not(.add-row):hover {
 
 .search-container {
   width: 40%;
-  max-width: 500px;
+  max-width: 500pblox;
 }
 
 .card {
