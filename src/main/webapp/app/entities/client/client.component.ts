@@ -23,9 +23,12 @@ export default defineComponent({
     const clients = ref([]);
     const allClients = ref([]);
     const clientTypes = ref([]);
+    const clientSizes = ref([]);
     const viewMode = ref('list');
     const searchTerm = ref('');
     const searchTimeout = ref(null);
+    const selectedClientTypeFilter = ref(null);
+    const selectedClientSizeFilter = ref(null);
 
     // Pagination
     const currentPage = ref(1);
@@ -100,6 +103,49 @@ export default defineComponent({
       }
     };
 
+    // Méthode pour appliquer les filtres
+    const applyFilters = () => {
+      let filteredClients = [...allClients.value];
+
+      // Filtrer par clientType
+      if (selectedClientTypeFilter.value) {
+        filteredClients = filteredClients.filter(client => client.clientType?.id === selectedClientTypeFilter.value.id);
+      }
+
+      // Filtrer par clientSize
+      if (selectedClientSizeFilter.value) {
+        filteredClients = filteredClients.filter(client => client.size?.id === selectedClientSizeFilter.value.id);
+      }
+
+      // Appliquer la recherche
+      if (searchTerm.value.trim() !== '') {
+        const searchTermLower = searchTerm.value.toLowerCase();
+        filteredClients = filteredClients.filter(
+          client =>
+            (client.name && client.name.toLowerCase().includes(searchTermLower)) ||
+            (client.firstName && client.firstName.toLowerCase().includes(searchTermLower)) ||
+            (client.email && client.email.toLowerCase().includes(searchTermLower)) ||
+            (client.phone && client.phone.toLowerCase().includes(searchTermLower)) ||
+            (client.notes && client.notes.toLowerCase().includes(searchTermLower)) ||
+            (client.clientType && client.clientType.type.toLowerCase().includes(searchTermLower)),
+        );
+      }
+
+      clients.value = filteredClients;
+      updateTotalItems();
+      currentPage.value = 1;
+    };
+
+    // Réinitialiser les filtres
+    const resetFilters = () => {
+      selectedClientTypeFilter.value = null;
+      selectedClientSizeFilter.value = null;
+      searchTerm.value = '';
+      clients.value = [...allClients.value];
+      updateTotalItems();
+      currentPage.value = 1;
+    };
+
     // Méthode de recherche
     const handleSearch = () => {
       if (searchTimeout.value) {
@@ -107,22 +153,7 @@ export default defineComponent({
       }
 
       searchTimeout.value = setTimeout(() => {
-        if (searchTerm.value.trim() === '') {
-          clients.value = [...allClients.value];
-        } else {
-          const searchTermLower = searchTerm.value.toLowerCase();
-          clients.value = allClients.value.filter(
-            client =>
-              (client.name && client.name.toLowerCase().includes(searchTermLower)) ||
-              (client.firstName && client.firstName.toLowerCase().includes(searchTermLower)) ||
-              (client.email && client.email.toLowerCase().includes(searchTermLower)) ||
-              (client.phone && client.phone.toLowerCase().includes(searchTermLower)) ||
-              (client.notes && client.notes.toLowerCase().includes(searchTermLower)) ||
-              (client.clientType && client.clientType.type.toLowerCase().includes(searchTermLower)),
-          );
-        }
-        updateTotalItems();
-        currentPage.value = 1;
+        applyFilters();
       }, 300);
     };
 
@@ -131,6 +162,16 @@ export default defineComponent({
       try {
         const res = await clientTypeService().retrieve();
         clientTypes.value = res.data;
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
+    };
+
+    // Récupérer les tailles de clients
+    const retrieveClientSizes = async () => {
+      try {
+        const res = await clientSizeService().retrieve();
+        clientSizes.value = res.data;
       } catch (err) {
         alertService.showHttpError(err.response);
       }
@@ -163,7 +204,6 @@ export default defineComponent({
 
         clients.value = clientsWithDetails;
         allClients.value = clientsWithDetails;
-        console.log(allClients.value);
       } catch (err) {
         alertService.showHttpError(err.response);
       } finally {
@@ -217,6 +257,7 @@ export default defineComponent({
 
     onMounted(async () => {
       await retrieveClientTypes();
+      await retrieveClientSizes();
       await retrieveClients();
       document.addEventListener('click', event => {
         if (!event.target.closest('.dropdown-menu-container')) {
@@ -237,6 +278,7 @@ export default defineComponent({
       newClient,
       clients,
       clientTypes,
+      clientSizes,
       handleSyncList,
       isFetching,
       retrieveClients,
@@ -258,6 +300,10 @@ export default defineComponent({
       goToPrevPage,
       searchTerm,
       handleSearch,
+      selectedClientTypeFilter,
+      selectedClientSizeFilter,
+      applyFilters,
+      resetFilters,
       accountService,
       hasAnyAuthorityValues,
       ...dataUtils,
