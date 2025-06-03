@@ -1,6 +1,8 @@
 import { type Ref, defineComponent, inject, onMounted, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ClientEventService from './client-event.service';
+import ClientService from '@/entities/client/client.service.ts';
+import ClientEventTypeService from '../client-event-type/client-event-type.service';
 import { type IClientEvent } from '@/shared/model/client-event.model';
 import useDataUtils from '@/shared/data/data-utils.service';
 import { useAlertService } from '@/shared/alert/alert.service';
@@ -13,15 +15,20 @@ export default defineComponent({
     const { t: t$ } = useI18n();
     const dataUtils = useDataUtils();
     const clientEventService = inject('clientEventService', () => new ClientEventService());
+    const clientService = inject('clientService', () => new ClientService());
+    const clientEventTypeService = inject('clientEventTypeService', () => new ClientEventTypeService());
     const alertService = inject('alertService', () => useAlertService(), true);
     const accountService = inject<AccountService>('accountService');
 
     const hasAnyAuthorityValues: Ref<any> = ref({});
-
     const clientEvents = ref<IClientEvent[]>([]);
     const allClientEvents = ref<IClientEvent[]>([]);
+    const clients = ref([]);
+    const clientEventTypes = ref([]);
     const searchTerm = ref('');
     const searchTimeout = ref<NodeJS.Timeout | null>(null);
+    const selectedClientFilter = ref(null);
+    const selectedEventTypeFilter = ref(null);
 
     // Pagination
     const currentPage = ref(1);
@@ -78,6 +85,48 @@ export default defineComponent({
       }
     };
 
+    // Apply filters
+    const applyFilters = () => {
+      let filteredEvents = [...allClientEvents.value];
+
+      // Filter by client
+      if (selectedClientFilter.value) {
+        filteredEvents = filteredEvents.filter(event => event.client?.id === selectedClientFilter.value.id);
+      }
+
+      // Filter by event type
+      if (selectedEventTypeFilter.value) {
+        filteredEvents = filteredEvents.filter(event => event.clientEventType?.id === selectedEventTypeFilter.value.id);
+      }
+
+      // Apply search
+      if (searchTerm.value.trim() !== '') {
+        const searchTermLower = searchTerm.value.toLowerCase();
+        filteredEvents = filteredEvents.filter(
+          event =>
+            (event.event && event.event.toLowerCase().includes(searchTermLower)) ||
+            (event.description && event.description.toLowerCase().includes(searchTermLower)) ||
+            (event.notes && event.notes.toLowerCase().includes(searchTermLower)) ||
+            (event.client?.code && event.client.code.toLowerCase().includes(searchTermLower)) ||
+            (event.clientEventType?.type && event.clientEventType.type.toLowerCase().includes(searchTermLower)),
+        );
+      }
+
+      clientEvents.value = filteredEvents;
+      updateTotalItems();
+      currentPage.value = 1;
+    };
+
+    // Reset filters
+    const resetFilters = () => {
+      selectedClientFilter.value = null;
+      selectedEventTypeFilter.value = null;
+      searchTerm.value = '';
+      clientEvents.value = [...allClientEvents.value];
+      updateTotalItems();
+      currentPage.value = 1;
+    };
+
     // Search method
     const handleSearch = () => {
       if (searchTimeout.value) {
@@ -85,22 +134,28 @@ export default defineComponent({
       }
 
       searchTimeout.value = setTimeout(() => {
-        if (searchTerm.value.trim() === '') {
-          clientEvents.value = [...allClientEvents.value];
-        } else {
-          const searchTermLower = searchTerm.value.toLowerCase();
-          clientEvents.value = allClientEvents.value.filter(
-            event =>
-              (event.event && event.event.toLowerCase().includes(searchTermLower)) ||
-              (event.description && event.description.toLowerCase().includes(searchTermLower)) ||
-              (event.notes && event.notes.toLowerCase().includes(searchTermLower)) ||
-              (event.client?.code && event.client.code.toLowerCase().includes(searchTermLower)) ||
-              (event.clientEventType?.type && event.clientEventType.type.toLowerCase().includes(searchTermLower)),
-          );
-        }
-        updateTotalItems();
-        currentPage.value = 1;
+        applyFilters();
       }, 300);
+    };
+
+    // Fetch clients
+    const retrieveClients = async () => {
+      try {
+        const res = await clientService().retrieve();
+        clients.value = res.data;
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
+    };
+
+    // Fetch client event types
+    const retrieveClientEventTypes = async () => {
+      try {
+        const res = await clientEventTypeService().retrieve();
+        clientEventTypes.value = res.data;
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
     };
 
     // Fetch client events
@@ -160,17 +215,23 @@ export default defineComponent({
     );
 
     onMounted(async () => {
+      await retrieveClients();
+      await retrieveClientEventTypes();
       await retrieveClientEvents();
     });
 
     return {
       clientEvents,
       allClientEvents,
+      clients,
+      clientEventTypes,
       isFetching,
       removeId,
       removeEntity,
       searchTerm,
       searchTimeout,
+      selectedClientFilter,
+      selectedEventTypeFilter,
       currentPage,
       itemsPerPage,
       totalItems,
@@ -185,6 +246,8 @@ export default defineComponent({
       closeDialog,
       removeClientEvent,
       handleSearch,
+      applyFilters,
+      resetFilters,
       goToNextPage,
       goToPrevPage,
       accountService,
