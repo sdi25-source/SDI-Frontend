@@ -37,6 +37,28 @@
 
       <!-- Action Buttons -->
       <div class="d-flex align-items-center">
+        <!-- Product Line Filter -->
+        <div class="filter-item mr-4">
+          <span class="filter-label mr-3">Product Line</span>
+          <select v-model="selectedProductLineFilter" @change="applyFilters" class="filter-select">
+            <option :value="null">All Product Lines</option>
+            <option v-for="productLine in productLineOptions" :key="productLine.id" :value="productLine.id">
+              {{ productLine.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Reset Button -->
+        <button class="btn-reset mr-4" @click="resetFilters">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+            <path
+              d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+            />
+          </svg>
+          Reset
+        </button>
+
         <div class="pagination-info mr-3">
           <span class="text-muted small">{{ paginationInfo }}</span>
         </div>
@@ -72,10 +94,6 @@
             </svg>
           </button>
         </div>
-        <button class="btn btn-light btn-sm ml-3" @click="handleSyncList" :disabled="isFetching">
-          <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon>
-          <span v-text="t$('sdiFrontendApp.product.home.refreshListLabel')"></span>
-        </button>
       </div>
     </div>
 
@@ -1940,6 +1958,75 @@
 <script lang="ts" src="./product.component.ts"></script>
 
 <style scoped>
+.filter-item {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+}
+
+.filter-label {
+  margin-right: 8px;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.filter-select {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 4px 20px 4px 0;
+  font-size: 0.875rem;
+  cursor: pointer;
+  font-weight: 500;
+  color: #343a40;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23343a40' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 16px;
+}
+
+.filter-select:focus {
+  outline: none;
+}
+
+.btn-reset {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.btn-reset:hover {
+  color: #000;
+}
+
+.btn-reset svg {
+  margin-right: 4px;
+}
+.btn-reset {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.btn-reset:hover {
+  color: #000;
+}
+
+.btn-reset svg {
+  margin-right: 4px;
+}
 .scroll-container {
   max-height: 250px;
   overflow-y: auto;

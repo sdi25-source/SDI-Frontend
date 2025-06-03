@@ -133,6 +133,7 @@ export default defineComponent({
     const filteredModuleVersionOptions = ref([]);
 
     const showAddModuleVersionForm = ref(false);
+    const selectedProductLineFilter = ref(null);
 
     // New item templates
     const newProduct = ref({
@@ -182,14 +183,35 @@ export default defineComponent({
       moduleVersion: null,
     });
 
-    // Computed properties
     const filteredProducts = computed(() => {
-      if (!searchTerm.value) return allProducts.value;
-      const term = searchTerm.value.toLowerCase();
-      return allProducts.value.filter(
-        product => product.name?.toLowerCase().includes(term) || product.description?.toLowerCase().includes(term),
-      );
+      let filtered = allProducts.value;
+
+      // Apply product line filter
+      if (selectedProductLineFilter.value) {
+        filtered = filtered.filter(product => product.productLines?.some(line => line.id === selectedProductLineFilter.value));
+      }
+
+      // Apply search filter
+      if (searchTerm.value) {
+        const term = searchTerm.value.toLowerCase();
+        filtered = filtered.filter(
+          product => product.name?.toLowerCase().includes(term) || product.description?.toLowerCase().includes(term),
+        );
+      }
+
+      return filtered;
     });
+
+    const applyFilters = () => {
+      currentPage.value = 1; // Reset to first page when filters change
+      updateTotalItems(); // Update pagination
+    };
+    const resetFilters = () => {
+      selectedProductLineFilter.value = null;
+      searchTerm.value = '';
+      currentPage.value = 1;
+      updateTotalItems();
+    };
 
     const paginatedProducts = computed(() => {
       const start = (currentPage.value - 1) * itemsPerPage.value;
@@ -451,6 +473,7 @@ export default defineComponent({
       searchTimeout.value = setTimeout(() => {
         products.value = filteredProducts.value;
         updateTotalItems();
+        applyFilters();
         currentPage.value = 1;
       }, 300);
     };
@@ -2251,6 +2274,10 @@ export default defineComponent({
       toggleAddModuleVersionRow,
       cancelAddModuleVersionRow,
       dataUtils,
+      selectedProductLineFilter,
+      applyFilters,
+      resetFilters,
+      handleSearch,
     };
   },
   methods: {
