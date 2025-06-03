@@ -49,6 +49,10 @@ export default defineComponent({
     const requestToDelete = ref(null);
     const currentStep = ref('');
 
+    // Add new data properties
+    const showAddModuleDropdown = ref(false);
+    const selectedNewModuleVersion = ref(null);
+
     // Tab navigation
     const activeTabIndex = ref(0);
     const hoveredIndex = ref(null);
@@ -263,11 +267,6 @@ export default defineComponent({
     // Deselect request
     const deselectRequest = () => {
       selectedRequest.value = null;
-    };
-
-    const viewRequestModules = request => {
-      selectedModuleRequest.value = { ...request };
-      showModulesModal.value = true;
     };
 
     const viewRequestDetails = request => {
@@ -641,6 +640,57 @@ export default defineComponent({
       }
     };
 
+    // Modify viewRequestModules to set newRequest.productVersion
+    const viewRequestModules = async request => {
+      selectedModuleRequest.value = { ...request };
+      // Set newRequest.productVersion to trigger filteredModuleVersions computation
+      newRequest.value.productVersion = request.productVersion;
+      showModulesModal.value = true;
+    };
+
+    // Toggle the dropdown
+    const toggleAddModuleDropdown = () => {
+      showAddModuleDropdown.value = !showAddModuleDropdown.value;
+    };
+
+    // Add new module version to the request
+    const addNewModuleVersion = async () => {
+      if (!selectedNewModuleVersion.value || !selectedModuleRequest.value) return;
+
+      try {
+        // Ensure the module version is not already in the list
+        const exists = selectedModuleRequest.value.moduleVersions.some(mv => mv.id === selectedNewModuleVersion.value.id);
+        if (exists) {
+          alertService.showInfo(t$('sdiFrontendApp.requestOfChange.moduleAlreadyAdded').toString());
+          return;
+        }
+
+        // Add the new module version to the request
+        selectedModuleRequest.value.moduleVersions.push(selectedNewModuleVersion.value);
+
+        // Update the request in the backend
+        await requestOfChangeService.update(selectedModuleRequest.value);
+        alertService.showSuccess(t$('sdiFrontendApp.requestOfChange.moduleAdded').toString());
+
+        // Update the local requestOfChanges to reflect the change
+        const updatedRequestIndex = requestOfChanges.value.findIndex(request => request.id === selectedModuleRequest.value.id);
+        if (updatedRequestIndex !== -1) {
+          requestOfChanges.value[updatedRequestIndex].moduleVersions = [...selectedModuleRequest.value.moduleVersions];
+        }
+
+        // If the selected request is the same as the module request, update it too
+        if (selectedRequest.value && selectedRequest.value.id === selectedModuleRequest.value.id) {
+          selectedRequest.value.moduleVersions = [...selectedModuleRequest.value.moduleVersions];
+        }
+
+        // Reset the dropdown
+        selectedNewModuleVersion.value = null;
+        showAddModuleDropdown.value = false;
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
+    };
+
     return {
       keywordInput,
       keywordsList,
@@ -713,6 +763,10 @@ export default defineComponent({
       RequestStatus,
       accountService,
       hasAnyAuthorityValues,
+      showAddModuleDropdown,
+      selectedNewModuleVersion,
+      toggleAddModuleDropdown,
+      addNewModuleVersion,
     };
   },
   methods: {

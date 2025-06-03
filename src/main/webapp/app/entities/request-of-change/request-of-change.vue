@@ -100,7 +100,7 @@
               <table class="table table-hover mb-0" aria-describedby="requestOfChanges">
                 <thead class="thead-light">
                   <tr>
-                    <th scope="col" width="50"></th>
+                    <th scope="col" width="50" v-if="hasAnyAuthority('ROLE_USER')"></th>
                     <th scope="col"><span v-text="t$('sdiFrontendApp.requestOfChange.title')"></span></th>
                     <th scope="col"><span v-text="t$('sdiFrontendApp.requestOfChange.client')"></span></th>
                     <th scope="col"><span v-text="t$('sdiFrontendApp.requestOfChange.productVersion')"></span></th>
@@ -117,7 +117,7 @@
                     class="align-middle"
                     :class="{ 'selected-row': selectedRequest && selectedRequest.id === request.id }"
                   >
-                    <td class="text-center">
+                    <td class="text-center" v-if="hasAnyAuthority('ROLE_USER')">
                       <div class="form-check">
                         <input
                           class="form-check-input"
@@ -191,25 +191,28 @@
                           </svg>
                         </div>
                         <div
-                          class="alert alert-primary d-inline-flex align-items-center py-1 px-2 btn-sm"
-                          style="font-size: 0.9rem; line-height: 1; gap: 0.25rem; margin-top: 0px; margin-bottom: 0px; cursor: pointer"
+                          class="icon-container settings-container"
                           @click="viewRequestModules(request)"
-                          title="Voir les modules"
+                          title="modules"
                           v-if="hasAnyAuthority('ROLE_COMMERCIAL')"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            height="14"
-                            fill="currentColor"
-                            class="bi bi-layers"
-                            viewBox="0 0 512 512"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
                           >
-                            <path
-                              d="M345 39.1L472.8 168.4c52.4 53 52.4 138.2 0 191.2L360.8 472.9c-9.3 9.4-24.5 9.5-33.9 .2s-9.5-24.5-.2-33.9L438.6 325.9c33.9-34.3 33.9-89.4 0-123.7L310.9 72.9c-9.3-9.4-9.2-24.6 .2-33.9s24.6-9.2 33.9 .2zM0 229.5L0 80C0 53.5 21.5 32 48 32l149.5 0c17 0 33.3 6.7 45.3 18.7l168 168c25 25 25 65.5 0 90.5L277.3 442.7c-25 25-65.5 25-90.5 0l-168-168C6.7 262.7 0 246.5 0 229.5zM144 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"
-                            />
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
                           </svg>
-                          Modules
                         </div>
                       </div>
                     </td>
@@ -228,7 +231,7 @@
     </div>
 
     <!-- Detailed View Section (appears when a request is selected) -->
-    <div v-if="selectedRequest" class="mt-4">
+    <div class="mt-4" v-if="selectedRequest && hasAnyAuthority('ROLE_USER')">
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h6 class="m-0">{{ selectedRequest.title }}</h6>
@@ -891,6 +894,26 @@
 
         <div class="modal-body">
           <div v-if="selectedModuleRequest">
+            <div class="d-flex align-items-center mb-3">
+              <h6 class="mb-0 mr-2">Add a module version</h6>
+              <button
+                v-if="hasAnyAuthority('ROLE_COMMERCIAL')"
+                class="btn btn-sm btn-outline-dark rounded-circle p-0"
+                style="width: 24px; height: 24px; color: #00366d"
+                @click="toggleAddModuleDropdown"
+                title="Ajouter un module"
+              >
+                <font-awesome-icon icon="plus"></font-awesome-icon>
+              </button>
+            </div>
+            <div v-if="showAddModuleDropdown" class="mb-3">
+              <select v-model="selectedNewModuleVersion" class="form-select form-select-sm" @change="addNewModuleVersion">
+                <option :value="null" disabled>Select a module version</option>
+                <option v-for="moduleVersion in filteredModuleVersions" :key="moduleVersion.id" :value="moduleVersion">
+                  {{ moduleVersion.module ? moduleVersion.module.name : 'N/A' }} - v {{ moduleVersion.version }}
+                </option>
+              </select>
+            </div>
             <div v-if="!selectedModuleRequest.moduleVersions || selectedModuleRequest.moduleVersions.length === 0" class="text-center py-3">
               <span class="text-muted" v-text="t$('sdiFrontendApp.requestOfChange.noModule')"></span>
             </div>
@@ -901,7 +924,7 @@
                 class="badge bg-light text-dark p-2 rounded-pill position-relative"
               >
                 {{ module.module ? module.module.name : 'N/A' }} <span class="text-muted">{{ ' - v ' }}{{ module.version }}</span>
-                <span class="remove-module-icon" @click="removeModule(module.id)" title="Supprimer le module">
+                <span class="remove-module-icon" @click="removeModule(module.id)" title="remove a module">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                     <path
                       d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
@@ -914,6 +937,57 @@
         </div>
       </div>
     </div>
+
+    <!-- Modules Modal -->
+    <!--    <div class="modal-backdrop" v-if="showModulesModal" @click="closeModulesModal"></div>-->
+    <!--    <div class="modal-container" v-if="showModulesModal" role="dialog" aria-modal="true">-->
+    <!--      <div class="modal-content">-->
+    <!--        <div class="modal-header">-->
+    <!--          <h5 class="modal-title" v-text="t$('sdiFrontendApp.requestOfChange.moduleVersion')"></h5>-->
+    <!--          <button type="button" class="close-button" @click="closeModulesModal" aria-label="Fermer">-->
+    <!--            <svg-->
+    <!--              xmlns="http://www.w3.org/2000/svg"-->
+    <!--              width="24"-->
+    <!--              height="24"-->
+    <!--              viewBox="0 0 24 24"-->
+    <!--              fill="none"-->
+    <!--              stroke="currentColor"-->
+    <!--              strokeWidth="2"-->
+    <!--              strokeLinecap="round"-->
+    <!--              strokeLinejoin="round"-->
+    <!--              class="icon"-->
+    <!--            >-->
+    <!--              <line x1="18" y1="6" x2="6" y2="18"></line>-->
+    <!--              <line x1="6" y1="6" x2="18" y2="18"></line>-->
+    <!--            </svg>-->
+    <!--          </button>-->
+    <!--        </div>-->
+
+    <!--        <div class="modal-body">-->
+    <!--          <div v-if="selectedModuleRequest">-->
+    <!--            <div v-if="!selectedModuleRequest.moduleVersions || selectedModuleRequest.moduleVersions.length === 0" class="text-center py-3">-->
+    <!--              <span class="text-muted" v-text="t$('sdiFrontendApp.requestOfChange.noModule')"></span>-->
+    <!--            </div>-->
+    <!--            <div v-else class="d-flex flex-wrap gap-2">-->
+    <!--              <div-->
+    <!--                v-for="module in selectedModuleRequest.moduleVersions"-->
+    <!--                :key="module.id"-->
+    <!--                class="badge bg-light text-dark p-2 rounded-pill position-relative"-->
+    <!--              >-->
+    <!--                {{ module.module ? module.module.name : 'N/A' }} <span class="text-muted">{{ ' - v ' }}{{ module.version }}</span>-->
+    <!--                <span class="remove-module-icon" @click="removeModule(module.id)" title="Supprimer le module">-->
+    <!--                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">-->
+    <!--                    <path-->
+    <!--                      d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"-->
+    <!--                    />-->
+    <!--                  </svg>-->
+    <!--                </span>-->
+    <!--              </div>-->
+    <!--            </div>-->
+    <!--          </div>-->
+    <!--        </div>-->
+    <!--      </div>-->
+    <!--    </div>-->
 
     <!-- details Modal -->
     <div class="modal-backdrop" v-if="showDetailsModal" @click="closeDetailsModal"></div>
@@ -1225,6 +1299,25 @@
   margin-bottom: 20px;
 }
 
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.icon-container:active {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.icon-container:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
 .tabs-list {
   display: flex;
   position: relative;
@@ -1332,8 +1425,8 @@
   transform: translate(-50%, -50%);
   z-index: 1001;
   width: 90%;
-  max-width: 700px;
-  max-height: 90vh;
+  max-width: 1000px;
+  max-height: 80vh;
   display: flex;
   flex-direction: column;
 }
