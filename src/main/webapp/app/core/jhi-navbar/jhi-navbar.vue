@@ -10,7 +10,7 @@
       <!-- Nav Menu -->
       <nav id="navmenu" class="navmenu pl-5 ml-5">
         <ul>
-          <!-- dashboards && (hasAnyAuthority('ROLE_COMMERCIAL') || hasAnyAuthority('ROLE_ADMIN'))-->
+          <!-- Dashboards -->
           <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'dash' }">
             <a href="#" class="no-link-style"><span>Dashboards</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
@@ -31,39 +31,39 @@
 
           <!-- Clients -->
           <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'customer' }">
-            <a href="#" class="no-link-style"
-              ><span>{{ t$('global.menu.entities.client') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
-            ></a>
+            <a href="#" class="no-link-style">
+              <span>{{ t$('global.menu.entities.client') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i>
+            </a>
             <ul>
               <customers-menu class="entities-menu-scroll" @menu-item-clicked="setActiveMenu('customer')" />
             </ul>
           </li>
 
-          <!-- products -->
+          <!-- Products -->
           <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'product' }">
-            <a href="#" class="no-link-style"
-              ><span>{{ t$('global.menu.entities.product') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
-            ></a>
+            <a href="#" class="no-link-style">
+              <span>{{ t$('global.menu.entities.product') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i>
+            </a>
             <ul>
               <products-menu class="entities-menu-scroll" @menu-item-clicked="setActiveMenu('product')" />
             </ul>
           </li>
 
-          <!-- products Deployments -->
+          <!-- Product Deployments -->
           <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'deployments' }">
-            <a href="#" class="no-link-style"
-              ><span>{{ t$('global.menu.entities.deployements') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
-            ></a>
+            <a href="#" class="no-link-style">
+              <span>{{ t$('global.menu.entities.deployements') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i>
+            </a>
             <ul>
               <deployments-menu class="entities-menu-scroll" @menu-item-clicked="setActiveMenu('deployments')" />
             </ul>
           </li>
 
-          <!-- parameters -->
+          <!-- Parameters -->
           <li v-if="authenticated && hasAnyAuthority('ROLE_ADMIN')" class="dropdown" :class="{ active: activeMenu === 'parameters' }">
-            <a href="#" class="no-link-style"
-              ><span>{{ t$('global.menu.entities.parameters') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
-            ></a>
+            <a href="#" class="no-link-style">
+              <span>{{ t$('global.menu.entities.parameters') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i>
+            </a>
             <ul>
               <parameters-menu class="entities-menu-scroll" @menu-item-clicked="setActiveMenu('parameters')" />
             </ul>
@@ -71,48 +71,26 @@
 
           <!-- Admin Menu -->
           <li v-if="authenticated && hasAnyAuthority('ROLE_ADMIN')" class="dropdown" :class="{ active: activeMenu === 'administration' }">
-            <a href="#" class="no-link-style"
-              ><span>{{ t$('global.menu.admin.main') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
-            ></a>
+            <a href="#" class="no-link-style">
+              <span>{{ t$('global.menu.admin.main') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i>
+            </a>
             <ul>
               <administration-menu @menu-item-clicked="setActiveMenu('administration')" />
             </ul>
           </li>
 
+          <!-- Home (Unauthenticated) -->
           <li>
             <router-link to="/" exact class="nav-link active" v-if="!authenticated" :class="{ active: activeMenu === 'home' }">
               <span>{{ t$('global.menu.home') }}</span>
             </router-link>
           </li>
 
-          <!-- Languages -->
-          <!--          <li-->
-          <!--            v-if="!authenticated && languages && Object.keys(languages).length > 1"-->
-          <!--            class="dropdown""-->
-          <!--            :class="{ active: activeMenu === 'language' }"-->
-          <!--          >-->
-          <!--            <a href="#" class="no-link-style"-->
-          <!--              ><span>{{ t$('global.menu.language') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i-->
-          <!--            ></a>-->
-          <!--            <ul class="">-->
-          <!--              <li v-for="(value, key) in languages" :key="`lang-${key}`" :class="{ active: isActiveLanguage(key) }">-->
-          <!--                <a-->
-          <!--                  href="#"-->
-          <!--                  @click.prevent="-->
-          <!--                    changeLanguage(key);-->
-          <!--                    setActiveMenu('language');-->
-          <!--                  "-->
-          <!--                  >{{ value.name }}</a-->
-          <!--                >-->
-          <!--              </li>-->
-          <!--            </ul>-->
-          <!--          </li>-->
-
-          <!--  Account -->
+          <!-- Account (Unauthenticated) -->
           <li class="dropdown" v-if="!authenticated" :class="{ active: activeMenu === 'account' }">
-            <a href="#" class="no-link-style"
-              ><span>{{ t$('global.menu.account.main') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
-            ></a>
+            <a href="#" class="no-link-style">
+              <span>{{ t$('global.menu.account.main') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i>
+            </a>
             <ul>
               <li>
                 <router-link to="/login" class="d-flex align-items-center gap-1 no-link-style" @click="setActiveMenu('account')">
@@ -131,13 +109,38 @@
         </ul>
       </nav>
 
+      <!-- Login Button (Unauthenticated) -->
       <router-link to="/login" class="d-flex align-items-center gap-1 btn-getstarted" v-if="!authenticated">
         {{ t$('global.menu.account.login') }}
       </router-link>
 
+      <!-- Authenticated Nav with Profile Badges and Dropdown -->
       <nav id="navmenu" class="navmenu pl-5 ml-5" v-if="authenticated">
         <ul>
-          <li v-if="authenticated" class="dropdown">
+          <li class="role-badges">
+            <div class="role-avatars">
+              <span v-if="hasAnyAuthority('ROLE_ADMIN')" class="role-badge role-admin">
+                A
+                <span class="role-tooltip">Admin</span>
+              </span>
+              <span v-if="hasAnyAuthority('ROLE_USER')" class="role-badge role-delivery">
+                D
+                <span class="role-tooltip">Delivery Manager</span>
+              </span>
+              <span v-if="hasAnyAuthority('ROLE_COMMERCIAL')" class="role-badge role-commercial">
+                C
+                <span class="role-tooltip">Commercial</span>
+              </span>
+              <span
+                v-if="!hasAnyAuthority('ROLE_ADMIN') && !hasAnyAuthority('ROLE_USER') && !hasAnyAuthority('ROLE_COMMERCIAL')"
+                class="role-badge role-user"
+              >
+                U
+                <span class="role-tooltip">User</span>
+              </span>
+            </div>
+          </li>
+          <li class="dropdown">
             <a href="#" class="no-link-style">
               <i class="bi bi-list toggle-dropdown"></i>
             </a>
@@ -171,11 +174,13 @@
   width: 24px;
   text-align: center;
 }
+
 /* General styles for links */
 .entities-category .dropdown-item {
   padding: 6px 10px;
   font-size: 0.9rem;
 }
+
 .no-link-style {
   text-decoration: none;
   color: inherit;
@@ -210,14 +215,14 @@
 }
 
 .dropdown:hover .toggle-dropdown {
-  transform: rotate(90deg); /* Rotate icon on hover for visual feedback */
+  transform: rotate(90deg);
 }
 
 /* Dropdown menu */
 .dropdown-menu {
   position: absolute;
   top: 100%;
-  right: 0; /* Default: align to the right of the toggle icon */
+  right: 0;
   width: 250px;
   background: white;
   border: 1px solid #ddd;
@@ -269,11 +274,98 @@
   color: #0d83fd;
 }
 
-/* Responsive positioning for smaller screens */
+/* Role badges styling */
+.role-avatars {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.role-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  border: 2px solid white;
+  margin-left: -10px; /* Overlap effect */
+  position: relative; /* For tooltip positioning */
+  cursor: pointer; /* Indicate hoverability */
+}
+
+.role-badge:first-child {
+  margin-left: 0; /* No overlap for the first badge */
+}
+
+/* Specific colors for each role */
+.role-admin {
+  background-color: #07459c; /* Bright blue for Admin */
+}
+
+.role-delivery {
+  background-color: #4154f1; /* Dodger blue for Delivery Manager */
+}
+
+.role-commercial {
+  background-color: #0378fb; /* Steel blue for Commercial */
+}
+
+.role-user {
+  background-color: #87ceeb; /* Sky blue for User */
+}
+
+/* Tooltip styling */
+.role-tooltip {
+  position: absolute;
+  top: -30px; /* Position above the badge */
+  left: 50%;
+  transform: translateX(-50%) translateY(10px); /* Center horizontally, offset vertically */
+  background-color: #333;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  z-index: 1000;
+}
+
+.role-badge:hover .role-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0); /* Slide up into position */
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .dropdown-menu {
     right: auto;
-    left: 0; /* Align to the left on smaller screens to avoid right overflow */
+    left: 0;
+  }
+
+  .role-avatars {
+    margin-right: 5px;
+  }
+
+  .role-badge {
+    width: 25px;
+    height: 25px;
+    font-size: 12px;
+    margin-left: -8px;
+  }
+
+  .role-tooltip {
+    top: -25px; /* Adjust for smaller badges */
+    font-size: 11px;
+    padding: 4px 8px;
   }
 }
 
@@ -284,7 +376,6 @@
     left: auto;
   }
 
-  /* Flip to left for the last dropdown to avoid right-edge overflow */
   .dropdown:last-child .dropdown-menu {
     right: auto;
     left: 0;
@@ -294,7 +385,7 @@
 /* Additional styles from your full code to ensure consistency */
 .header-container {
   width: 90%;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 10px;
 }
