@@ -129,10 +129,6 @@ export default defineComponent({
         // Filter deployments for the selected product and latest version only
         const productDeployments = productDeploymentDetails.filter(detail => detail.productVersion?.id === lastVersion.id);
 
-        // Get all module deployments
-        const moduleDeploymentsRes = await moduleDeployementService.retrieve();
-        const moduleDeployments: IModuleDeployement[] = moduleDeploymentsRes.data;
-
         // Get all product deployments to have access to client information
         const productDeployementRes = await productDeployementService.retrieve();
         const allProductDeployements: IProductDeployement[] = productDeployementRes.data;

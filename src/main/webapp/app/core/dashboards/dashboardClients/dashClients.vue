@@ -88,36 +88,20 @@
                 No request of changes data available
               </div>
 
-              <!-- Legend for customization levels -->
-              <div class="customization-legend mt-3">
-                <div class="legend-item">
-                  <span class="legend-color basic"></span>
-                  <span class="legend-text">Basic</span>
-                </div>
-                <div class="legend-item">
-                  <span class="legend-color intermediate"></span>
-                  <span class="legend-text">Intermediate</span>
-                </div>
-                <div class="legend-item">
-                  <span class="legend-color advanced"></span>
-                  <span class="legend-text">Advanced</span>
-                </div>
-              </div>
-
               <!-- Summary Stats -->
               <div class="request-stats mt-3">
                 <div class="stats-grid">
                   <div class="stat-item">
                     <span class="stat-number">{{ totalRequests.basic }}</span>
-                    <span class="stat-label">Basic Requests</span>
+                    <span class="stat-label">Basic Changes</span>
                   </div>
                   <div class="stat-item">
                     <span class="stat-number">{{ totalRequests.intermediate }}</span>
-                    <span class="stat-label">Intermediate</span>
+                    <span class="stat-label">Intermediate Changes</span>
                   </div>
                   <div class="stat-item">
                     <span class="stat-number">{{ totalRequests.advanced }}</span>
-                    <span class="stat-label">Advanced Requests</span>
+                    <span class="stat-label">Advanced Changes</span>
                   </div>
                 </div>
               </div>
@@ -127,8 +111,6 @@
       </div>
     </div>
   </div>
-
-  <div class="section"></div>
 </template>
 
 <script lang="ts" src="./dashClients.component.ts"></script>
