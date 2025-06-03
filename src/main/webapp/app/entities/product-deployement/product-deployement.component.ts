@@ -20,6 +20,8 @@ import type { IModuleVersion } from '@/shared/model/module-version.model';
 import InfraComponentVersionService from '../infra-component-version/infra-component-version.service';
 import InfraComponentService from '../infra-component/infra-component.service';
 import type AccountService from '@/account/account.service.ts';
+import CertificationVersionService from '@/entities/certification/certification-version.service.ts';
+import CertificationService from '@/entities/certification/certification.service.ts';
 
 export default defineComponent({
   computed: {
@@ -50,10 +52,19 @@ export default defineComponent({
 
     const infraComponentVersionService = inject('infraComponentVersionService', () => new InfraComponentVersionService());
     const infraComponentService = inject('infraComponentService', () => new InfraComponentService());
+    const certificationVersionService = inject('certificationVersionService', () => new CertificationVersionService());
+    const certificationService = inject('certificationService', () => new CertificationService());
 
     // État principal
     const productDeployments: Ref<IProductDeployment[]> = ref([]);
     const allProductDeployments: Ref<IProductDeployment[]> = ref([]);
+    const productDeploymentCertifications = ref([]);
+    const showCertificationsModal = ref(false);
+    const showCertificationSelector = ref(false);
+    const selectedCertificationId = ref('');
+    const certificationsOptionsVersions = ref([]);
+    const certificationsOptions = ref([]);
+
     const clients: Ref<IClient[]> = ref([]);
     const products: Ref<any[]> = ref([]);
     const viewMode = ref('list');
@@ -198,6 +209,55 @@ export default defineComponent({
         // Charger les détails du déploiement
         loadDeploymentDetails();
       }
+    };
+
+    const retrieveCertifications = async () => {
+      try {
+        const res = await certificationService().retrieve();
+        certificationsOptions.value = res.data;
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
+    };
+
+    const retrieveCertificationsVersions = async () => {
+      try {
+        const res = await certificationVersionService().retrieve();
+        certificationsOptionsVersions.value = res.data;
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
+    };
+
+    const getCertificationById = id => {
+      return certificationsOptionsVersions.value.find(cert => cert.id === Number.parseInt(id));
+    };
+
+    const addCertificationToProduct = () => {
+      if (!selectedCertificationId.value) return;
+
+      const certification = getCertificationById(selectedCertificationId.value);
+      if (certification) {
+        const exists = productDeploymentCertifications.value.some(c => c.id === certification.id);
+        if (!exists) {
+          productDeploymentCertifications.value.push(certification);
+        }
+        selectedCertificationId.value = '';
+      }
+    };
+
+    const getCertificationCached = certificationVersionId => {
+      const certificationVersion = certificationsOptionsVersions.value.find(mv => mv.id === certificationVersionId);
+      console.log('1', certificationVersion);
+
+      if (!certificationVersion) return null;
+
+      const certification = certificationsOptions.value.find(m => m.id === certificationVersion.certification?.id);
+      console.log('2', certification);
+      return {
+        ...certificationVersion,
+        certification: certification ? { ...certification } : null,
+      };
     };
 
     // NOUVELLE FONCTION - Retour à la liste
@@ -1148,6 +1208,10 @@ export default defineComponent({
       selectedAllowedModuleVersions.value = [];
     };
 
+    const closeCertificationsModal = () => {
+      showCertificationsModal.value = false;
+    };
+
     // Fonction pour formater les dates
     const formatDate = dateString => {
       if (!dateString) return 'Non définie';
@@ -1157,6 +1221,32 @@ export default defineComponent({
         month: '2-digit',
         day: '2-digit',
       });
+    };
+
+    const openCertifications = productDeployement => {
+      selectedProductDeployment.value = productDeployement;
+      productDeploymentCertifications.value = productDeployement.certifications || [];
+      showCertificationsModal.value = true;
+    };
+
+    const removeCertificationFromProduct = index => {
+      productDeploymentCertifications.value.splice(index, 1);
+    };
+
+    const saveCertificationsModal = async () => {
+      try {
+        if (selectedProductDeployment.value) {
+          // Update existing product
+          selectedProductDeployment.value.certifications = productDeploymentCertifications.value;
+          await productDeploymentService().update(selectedProductDeployment.value);
+          await retrieveProducts();
+        } else {
+          newProductDeployment.value.certifications = productDeploymentCertifications.value;
+        }
+        closeCertificationsModal();
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
     };
 
     // Watchers
@@ -1186,12 +1276,24 @@ export default defineComponent({
       await retrieveClients();
       await retrieveProducts();
       await retrieveProductDeployments();
+      await retrieveCertifications();
+      await retrieveCertificationsVersions();
     });
 
     return {
       accountService,
       hasAnyAuthorityValues,
       // État principal
+      showCertificationsModal,
+      openCertifications,
+      closeCertificationsModal,
+      showCertificationSelector,
+      selectedCertificationId,
+      certificationsOptionsVersions,
+      getCertificationCached,
+      productDeploymentCertifications,
+      removeCertificationFromProduct,
+      saveCertificationsModal,
       viewMode,
       showAddRow,
       newProductDeployment,
@@ -1230,7 +1332,8 @@ export default defineComponent({
       toggleProductDeploymentSelection,
       returnToProductDeploymentList,
       loadDeploymentDetails,
-
+      retrieveCertificationsVersions,
+      addCertificationToProduct,
       // État des détails
       productDeployementDetails,
       deployementTypes,

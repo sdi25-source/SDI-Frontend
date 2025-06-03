@@ -227,6 +227,23 @@
                           />
                         </svg>
                       </div>
+                      <div class="icon-container settings-container" @click="openCertifications(productDeployment)" title="Certification">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="icon"
+                        >
+                          <circle cx="12" cy="8" r="7"></circle>
+                          <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                        </svg>
+                      </div>
                     </div>
                   </template>
                 </div>
@@ -282,6 +299,132 @@
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Product certifications Modal -->
+    <div class="modal-backdrop" v-if="showCertificationsModal" @click="closeCertificationsModal"></div>
+    <div class="modal-container" v-if="showCertificationsModal" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Product Certifications</h5>
+          <button type="button" class="close-button" @click="closeCertificationsModal" aria-label="Fermer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="icon"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- certification Section -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="icon"
+                >
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Available certification</span>
+              </div>
+              <button
+                class="button"
+                :class="{ 'button-primary': !showCertificationSelector, 'button-secondary': showCertificationSelector }"
+                @click="showCertificationSelector = !showCertificationSelector"
+                v-if="hasAnyAuthority('ROLE_USER')"
+              >
+                {{ showCertificationSelector ? 'Close' : 'Add' }}
+              </button>
+            </div>
+
+            <div class="card-body">
+              <div v-if="showCertificationSelector" class="selector-container">
+                <div class="select-wrapper">
+                  <select class="select" v-model="selectedCertificationId">
+                    <option value="">Select a certifications</option>
+                    <option v-for="cert in certificationsOptionsVersions" :key="cert.id" :value="cert.id">
+                      {{ cert.certification.name }} {{ '-' }} {{ cert.version }}
+                    </option>
+                  </select>
+                </div>
+                <button class="button button-success" @click="addCertificationToProduct" :disabled="!selectedCertificationId">Add</button>
+              </div>
+              <div style="max-height: 400px; overflow-y: auto">
+                <table class="table table-hover" style="line-height: 1.2">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="pl-5">Name</th>
+                      <th>Version</th>
+                      <th scope="col" class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Liste des certifications -->
+                    <tr v-for="(cert, index) in productDeploymentCertifications" :key="index">
+                      <td class="pl-5">{{ getCertificationCached(cert.id).certification.name }}</td>
+                      <td>{{ cert.version }}</td>
+                      <td class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">
+                        <button class="button-icon" @click="removeCertificationFromProduct(index)" aria-label="Supprimer">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr v-if="productDeploymentCertifications.length === 0">
+                      <td colspan="3" class="empty-message">No selected certification</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="button button-secondary" @click="closeCertificationsModal" v-if="hasAnyAuthority('ROLE_USER')">
+            Cancel
+          </button>
+          <button type="button" class="button button-primary" @click="saveCertificationsModal" v-if="hasAnyAuthority('ROLE_USER')">
+            Save
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1009,6 +1152,8 @@
       </template>
     </b-modal>
   </div>
+  <div class="section"></div>
+  <div class="section"></div>
 </template>
 
 <script lang="ts" src="./product-deployement.component.ts"></script>

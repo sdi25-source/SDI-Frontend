@@ -1,5 +1,6 @@
 import { type IClient } from '@/shared/model/client.model';
 import { type IProduct } from '@/shared/model/product.model';
+import type { ICertificationVersion } from '@/shared/model/certification-version.model.ts';
 
 export interface IProductDeployement {
   id?: number;
@@ -9,6 +10,7 @@ export interface IProductDeployement {
   notes?: string | null;
   client?: IClient | null;
   product?: IProduct | null;
+  certifications?: ICertificationVersion[] | null;
 }
 
 export class ProductDeployement implements IProductDeployement {
@@ -20,5 +22,6 @@ export class ProductDeployement implements IProductDeployement {
     public notes?: string | null,
     public client?: IClient | null,
     public product?: IProduct | null,
+    public certifications?: ICertificationVersion[] | null,
   ) {}
 }
