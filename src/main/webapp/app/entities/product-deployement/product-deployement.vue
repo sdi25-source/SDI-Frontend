@@ -1160,7 +1160,7 @@
 
 <style scoped>
 .product-deployment-container {
-  padding: 1.5rem;
+  padding: 1.8rem;
 }
 
 .navigation-bar {
