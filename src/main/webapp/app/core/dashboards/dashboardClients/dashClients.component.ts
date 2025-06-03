@@ -112,7 +112,7 @@ export default defineComponent({
               name: client.name || 'Unknown Client',
               type: client.clientType?.type,
               badgeClass: getClientBadgeClass(1),
-              icon: getClientIcon(index),
+              icon: 'bi-building',
               products: products,
               requestsOfChanges: requestOfChanges,
               deployments: deployments,
@@ -235,7 +235,7 @@ export default defineComponent({
         const deploymentDetailCounts = new Map<string, number>();
 
         productDeployments.forEach((deployment: IProductDeployement) => {
-          const deploymentName = deployment.refContract || `Deployment ${deployment.id}`;
+          const deploymentName = deployment.product?.name + ' - ' + deployment.refContract;
           const detailsCount = allDetails.filter(detail => detail.productDeployement?.id === deployment.id).length;
           deploymentDetailCounts.set(deploymentName, detailsCount);
         });
@@ -422,8 +422,8 @@ export default defineComponent({
       }
     };
 
-    const generateColors = (count: number) => {
-      const colors = [
+    const generateColors = (count: number): string[] => {
+      const baseColors = [
         'rgba(12, 45, 87, 0.8)',
         'rgba(149, 160, 244, 0.8)',
         'rgba(12, 166, 120, 0.8)',
@@ -434,10 +434,17 @@ export default defineComponent({
         'rgba(255, 87, 34, 0.8)',
       ];
 
-      const result = [];
+      const result: string[] = [];
+
       for (let i = 0; i < count; i++) {
-        result.push(colors[i % colors.length]);
+        if (i < baseColors.length) {
+          result.push(baseColors[i]);
+        } else {
+          const hue = ((i - baseColors.length) * 360) / (count - baseColors.length);
+          result.push(`hsla(${hue}, 70%, 60%, 0.8)`);
+        }
       }
+
       return result;
     };
 

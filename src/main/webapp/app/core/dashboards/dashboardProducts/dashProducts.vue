@@ -58,7 +58,8 @@
             <div class="chart-container">
               <h4 class="chart-title">
                 Clients Distribution by Module Deployments (Latest Version:
-                {{ latestVersions.get(selectedProduct.name)?.version || 'N/A' }})
+                {{ selectedProduct.name || 'N/A' }}
+                v{{ latestVersions.get(selectedProduct.name)?.version || 'N/A' }})
               </h4>
               <div class="chart-wrapper">
                 <canvas ref="clientsChart" width="400" height="400"></canvas>

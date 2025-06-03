@@ -259,8 +259,8 @@ export default defineComponent({
       }
     };
 
-    const generateColors = (count: number) => {
-      const colors = [
+    const generateColors = (count: number): string[] => {
+      const baseColors = [
         'rgba(12, 45, 87, 0.8)',
         'rgba(149, 160, 244, 0.8)',
         'rgba(12, 166, 120, 0.8)',
@@ -271,10 +271,17 @@ export default defineComponent({
         'rgba(255, 87, 34, 0.8)',
       ];
 
-      const result = [];
+      const result: string[] = [];
+
       for (let i = 0; i < count; i++) {
-        result.push(colors[i % colors.length]);
+        if (i < baseColors.length) {
+          result.push(baseColors[i]);
+        } else {
+          const hue = ((i - baseColors.length) * 360) / (count - baseColors.length);
+          result.push(`hsla(${hue}, 70%, 60%, 0.8)`);
+        }
       }
+
       return result;
     };
 
@@ -316,7 +323,7 @@ export default defineComponent({
                     const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
                     const percentage = ((value / total) * 100).toFixed(1);
                     const latestVersion = latestVersions.value.get(selectedProduct.value?.name || '')?.version || 'N/A';
-                    return `${label}: ${value} module deployments (${percentage}%) - Version ${latestVersion}`;
+                    return `${label}: ${value} module (${percentage}%) - ${selectedProduct.value?.name} v ${latestVersion}`;
                   },
                 },
               },

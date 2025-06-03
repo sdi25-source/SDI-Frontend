@@ -9,7 +9,7 @@
               <span v-text="t$('home.di')"></span>
             </div>
             <h1 class="mb-4">
-              <span>Welcome, </span> <span class="accent-text">{{ username }}</span> <br />
+              <span>Welcome, </span> <span class="accent-text">{{ user.firstName }}</span> <br />
               <span>to your</span> <br />
               <span>Admin Space</span> <br />
             </h1>
