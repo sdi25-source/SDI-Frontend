@@ -12,7 +12,7 @@
             <span v-if="currentStep === 1">Product data verification</span>
             <span v-else-if="currentStep === 2">Product version configuration</span>
             <span v-else-if="currentStep === 3">Product modules version</span>
-            <span v-else>Résumé et confirmation</span>
+            <span v-else>Resume and confirmation</span>
           </h5>
           <button type="button" class="close-button" @click="closeModal" aria-label="Fermer">
             <svg
