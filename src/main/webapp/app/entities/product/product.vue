@@ -1302,24 +1302,25 @@
                   <button class="button button-success" @click="addInfraToVersion" :disabled="!selectedVersionInfraComponentId">Add</button>
                 </div>
 
-                <ul class="component-list scroll-container">
-                  <li v-for="(component, index) in versionInfraComponents" :key="index" class="component-item">
-                    <div class="component-info">
-                      <span class="component-name"
-                        >{{ getIfraComponentVersionWithInfraCached(component.id).infraComponent.name }}
-                        <span class="component-version">{{ component.version }}</span></span
-                      >
+                <!-- Grille pour afficher 3 composants par ligne -->
+                <div class="component-grid scroll-container">
+                  <div v-for="(component, index) in versionInfraComponents" :key="index" class="component-item-grid">
+                    <div class="component-info-compact">
+                      <span class="component-name-compact">
+                        {{ getIfraComponentVersionWithInfraCached(component.id).infraComponent.name }}
+                      </span>
+                      <span class="component-version-compact">{{ component.version }}</span>
                     </div>
                     <button
-                      class="button-icon"
+                      class="button-icon-compact"
                       @click="removeInfraFromVersion(index)"
                       aria-label="Supprimer"
                       v-if="hasAnyAuthority('ROLE_USER')"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
+                        width="16"
+                        height="16"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -1332,12 +1333,12 @@
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                       </svg>
                     </button>
-                  </li>
-                  <li v-if="versionInfraComponents.length === 0" class="empty-message">No selected component</li>
-                </ul>
+                  </div>
+
+                  <div v-if="versionInfraComponents.length === 0" class="empty-message-grid">No selected component</div>
+                </div>
               </div>
             </div>
-
             <!-- Modules Section -->
             <div class="card" v-if="activeVersionSettingsSection === 'modules'">
               <div align="right" class="mr-3">
@@ -1347,7 +1348,7 @@
                   @click="showVersionModuleSelector = !showVersionModuleSelector"
                   v-if="hasAnyAuthority('ROLE_USER')"
                 >
-                  {{ showModuleSelector ? 'Close' : 'Add' }}
+                  {{ showVersionModuleSelector ? 'Close' : 'Add' }}
                 </button>
               </div>
               <div class="card-body">
@@ -1373,41 +1374,41 @@
                   <button class="button button-success" @click="addModuleToVersion" :disabled="!selectedVersionModuleId">Add</button>
                 </div>
 
-                <ul class="component-list scroll-container">
-                  <li v-for="(moduleVersion, index) in versionModuleVersions" :key="index" class="component-item">
-                    <div class="component-info">
-                      <span class="component-name">
+                <!-- Grille pour afficher 5 modules par ligne -->
+                <div class="component-grid scroll-container">
+                  <div v-for="(moduleVersion, index) in versionModuleVersions" :key="index" class="component-item-grid">
+                    <div class="component-info-compact p-3">
+                      <span class="component-name-compact">
                         {{ getModuleVersionWithModuleCached(moduleVersion.id)?.module?.name }}
-                        <span class="component-version">{{ moduleVersion.version }}</span></span
-                      >
+                      </span>
+                      <span class="component-version-compact">{{ moduleVersion.version }}</span>
                     </div>
-                    <div class="action-buttons">
-                      <button
-                        class="button-icon"
-                        @click="removeModuleFromVersion(index)"
-                        aria-label="Supprimer"
-                        v-if="hasAnyAuthority('ROLE_USER')"
+                    <button
+                      class="button-icon-compact"
+                      @click="removeModuleFromVersion(index)"
+                      aria-label="Supprimer"
+                      v-if="hasAnyAuthority('ROLE_USER')"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          class="icon"
-                        >
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                      </button>
-                    </div>
-                  </li>
-                  <li v-if="versionModuleVersions.length === 0" class="empty-message">No selected module</li>
-                </ul>
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div v-if="versionModuleVersions.length === 0" class="empty-message-grid">No selected module</div>
+                </div>
               </div>
             </div>
           </div>
@@ -1958,6 +1959,207 @@
 <script lang="ts" src="./product.component.ts"></script>
 
 <style scoped>
+.component-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Élément de composant compact */
+.component-item-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.5rem;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+  min-height: 100px;
+  position: relative;
+}
+
+.component-item-grid:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Informations du composant compactes */
+.component-info-compact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.25rem;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.component-name-compact {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.component-version-compact {
+  font-size: 0.75rem;
+  color: #64748b;
+  background-color: #e2e8f0;
+  padding: 0.125rem 0.375rem;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* Bouton de suppression compact */
+.button-icon-compact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 24px;
+  height: 24px;
+}
+
+.button-icon-compact:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* Message vide pour la grille */
+.empty-message-grid {
+  grid-column: 1 / -1;
+  padding: 2rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 2px dashed #e2e8f0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .component-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .component-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Styles existants pour la cohérence */
+.card {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-body {
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.selector-container {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.select-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background-color: white;
+  color: #0f172a;
+  font-size: 0.875rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1rem;
+  padding-right: 2rem;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+}
+
+.button-primary {
+  background-color: #0c2d57;
+  color: white;
+  border-color: #0c2d57;
+}
+
+.button-secondary {
+  background-color: #f1f5f9;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+
+.button-success {
+  background-color: #10b981;
+  color: white;
+  border-color: #10b981;
+}
+
+.button-success:disabled {
+  background-color: #d1d5db;
+  border-color: #d1d5db;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.scroll-container {
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
 .filter-item {
   display: inline-flex;
   align-items: center;
