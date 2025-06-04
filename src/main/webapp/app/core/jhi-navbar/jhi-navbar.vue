@@ -131,13 +131,6 @@
                 C
                 <span class="role-tooltip">Commercial</span>
               </span>
-              <span
-                v-if="!hasAnyAuthority('ROLE_ADMIN') && !hasAnyAuthority('ROLE_USER') && !hasAnyAuthority('ROLE_COMMERCIAL')"
-                class="role-badge role-user"
-              >
-                U
-                <span class="role-tooltip">User</span>
-              </span>
             </div>
           </li>
           <li class="dropdown">
@@ -209,7 +202,7 @@
 /* Toggle icon (bi-list) */
 .toggle-dropdown {
   font-size: 1.2rem;
-  margin-left: 5px;
+  margin-left: 0.1px;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -392,7 +385,7 @@
 
 /* Style for the entities menu scroll (for other dropdowns) */
 .entities-menu-scroll {
-  max-height: 300px;
+  max-height: 700px;
   overflow-y: auto;
   overflow-x: hidden;
   display: block;
