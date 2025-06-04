@@ -938,57 +938,6 @@
       </div>
     </div>
 
-    <!-- Modules Modal -->
-    <!--    <div class="modal-backdrop" v-if="showModulesModal" @click="closeModulesModal"></div>-->
-    <!--    <div class="modal-container" v-if="showModulesModal" role="dialog" aria-modal="true">-->
-    <!--      <div class="modal-content">-->
-    <!--        <div class="modal-header">-->
-    <!--          <h5 class="modal-title" v-text="t$('sdiFrontendApp.requestOfChange.moduleVersion')"></h5>-->
-    <!--          <button type="button" class="close-button" @click="closeModulesModal" aria-label="Fermer">-->
-    <!--            <svg-->
-    <!--              xmlns="http://www.w3.org/2000/svg"-->
-    <!--              width="24"-->
-    <!--              height="24"-->
-    <!--              viewBox="0 0 24 24"-->
-    <!--              fill="none"-->
-    <!--              stroke="currentColor"-->
-    <!--              strokeWidth="2"-->
-    <!--              strokeLinecap="round"-->
-    <!--              strokeLinejoin="round"-->
-    <!--              class="icon"-->
-    <!--            >-->
-    <!--              <line x1="18" y1="6" x2="6" y2="18"></line>-->
-    <!--              <line x1="6" y1="6" x2="18" y2="18"></line>-->
-    <!--            </svg>-->
-    <!--          </button>-->
-    <!--        </div>-->
-
-    <!--        <div class="modal-body">-->
-    <!--          <div v-if="selectedModuleRequest">-->
-    <!--            <div v-if="!selectedModuleRequest.moduleVersions || selectedModuleRequest.moduleVersions.length === 0" class="text-center py-3">-->
-    <!--              <span class="text-muted" v-text="t$('sdiFrontendApp.requestOfChange.noModule')"></span>-->
-    <!--            </div>-->
-    <!--            <div v-else class="d-flex flex-wrap gap-2">-->
-    <!--              <div-->
-    <!--                v-for="module in selectedModuleRequest.moduleVersions"-->
-    <!--                :key="module.id"-->
-    <!--                class="badge bg-light text-dark p-2 rounded-pill position-relative"-->
-    <!--              >-->
-    <!--                {{ module.module ? module.module.name : 'N/A' }} <span class="text-muted">{{ ' - v ' }}{{ module.version }}</span>-->
-    <!--                <span class="remove-module-icon" @click="removeModule(module.id)" title="Supprimer le module">-->
-    <!--                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">-->
-    <!--                    <path-->
-    <!--                      d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"-->
-    <!--                    />-->
-    <!--                  </svg>-->
-    <!--                </span>-->
-    <!--              </div>-->
-    <!--            </div>-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--      </div>-->
-    <!--    </div>-->
-
     <!-- details Modal -->
     <div class="modal-backdrop" v-if="showDetailsModal" @click="closeDetailsModal"></div>
     <div class="modal-container" v-if="showDetailsModal" role="dialog" aria-modal="true">
