@@ -84,12 +84,6 @@ export default defineComponent({
 
     const dataUtils = useDataUtils();
 
-    // Validation personnalisée pour le logo
-    const maxFileSize = (value: File | string): boolean => {
-      if (!value || typeof value === 'string') return true; // Pas de fichier ou déjà une chaîne
-      return value.size <= 2 * 1024 * 1024; // 2MB max
-    };
-
     // Compression du logo
     const compressLogo = (file: File): Promise<string> => {
       return new Promise((resolve, reject) => {

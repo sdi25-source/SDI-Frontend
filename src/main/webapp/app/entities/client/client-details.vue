@@ -40,8 +40,8 @@
             </div>
             <div class="col-md-3 mb-3 pb-2">
               <div class="detail-group">
-                <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.address')"></label>
-                <p class="mb-0 fw-medium">{{ client.address }}</p>
+                <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.createDate')"></label>
+                <p class="mb-0 fw-medium">{{ client.createDate }}</p>
               </div>
             </div>
             <div class="col-md-3 mb-3 pb-2">
@@ -64,26 +64,20 @@
             </div>
             <div class="col-md-3 mb-3 pb-2">
               <div class="detail-group">
-                <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.createDate')"></label>
-                <p class="mb-0 fw-medium">{{ client.createDate }}</p>
+                <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.url')"></label>
+                <p>
+                  <a :href="client.url" target="_blank" class="mb-0 fw-medium text-decoration-none text-break">
+                    {{ client.url }}
+                    <i class="ms-1 fas fa-external-link-alt"></i>
+                  </a>
+                </p>
               </div>
             </div>
           </div>
 
-          <div class="mb-4 pb-3 border-bottom">
-            <div class="row">
-              <div class="col-md-4 mb-3 pb-2">
-                <div class="detail-group">
-                  <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.url')"></label>
-                  <p>
-                    <a :href="client.url" target="_blank" class="mb-0 fw-medium text-decoration-none text-break">
-                      {{ client.url }}
-                      <i class="ms-1 fas fa-external-link-alt"></i>
-                    </a>
-                  </p>
-                </div>
-              </div>
-              <div class="col-md-4 mb-3 pb-2">
+          <div class="border-bottom">
+            <div class="row mb-5">
+              <div class="col-md-3 mb-3 pb-2">
                 <div class="detail-group">
                   <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.size')"></label>
                   <p class="mb-0 fw-medium">
@@ -91,7 +85,7 @@
                   </p>
                 </div>
               </div>
-              <div class="col-md-4 mb-3 pb-2">
+              <div class="col-md-3 mb-3 pb-2">
                 <div class="detail-group">
                   <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.clientType')"></label>
                   <p class="mb-0 fw-medium">
@@ -99,11 +93,23 @@
                   </p>
                 </div>
               </div>
+<!--              <div class="col-md-3 mb-3 pb-2">-->
+<!--                <div class="detail-group">-->
+<!--                  <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.country')"></label>-->
+<!--                  <p class="mb-0 fw-medium">{{ client.country?.countryFlag }}{{ ' ' }}{{ client.country?.countryname }}</p>-->
+<!--                </div>-->
+<!--              </div>-->
+              <div class="col-md-3 mb-3 pb-2">
+                <div class="detail-group">
+                  <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.address')"></label>
+                  <p class="mb-0 fw-medium">{{ client.address }}</p>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- Notes section -->
-          <div class="mb-4 pb-3">
+          <div class="mb-4 pb-3 mt-4">
             <label class="fw-bold mb-2" v-text="t$('sdiFrontendApp.client.notes')"></label>
             <p class="mb-0 text-muted">{{ client.notes }}</p>
           </div>

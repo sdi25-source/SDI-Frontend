@@ -89,13 +89,13 @@ export default defineComponent({
         let response;
         if (userAccount.value.id) {
           response = await userManagementService.update(userAccount.value);
-          this.isSaving = false;
           previousState();
+          this.isSaving = false;
           alertService.showInfo(getToastMessageFromHeader(response));
         } else {
           response = await userManagementService.create(userAccount.value);
-          this.isSaving = false;
           previousState();
+          this.isSaving = false;
           alertService.showSuccess(getToastMessageFromHeader(response));
         }
         isSaving.value = false;
