@@ -356,14 +356,14 @@ export default defineComponent({
     const openVersionsModal = async certification => {
       selectedCertification.value = certification;
 
-      // Réinitialiser les variables de pagination et de recherche
+      // Reset pagination and search variables
       versionCurrentPage.value = 1;
       versionSearchTerm.value = '';
 
-      // Récupérer les versions pour cette certification
+      // Retrieve versions for this certification
       await retrieveVersionsForCertification(certification.id);
 
-      // Initialiser la nouvelle version avec la certification sélectionnée
+      // Initialize new version with the selected certification
       newVersion.value = {
         version: '',
         description: '',
@@ -372,10 +372,13 @@ export default defineComponent({
         certification: certification,
       };
 
-      // Ouvrir le modal
-      versionsModal.value.show();
+      // Show the modal
+      if (versionsModal.value && typeof versionsModal.value.show === 'function') {
+        versionsModal.value.show();
+      } else {
+        console.error('versionsModal is not properly initialized or show method is unavailable');
+      }
     };
-
     const closeVersionsModal = () => {
       versionsModal.value.hide();
       showAddVersionRow.value = false;
@@ -568,7 +571,7 @@ export default defineComponent({
 
     onMounted(async () => {
       await retrieveCertifications();
-      versionsModal.value = ref('versionsModal');
+   //   versionsModal.value = ref('versionsModal');
       removeEntity.value = ref('removeEntity');
       removeVersionEntity.value = ref('removeVersionEntity');
 
