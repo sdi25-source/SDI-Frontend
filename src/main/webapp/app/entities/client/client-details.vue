@@ -1,6 +1,12 @@
 <template>
   <div class="row justify-content-center p-lg-5">
     <div class="col-12 p-5">
+      <!-- Loading Indicator -->
+      <div v-if="isLoading" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p class="loading-message">Client Report in Progress...</p>
+      </div>
+
       <div v-if="client" class="card border-0">
         <div class="card-body p-0">
           <!-- Header avec bouton retour, nom client et logo -->
@@ -105,7 +111,7 @@
           <!-- Modal Footer with Buttons -->
           <div class="modal-footer">
             <button type="submit" @click.prevent="previousState()" class="button button-secondary" data-cy="entityDetailsBackButton">
-              <font-awesome-icon icon="arrow-left"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.back')"></span>
+              <font-awesome-icon icon="arrow-left"></font-awesome-icon> <span v-text="t$('entity.action.back')"></span>
             </button>
             <router-link
               v-if="client.id && hasAnyAuthority('ROLE_COMMERCIAL')"
@@ -114,11 +120,11 @@
               v-slot="{ navigate }"
             >
               <button @click="navigate" class="button button-primary">
-                <font-awesome-icon icon="pencil-alt"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.edit')"></span>
+                <font-awesome-icon icon="pencil-alt"></font-awesome-icon> <span v-text="t$('entity.action.edit')"></span>
               </button>
             </router-link>
-            <button v-if="client.id" @click="generateReport" class="button button-primary">
-              <i class="bi bi-file-pdf"></i>&nbsp;<span>Generate Report</span>
+            <button v-if="client.id" @click="generateReport" class="button button-primary" :disabled="isLoading">
+              <i class="bi bi-file-pdf"></i> <span>Generate Report</span>
             </button>
           </div>
         </div>
@@ -130,7 +136,7 @@
       <div class="pdf-modal-content">
         <div class="pdf-modal-header">
           <h5>Customer Report</h5>
-          <button @click="closePdfModal" class="close-button">&times;</button>
+          <button @click="closePdfModal" class="close-button">×</button>
         </div>
         <div class="pdf-modal-body">
           <iframe v-if="pdfUrl" :src="pdfUrl" class="pdf-iframe"></iframe>
@@ -138,7 +144,7 @@
         </div>
         <div class="pdf-modal-footer">
           <button @click="downloadPdf" class="button button-primary">
-            <font-awesome-icon icon="download"></font-awesome-icon>&nbsp;Download PDF
+            <font-awesome-icon icon="download"></font-awesome-icon> Download PDF
           </button>
           <button @click="closePdfModal" class="button button-secondary">Close</button>
         </div>
@@ -150,6 +156,41 @@
 <script lang="ts" src="./client-details.component.ts"></script>
 
 <style scoped>
+/* Loading Indicator Styles */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #0c2d57;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+.loading-message {
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #0c2d57;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 /* Existing styles (unchanged) */
 .button {
   display: inline-flex;
@@ -193,8 +234,8 @@
   background-color: #fff;
   border-radius: 8px;
   width: 90%;
-  max-width: 1000px;
-  max-height: 100vh;
+  max-width: 1200px;
+  max-height: 700vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -229,7 +270,7 @@
 
 .pdf-iframe {
   width: 100%;
-  height: 500px;
+  height: 600px;
   border: none;
 }
 
