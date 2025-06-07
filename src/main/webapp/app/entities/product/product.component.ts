@@ -288,9 +288,9 @@ export default defineComponent({
             ...fullComponentVersion,
             infraComponent: infraComponent
               ? {
-                  ...infraComponent,
-                  componentType: componentType || null,
-                }
+                ...infraComponent,
+                componentType: componentType || null,
+              }
               : null,
           };
         })
@@ -327,11 +327,11 @@ export default defineComponent({
           // Enrichir les modules de chaque produit
           const modulesWithExpansion = product.modules
             ? product.modules.map(mod => ({
-                ...mod,
-                isExpanded: false,
-                versions: [],
-                isLoadingVersions: false,
-              }))
+              ...mod,
+              isExpanded: false,
+              versions: [],
+              isLoadingVersions: false,
+            }))
             : [];
           return {
             ...product,
@@ -717,16 +717,16 @@ export default defineComponent({
           // Initialize with root's configuration
           versionInfraComponents.value = rootVersion.infraComponentVersions
             ? rootVersion.infraComponentVersions.map(icv => ({
-                ...icv,
-                id: icv.id,
-              }))
+              ...icv,
+              id: icv.id,
+            }))
             : [];
 
           versionModuleVersions.value = rootVersion.moduleVersions
             ? rootVersion.moduleVersions.map(mv => ({
-                ...mv,
-                id: mv.id,
-              }))
+              ...mv,
+              id: mv.id,
+            }))
             : [];
         } catch (error) {
           alertService.showHttpError(error.response);
@@ -1259,15 +1259,15 @@ export default defineComponent({
           const rootVersion = await productVersionService().find(newVersion.value.root.id);
           versionInfraComponents.value = rootVersion.infraComponentVersions
             ? rootVersion.infraComponentVersions.map(icv => ({
-                ...icv,
-                id: icv.id,
-              }))
+              ...icv,
+              id: icv.id,
+            }))
             : [];
           versionModuleVersions.value = rootVersion.moduleVersions
             ? rootVersion.moduleVersions.map(mv => ({
-                ...mv,
-                id: mv.id,
-              }))
+              ...mv,
+              id: mv.id,
+            }))
             : [];
         } catch (error) {
           alertService.showHttpError(error.response);
@@ -1920,16 +1920,16 @@ export default defineComponent({
             // Update versionInfraComponents and versionModuleVersions with root's configuration
             versionInfraComponents.value = rootVersion.infraComponentVersions
               ? rootVersion.infraComponentVersions.map(icv => ({
-                  ...icv,
-                  id: icv.id, // Ensure ID is included
-                }))
+                ...icv,
+                id: icv.id, // Ensure ID is included
+              }))
               : [];
 
             versionModuleVersions.value = rootVersion.moduleVersions
               ? rootVersion.moduleVersions.map(mv => ({
-                  ...mv,
-                  id: mv.id, // Ensure ID is included
-                }))
+                ...mv,
+                id: mv.id, // Ensure ID is included
+              }))
               : [];
 
             alertService.showInfo('Configuration du root appliquée automatiquement', { variant: 'info' });
@@ -2182,7 +2182,6 @@ export default defineComponent({
       prepareRemove,
       closeDialog,
       removeProduct,
-      handleSearch,
       goToPrevPage,
       goToNextPage,
       updateTotalItems,
