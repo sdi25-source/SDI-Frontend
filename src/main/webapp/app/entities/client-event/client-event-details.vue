@@ -1,4 +1,3 @@
-```vue
 <template>
   <div class="row justify-content-center p-lg-5">
     <div class="col-12 p-5">
@@ -40,34 +39,22 @@
               <div class="detail-group">
                 <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.clientEvent.clientEventType')"></label>
                 <p class="mb-0 fw-medium">
-                  <router-link
-                    v-if="clientEvent.clientEventType"
-                    :to="{ name: 'ClientEventTypeView', params: { clientEventTypeId: clientEvent.clientEventType.id } }"
-                    class="info-link"
-                  >
-                    {{ clientEvent.clientEventType.type }}
-                  </router-link>
-                  <span v-else>-</span>
+                  {{ clientEvent.clientEventType.type }}
                 </p>
               </div>
             </div>
-            <div class="col-md-4 mb-3 pb-2">
+            <div class="col-md-4 mb-3 pb-2 pt-3">
               <div class="detail-group">
                 <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.clientEvent.eventDate')"></label>
                 <p class="mb-0 fw-medium">{{ clientEvent.eventDate }}</p>
               </div>
             </div>
-            <div class="col-md-4 mb-3 pb-2">
-              <div class="detail-group">
-                <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.clientEvent.notes')"></label>
-                <p class="mb-0 fw-medium">{{ clientEvent.notes || '-' }}</p>
-              </div>
-            </div>
           </div>
 
+          <!-- Notes section avec contenu formaté -->
           <div class="mb-4 pb-3 pl-5">
             <label class="fw-bold mb-2" v-text="t$('sdiFrontendApp.clientEvent.description')"></label>
-            <p class="mb-0 text-muted notes-content">{{ clientEvent.description }}</p>
+            <div class="notes-content" v-html="clientEvent.notes || 'Aucune note disponible'"></div>
           </div>
 
           <!-- Footer with action buttons -->
@@ -180,12 +167,90 @@
   text-decoration: underline;
 }
 
-/* Section notes */
+/* Section notes avec styles pour le contenu formaté */
 .notes-content {
   font-size: 1rem;
   line-height: 1.6;
   color: #555;
   margin-bottom: 0;
+  min-height: 1.5rem;
+}
+
+/* Styles pour le contenu HTML formaté dans les notes */
+.notes-content h1,
+.notes-content h2,
+.notes-content h3 {
+  color: #012970;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.notes-content h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.notes-content h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.notes-content h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.notes-content p {
+  margin-bottom: 0.75rem;
+}
+
+.notes-content strong,
+.notes-content b {
+  font-weight: 600;
+  color: #333;
+}
+
+.notes-content em,
+.notes-content i {
+  font-style: italic;
+}
+
+.notes-content u {
+  text-decoration: underline;
+}
+
+.notes-content ul,
+.notes-content ol {
+  margin-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.notes-content li {
+  margin-bottom: 0.25rem;
+}
+
+.notes-content a {
+  color: #0d83fd;
+  text-decoration: none;
+}
+
+.notes-content a:hover {
+  text-decoration: underline;
+}
+
+.notes-content code {
+  background-color: #f1f5f9;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.notes-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 0.5rem 0;
 }
 
 /* Card styling */
@@ -237,4 +302,3 @@
   }
 }
 </style>
-```

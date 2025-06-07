@@ -363,7 +363,8 @@
                 <div class="mb-4 d-flex justify-content-between align-items-start">
                   <div class="flex-grow-1">
                     <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.description')"></h6>
-                    <p class="mb-0">{{ selectedRequest.description || ' ' }}</p>
+                    <div class="notes-content mb-0" v-html="selectedRequest.description || ' '"></div>
+
                   </div>
                   <div class="ms-4 text-end">
                     <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.createDate')"></h6>
@@ -730,21 +731,99 @@
                 </div>
               </div>
 
+
+              <!-- Rich Text Editor for Notes -->
               <div class="form-group">
-                <label
-                  class="form-control-label"
-                  v-text="t$('sdiFrontendApp.requestOfChange.description')"
-                  for="request-of-change-description"
-                ></label>
-                <textarea
-                  class="form-control form-control-sm"
-                  name="description"
-                  id="request-of-change-description"
-                  data-cy="description"
-                  v-model="newRequest.description"
-                  rows="3"
-                ></textarea>
+                <label class="form-control-label" v-text="t$('sdiFrontendApp.requestOfChange.description')" for="request-of-change-notes"></label>
+                <div class="input-with-validation">
+                  <div class="rich-text-editor">
+                    <!-- Toolbar -->
+                    <div class="editor-toolbar">
+                      <select class="toolbar-select" v-model="selectedHeading" @change="applyHeading">
+                        <option value="">Heading</option>
+                        <option value="h1">Heading 1</option>
+                        <option value="h2">Heading 2</option>
+                        <option value="h3">Heading 3</option>
+                      </select>
+
+                      <select class="toolbar-select" v-model="selectedFont" @change="applyFont">
+                        <option value="">Sans Serif</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Courier New">Courier New</option>
+                      </select>
+
+                      <div class="toolbar-divider"></div>
+
+                      <button type="button" class="toolbar-btn" @click="toggleBold" :class="{ active: isBold }">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
+                          <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
+                        </svg>
+                      </button>
+                      <button type="button" class="toolbar-btn" @click="toggleItalic" :class="{ active: isItalic }">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="19" y1="4" x2="10" y2="4" />
+                          <line x1="14" y1="20" x2="5" y2="20" />
+                          <line x1="15" y1="4" x2="9" y2="20" />
+                        </svg>
+                      </button>
+                      <button type="button" class="toolbar-btn" @click="toggleUnderline" :class="{ active: isUnderline }">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3" />
+                          <line x1="4" y1="21" x2="20" y2="21" />
+                        </svg>
+                      </button>
+
+                      <div class="toolbar-divider"></div>
+
+                      <button type="button" class="toolbar-btn" @click="toggleBulletList">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="8" y1="6" x2="21" y2="6" />
+                          <line x1="8" y1="12" x2="21" y2="12" />
+                          <line x1="8" y1="18" x2="21" y2="18" />
+                          <line x1="3" y1="6" x2="3.01" y2="6" />
+                          <line x1="3" y1="12" x2="3.01" y2="12" />
+                          <line x1="3" y1="18" x2="3.01" y2="18" />
+                        </svg>
+                      </button>
+                      <button type="button" class="toolbar-btn" @click="toggleNumberedList">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="10" y1="6" x2="21" y2="6" />
+                          <line x1="10" y1="12" x2="21" y2="12" />
+                          <line x1="10" y1="18" x2="21" y2="18" />
+                          <path d="M4 6h1v4" />
+                          <path d="M4 10h2" />
+                          <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" />
+                        </svg>
+                      </button>
+
+                      <div class="toolbar-divider"></div>
+                      <button type="button" class="toolbar-btn" @click="insertCode">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="16,18 22,12 16,6"/>
+                          <polyline points="8,6 2,12 8,18"/>
+                        </svg>
+                      </button>
+                    </div>
+
+                    <!-- Editor Content -->
+                    <div
+                      ref="notesEditor"
+                      class="editor-content"
+                      contenteditable="true"
+                      @input="updateNotes"
+                      @keyup="updateToolbarState"
+                      @mouseup="updateToolbarState"
+                      v-html="v$.description.$model"
+                      data-cy="notes"
+                    ></div>
+                  </div>
+                  <font-awesome-icon icon="check" class="text-success" />
+                </div>
               </div>
+
+
               <div class="form-group">
                 <label class="form-control-label" for="request-of-change-productVersion">Product Version</label>
                 <select v-model="newRequest.productVersion" class="form-select">
@@ -969,7 +1048,7 @@
               <div class="mb-4 d-flex justify-content-between align-items-start">
                 <div class="flex-grow-1">
                   <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.description')"></h6>
-                  <p class="mb-0">{{ selectedRequest.description || ' ' }}</p>
+                  <div class="notes-content mb-0" v-html="selectedRequest.description || ' '"></div>
                 </div>
                 <div class="ms-4 text-end">
                   <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.createDate')"></h6>
@@ -1112,6 +1191,122 @@
 <script lang="ts" src="./request-of-change.component.ts"></script>
 
 <style scoped>
+/* Rich Text Editor Styles */
+.rich-text-editor {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.toolbar-select {
+  padding: 4px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 0.875rem;
+  min-width: 100px;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #6b7280;
+}
+
+.toolbar-btn:hover {
+  background-color: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+.toolbar-btn.active {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background-color: #d1d5db;
+  margin: 0 4px;
+}
+
+.editor-content {
+  min-height: 120px;
+  padding: 12px;
+  outline: none;
+  line-height: 1.5;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+.editor-content:empty::before {
+  content: 'Enter your notes here...';
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.editor-content:focus {
+  background-color: #fafafa;
+}
+
+.input-with-validation {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.valid-check {
+  position: absolute;
+  right: 10px;
+  color: #28a745;
+  font-size: 0.875rem;
+}
+
+.text-success {
+  color: #28a745 !important;
+}
+
+.form-text.text-danger {
+  color: #dc3545 !important;
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+/* Ensure modal form styling */
+.compact-form .form-container {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.compact-form .form-group {
+  margin-bottom: 0.75rem;
+}
+
+.compact-form label {
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
 .remove-module-icon {
   position: absolute;
   top: -6px;

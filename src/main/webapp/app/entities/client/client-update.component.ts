@@ -1,4 +1,4 @@
-import { type Ref, computed, defineComponent, inject, ref } from 'vue';
+import { type Ref, computed, defineComponent, inject, ref, onMounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useVuelidate } from '@vuelidate/core';
@@ -34,6 +34,14 @@ export default defineComponent({
     const clientTypes: Ref<IClientType[]> = ref([]);
     const isSaving = ref(false);
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'en'), true);
+
+    // Rich text editor refs
+    const editorContent = ref<HTMLElement | null>(null);
+    const selectedHeading = ref('');
+    const selectedFont = ref('');
+    const isBold = ref(false);
+    const isItalic = ref(false);
+    const isUnderline = ref(false);
 
     const route = useRoute();
     const router = useRouter();
@@ -146,6 +154,87 @@ export default defineComponent({
       }
     };
 
+    // Rich text editor methods
+    const updateNotes = () => {
+      if (editorContent.value) {
+        v$.value.notes.$model = editorContent.value.innerHTML;
+        v$.value.notes.$touch();
+      }
+    };
+
+    const updateToolbarState = () => {
+      if (!editorContent.value) return;
+
+      isBold.value = document.queryCommandState('bold');
+      isItalic.value = document.queryCommandState('italic');
+      isUnderline.value = document.queryCommandState('underline');
+    };
+
+    const toggleBold = () => {
+      document.execCommand('bold');
+      updateToolbarState();
+      updateNotes();
+    };
+
+    const toggleItalic = () => {
+      document.execCommand('italic');
+      updateToolbarState();
+      updateNotes();
+    };
+
+    const toggleUnderline = () => {
+      document.execCommand('underline');
+      updateToolbarState();
+      updateNotes();
+    };
+
+    const toggleBulletList = () => {
+      document.execCommand('insertUnorderedList');
+      updateNotes();
+    };
+
+    const toggleNumberedList = () => {
+      document.execCommand('insertOrderedList');
+      updateNotes();
+    };
+
+    const applyHeading = () => {
+      if (selectedHeading.value) {
+        document.execCommand('formatBlock', false, selectedHeading.value);
+        selectedHeading.value = '';
+        updateNotes();
+      }
+    };
+
+    const applyFont = () => {
+      if (selectedFont.value) {
+        document.execCommand('fontName', false, selectedFont.value);
+        selectedFont.value = '';
+        updateNotes();
+      }
+    };
+
+
+    const insertCode = () => {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const code = document.createElement('code');
+        code.style.backgroundColor = '#f1f5f9';
+        code.style.padding = '2px 4px';
+        code.style.borderRadius = '3px';
+        code.style.fontFamily = 'monospace';
+
+        try {
+          range.surroundContents(code);
+        } catch (e) {
+          code.appendChild(range.extractContents());
+          range.insertNode(code);
+        }
+        updateNotes();
+      }
+    };
+
     const validations = useValidation();
     const validationRules = {
       clientLogo: {},
@@ -175,6 +264,17 @@ export default defineComponent({
     };
     const v$ = useVuelidate(validationRules, client as any);
 
+    onMounted(() => {
+      if (editorContent.value) {
+        editorContent.value.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const text = e.clipboardData?.getData('text/plain') || '';
+          document.execCommand('insertText', false, text);
+          updateNotes();
+        });
+      }
+    });
+
     return {
       clientService,
       alertService,
@@ -188,6 +288,23 @@ export default defineComponent({
       clientSizes,
       clientTypes,
       onLogoChange,
+      // Rich text editor
+      editorContent,
+      selectedHeading,
+      selectedFont,
+      isBold,
+      isItalic,
+      isUnderline,
+      updateNotes,
+      updateToolbarState,
+      toggleBold,
+      toggleItalic,
+      toggleUnderline,
+      toggleBulletList,
+      toggleNumberedList,
+      applyHeading,
+      applyFont,
+      insertCode,
       ...dataUtils,
       v$,
       t$,

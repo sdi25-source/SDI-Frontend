@@ -1,6 +1,7 @@
 import { type Ref, defineComponent, ref, onMounted, computed, reactive, nextTick, inject, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import { useVuelidate } from '@vuelidate/core';
 import { RequestOfChange } from '@/shared/model/request-of-change.model';
 import { RequestStatus } from '@/shared/model/enumerations/request-status.model';
 import RequestOfChangeService from '@/entities/request-of-change/request-of-change.service';
@@ -48,10 +49,30 @@ export default defineComponent({
     const selectedModuleRequest = ref(null);
     const requestToDelete = ref(null);
     const currentStep = ref('');
-
-    // Add new data properties
     const showAddModuleDropdown = ref(false);
     const selectedNewModuleVersion = ref(null);
+
+    // Rich text editor refs
+    const notesEditor = ref<HTMLElement | null>(null);
+    const selectedHeading = ref('');
+    const selectedFont = ref('');
+    const isBold = ref(false);
+    const isItalic = ref(false);
+    const isUnderline = ref(false);
+
+    // New request form
+    const newRequest = ref(new RequestOfChange());
+    const keywordInput = ref('');
+    const keywordsList = ref<string[]>([]);
+
+    // Validation rules
+    const rules = computed(() => ({
+      title: { required: true },
+      type: { required: true },
+      description: {}, // Optional field, no validation required
+    }));
+
+    const v$ = useVuelidate(rules, newRequest);
 
     // Tab navigation
     const activeTabIndex = ref(0);
@@ -60,44 +81,8 @@ export default defineComponent({
     const hoverStyle = reactive({ left: 0, width: 0 });
     const activeStyle = reactive({ left: 0, width: 0 });
 
-    // New request form
-    const newRequest = ref(new RequestOfChange());
-
     // State
     const showNewProductVersionPopup = ref(false);
-
-    const keywordInput = ref(''); // Champ temporaire pour la saisie
-    const keywordsList = ref<string[]>([]); // Liste des mots-clés sous forme de badges
-
-    // Méthodes pour gérer le popup
-    const openNewProductVersionPopup = () => {
-      if (!selectedRequest.value) {
-        alertService.showError('No selected request');
-        return;
-      }
-
-      if (!selectedRequest.value.productVersion || !selectedRequest.value.productVersion.product) {
-        alertService.showError('Unable to create a new product version: missing information');
-        return;
-      }
-      showNewProductVersionPopup.value = true;
-    };
-
-    const closeNewProductVersionPopup = () => {
-      showNewProductVersionPopup.value = false;
-    };
-
-    const handleProductCreated = product => {
-      alertService.showInfo('Nouvelle version du produit créée avec succès', { variant: 'success' });
-      closeNewProductVersionPopup();
-      // Rafraîchir les données si nécessaire
-      retrieveRequestOfChanges();
-    };
-
-    // Méthode pour sélectionner une demande
-    const selectRequest = request => {
-      selectedRequest.value = request;
-    };
 
     // Tab configuration
     const statusTabs = [
@@ -115,7 +100,6 @@ export default defineComponent({
     // Computed
     const progressPercentage = computed(() => {
       if (!selectedRequest.value) return 0;
-
       switch (selectedRequest.value.status) {
         case 'PENDING':
           return 33;
@@ -129,6 +113,84 @@ export default defineComponent({
       }
     });
 
+    // Rich text editor methods
+    const updateNotes = () => {
+      if (notesEditor.value) {
+        v$.value.description.$model = notesEditor.value.innerHTML;
+        v$.value.description.$touch();
+      }
+    };
+
+    const updateToolbarState = () => {
+      if (!notesEditor.value) return;
+      isBold.value = document.queryCommandState('bold');
+      isItalic.value = document.queryCommandState('italic');
+      isUnderline.value = document.queryCommandState('underline');
+    };
+
+    const toggleBold = () => {
+      document.execCommand('bold');
+      updateToolbarState();
+      updateNotes();
+    };
+
+    const toggleItalic = () => {
+      document.execCommand('italic');
+      updateToolbarState();
+      updateNotes();
+    };
+
+    const toggleUnderline = () => {
+      document.execCommand('underline');
+      updateToolbarState();
+      updateNotes();
+    };
+
+    const toggleBulletList = () => {
+      document.execCommand('insertUnorderedList');
+      updateNotes();
+    };
+
+    const toggleNumberedList = () => {
+      document.execCommand('insertOrderedList');
+      updateNotes();
+    };
+
+    const applyHeading = () => {
+      if (selectedHeading.value) {
+        document.execCommand('formatBlock', false, selectedHeading.value);
+        selectedHeading.value = '';
+        updateNotes();
+      }
+    };
+
+    const applyFont = () => {
+      if (selectedFont.value) {
+        document.execCommand('fontName', false, selectedFont.value);
+        selectedFont.value = '';
+        updateNotes();
+      }
+    };
+
+    const insertCode = () => {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const code = document.createElement('code');
+        code.style.backgroundColor = '#f1f5f9';
+        code.style.padding = '2px 4px';
+        code.style.borderRadius = '3px';
+        code.style.fontFamily = 'monospace';
+        try {
+          range.surroundContents(code);
+        } catch (e) {
+          code.appendChild(range.extractContents());
+          range.insertNode(code);
+        }
+        updateNotes();
+      }
+    };
+
     // Methods for tab navigation
     const updateTabStyles = () => {
       nextTick(() => {
@@ -138,7 +200,6 @@ export default defineComponent({
           hoverStyle.left = hoveredRect.left - containerRect.left;
           hoverStyle.width = hoveredRect.width;
         }
-
         if (tabRefs.value[activeTabIndex.value]) {
           const activeRect = tabRefs.value[activeTabIndex.value].getBoundingClientRect();
           const containerRect = tabRefs.value[0].parentElement.getBoundingClientRect();
@@ -165,7 +226,6 @@ export default defineComponent({
       try {
         const res = await requestOfChangeService.retrieve();
         requestOfChanges.value = res.data;
-
         requestOfChanges.value.forEach(request => {
           if (request.moduleVersions) {
             request.moduleVersions = request.moduleVersions.map(mv => {
@@ -186,7 +246,6 @@ export default defineComponent({
           request.productVersion = productVersions.value.find(pv => pv.id === request.productVersion?.id);
         });
         filteredRequests.value = [...requestOfChanges.value];
-        console.log('result data', filteredRequests.value);
       } catch (err) {
         alertService.showHttpError(err.response);
       } finally {
@@ -209,12 +268,11 @@ export default defineComponent({
         filteredRequests.value = [...requestOfChanges.value];
         return;
       }
-
       const term = searchTerm.value.toLowerCase();
       filteredRequests.value = requestOfChanges.value.filter(
         request =>
           request.title.toLowerCase().includes(term) ||
-          request.description.toLowerCase().includes(term) ||
+          (request.description && request.description.toLowerCase().includes(term)) ||
           (request.client && request.client.code.toLowerCase().includes(term)),
       );
     };
@@ -229,22 +287,22 @@ export default defineComponent({
 
     const editRequest = async request => {
       newRequest.value = { ...request };
-      newRequest.value.type = request.type.value;
-      // S'assurer que les moduleVersions utilisent les références complètes
+      newRequest.value.type = request.type;
       newRequest.value.moduleVersions = request.moduleVersions
         ? request.moduleVersions.map(mv => {
-            const fullModuleVersion = moduleVersions.value.find(opt => opt.id === mv.id);
-            return fullModuleVersion ? fullModuleVersion : mv;
-          })
+          const fullModuleVersion = moduleVersions.value.find(opt => opt.id === mv.id);
+          return fullModuleVersion ? fullModuleVersion : mv;
+        })
         : [];
-      // Charger les moduleVersions pour la productVersion sélectionnée
+      if (newRequest.value.description) {
+        v$.value.description.$model = newRequest.value.description;
+      }
       if (newRequest.value.productVersion && newRequest.value.productVersion.id) {
         await loadModuleVersionsForProductVersion(newRequest.value.productVersion.id);
       }
       showCreateModal.value = true;
     };
 
-    // Toggle request selection with checkbox
     const toggleRequestSelection = async request => {
       if (selectedRequest.value && selectedRequest.value.id === request.id) {
         selectedRequest.value = null;
@@ -252,19 +310,14 @@ export default defineComponent({
         selectedRequest.value = request;
         const res = await productVersionService.retrieve();
         const matchedVersion = res.data.find(pv => pv.id === request.productVersion?.id);
-
         if (matchedVersion) {
           request.productVersion.product = matchedVersion.product;
         }
         request.productVersionResult = res.data.find(pv => pv.id === request.productVersionResult?.id);
-
-        console.log(request.productVersion);
-
         currentStep.value = request.status;
       }
     };
 
-    // Deselect request
     const deselectRequest = () => {
       selectedRequest.value = null;
     };
@@ -296,7 +349,6 @@ export default defineComponent({
 
     const confirmDelete = async () => {
       if (!requestToDelete.value) return;
-
       try {
         await requestOfChangeService.delete(requestToDelete.value.id);
         alertService.showSuccess(t$('sdiFrontendApp.requestOfChange.deleted', { param: requestToDelete.value.title }).toString());
@@ -309,23 +361,22 @@ export default defineComponent({
 
     const openCreateRequestModal = () => {
       newRequest.value = new RequestOfChange();
-      // Définir des valeurs par défaut
       newRequest.value.status = 'PENDING';
       newRequest.value.createDate = new Date().toISOString().split('T')[0];
       newRequest.value.moduleVersions = [];
+      newRequest.value.description = '';
       newRequest.value.done = false;
-      showCreateModal.value = true;
-      newRequest.value.type = 'EXTERNAL'; // Valeur par défaut
+      newRequest.value.type = 'EXTERNAL';
       showCreateModal.value = true;
     };
 
     const closeCreateModal = () => {
       showCreateModal.value = false;
+      v$.value.$reset();
     };
 
     const saveNewRequest = async () => {
       isSaving.value = true;
-
       try {
         newRequest.value.productVersionResult = newRequest.value.productVersion;
         newRequest.value.moduleVersions = newRequest.value.moduleVersions.map(mv => {
@@ -339,7 +390,6 @@ export default defineComponent({
           await requestOfChangeService.create(newRequest.value);
           alertService.showSuccess(t$('sdiFrontendApp.requestOfChange.created', { param: newRequest.value.title }).toString());
         }
-
         closeCreateModal();
         await retrieveRequestOfChanges();
       } catch (error) {
@@ -351,7 +401,6 @@ export default defineComponent({
 
     const formatDate = dateString => {
       if (!dateString) return '-';
-
       const date = new Date(dateString);
       return new Intl.DateTimeFormat('fr-FR', {
         year: 'numeric',
@@ -360,7 +409,6 @@ export default defineComponent({
       }).format(date);
     };
 
-    // Méthode pour obtenir la classe de couleur en fonction du statut
     const getStatusColorClass = status => {
       switch (status) {
         case 'PENDING':
@@ -376,7 +424,6 @@ export default defineComponent({
       }
     };
 
-    // Méthode pour obtenir le texte du statut
     const getStatusText = status => {
       switch (status) {
         case 'PENDING':
@@ -398,11 +445,9 @@ export default defineComponent({
 
     const isStepCompleted = step => {
       if (!selectedRequest.value) return false;
-
       const statusOrder = ['PENDING', 'APPROVED', 'REJECTED', 'COMPLETED'];
       const currentIndex = statusOrder.indexOf(selectedRequest.value.status);
       const stepIndex = statusOrder.indexOf(step);
-
       return stepIndex < currentIndex;
     };
 
@@ -410,21 +455,15 @@ export default defineComponent({
       try {
         const updatedRequest = { ...selectedRequest.value, status: newStatus };
         await requestOfChangeService.update(updatedRequest);
-
-        // Mettre à jour la liste locale et l'état actuel
         selectedRequest.value.status = newStatus;
         currentStep.value = newStatus;
-
-        // Rafraîchir la liste pour refléter les changements
         await retrieveRequestOfChanges();
-
         alertService.showInfo(t$('sdiFrontendApp.requestOfChange.statusUpdated'));
       } catch (err) {
         alertService.showHttpError(err.response);
       }
     };
 
-    // Load relationships
     const loadRelationships = async () => {
       try {
         const [productVersionRes, clientRes, moduleVersionRes, customisationLevelRes] = await Promise.all([
@@ -433,7 +472,6 @@ export default defineComponent({
           moduleVersionService.retrieve(),
           customisationLevelService.retrieve(),
         ]);
-
         productVersions.value = productVersionRes.data;
         clients.value = clientRes.data;
         moduleVersions.value = moduleVersionRes.data;
@@ -443,17 +481,8 @@ export default defineComponent({
       }
     };
 
-    // Lifecycle hooks
-    onMounted(async () => {
-      await loadRelationships();
-      await retrieveRequestOfChanges();
-      updateTabStyles();
-    });
-
-    // Fonction pour regrouper les versions par produit
     const groupedProductVersions = computed(() => {
       const grouped = {};
-
       productVersions.value.forEach(version => {
         if (!version.product) return;
         const productId = version.product.id;
@@ -463,110 +492,60 @@ export default defineComponent({
             versions: [],
           };
         }
-
         grouped[productId].versions.push(version);
-        console.log(grouped);
       });
       return Object.values(grouped);
     });
 
-    // Filtrer les moduleVersions en fonction du productVersion sélectionné
     const filteredModuleVersions = computed(() => {
       if (!newRequest.value.productVersion || !newRequest.value.productVersion.id) {
         return [];
       }
-
       if (
         newRequest.value.productVersion.moduleVersions &&
         Array.isArray(newRequest.value.productVersion.moduleVersions) &&
         newRequest.value.productVersion.moduleVersions.length > 0
       ) {
-        // Enrichir les moduleVersions avec les données complètes
         const enrichedModuleVersions = newRequest.value.productVersion.moduleVersions.map(mv => {
           const full = moduleVersions.value.find(opt => opt.id === mv.id);
           return full ? full : mv;
         });
-
-        // S'assurer que les moduleVersions déjà sélectionnées sont marquées
         newRequest.value.moduleVersions = newRequest.value.moduleVersions.map(selectedMv => {
           const full = enrichedModuleVersions.find(opt => opt.id === selectedMv.id);
           return full ? full : selectedMv;
         });
-
         return enrichedModuleVersions;
       } else {
-        console.log('Aucun moduleVersion trouvé pour cette version de produit');
         return [];
       }
     });
 
-    // Fonction pour enrichir les moduleVersions avec les données complètes
-    const enrichModuleVersions = () => {
-      if (
-        !newRequest.value.productVersion ||
-        !newRequest.value.productVersion.moduleVersions ||
-        !Array.isArray(newRequest.value.productVersion.moduleVersions) ||
-        newRequest.value.productVersion.moduleVersions.length === 0
-      ) {
-        return;
-      }
-
-      // Enrichir chaque moduleVersion avec les données complètes disponibles
-      newRequest.value.productVersion.moduleVersions = newRequest.value.productVersion.moduleVersions.map(mv => {
-        const full = moduleVersions.value.find(opt => opt.id === mv.id);
-        return full ? full : mv;
-      });
-    };
-
     const loadModuleVersionsForProductVersion = async productVersionId => {
       if (!productVersionId) return;
-
       try {
-        // Appel à l'API pour récupérer la productVersion avec ses moduleVersions
         const response = await productVersionService.find(productVersionId);
         if (response && response.data) {
-          // Si la réponse contient la productVersion complète
-          // Assurez-vous que les modules sont correctement chargés dans chaque moduleVersion
-          const productVersion = response.data;
-
-          // Si les moduleVersions existent mais n'ont pas leurs modules chargés,
-          // nous devons peut-être les charger séparément
-          if (productVersion.moduleVersions && productVersion.moduleVersions.length > 0) {
-            // Optionnel: charger les détails des modules si nécessaire
-            productVersion.moduleVersions = await loadModuleDetails(productVersion.moduleVersions);
-          }
-
-          // Mise à jour de la productVersion dans la requête
-          newRequest.value.productVersion = productVersion;
+          newRequest.value.productVersion = response.data;
         }
       } catch (error) {
         alertService.showHttpError(error.response);
       }
     };
 
-    // Mettre à jour le watcher pour appeler enrichModuleVersions
-    const watchProductVersionChange = () => {
-      watch(
-        () => newRequest.value.productVersion,
-        async newValue => {
-          if (newValue && newValue.id) {
-            // Charger les moduleVersions pour la nouvelle productVersion
-            await loadModuleVersionsForProductVersion(newValue.id);
-            // Conserver les moduleVersions déjà sélectionnées si elles sont valides
-            newRequest.value.moduleVersions = newRequest.value.moduleVersions.filter(mv =>
-              newValue.moduleVersions?.some(opt => opt.id === mv.id),
-            );
-          } else {
-            // Réinitialiser si aucune productVersion n'est sélectionnée
-            newRequest.value.moduleVersions = [];
-          }
-        },
-        { immediate: true },
-      );
-    };
-
-    // Appelez cette fonction dans le setup()
-    watchProductVersionChange();
+    watch(
+      () => newRequest.value.productVersion,
+      async newValue => {
+        if (newValue && newValue.id) {
+          await loadModuleVersionsForProductVersion(newValue.id);
+          newRequest.value.moduleVersions = newRequest.value.moduleVersions.filter(mv =>
+            newValue.moduleVersions?.some(opt => opt.id === mv.id),
+          );
+        } else {
+          newRequest.value.moduleVersions = [];
+        }
+      },
+      { immediate: true },
+    );
 
     watch(
       () => newRequest.value.keywords,
@@ -583,7 +562,6 @@ export default defineComponent({
       { immediate: true },
     );
 
-    // Synchroniser newRequest.keywords avec la liste des badges
     watch(
       keywordsList,
       newList => {
@@ -592,15 +570,13 @@ export default defineComponent({
       { deep: true },
     );
 
-    // Ajouter un mot-clé
     const addKeyword = () => {
       if (keywordInput.value.trim()) {
         keywordsList.value.push(keywordInput.value.trim());
-        keywordInput.value = ''; // Vider l'input après ajout
+        keywordInput.value = '';
       }
     };
 
-    // Gérer l'entrée pour permettre l'ajout par virgule ou Entrée
     const handleKeywordInput = event => {
       if (event.key === ',') {
         event.preventDefault();
@@ -608,30 +584,20 @@ export default defineComponent({
       }
     };
 
-    // Supprimer un mot-clé
     const removeKeyword = index => {
       keywordsList.value.splice(index, 1);
     };
 
-    // Add this method inside the setup function
     const removeModule = async moduleId => {
       if (!selectedModuleRequest.value) return;
-
       try {
-        // Filter out the module with the given moduleId
         selectedModuleRequest.value.moduleVersions = selectedModuleRequest.value.moduleVersions.filter(module => module.id !== moduleId);
-
-        // Update the request in the backend
         await requestOfChangeService.update(selectedModuleRequest.value);
         alertService.showSuccess(t$('sdiFrontendApp.requestOfChange.moduleRemoved').toString());
-
-        // Optionally, update the local requestOfChanges to reflect the change
         const updatedRequestIndex = requestOfChanges.value.findIndex(request => request.id === selectedModuleRequest.value.id);
         if (updatedRequestIndex !== -1) {
           requestOfChanges.value[updatedRequestIndex].moduleVersions = [...selectedModuleRequest.value.moduleVersions];
         }
-
-        // If the selected request is the same as the module request, update it too
         if (selectedRequest.value && selectedRequest.value.id === selectedModuleRequest.value.id) {
           selectedRequest.value.moduleVersions = [...selectedModuleRequest.value.moduleVersions];
         }
@@ -640,56 +606,80 @@ export default defineComponent({
       }
     };
 
-    // Modify viewRequestModules to set newRequest.productVersion
     const viewRequestModules = async request => {
       selectedModuleRequest.value = { ...request };
-      // Set newRequest.productVersion to trigger filteredModuleVersions computation
       newRequest.value.productVersion = request.productVersion;
       showModulesModal.value = true;
     };
 
-    // Toggle the dropdown
     const toggleAddModuleDropdown = () => {
       showAddModuleDropdown.value = !showAddModuleDropdown.value;
     };
 
-    // Add new module version to the request
     const addNewModuleVersion = async () => {
       if (!selectedNewModuleVersion.value || !selectedModuleRequest.value) return;
-
       try {
-        // Ensure the module version is not already in the list
         const exists = selectedModuleRequest.value.moduleVersions.some(mv => mv.id === selectedNewModuleVersion.value.id);
         if (exists) {
           alertService.showInfo(t$('sdiFrontendApp.requestOfChange.moduleAlreadyAdded').toString());
           return;
         }
-
-        // Add the new module version to the request
         selectedModuleRequest.value.moduleVersions.push(selectedNewModuleVersion.value);
-
-        // Update the request in the backend
         await requestOfChangeService.update(selectedModuleRequest.value);
         alertService.showSuccess(t$('sdiFrontendApp.requestOfChange.moduleAdded').toString());
-
-        // Update the local requestOfChanges to reflect the change
         const updatedRequestIndex = requestOfChanges.value.findIndex(request => request.id === selectedModuleRequest.value.id);
         if (updatedRequestIndex !== -1) {
           requestOfChanges.value[updatedRequestIndex].moduleVersions = [...selectedModuleRequest.value.moduleVersions];
         }
-
-        // If the selected request is the same as the module request, update it too
         if (selectedRequest.value && selectedRequest.value.id === selectedModuleRequest.value.id) {
           selectedRequest.value.moduleVersions = [...selectedModuleRequest.value.moduleVersions];
         }
-
-        // Reset the dropdown
         selectedNewModuleVersion.value = null;
         showAddModuleDropdown.value = false;
       } catch (error) {
         alertService.showHttpError(error.response);
       }
     };
+
+    const openNewProductVersionPopup = () => {
+      if (!selectedRequest.value) {
+        alertService.showError('No selected request');
+        return;
+      }
+      if (!selectedRequest.value.productVersion || !selectedRequest.value.productVersion.product) {
+        alertService.showError('Unable to create a new product version: missing information');
+        return;
+      }
+      showNewProductVersionPopup.value = true;
+    };
+
+    const closeNewProductVersionPopup = () => {
+      showNewProductVersionPopup.value = false;
+    };
+
+    const handleProductCreated = product => {
+      alertService.showInfo('Nouvelle version du produit créée avec succès', { variant: 'success' });
+      closeNewProductVersionPopup();
+      retrieveRequestOfChanges();
+    };
+
+    const selectRequest = request => {
+      selectedRequest.value = request;
+    };
+
+    onMounted(async () => {
+      await loadRelationships();
+      await retrieveRequestOfChanges();
+      updateTabStyles();
+      if (notesEditor.value) {
+        notesEditor.value.addEventListener('paste', e => {
+          e.preventDefault();
+          const text = e.clipboardData?.getData('text/plain') || '';
+          document.execCommand('insertText', false, text);
+          updateNotes();
+        });
+      }
+    });
 
     return {
       keywordInput,
@@ -767,6 +757,24 @@ export default defineComponent({
       selectedNewModuleVersion,
       toggleAddModuleDropdown,
       addNewModuleVersion,
+      // Rich text editor
+      notesEditor,
+      selectedHeading,
+      selectedFont,
+      isBold,
+      isItalic,
+      isUnderline,
+      updateNotes,
+      updateToolbarState,
+      toggleBold,
+      toggleItalic,
+      toggleUnderline,
+      toggleBulletList,
+      toggleNumberedList,
+      applyHeading,
+      applyFont,
+      insertCode,
+      v$,
     };
   },
   methods: {
