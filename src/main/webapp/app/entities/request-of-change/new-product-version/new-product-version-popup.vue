@@ -131,7 +131,9 @@
                         class="list-group-item d-flex justify-content-between align-items-center"
                       >
                         <div>
-                          <span class="font-weight-bold">{{ component.infraComponent?.name }}</span>
+                          <span class="font-weight-bold">{{
+                            getIfraComponentVersionWithInfraCached(component.id)?.infraComponent.name
+                          }}</span>
                           <span class="text-muted ml-2">{{ component.version }}</span>
                         </div>
                         <button class="btn btn-sm btn-outline-danger" @click="removeInfraComponent(index)">
@@ -339,7 +341,7 @@
                   <div v-if="newProductVersion.infraComponentVersions && newProductVersion.infraComponentVersions.length > 0">
                     <ul class="list-group">
                       <li v-for="(component, index) in newProductVersion.infraComponentVersions" :key="index" class="list-group-item">
-                        <span class="font-weight-bold">{{ component.infraComponent?.name }}</span>
+                        <span class="font-weight-bold">{{ getIfraComponentVersionWithInfraCached(component.id)?.infraComponent.name }}</span>
                         <span class="text-muted ml-2">{{ component.version }}</span>
                       </li>
                     </ul>
