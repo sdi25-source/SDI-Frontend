@@ -129,12 +129,29 @@ export default defineComponent({
 
     const countClientDeployments = async (clientId: number): Promise<number> => {
       try {
+        // Fetch all product deployments
         const res = await productDeployementService.retrieve();
         const deployments = res.data.filter((pd: IProductDeployement) => pd.client?.id === clientId);
-        return deployments.length;
+
+        // If no deployments found, return 0
+        if (!deployments.length) {
+          return 0;
+        }
+
+        // Fetch all product deployment details
+        const productDeploymentDetailsRes = await productDeployementDetailService.retrieve();
+        const allDetails: IProductDeployementDetail[] = productDeploymentDetailsRes.data;
+
+        // Count details for all deployments
+        const detailsCount = deployments.reduce((count, deployment: IProductDeployement) => {
+          const deploymentDetails = allDetails.filter(detail => detail.productDeployement?.id === deployment.id);
+          return count + deploymentDetails.length;
+        }, 0);
+
+        return detailsCount;
       } catch (error) {
         console.error('Error counting client deployments:', error);
-        return 0;
+        throw error; // Rethrow the error for upstream handling
       }
     };
 
