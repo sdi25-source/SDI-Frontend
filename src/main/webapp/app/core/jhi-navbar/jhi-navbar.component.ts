@@ -1,6 +1,7 @@
 import { type Ref, computed, defineComponent, inject, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import axios from 'axios';  // Import axios
 import type LoginService from '@/account/login.service';
 import type AccountService from '@/account/account.service';
 import languages from '@/shared/config/languages';
@@ -43,6 +44,17 @@ export default defineComponent({
     const store = useStore();
 
     const version = `v${APP_VERSION}`;
+    const versionTag = ref('...'); // Valeur initiale pendant chargement
+
+    // Charger dynamiquement le tag version via API
+    axios.get('/api/version')
+      .then(response => {
+        versionTag.value = response.data;
+      })
+      .catch(() => {
+        versionTag.value = 'inconnue';
+      });
+
     const hasAnyAuthorityValues: Ref<any> = ref({});
 
     const openAPIEnabled = computed(() => store.activeProfiles.indexOf('api-docs') > -1);
@@ -84,6 +96,7 @@ export default defineComponent({
       languages: languages(),
       isActiveLanguage,
       version,
+      versionTag, // <-- expose versionTag
       currentLanguage,
       hasAnyAuthorityValues,
       openAPIEnabled,
