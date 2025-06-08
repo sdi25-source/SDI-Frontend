@@ -17,6 +17,7 @@ import type { IProductDeployementDetail } from '@/shared/model/product-deployeme
 import type { IRequestOfChange } from '@/shared/model/request-of-change.model';
 import ClientSizeService from '@/entities/client-size/client-size.service.ts';
 import ClientTypeService from '@/entities/client-type/client-type.service.ts';
+import CustomisationLevelService from '@/entities/customisation-level/customisation-level.service.ts';
 
 // Client overview interface
 interface ClientOverview {
@@ -77,6 +78,7 @@ export default defineComponent({
     const productDeployementService = new ProductDeployementService();
     const productDeployementDetailService = new ProductDeployementDetailService();
     const requestOfChangeService = new RequestOfChangeService();
+    const customisationLevelService = new CustomisationLevelService();
     const clientSizeService = inject('clientSizeService', () => new ClientSizeService());
     const clientTypeService = inject('clientTypeService', () => new ClientTypeService());
 
@@ -289,9 +291,10 @@ export default defineComponent({
       try {
         // Get all request of changes for this client
         const requestChangesRes = await requestOfChangeService.retrieve();
+
         const clientRequests = requestChangesRes.data.filter((req: IRequestOfChange) => req.client?.id === clientId);
 
-        console.log('Client requests found:', clientRequests.length);
+        console.log('Client requests founjojojokkpojiod:', clientRequests);
 
         if (clientRequests.length === 0) {
           requestChangesChartData.value = { datasets: [] };
@@ -309,7 +312,7 @@ export default defineComponent({
         let totalIntermediate = 0;
         let totalAdvanced = 0;
 
-        clientRequests.forEach((request: IRequestOfChange) => {
+        for (const request of clientRequests) {
           console.log('Processing request:', {
             id: request.id,
             createDate: request.createDate,
@@ -327,7 +330,7 @@ export default defineComponent({
 
             // Get the customization level from the request - check multiple possible properties
             let customizationLevel = '';
-
+             request.customisationLevel = await customisationLevelService.find(request.customisationLevel?.id);
             if (request.customisationLevel) {
               // Try different possible property names
               customizationLevel =
@@ -385,7 +388,7 @@ export default defineComponent({
               }
             }
           }
-        });
+        }
 
         // Update totals
         totalRequests.value = {
