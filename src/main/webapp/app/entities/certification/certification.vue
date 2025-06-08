@@ -428,6 +428,9 @@
                       </div>
                     </td>
                   </tr>
+                  <tr v-if="paginatedVersions.length === 0 && !showAddVersionRow">
+                    <td colspan="4" class="empty-message">No certification available</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -484,6 +487,16 @@
 <script lang="ts" src="./certification.component.ts"></script>
 
 <style scoped>
+.empty-message {
+  padding: 1rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  border: 1px dashed #e2e8f0;
+}
+
 .button-info {
   color: #0c2d57;
 }

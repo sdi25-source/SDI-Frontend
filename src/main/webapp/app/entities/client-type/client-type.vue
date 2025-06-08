@@ -178,6 +178,9 @@
                 </div>
               </td>
             </tr>
+            <tr v-if="paginatedClientTypes.length === 0 && !showAddRow">
+              <td colspan="3" class="empty-message">No client type available</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -246,6 +249,16 @@ button {
 
 .button-primary:hover {
   background-color: #26538a;
+}
+
+.empty-message {
+  padding: 1rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  border: 1px dashed #e2e8f0;
 }
 
 .client-type-container {

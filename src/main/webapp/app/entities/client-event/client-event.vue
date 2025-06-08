@@ -104,7 +104,7 @@
     </div>
 
     <!-- Data table (List View) -->
-    <div class="card" v-if="clientEvents && clientEvents.length > 0">
+    <div class="card" v-if="clientEvents">
       <div class="table-responsive">
         <table class="table table-hover mb-0" aria-describedby="clientEvents">
           <thead class="thead-light">
@@ -180,15 +180,14 @@
                 </div>
               </td>
             </tr>
+            <tr v-if="paginatedClientEvents.length === 0">
+              <td colspan="6" class="empty-message">No clients events available</td>
+            </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- No data message -->
-    <div class="alert alert-warning" v-if="!isFetching && clientEvents && clientEvents.length === 0">
-      <span v-text="t$('sdiFrontendApp.clientEvent.home.notFound')"></span>
-    </div>
 
     <!-- Modal suppression -->
     <b-modal ref="removeEntity" id="removeEntity" centered title-class="text-danger">
@@ -353,6 +352,16 @@
   width: 40%;
   max-width: 500px;
 }
+.empty-message {
+  padding: 1rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  border: 1px dashed #e2e8f0;
+}
+
 
 .card {
   border-radius: 0.5rem;

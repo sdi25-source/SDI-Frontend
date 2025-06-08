@@ -226,6 +226,9 @@
                 </div>
               </td>
             </tr>
+            <tr v-if="paginatedInfraComponents.length === 0 && !showAddRow">
+              <td colspan="5" class="empty-message">No infra componenet available</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -524,6 +527,16 @@
 
 .infra-component-container {
   padding: 1.5rem;
+}
+
+.empty-message {
+  padding: 1rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  border: 1px dashed #e2e8f0;
 }
 
 .navigation-bar {

@@ -156,7 +156,6 @@
                 </div>
               </td>
             </tr>
-
             <tr v-if="showAddRow" class="add-row">
               <td><input type="text" class="form-control-borderless" v-model="newClientEventType.type" placeholder="Type" /></td>
               <td>
@@ -177,6 +176,9 @@
                   </div>
                 </div>
               </td>
+            </tr>
+            <tr v-if="paginatedClientEventTypes.length === 0 && !showAddRow">
+              <td colspan="3" class="empty-message">No client event type available</td>
             </tr>
           </tbody>
         </table>
@@ -259,6 +261,16 @@
 .navigation-bar {
   padding: 0.5rem 0;
   border-bottom: 1px solid #e9ecef;
+}
+
+.empty-message {
+  padding: 1rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  border: 1px dashed #e2e8f0;
 }
 
 .search-container {

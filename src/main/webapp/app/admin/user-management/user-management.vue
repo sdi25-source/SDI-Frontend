@@ -76,105 +76,105 @@
       <div class="table-responsive">
         <table class="table table-hover mb-0" aria-describedby="users">
           <thead class="thead-light">
-          <tr>
-            <th scope="col" @click="changeOrder('login')">
-              <span v-text="t$('userManagement.login')" class="pl-3"></span>
-              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" field-name="login" />
-            </th>
-            <th scope="col" @click="changeOrder('email')">
-              <span v-text="t$('userManagement.email')"></span>
-            </th>
-            <th scope="col"><span v-text="t$('userManagement.profiles')"></span></th>
-            <th scope="col" @click="changeOrder('lastModifiedBy')">
-              {{ t$('userManagement.lastModifiedBy') }}
-            </th>
-            <th scope="col"><span>Status</span></th>
-            <th scope="col" width="160" class="text-center">Actions</th>
-          </tr>
+            <tr>
+              <th scope="col" @click="changeOrder('login')">
+                <span v-text="t$('userManagement.login')" class="pl-3"></span>
+                <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" field-name="login" />
+              </th>
+              <th scope="col" @click="changeOrder('email')">
+                <span v-text="t$('userManagement.email')"></span>
+              </th>
+              <th scope="col"><span v-text="t$('userManagement.profiles')"></span></th>
+              <th scope="col" @click="changeOrder('lastModifiedBy')">
+                {{ t$('userManagement.lastModifiedBy') }}
+              </th>
+              <th scope="col"><span>Status</span></th>
+              <th scope="col" width="160" class="text-center">Actions</th>
+            </tr>
           </thead>
           <tbody>
-          <tr v-for="user in users" :key="user.id" :id="user.login" data-cy="entityTable" class="align-middle">
-            <td>
-              <span class="pl-3">{{ user.login }}</span>
-            </td>
-            <td>{{ user.email }}</td>
-            <td>
-              <div v-for="authority in user.authorities" :key="authority">
+            <tr v-for="user in users" :key="user.id" :id="user.login" data-cy="entityTable" class="align-middle">
+              <td>
+                <span class="pl-3">{{ user.login }}</span>
+              </td>
+              <td>{{ user.email }}</td>
+              <td>
+                <div v-for="authority in user.authorities" :key="authority">
                   <span class="badge bg-info text-dark rounded-2">
                     {{ authority === 'ROLE_USER' ? 'DELIVERY MANAGER' : authority.replace('ROLE_', '') }}
                   </span>
-              </div>
-            </td>
-            <td>
-              <span v-if="user.lastModifiedBy">{{ user.lastModifiedBy }}</span>
-              <span v-else>-</span>
-            </td>
-            <td>
-              <button
-                class="btn btn-danger btn-sm deactivated rounded-1"
-                @click="setActive(user, true)"
-                v-if="!user.activated"
-                v-text="t$('userManagement.deactivated')"
-              ></button>
-              <button
-                class="btn btn-success btn-sm rounded-1"
-                @click="setActive(user, false)"
-                v-if="user.activated"
-                :disabled="username === user.login"
-                v-text="t$('userManagement.activated')"
-              ></button>
-            </td>
-            <td class="text-center">
-              <div class="action-icons">
-                <router-link :to="{ name: 'JhiUserEdit', params: { userId: user.login } }" custom v-slot="{ navigate }">
-                  <div class="icon-container edit-container" title="Modifier" @click="navigate">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      class="bi bi-pencil-fill"
-                      viewBox="0 0 16 16"
-                    >
-                      <path
-                        d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
-                      />
-                    </svg>
-                  </div>
-                </router-link>
-                <router-link :to="{ name: 'JhiUserView', params: { userId: user.login } }" custom v-slot="{ navigate }">
-                  <div class="icon-container view-container" title="Voir" @click="navigate">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      class="bi bi-eye"
-                      viewBox="0 0 16 16"
-                    >
-                      <path
-                        d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"
-                      />
-                      <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
-                    </svg>
-                  </div>
-                </router-link>
-                <div
-                  class="icon-container delete-container"
-                  @click="prepareRemove(user)"
-                  title="Supprimer"
-                  :class="{ disabled: username === user.login }"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel" width="14" height="14">
-                    <path
-                      d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
-                      fill="currentColor"
-                    />
-                  </svg>
                 </div>
-              </div>
-            </td>
-          </tr>
+              </td>
+              <td>
+                <span v-if="user.lastModifiedBy">{{ user.lastModifiedBy }}</span>
+                <span v-else>-</span>
+              </td>
+              <td>
+                <button
+                  class="btn btn-danger btn-sm deactivated rounded-1"
+                  @click="setActive(user, true)"
+                  v-if="!user.activated"
+                  v-text="t$('userManagement.deactivated')"
+                ></button>
+                <button
+                  class="btn btn-success btn-sm rounded-1"
+                  @click="setActive(user, false)"
+                  v-if="user.activated"
+                  :disabled="username === user.login"
+                  v-text="t$('userManagement.activated')"
+                ></button>
+              </td>
+              <td class="text-center">
+                <div class="action-icons">
+                  <router-link :to="{ name: 'JhiUserEdit', params: { userId: user.login } }" custom v-slot="{ navigate }">
+                    <div class="icon-container edit-container" title="Modifier" @click="navigate">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        class="bi bi-pencil-fill"
+                        viewBox="0 0 16 16"
+                      >
+                        <path
+                          d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                        />
+                      </svg>
+                    </div>
+                  </router-link>
+                  <router-link :to="{ name: 'JhiUserView', params: { userId: user.login } }" custom v-slot="{ navigate }">
+                    <div class="icon-container view-container" title="Voir" @click="navigate">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        class="bi bi-eye"
+                        viewBox="0 0 16 16"
+                      >
+                        <path
+                          d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"
+                        />
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                      </svg>
+                    </div>
+                  </router-link>
+                  <div
+                    class="icon-container delete-container"
+                    @click="prepareRemove(user)"
+                    title="Supprimer"
+                    :class="{ disabled: username === user.login }"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel" width="14" height="14">
+                      <path
+                        d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -463,10 +463,9 @@ export default defineComponent({
           );
         } else {
           // Message de succès par défaut
-          alertService.showInfo(
-            t('userManagement.deleted', { param: removeId.value }) || 'Utilisateur supprimé avec succès',
-            { variant: 'success' }
-          );
+          alertService.showInfo(t('userManagement.deleted', { param: removeId.value }) || 'Utilisateur supprimé avec succès', {
+            variant: 'success',
+          });
         }
 
         // Fermer le modal immédiatement
@@ -480,7 +479,6 @@ export default defineComponent({
 
         // Réinitialiser l'ID de suppression
         removeId.value = null;
-
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
 
@@ -493,9 +491,7 @@ export default defineComponent({
           alertService.showError(error.message);
         } else {
           // Erreur générique
-          alertService.showError(
-            t('error.server.not.reachable') || 'Erreur lors de la suppression de l\'utilisateur'
-          );
+          alertService.showError(t('error.server.not.reachable') || "Erreur lors de la suppression de l'utilisateur");
         }
 
         closeDialog(); // Fermer le modal même en cas d'erreur

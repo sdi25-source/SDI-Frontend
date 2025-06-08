@@ -172,6 +172,10 @@
                 </div>
               </td>
             </tr>
+
+            <tr v-if="paginatedDeployementTypes.length === 0 && !showAddRow">
+              <td colspan="3" class="empty-message">No deployement type available</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -366,6 +370,16 @@
 <script lang="ts" src="./deployement-type.component.ts"></script>
 
 <style scoped>
+.empty-message {
+  padding: 1rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  border: 1px dashed #e2e8f0;
+}
+
 .button {
   display: inline-flex;
   align-items: center;

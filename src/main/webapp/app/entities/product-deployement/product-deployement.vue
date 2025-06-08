@@ -297,6 +297,9 @@
               </div>
             </td>
           </tr>
+          <tr v-if="paginatedProductDeployments.length === 0 && !showAddRow">
+            <td colspan="5" class="empty-message">No deployement available</td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -711,11 +714,7 @@
 
                   <!-- Message if no data -->
                   <tr v-if="productDeployementDetails.length === 0 && !showAddDetailRow">
-                    <td colspan="6" class="text-center py-4">
-                      <div class="empty-state">
-                        <h5 class="text-muted">No details available</h5>
-                      </div>
-                    </td>
+                      <td colspan="6" class="empty-message">No details available</td>
                   </tr>
                   </tbody>
                 </table>
@@ -749,12 +748,7 @@
 
                   <!-- Message if no infrastructure data -->
                   <tr v-if="getInfraComponentVersionsForSelectedProduct().length === 0">
-                    <td colspan="2" class="text-center py-4">
-                      <div class="empty-state">
-                        <h5 class="text-muted">No configured infrastructure</h5>
-                        <p class="text-muted">No infrastructure component associated with this product</p>
-                      </div>
-                    </td>
+                    <td colspan="2" class="empty-message">No configured infrastructure</td>
                   </tr>
                   </tbody>
                 </table>

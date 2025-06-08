@@ -187,6 +187,9 @@
                 </div>
               </td>
             </tr>
+            <tr v-if="paginatedClientSizes.length === 0 && !showAddRow">
+              <td colspan="4" class="empty-message">No client size available</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -293,6 +296,16 @@
   text-transform: uppercase;
   font-size: 0.8rem;
   color: #6c757d;
+}
+
+.empty-message {
+  padding: 1rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  border: 1px dashed #e2e8f0;
 }
 
 .table td {
