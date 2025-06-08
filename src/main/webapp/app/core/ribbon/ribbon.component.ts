@@ -13,6 +13,7 @@ export default defineComponent({
     return {
       ribbonEnv,
       ribbonEnabled,
+      appVersion: `${VERSION_P}`,
       t$: useI18n().t,
     };
   },

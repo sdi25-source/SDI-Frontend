@@ -4,8 +4,6 @@
       <router-link to="/" class="logo d-flex align-items-center me-auto me-xl-0">
         <h1>
           <strong>{{ t$('global.title') }}</strong>
-          <span class="version-tag">1.0</span>
-
         </h1>
       </router-link>
 

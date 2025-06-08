@@ -3,9 +3,18 @@ import { defineConfig, normalizePath } from 'vite';
 
 import vue from '@vitejs/plugin-vue';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import { execSync } from 'child_process';
 
 const { getAbsoluteFSPath } = await import('swagger-ui-dist');
 const swaggerUiPath = getAbsoluteFSPath();
+
+function getGitVersion() {
+  try {
+    return execSync('git describe --tags --abbrev=0').toString().trim();
+  } catch {
+    return 'unknown';
+  }
+}
 
 // eslint-disable-next-line prefer-const
 const config = defineConfig({
@@ -48,6 +57,7 @@ const config = defineConfig({
     I18N_HASH: '"generated_hash"',
     SERVER_API_URL: '"/"',
     APP_VERSION: `"${process.env.APP_VERSION ? process.env.APP_VERSION : 'DEV'}"`,
+    VERSION_P: JSON.stringify(getGitVersion()),
   },
   server: {
     host: true,
