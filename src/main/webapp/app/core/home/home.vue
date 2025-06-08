@@ -75,9 +75,55 @@
 
   <!-- Dashboard Section (Authenticated) -->
   <div class="home row" v-if="authenticated">
-    <AdminHome v-if="hasAnyAuthority('ROLE_ADMIN') && authenticated"></AdminHome>
-    <DMHome v-if="hasAnyAuthority('ROLE_USER') && !hasAnyAuthority('ROLE_ADMIN') && authenticated"></DMHome>
-    <CommercialHome v-if="hasAnyAuthority('ROLE_COMMERCIAL') && authenticated"></CommercialHome>
+    <section id="hero" class="hero section">
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <div class="hero-content" data-aos="fade-up" data-aos-delay="200">
+              <div class="company-badge mb-4">
+                <img src="../../../content/images/s2m.svg" alt="Admin Icon" style="width: 60px; height: 40px; margin-right: 8px" />
+                <span v-text="t$('home.di')"></span>
+              </div>
+              <h1 class="mb-4">
+                <span>Welcome, </span> <span class="accent-text">{{ user.firstName }}</span> <br />
+                <span>to your </span>
+                <span v-if="hasAnyAuthority('ROLE_ADMIN')">Admin</span>
+                <span v-if="hasAnyAuthority('ROLE_ADMIN') && (hasAnyAuthority('ROLE_USER') || hasAnyAuthority('ROLE_COMMERCIAL'))">
+                  &
+                </span>
+                <span v-if="hasAnyAuthority('ROLE_USER')">Delivery Manager</span>
+                <span v-if="hasAnyAuthority('ROLE_USER') && hasAnyAuthority('ROLE_COMMERCIAL')"> & </span>
+                <span v-if="hasAnyAuthority('ROLE_COMMERCIAL')">Commercial</span>
+                <br />
+                Space
+              </h1>
+              <span class="mb-4 mb-md-5" v-if="hasAnyAuthority('ROLE_ADMIN')"> {{ t$('home.equipeAdesc') }} </span><br />
+              <span class="mb-4 mb-md-5" v-if="hasAnyAuthority('ROLE_USER')"> {{ t$('home.equipeDdesc') }} </span><br />
+              <span class="mb-4 mb-md-5" v-if="hasAnyAuthority('ROLE_COMMERCIAL')">
+                {{ t$('home.equipeCdesc') }}
+              </span>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="hero-image" data-aos="zoom-out" data-aos-delay="300">
+              <img src="../../../content/images/hero-img.png" alt="Hero Image" class="img-fluid" />
+              <div class="customers-badge">
+                <div class="customer-avatars">
+                  <img src="../../../content/images/avatar-1.webp" alt="Customer 1" class="avatar" />
+                  <img src="../../../content/images/avatar-2.webp" alt="Customer 2" class="avatar" />
+                  <img src="../../../content/images/avatar-3.webp" alt="Customer 3" class="avatar" />
+                  <img src="../../../content/images/avatar-4.webp" alt="Customer 4" class="avatar" />
+                  <img src="../../../content/images/avatar-5.webp" alt="Customer 5" class="avatar" />
+                  <span class="avatar more">12+</span>
+                </div>
+                <p class="mb-0 mt-2" v-text="t$('home.refTitle')"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="hero section"></section>
   </div>
 </template>
 

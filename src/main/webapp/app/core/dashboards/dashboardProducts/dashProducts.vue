@@ -81,7 +81,6 @@
         </div>
       </div>
     </div>
-    <div class="section"></div>
   </div>
 </template>
 

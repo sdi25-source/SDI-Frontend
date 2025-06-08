@@ -81,16 +81,14 @@
                 <span v-text="t$('userManagement.login')" class="pl-3"></span>
                 <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" field-name="login" />
               </th>
-              <th scope="col"><span>Status</span></th>
               <th scope="col" @click="changeOrder('email')">
                 <span v-text="t$('userManagement.email')"></span>
-                <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" field-name="email" />
               </th>
               <th scope="col"><span v-text="t$('userManagement.profiles')"></span></th>
               <th scope="col" @click="changeOrder('lastModifiedBy')">
                 {{ t$('userManagement.lastModifiedBy') }}
-                <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" field-name="lastModifiedBy" />
               </th>
+              <th scope="col"><span>Status</span></th>
               <th scope="col" width="160" class="text-center">Actions</th>
             </tr>
           </thead>
@@ -98,6 +96,18 @@
             <tr v-for="user in users" :key="user.id" :id="user.login" data-cy="entityTable" class="align-middle">
               <td>
                 <span class="pl-3">{{ user.login }}</span>
+              </td>
+              <td>{{ user.email }}</td>
+              <td>
+                <div v-for="authority in user.authorities" :key="authority">
+                  <span class="badge bg-info text-dark rounded-2">
+                    {{ authority === 'ROLE_USER' ? 'DELIVERY MANAGER' : authority.replace('ROLE_', '') }}
+                  </span>
+                </div>
+              </td>
+              <td>
+                <span v-if="user.lastModifiedBy">{{ user.lastModifiedBy }}</span>
+                <span v-else>-</span>
               </td>
               <td>
                 <button
@@ -113,18 +123,6 @@
                   :disabled="username === user.login"
                   v-text="t$('userManagement.activated')"
                 ></button>
-              </td>
-              <td>{{ user.email }}</td>
-              <td>
-                <div v-for="authority in user.authorities" :key="authority">
-                  <span class="badge bg-info text-dark rounded-2">
-                    {{ authority === 'ROLE_USER' ? 'DELIVERY MANAGER' : authority.replace('ROLE_', '') }}
-                  </span>
-                </div>
-              </td>
-              <td>
-                <span v-if="user.lastModifiedBy">{{ user.lastModifiedBy }}</span>
-                <span v-else>-</span>
               </td>
               <td class="text-center">
                 <div class="action-icons">

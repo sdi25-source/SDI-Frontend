@@ -393,11 +393,11 @@ export default defineComponent({
     const openVersionsModal = async component => {
       selectedComponent.value = component;
 
-      // Réinitialiser les variables de pagination et de recherche
+      // Reset pagination and search variables
       versionCurrentPage.value = 1;
       versionSearchTerm.value = '';
 
-      // Récupérer les versions pour ce composant
+      // Retrieve versions for this infracomponent
       await retrieveVersionsForComponent(component.id);
 
       // Initialiser la nouvelle version avec le composant sélectionné
@@ -409,9 +409,19 @@ export default defineComponent({
         infraComponent: component,
       };
 
-      // Ouvrir le modal
-      versionsModal.value.show();
+
+      // Show the modal
+      if (versionsModal.value && typeof versionsModal.value.show === 'function') {
+        versionsModal.value.show();
+      } else {
+        console.error('versionsModal is not properly initialized or show method is unavailable');
+      }
     };
+
+
+
+
+
 
     const closeVersionsModal = () => {
       versionsModal.value.hide();
@@ -627,7 +637,7 @@ export default defineComponent({
       await retrieveComponentTypes();
 
       // Initialiser les références aux modals
-      versionsModal.value = ref('versionsModal');
+     // versionsModal.value = ref('versionsModal');
       removeEntity.value = ref('removeEntity');
       removeVersionEntity.value = ref('removeVersionEntity');
 

@@ -1161,7 +1161,7 @@
 <style scoped>
 /* Tous les styles CSS restent identiques */
 .product-deployment-container {
-  padding: 1.5rem;
+  padding: 1.8rem;
 }
 
 .navigation-bar {

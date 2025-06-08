@@ -29,7 +29,7 @@ export default class AlertService {
       title: 'Info',
       variant: 'info',
       solid: true,
-      autoHideDelay: 5000,
+      autoHideDelay: 9000,
       ...toastOptions,
     });
   }

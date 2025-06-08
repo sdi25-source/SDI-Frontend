@@ -133,6 +133,7 @@ export default defineComponent({
     const filteredModuleVersionOptions = ref([]);
 
     const showAddModuleVersionForm = ref(false);
+    const selectedProductLineFilter = ref(null);
 
     // New item templates
     const newProduct = ref({
@@ -182,14 +183,35 @@ export default defineComponent({
       moduleVersion: null,
     });
 
-    // Computed properties
     const filteredProducts = computed(() => {
-      if (!searchTerm.value) return allProducts.value;
-      const term = searchTerm.value.toLowerCase();
-      return allProducts.value.filter(
-        product => product.name?.toLowerCase().includes(term) || product.description?.toLowerCase().includes(term),
-      );
+      let filtered = allProducts.value;
+
+      // Apply product line filter
+      if (selectedProductLineFilter.value) {
+        filtered = filtered.filter(product => product.productLines?.some(line => line.id === selectedProductLineFilter.value));
+      }
+
+      // Apply search filter
+      if (searchTerm.value) {
+        const term = searchTerm.value.toLowerCase();
+        filtered = filtered.filter(
+          product => product.name?.toLowerCase().includes(term) || product.description?.toLowerCase().includes(term),
+        );
+      }
+
+      return filtered;
     });
+
+    const applyFilters = () => {
+      currentPage.value = 1; // Reset to first page when filters change
+      updateTotalItems(); // Update pagination
+    };
+    const resetFilters = () => {
+      selectedProductLineFilter.value = null;
+      searchTerm.value = '';
+      currentPage.value = 1;
+      updateTotalItems();
+    };
 
     const paginatedProducts = computed(() => {
       const start = (currentPage.value - 1) * itemsPerPage.value;
@@ -266,9 +288,9 @@ export default defineComponent({
             ...fullComponentVersion,
             infraComponent: infraComponent
               ? {
-                  ...infraComponent,
-                  componentType: componentType || null,
-                }
+                ...infraComponent,
+                componentType: componentType || null,
+              }
               : null,
           };
         })
@@ -305,11 +327,11 @@ export default defineComponent({
           // Enrichir les modules de chaque produit
           const modulesWithExpansion = product.modules
             ? product.modules.map(mod => ({
-                ...mod,
-                isExpanded: false,
-                versions: [],
-                isLoadingVersions: false,
-              }))
+              ...mod,
+              isExpanded: false,
+              versions: [],
+              isLoadingVersions: false,
+            }))
             : [];
           return {
             ...product,
@@ -451,6 +473,7 @@ export default defineComponent({
       searchTimeout.value = setTimeout(() => {
         products.value = filteredProducts.value;
         updateTotalItems();
+        applyFilters();
         currentPage.value = 1;
       }, 300);
     };
@@ -694,16 +717,16 @@ export default defineComponent({
           // Initialize with root's configuration
           versionInfraComponents.value = rootVersion.infraComponentVersions
             ? rootVersion.infraComponentVersions.map(icv => ({
-                ...icv,
-                id: icv.id,
-              }))
+              ...icv,
+              id: icv.id,
+            }))
             : [];
 
           versionModuleVersions.value = rootVersion.moduleVersions
             ? rootVersion.moduleVersions.map(mv => ({
-                ...mv,
-                id: mv.id,
-              }))
+              ...mv,
+              id: mv.id,
+            }))
             : [];
         } catch (error) {
           alertService.showHttpError(error.response);
@@ -1236,15 +1259,15 @@ export default defineComponent({
           const rootVersion = await productVersionService().find(newVersion.value.root.id);
           versionInfraComponents.value = rootVersion.infraComponentVersions
             ? rootVersion.infraComponentVersions.map(icv => ({
-                ...icv,
-                id: icv.id,
-              }))
+              ...icv,
+              id: icv.id,
+            }))
             : [];
           versionModuleVersions.value = rootVersion.moduleVersions
             ? rootVersion.moduleVersions.map(mv => ({
-                ...mv,
-                id: mv.id,
-              }))
+              ...mv,
+              id: mv.id,
+            }))
             : [];
         } catch (error) {
           alertService.showHttpError(error.response);
@@ -1897,16 +1920,16 @@ export default defineComponent({
             // Update versionInfraComponents and versionModuleVersions with root's configuration
             versionInfraComponents.value = rootVersion.infraComponentVersions
               ? rootVersion.infraComponentVersions.map(icv => ({
-                  ...icv,
-                  id: icv.id, // Ensure ID is included
-                }))
+                ...icv,
+                id: icv.id, // Ensure ID is included
+              }))
               : [];
 
             versionModuleVersions.value = rootVersion.moduleVersions
               ? rootVersion.moduleVersions.map(mv => ({
-                  ...mv,
-                  id: mv.id, // Ensure ID is included
-                }))
+                ...mv,
+                id: mv.id, // Ensure ID is included
+              }))
               : [];
 
             alertService.showInfo('Configuration du root appliquée automatiquement', { variant: 'info' });
@@ -2159,7 +2182,6 @@ export default defineComponent({
       prepareRemove,
       closeDialog,
       removeProduct,
-      handleSearch,
       goToPrevPage,
       goToNextPage,
       updateTotalItems,
@@ -2251,6 +2273,10 @@ export default defineComponent({
       toggleAddModuleVersionRow,
       cancelAddModuleVersionRow,
       dataUtils,
+      selectedProductLineFilter,
+      applyFilters,
+      resetFilters,
+      handleSearch,
     };
   },
   methods: {

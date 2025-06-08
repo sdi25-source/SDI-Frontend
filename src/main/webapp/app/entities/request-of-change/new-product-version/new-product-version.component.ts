@@ -1,4 +1,4 @@
-import { inject, type PropType } from 'vue';
+import { inject, nextTick, onMounted, type PropType } from 'vue';
 import { defineComponent, ref, reactive, computed, watch } from 'vue';
 import type { IRequestOfChange } from '@/shared/model/request-of-change.model';
 import type { IProductVersion } from '@/shared/model/product-version.model';
@@ -14,6 +14,8 @@ import InfraComponentVersionService from '@/entities/infra-component-version/inf
 import { useAlertService } from '@/shared/alert/alert.service';
 import RequestOfChangeService from '@/entities/request-of-change/request-of-change.service.ts';
 import ProductService from '@/entities/product/product.service.ts';
+import type { IInfraComponent } from '@/shared/model/infra-component.model.ts';
+import InfraComponentService from '@/entities/infra-component/infra-component.service.ts';
 
 export default defineComponent({
   name: 'NewProductVersionPopup',
@@ -38,6 +40,7 @@ export default defineComponent({
     const moduleService = new ModuleService();
     const featureService = new FeatureService();
     const infraComponentVersionService = new InfraComponentVersionService();
+    const infraComponentService = inject('infraComponentService', () => new InfraComponentService());
     const alertService = useAlertService();
 
     // State
@@ -47,6 +50,7 @@ export default defineComponent({
     const selectedInfraComponentId = ref('');
     const selectedModuleForFeature = ref<IModuleVersion | null>(null);
     const availableInfraComponents = ref<IInfraComponentVersion[]>([]);
+    const infraComponentOptions = ref<IInfraComponent[]>([]);
     const availableModules = ref<IModule[]>([]);
     const availableModuleVersions = ref<IModuleVersion[]>([]);
     const availableRootVersions = ref<IProductVersion[]>([]);
@@ -591,6 +595,40 @@ export default defineComponent({
       }
     };
 
+    const infraComponentVersionOptions = ref([]);
+    const fetchInfraComponentVersionOptions = async () => {
+      try {
+        const res = await infraComponentVersionService.retrieve();
+        infraComponentVersionOptions.value = res.data;
+        console.log(infraComponentVersionOptions.value);
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
+    };
+    const getIfraComponentVersionWithInfraCached = infracomponenetVersionId => {
+      const infracomponenetVersion = infraComponentVersionOptions.value.find(ifc => ifc.id === infracomponenetVersionId);
+      if (!infracomponenetVersion) return null;
+      const infraComponent = infraComponentOptions.value.find(m => m.id === infracomponenetVersion.infraComponent?.id);
+      return {
+        ...infracomponenetVersion,
+        infraComponent: infraComponent ? { ...infraComponent } : null,
+      };
+    };
+
+    const fetchInfraComponents = async () => {
+      try {
+        const res = await infraComponentService().retrieve();
+        infraComponentOptions.value = res.data;
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
+    };
+
+    onMounted(async () => {
+      await fetchInfraComponentVersionOptions();
+      await fetchInfraComponents();
+    });
+
     return {
       currentStep,
       newProductVersion,
@@ -599,6 +637,8 @@ export default defineComponent({
       selectedInfraComponentId,
       selectedModuleForFeature,
       availableInfraComponents,
+      fetchInfraComponentVersionOptions,
+      infraComponentOptions,
       availableModules,
       availableModuleVersions,
       availableRootVersions,
@@ -623,6 +663,8 @@ export default defineComponent({
       addFeature,
       removeFeature,
       saveNewProductVersion,
+      getIfraComponentVersionWithInfraCached,
+      fetchInfraComponents,
     };
   },
 });

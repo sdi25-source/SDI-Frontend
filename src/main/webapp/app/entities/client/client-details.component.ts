@@ -21,11 +21,12 @@ export default defineComponent({
     const route = useRoute();
     const router = useRouter();
     const hasAnyAuthorityValues: Ref<any> = ref({});
-
-    const previousState = () => router.go(-1);
     const client: Ref<IClient> = ref({});
     const showPdfModal = ref(false);
     const pdfUrl = ref<string | null>(null);
+    const isLoading = ref(false); // New reactive state for loading
+
+    const previousState = () => router.go(-1);
 
     const retrieveClient = async (clientId: string | string[]) => {
       try {
@@ -42,12 +43,15 @@ export default defineComponent({
 
     const generateReport = async () => {
       try {
+        isLoading.value = true; // Set loading to true before the request
         const pdfBlob = await clientService().generateClientReport(Number(client.value.id));
         const url = window.URL.createObjectURL(pdfBlob);
         pdfUrl.value = url;
         showPdfModal.value = true;
       } catch (error) {
         alertService.showHttpError(error.response);
+      } finally {
+        isLoading.value = false; // Reset loading state after request completes
       }
     };
 
@@ -80,6 +84,7 @@ export default defineComponent({
       downloadPdf,
       accountService,
       hasAnyAuthorityValues,
+      isLoading, // Expose isLoading to the template
       ...dataUtils,
       t$: useI18n().t,
     };
