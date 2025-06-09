@@ -1,6 +1,6 @@
 import { URL, fileURLToPath } from 'node:url';
 import { defineConfig, normalizePath } from 'vite';
-
+import { execSync } from 'child_process';
 import vue from '@vitejs/plugin-vue';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { execSync } from 'child_process';
