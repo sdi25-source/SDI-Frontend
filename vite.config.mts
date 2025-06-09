@@ -10,7 +10,7 @@ const swaggerUiPath = getAbsoluteFSPath();
 
 function getGitVersion() {
   try {
-    return execSync('git describe --tags --abbrev=0').toString().trim();
+    return execSync('git tag --points-at HEAD').toString().trim();
   } catch {
     return 'unknown';
   }
