@@ -10,8 +10,16 @@ const swaggerUiPath = getAbsoluteFSPath();
 
 function getGitVersion() {
   try {
-    return execSync('git tag --points-at HEAD').toString().trim();
+    // Vérifier d'abord s'il y a un tag pointant directement sur HEAD
+    const tag = execSync('git tag --points-at HEAD').toString().trim();
+    if (tag) {
+      // Si un tag est trouvé, retourner le premier
+      return tag.split('\n')[0];
+    }
+    // Si aucun tag n'est associé à HEAD, retourner le dernier tag dans l'historique
+    return execSync('git describe --tags --abbrev=0').toString().trim();
   } catch {
+    // Fallback en cas d'erreur (par exemple, pas de Git ou pas de tags)
     return 'unknown';
   }
 }
