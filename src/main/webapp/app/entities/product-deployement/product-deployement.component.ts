@@ -1,5 +1,3 @@
-"use client"
-
 import { defineComponent, ref, computed, watch, onMounted, inject } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRouter } from "vue-router"
@@ -19,7 +17,6 @@ import InfraComponentService from "../infra-component/infra-component.service"
 import type AccountService from "@/account/account.service.ts"
 import CertificationVersionService from "@/entities/certification/certification-version.service.ts"
 import CertificationService from "@/entities/certification/certification.service.ts"
-
 export default defineComponent({
   name: "ProductDeployment",
   setup() {
@@ -1159,12 +1156,6 @@ export default defineComponent({
       }
     }
 
-    // Fonction pour vérifier les autorisations
-    const hasAnyAuthority = (authorities) => {
-      if (!accountService) return false
-      return accountService.hasAnyAuthorityAndCheckAuth(authorities)
-    }
-
     // Watchers
     watch(
       productDeployments,
@@ -1339,7 +1330,18 @@ export default defineComponent({
 
       // Fonctions utilitaires
       formatDate,
-      hasAnyAuthority,
+      accountService,
+      hasAnyAuthorityValues,
     }
+  },
+  methods: {
+    hasAnyAuthority(authorities: any): boolean {
+      this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then(value => {
+        if (this.hasAnyAuthorityValues[authorities] !== value) {
+          this.hasAnyAuthorityValues = { ...this.hasAnyAuthorityValues, [authorities]: value };
+        }
+      });
+      return this.hasAnyAuthorityValues[authorities] ?? false;
+    },
   },
 })
