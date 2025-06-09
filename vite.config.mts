@@ -1,12 +1,20 @@
 import { URL, fileURLToPath } from 'node:url';
 import { defineConfig, normalizePath } from 'vite';
-
+import { execSync } from 'child_process';
 import vue from '@vitejs/plugin-vue';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 const { getAbsoluteFSPath } = await import('swagger-ui-dist');
 const swaggerUiPath = getAbsoluteFSPath();
 
+function getGitVersion() {
+  try {
+    const tag = execSync('git tag --points-at HEAD').toString().trim();
+    return tag ? tag.split('\n')[0] : 'unknown';
+  } catch {
+    return 'unknown';
+  }
+}
 // eslint-disable-next-line prefer-const
 const config = defineConfig({
   plugins: [
@@ -48,6 +56,7 @@ const config = defineConfig({
     I18N_HASH: '"generated_hash"',
     SERVER_API_URL: '"/"',
     APP_VERSION: `"${process.env.APP_VERSION ? process.env.APP_VERSION : 'DEV'}"`,
+    VERSION_P: JSON.stringify(getGitVersion()),
   },
   server: {
     host: true,
