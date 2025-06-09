@@ -73,6 +73,12 @@
       <img src="../../../content/images/hero-img.png" class="img-fluid animate" alt="hero image" />
     </div>
   </div>
+  <div class="login mt-5"></div>
+  <div class="login mt-5"></div>
+  <div class="login mt-5"></div>
+  <div class="login mt-5"></div>
+  <div class="login mt-5"></div>
+
 </template>
 
 <script lang="ts" src="./login-form.component.ts"></script>
@@ -119,7 +125,8 @@
   flex-direction: column;
   gap: 24px;
   padding: 24px;
-  margin-left: 100px;
+  margin-left: 260px;
+  margin-top: 90px;
 }
 
 /* Form content */

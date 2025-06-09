@@ -71,6 +71,7 @@
         </div>
       </div>
     </section>
+    <div class="section"></div>
   </div>
 
   <!-- Dashboard Section (Authenticated) -->
@@ -124,6 +125,7 @@
       </div>
     </section>
     <section class="hero section"></section>
+    <div class="section"></div>
   </div>
 </template>
 

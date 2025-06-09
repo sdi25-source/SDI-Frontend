@@ -4,7 +4,7 @@
 
     <div v-if="loading" class="loading-overlay">
       <div class="loading-spinner"></div>
-      <p class="loading-message">Product Dashboard is loading ...</p>
+      <p class="loading-message">Client Dashboard is loading ...</p>
     </div>
 
     <!-- Module Overview Section -->

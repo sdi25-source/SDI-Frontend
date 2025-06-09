@@ -152,7 +152,7 @@
                           class="icon-container edit-container"
                           @click="editRequest(request)"
                           title="Modifier"
-                          v-if="hasAnyAuthority('ROLE_COMMERCIAL')"
+                          v-if="hasAnyAuthority('ROLE_COMMERCIAL') && status.value === 'PENDING'"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -194,7 +194,6 @@
                           class="icon-container settings-container"
                           @click="viewRequestModules(request)"
                           title="modules"
-                          v-if="hasAnyAuthority('ROLE_COMMERCIAL')"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -1002,7 +1001,7 @@
                 class="badge bg-light text-dark p-2 rounded-pill position-relative"
               >
                 {{ module.module ? module.module.name : 'N/A' }} <span class="text-muted">{{ ' - v ' }}{{ module.version }}</span>
-                <span class="remove-module-icon" @click="removeModule(module.id)" title="remove a module">
+                <span class="remove-module-icon" @click="removeModule(module.id)" title="remove a module"  v-if="hasAnyAuthority('ROLE_COMMERCIAL')">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                     <path
                       d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
