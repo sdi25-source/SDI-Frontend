@@ -16,10 +16,21 @@ function getGitVersion() {
       // Si un tag est trouvé, retourner le premier
       return tag.split('\n')[0];
     }
-    // Si aucun tag n'est associé à HEAD, retourner le dernier tag dans l'historique
-    return execSync('git describe --tags --abbrev=0').toString().trim();
+    // Si aucun tag n'est associé à HEAD, essayer de trouver le dernier tag dans l'historique
+    try {
+      return execSync('git describe --tags --abbrev=0').toString().trim();
+    } catch {
+      // Si git describe échoue, lister tous les tags et prendre le dernier
+      const allTags = execSync('git tag').toString().trim();
+      if (allTags) {
+        // Trier les tags par ordre lexicographique ou version
+        const tags = allTags.split('\n').filter(tag => tag);
+        return tags.sort().reverse()[0] || 'unknown';
+      }
+      return 'unknown';
+    }
   } catch {
-    // Fallback en cas d'erreur (par exemple, pas de Git ou pas de tags)
+    // Fallback en cas d'erreur générale
     return 'unknown';
   }
 }
