@@ -1,10 +1,6 @@
 <template>
   <div class="dashboard-content pt-lg-5">
     <div class="dashboard-header"></div>
-<!--    <div v-if="loading" class="loading-overlay">-->
-<!--      <div class="loading-spinner"></div>-->
-<!--      <p class="loading-message">Product Dashboard is loading ...</p>-->
-<!--    </div>-->
     <!-- Products Overview Section -->
     <div class="dashboard-section shadow">
       <div class="section-header">
@@ -91,7 +87,6 @@
 <script lang="ts" src="./dashProducts.component.ts"></script>
 
 <style scoped>
-
 /* Loading Indicator Styles */
 .loading-overlay {
   position: absolute;

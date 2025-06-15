@@ -1,7 +1,5 @@
-import type { ComputedRef } from 'vue';
 import { defineComponent, inject, onMounted, ref, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type LoginService from '@/account/login.service';
 import { useAlertService } from '@/shared/alert/alert.service';
 import Chart from 'chart.js/auto';
 
@@ -18,6 +16,9 @@ import type { IRequestOfChange } from '@/shared/model/request-of-change.model';
 import ClientSizeService from '@/entities/client-size/client-size.service.ts';
 import ClientTypeService from '@/entities/client-type/client-type.service.ts';
 import CustomisationLevelService from '@/entities/customisation-level/customisation-level.service.ts';
+import ProductVersionService from '@/entities/product-version/product-version.service.ts';
+import ModuleVersionService from '@/entities/module-version/module-version.service.ts';
+import ModuleService from '@/entities/module/module.service.ts';
 
 // Client overview interface
 interface ClientOverview {
@@ -44,9 +45,7 @@ interface ScatterPoint {
 export default defineComponent({
   name: 'DashClientsComponent',
   setup() {
-    const loginService = inject<LoginService>('loginService');
-    const authenticated = inject<ComputedRef<boolean>>('authenticated');
-    const username = inject<ComputedRef<string>>('currentUsername');
+    const productVersionService = inject('productVersionService', () => new ProductVersionService());
     const alertService = inject('alertService', () => useAlertService(), true);
     const { t } = useI18n();
 
@@ -75,6 +74,8 @@ export default defineComponent({
 
     // Services
     const clientService = new ClientService();
+    const moduleVersionService = new ModuleVersionService();
+    const moduleService = new ModuleService();
     const productDeployementService = new ProductDeployementService();
     const productDeployementDetailService = new ProductDeployementDetailService();
     const requestOfChangeService = new RequestOfChangeService();
@@ -250,13 +251,29 @@ export default defineComponent({
 
         const productDeploymentDetailsRes = await productDeployementDetailService.retrieve();
         const allDetails: IProductDeployementDetail[] = productDeploymentDetailsRes.data;
-
         const deploymentDetailCounts = new Map<string, number>();
+        const deploymentDetailsMap = new Map<string, { name: string; version: string; date: string }[]>();
 
         productDeployments.forEach((deployment: IProductDeployement) => {
-          const deploymentName = deployment.product?.name + ' - ' + deployment.refContract;
-          const detailsCount = allDetails.filter(detail => detail.productDeployement?.id === deployment.id).length;
+          const deploymentName = `${deployment.product?.name || 'Unknown Product'} - ${deployment.refContract || 'No Contract'}`;
+          const details = allDetails.filter(detail => detail.productDeployement?.id === deployment.id);
+          const detailsCount = details.length;
+
+          // Collecter les détails pour chaque déploiement
+          const deploymentInfo = details.map(detail => ({
+            name: deploymentName,
+            version: 'v ' + detail.productVersion?.version || 'Unknown Version',
+            date: detail.startDeployementDate
+              ? new Date(detail.startDeployementDate).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                })
+              : 'No Date',
+          }));
+
           deploymentDetailCounts.set(deploymentName, detailsCount);
+          deploymentDetailsMap.set(deploymentName, deploymentInfo);
         });
 
         const filteredEntries = Array.from(deploymentDetailCounts.entries()).filter(([_, count]) => count > 0);
@@ -278,6 +295,7 @@ export default defineComponent({
               backgroundColor: backgroundColors,
               borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
               borderWidth: 2,
+              deploymentDetails: Object.fromEntries(deploymentDetailsMap), // Stocker les détails pour les tooltips
             },
           ],
         };
@@ -291,10 +309,9 @@ export default defineComponent({
       try {
         // Get all request of changes for this client
         const requestChangesRes = await requestOfChangeService.retrieve();
-
         const clientRequests = requestChangesRes.data.filter((req: IRequestOfChange) => req.client?.id === clientId);
 
-        console.log('Client requests founjojojokkpojiod:', clientRequests);
+        console.log('Client requests found:', clientRequests);
 
         if (clientRequests.length === 0) {
           requestChangesChartData.value = { datasets: [] };
@@ -328,27 +345,46 @@ export default defineComponent({
               day: 'numeric',
             });
 
-            // Get the customization level from the request - check multiple possible properties
+            // Get the customization level from the request
             let customizationLevel = '';
-             request.customisationLevel = await customisationLevelService.find(request.customisationLevel?.id);
-            if (request.customisationLevel) {
-              // Try different possible property names
-              customizationLevel =
-                request.customisationLevel.level?.toLowerCase() ||
-                request.customisationLevel.name?.toLowerCase() ||
-                request.customisationLevel.type?.toLowerCase() ||
-                '';
-
-              // If still empty, check if customisationLevel itself is a string
-              if (!customizationLevel && typeof request.customisationLevel === 'string') {
-                customizationLevel = request.customisationLevel.toLowerCase();
+            if (request.customisationLevel?.id) {
+              try {
+                const customisationLevelData = await customisationLevelService.find(request.customisationLevel.id);
+                customizationLevel =
+                  customisationLevelData.level?.toLowerCase() ||
+                  customisationLevelData.name?.toLowerCase() ||
+                  customisationLevelData.type?.toLowerCase() ||
+                  '';
+                console.log('Customization level fetched:', customizationLevel);
+              } catch (error) {
+                console.error('Error fetching customization level:', error);
               }
-
-              // Log the full customisation level object to understand its structure
-              console.log('Full customisation level object:', request.customisationLevel);
+            } else if (typeof request.customisationLevel === 'string') {
+              customizationLevel = request.customisationLevel.toLowerCase();
             }
 
             console.log('Customization level extracted:', customizationLevel);
+
+            // Récupérer le produit et la version associés
+            let productName = 'Unknown Product';
+            let productVersion = 'Unknown Version';
+            if (request.productVersion?.id) {
+              try {
+                const productVersionData = await productVersionService().find(request.productVersion.id);
+                productName = productVersionData.product?.name || 'Unknown Product';
+                productVersion = productVersionData.version || 'Unknown Version';
+              } catch (error) {
+                console.error(`Error fetching product version for request ${request.id}:`, error);
+              }
+            }
+
+            // Récupérer les noms des modules affectés
+            const moduleNames =
+              request.moduleVersions?.map(
+                mv =>
+                  getModuleVersionWithModuleCached(mv.id).module?.name + ' v' + getModuleVersionWithModuleCached(mv.id).version + '\n' ||
+                  'Unknown Module',
+              ) || [];
 
             // Créer un point pour le scatter plot
             const point: ScatterPoint = {
@@ -356,11 +392,12 @@ export default defineComponent({
               y: 1, // Toujours 1 pour un point
               r: 10, // Rayon du cercle
               date: formattedDate,
-              requestId: request.id || 0,
-              description: request.description || 'No description',
+              productName,
+              productVersion,
+              moduleNames,
             };
 
-            // Catégoriser en fonction du niveau - avec des règles plus flexibles
+            // Catégoriser en fonction du niveau
             if (customizationLevel.includes('basic')) {
               basicPoints.push(point);
               totalBasic++;
@@ -501,7 +538,21 @@ export default defineComponent({
                     const value = context.parsed;
                     const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
                     const percentage = ((value / total) * 100).toFixed(1);
-                    return `${label}: ${value} deployment details (${percentage}%)`;
+                    const deploymentDetails = context.dataset.deploymentDetails?.[label] || [];
+
+                    // Créer le tooltip avec les déploiements en format de liste
+                    const tooltipLines = [`${label}: ${value} deployment details (${percentage}%)`];
+
+                    if (deploymentDetails.length > 0) {
+                      tooltipLines.push('Deployments:');
+                      deploymentDetails.forEach((detail, index) => {
+                        tooltipLines.push(`- Deployment ${index + 1} - ${detail.version} - ${detail.date}`);
+                      });
+                    } else {
+                      tooltipLines.push('No Deployments');
+                    }
+
+                    return tooltipLines;
                   },
                 },
               },
@@ -532,11 +583,22 @@ export default defineComponent({
                 callbacks: {
                   label: function (context) {
                     const point = context.raw as ScatterPoint;
-                    return [
-                      `Request ID: ${point.requestId}`,
+                    const tooltipLines = [
                       `Date: ${point.date}`,
-                      point.description ? `Description: ${point.description.substring(0, 30)}...` : '',
-                    ].filter(Boolean);
+                      `Product: ${point.productName || 'Unknown'} - ${point.productVersion || 'Unknown'}`,
+                    ];
+
+                    // Ajouter la liste des modules affectés
+                    if (point.moduleNames && point.moduleNames.length > 0) {
+                      tooltipLines.push('Modules Affected:');
+                      point.moduleNames.forEach(module => {
+                        tooltipLines.push(`- ${module}`);
+                      });
+                    } else {
+                      tooltipLines.push('No Modules Affected');
+                    }
+
+                    return tooltipLines.filter(Boolean);
                   },
                 },
               },
@@ -605,10 +667,48 @@ export default defineComponent({
       }
     };
 
-    onMounted(() => {
+    onMounted(async () => {
       fetchClients();
       checkScrollPosition();
+      await fetchModuleOptions();
+      await fetchModuleVersionOptions();
     });
+
+    const moduleOptions = ref([]);
+    const fetchModuleOptions = async () => {
+      try {
+        const res = await moduleService.retrieve();
+        moduleOptions.value = res.data;
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
+    };
+
+    const moduleVersionOptions = ref([]);
+    const fetchModuleVersionOptions = async () => {
+      try {
+        const res = await moduleVersionService.retrieve();
+        moduleVersionOptions.value = res.data;
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
+    };
+
+    const getModuleVersionWithModuleCached = moduleVersionId => {
+      // 1. Trouver la version de module dans le cache
+      const moduleVersion = moduleVersionOptions.value.find(mv => mv.id === moduleVersionId);
+
+      if (!moduleVersion) return null;
+
+      // 2. Trouver le module associé dans le cache
+      const module = moduleOptions.value.find(m => m.id === moduleVersion.module?.id);
+
+      // 3. Fusionner les données
+      return {
+        ...moduleVersion,
+        module: module ? { ...module } : null,
+      };
+    };
 
     return {
       scrollContainer,
