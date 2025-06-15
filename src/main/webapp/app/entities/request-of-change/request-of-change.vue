@@ -923,7 +923,8 @@
                       @input="updateNotes"
                       @keyup="updateToolbarState"
                       @mouseup="updateToolbarState"
-                      v-html="v$.description.$model"
+                      :lang="'en'"
+                      style="direction: ltr; text-align: left;"
                       data-cy="notes"
                     ></div>
                   </div>
