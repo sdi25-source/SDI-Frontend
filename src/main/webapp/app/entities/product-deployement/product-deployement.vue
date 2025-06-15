@@ -315,7 +315,7 @@
     <div class="modal-container" v-if="showCertificationsModal" role="dialog" aria-modal="true">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Product Certifications</h5>
+          <h5 class="modal-title">Client Certifications</h5>
           <button type="button" class="close-button" @click="closeCertificationsModal" aria-label="Fermer">
             <svg
               xmlns="http://www.w3.org/2000/svg"
