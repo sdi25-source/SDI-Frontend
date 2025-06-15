@@ -736,7 +736,7 @@
                 <select v-model="newRequest.productVersion" class="form-select">
                   <optgroup v-for="group in groupedProductVersions" :key="group.product.id" :label="group.product.name">
                     <option v-for="version in group.versions" :key="version.id" :value="version">
-                      {{ version.version }}
+                     {{group.product.name}} {{ "- v" }} {{ version.version }}
                     </option>
                   </optgroup>
                 </select>
@@ -777,7 +777,7 @@
                       v-model="newRequest.moduleVersions"
                     />
                     <label class="form-check-label" :for="'module-version-' + moduleVersion.id">
-                      {{ moduleVersion.module ? moduleVersion.module.name : '' }} - {{ moduleVersion.version }}
+                      {{ moduleVersion.module ? moduleVersion.module.name : '' }} - v {{ moduleVersion.version }}
                     </label>
                   </div>
                 </div>
