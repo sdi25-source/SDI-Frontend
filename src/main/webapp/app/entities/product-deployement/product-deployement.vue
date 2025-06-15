@@ -118,7 +118,7 @@
             <th scope="col"><span v-text="t$('sdiFrontendApp.productDeployement.refContract')"></span></th>
             <th scope="col"><span v-text="t$('sdiFrontendApp.productDeployement.client')"></span></th>
             <th scope="col"><span>Produit</span></th>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.productDeployement.notes')"></span></th>
+
             <th scope="col" width="220" class="text-center" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
           </tr>
           </thead>
@@ -164,6 +164,7 @@
                 {{ productDeployment.product ? productDeployment.product.name : productDeployment.productName }}
               </template>
             </td>
+            <!--
             <td class="text-truncate" style="max-width: 250px" :title="productDeployment.notes">
               <template v-if="productDeployment.isEditing">
                 <input v-model="productDeployment.notes" type="text" class="form-control-borderless" @click.stop />
@@ -172,6 +173,7 @@
                 {{ productDeployment.notes }}
               </template>
             </td>
+            -->
             <td class="text-center" @click.stop v-if="hasAnyAuthority('ROLE_USER')">
               <div class="btn-group">
                 <template v-if="productDeployment.isEditing">
@@ -276,7 +278,9 @@
                 </option>
               </select>
             </td>
+            <!--
             <td><input type="text" class="form-control-borderless" v-model="newProductDeployment.notes" placeholder="Notes" /></td>
+            -->
             <td class="text-center">
               <div class="action-icons">
                 <div class="icon-container save-container" @click="saveNewProductDeployment" title="Enregistrer">
