@@ -523,6 +523,7 @@ export default defineComponent({
 
         // Fetch product versions
         await fetchProductVersions(product.id);
+
       }
     };
 

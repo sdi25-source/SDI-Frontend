@@ -461,7 +461,6 @@
                     <tr>
                       <th></th>
                       <th scope="row"><span v-text="t$('sdiFrontendApp.productVersion.version')"></span></th>
-                      <!--                      <th scope="col"><span v-text="t$('sdiFrontendApp.productVersion.root')"></span></th>-->
                       <th scope="row"><span v-text="t$('sdiFrontendApp.productVersion.notes')"></span></th>
                       <th scope="row" class="pl-lg-5 ml-5"><span class="pl-lg-5 ml-5"></span></th>
                     </tr>
@@ -472,7 +471,7 @@
                         <span>No product version available</span>
                       </td>
                     </tr>
-                    <tr v-for="(version, index) in paginatedVersions" :key="index" @click="selectVersion(version)" style="cursor: pointer">
+                    <tr v-for="(version, index) in productVersions" :key="index" @click="selectVersion(version)" style="cursor: pointer">
                       <td></td>
                       <td>
                         <template v-if="isEditingVersion && editingVersionData && editingVersionData.id === version.id">
@@ -626,7 +625,6 @@
                     <tr v-if="showAddVersionRow" class="add-row">
                       <td></td>
                       <td><input type="text" class="form-control-borderless" v-model="newVersion.version" value="newVersion.version" /></td>
-                      <!--                      <td>{{ newVersion.root?.product.name }}{{ ' - ' }}{{ newVersion.root?.version }}</td>-->
                       <td><input type="text" class="form-control-borderless" v-model="newVersion.notes" placeholder="Notes" /></td>
                       <td>
                         <div class="mr-lg-5 action-icons">
