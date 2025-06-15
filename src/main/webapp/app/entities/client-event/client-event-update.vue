@@ -151,6 +151,8 @@
                     ref="editorContent"
                     class="editor-content"
                     contenteditable="true"
+                    :lang="'en'"
+                    style="direction: ltr; text-align: left;"
                     @input="updateNotes"
                     @keyup="updateToolbarState"
                     @mouseup="updateToolbarState"

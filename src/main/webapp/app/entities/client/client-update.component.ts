@@ -157,6 +157,7 @@ export default defineComponent({
     // Rich text editor methods
     const updateNotes = () => {
       if (editorContent.value) {
+        this.v$.notes.$model = this.$refs.notesEditor.innerText;
         v$.value.notes.$model = editorContent.value.innerHTML;
         v$.value.notes.$touch();
       }

@@ -1,4 +1,4 @@
-import { type Ref, defineComponent, ref, onMounted, computed, reactive, nextTick, inject, watch } from 'vue';
+import { computed, defineComponent, inject, nextTick, onMounted, reactive, ref, type Ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useVuelidate } from '@vuelidate/core';
@@ -118,6 +118,8 @@ export default defineComponent({
       if (notesEditor.value) {
         v$.value.description.$model = notesEditor.value.innerHTML;
         v$.value.description.$touch();
+
+        this.v$.description.$model = this.$refs.notesEditor.innerText;
       }
     };
 
@@ -290,9 +292,9 @@ export default defineComponent({
       newRequest.value.type = request.type;
       newRequest.value.moduleVersions = request.moduleVersions
         ? request.moduleVersions.map(mv => {
-          const fullModuleVersion = moduleVersions.value.find(opt => opt.id === mv.id);
-          return fullModuleVersion ? fullModuleVersion : mv;
-        })
+            const fullModuleVersion = moduleVersions.value.find(opt => opt.id === mv.id);
+            return fullModuleVersion ? fullModuleVersion : mv;
+          })
         : [];
       if (newRequest.value.description) {
         v$.value.description.$model = newRequest.value.description;
@@ -678,6 +680,9 @@ export default defineComponent({
           document.execCommand('insertText', false, text);
           updateNotes();
         });
+        if (this.v$.description.$model) {
+          this.$refs.notesEditor.innerText = this.v$.description.$model;
+        }
       }
     });
 
