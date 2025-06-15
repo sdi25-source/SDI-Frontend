@@ -728,63 +728,86 @@
                       </td>
                     </tr>
                     <tr v-for="(module, index) in getFilteredModules" :key="index">
-                      <td class="pl-5">{{ getModuleVersionWithModuleCached(module.id)?.module?.name }}</td>
-                      <td>{{ module.version }}</td>
+                      <td class="pl-5">
+                        <template v-if="isEditingModuleVersion && editingModuleVersionData && editingModuleVersionData.id === module.id">
+                          <select
+                            v-model="editingModuleVersionData.module"
+                            class="form-control-borderless"
+                            @click.stop
+                          >
+                            <option v-for="moduleOption in moduleOptions" :key="moduleOption.id" :value="{ id: moduleOption.id }">
+                              {{ moduleOption.name }}
+                            </option>
+                          </select>
+                        </template>
+                        <template v-else>
+                          {{ getModuleVersionWithModuleCached(module.id)?.module?.name }}
+                        </template>
+                      </td>
+                      <td>
+                        <template v-if="isEditingModuleVersion && editingModuleVersionData && editingModuleVersionData.id === module.id">
+                          <input
+                            type="text"
+                            class="form-control-borderless"
+                            v-model="editingModuleVersionData.version"
+                            placeholder="Version"
+                            @click.stop
+                          />
+                        </template>
+                        <template v-else>
+                          {{ module.version }}
+                        </template>
+                      </td>
                       <td class="text-truncate" style="max-width: 250px" :title="module.notes">
-                        {{ getModuleVersionWithModuleCached(module.id).notes }}
+                        <template v-if="isEditingModuleVersion && editingModuleVersionData && editingModuleVersionData.id === module.id">
+                          <input
+                            type="text"
+                            class="form-control-borderless"
+                            v-model="editingModuleVersionData.notes"
+                            placeholder="Notes"
+                            @click.stop
+                          />
+                        </template>
+                        <template v-else>
+                          {{ getModuleVersionWithModuleCached(module.id).notes }}
+                        </template>
                       </td>
                       <td>
                         <div class="action-icons pr-lg-5 mr-lg-5">
-                          <div class="icon-container edit-container" :title="t$('entity.action.edit')" v-if="hasAnyAuthority('ROLE_USER')">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="14"
-                              height="14"
-                              fill="currentColor"
-                              class="bi bi-pencil-fill"
-                              viewBox="0 0 16 16"
+                          <template v-if="isEditingModuleVersion && editingModuleVersionData && editingModuleVersionData.id === module.id">
+                            <div class="icon-container save-container" @click="saveEditModuleVersion(module)" title="Enregistrer">
+                              <font-awesome-icon icon="save"></font-awesome-icon>
+                            </div>
+                            <div class="icon-container cancel-container" @click="cancelEditModuleVersion" title="Annuler">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                              </svg>
+                            </div>
+                          </template>
+                          <template v-else>
+                            <div class="icon-container edit-container" @click="editModuleVersion(module)" :title="t$('entity.action.edit')" v-if="hasAnyAuthority('ROLE_USER')">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+                              </svg>
+                            </div>
+                            <div
+                              class="icon-container delete-container"
+                              @click="prepareRemoveModuleVersion(module)"
+                              :title="t$('entity.action.delete')"
+                              v-if="hasAnyAuthority('ROLE_USER')"
                             >
-                              <path
-                                d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
-                              />
-                            </svg>
-                          </div>
-                          <div
-                            class="icon-container delete-container"
-                            :title="t$('entity.action.delete')"
-                            v-if="hasAnyAuthority('ROLE_USER')"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="20"
-                              height="20"
-                              fill="currentColor"
-                              class="bi bi-x"
-                              viewBox="0 0 16 16"
-                            >
-                              <path
-                                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
-                              />
-                            </svg>
-                          </div>
-                          <div class="icon-container save-container" @click="openModuleFeaturesModal(module)" title="features">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="18"
-                              height="18"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              class="icon"
-                            >
-                              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                              <polyline points="2 17 12 22 22 17"></polyline>
-                              <polyline points="2 12 12 17 22 12"></polyline>
-                            </svg>
-                          </div>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                              </svg>
+                            </div>
+                            <div class="icon-container save-container" @click="openModuleFeaturesModal(module)" title="features">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                <polyline points="2 17 12 22 22 17"></polyline>
+                                <polyline points="2 12 12 17 22 12"></polyline>
+                              </svg>
+                            </div>
+                          </template>
                         </div>
                       </td>
                     </tr>
@@ -1949,8 +1972,61 @@
           </div>
         </template>
       </b-modal>
-    </div>
 
+      <!-- Delete Confirmation Modal for Module Version -->
+      <div class="modal-backdrop" v-if="showModuleVersionDeleteModal" @click="closeModuleVersionDeleteModal"></div>
+      <div class="modal-container" v-if="showModuleVersionDeleteModal" role="dialog" aria-modal="true">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title text-danger">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="currentColor"
+                class="bi bi-exclamation-triangle mr-2"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
+                />
+                <path
+                  d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"
+                />
+              </svg>
+              Confirmation
+            </h5>
+            <button type="button" class="close-button" @click="closeModuleVersionDeleteModal" aria-label="Fermer">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-0">Are you sure you want to delete this module version? This action is irreversible.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="button button-secondary" @click="closeModuleVersionDeleteModal">Cancel</button>
+            <button type="button" class="button button-danger" @click="confirmRemoveModuleVersion">Delete</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+    <div class="section"></div>
     <div class="section"></div>
     <div class="section"></div>
     <div class="section"></div>

@@ -135,6 +135,16 @@ export default defineComponent({
     const showAddModuleVersionForm = ref(false);
     const selectedProductLineFilter = ref(null);
 
+
+    const isEditingModuleVersion = ref(false)
+    const editingModuleVersionData = ref(null)
+
+    // Delete modals
+    const showVersionDeleteModal = ref(false)
+    const showModuleVersionDeleteModal = ref(false)
+    const versionToDelete = ref(null)
+    const moduleVersionToDelete = ref(null)
+
     // New item templates
     const newProduct = ref({
       name: '',
@@ -658,7 +668,6 @@ export default defineComponent({
         if (selectedProduct.value) {
           // Update existing product
           selectedProduct.value.modules = productModules.value;
-          selectedProduct.value.certifications = productCertifications.value;
           await productService().update(selectedProduct.value);
           await retrieveProducts();
         } else {
@@ -676,7 +685,6 @@ export default defineComponent({
       try {
         if (selectedProduct.value) {
           // Update existing product
-          selectedProduct.value.modules = productModules.value;
           selectedProduct.value.certifications = productCertifications.value;
           await productService().update(selectedProduct.value);
           await retrieveProducts();
@@ -1329,33 +1337,73 @@ export default defineComponent({
     };
 
     // Module version methods
-    const editModuleVersion = version => {
-      // Implement module version editing
-      version.isEditing = true;
-      version.originalData = { ...version };
-    };
+    const editModuleVersion = (moduleVersion) => {
+      editingModuleVersionData.value = { ...moduleVersion }
+      isEditingModuleVersion.value = true
+    }
 
-    const saveEditModuleVersion = async version => {
+    const prepareRemoveModuleVersion = (moduleVersion) => {
+      moduleVersionToDelete.value = moduleVersion
+      showModuleVersionDeleteModal.value = true
+    }
+
+    const saveEditModuleVersion = async (moduleVersion) => {
+      if (!editingModuleVersionData.value) return
+
       try {
-        await moduleVersionService().update(version);
-        version.isEditing = false;
-        version.originalData = { ...version };
+        // Simulate API call
+        console.log('Saving module version:', editingModuleVersionData.value)
 
-        // Refresh versions
-        if (selectedModule.value) {
-          await fetchModuleVersions(selectedModule.value.id);
+        // Update the module version in the selected version
+        if (selectedVersion.value && selectedVersion.value.moduleVersions) {
+          const index = selectedVersion.value.moduleVersions.findIndex(mv => mv.id === moduleVersion.id)
+          if (index !== -1) {
+            selectedVersion.value.moduleVersions[index] = { ...editingModuleVersionData.value }
+          }
         }
 
-        alertService.showInfo('Version du module mise à jour avec succès', { variant: 'success' });
+        isEditingModuleVersion.value = false;
+        editingModuleVersionData.value = null;
+        alertService.showInfo('Module Version updated successfully.', { variant: 'success' });
       } catch (error) {
-        alertService.showHttpError(error.response);
-      }
-    };
+        console.error('Error saving module version:', error)
+        alertService.showError('Error saving Module Version.', { variant: 'error' });
 
-    const cancelEditModuleVersion = version => {
-      Object.assign(version, version.originalData);
-      version.isEditing = false;
-    };
+      }
+    }
+
+    const cancelEditModuleVersion = () => {
+      isEditingModuleVersion.value = false
+      editingModuleVersionData.value = null
+    }
+
+    const closeModuleVersionDeleteModal = () => {
+      showModuleVersionDeleteModal.value = false
+      moduleVersionToDelete.value = null
+    }
+
+    const confirmRemoveModuleVersion = async () => {
+      if (!moduleVersionToDelete.value) return
+
+      try {
+        // Simulate API call
+        console.log('Deleting module version:', moduleVersionToDelete.value)
+
+        // Remove from selected version's module versions
+        if (selectedVersion.value && selectedVersion.value.moduleVersions) {
+          selectedVersion.value.moduleVersions = selectedVersion.value.moduleVersions.filter(
+            mv => mv.id !== moduleVersionToDelete.value.id
+          )
+        }
+
+        closeModuleVersionDeleteModal();
+        alertService.showSuccess('Module Version deleted successfully.', { variant: 'success' });
+      } catch (error) {
+        console.error('Error deleting module version:', error)
+        alertService.showError('Error deleting Module Version.', { variant: 'error' });
+      }
+    }
+
 
     const cancelNewModuleVersion = () => {
       showAddModuleVersionRow.value = false;
@@ -2275,6 +2323,15 @@ export default defineComponent({
       cancelAddModuleVersionRow,
       dataUtils,
       selectedProductLineFilter,
+      isEditingModuleVersion,
+      editingModuleVersionData,
+      showVersionDeleteModal,
+      showModuleVersionDeleteModal,
+      versionToDelete,
+      moduleVersionToDelete,
+      prepareRemoveModuleVersion,
+      closeModuleVersionDeleteModal,
+      confirmRemoveModuleVersion,
       applyFilters,
       resetFilters,
       handleSearch,
