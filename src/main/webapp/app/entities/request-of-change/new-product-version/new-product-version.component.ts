@@ -52,6 +52,8 @@ export default defineComponent({
     const availableInfraComponents = ref<IInfraComponentVersion[]>([]);
     const infraComponentOptions = ref<IInfraComponent[]>([]);
     const availableModules = ref<IModule[]>([]);
+    const moduleOptions = ref([]);
+    const features = ref([]);
     const availableModuleVersions = ref<IModuleVersion[]>([]);
     const availableRootVersions = ref<IProductVersion[]>([]);
     const dataInitialized = ref(false);
@@ -281,12 +283,13 @@ export default defineComponent({
                 notes: moduleVersion.notes || '',
                 createDate: new Date().toISOString(),
                 updateDate: new Date().toISOString(),
-                module: moduleVersion.module,
+                module: getModuleVersionWithModuleCached(moduleVersion.id).module,
                 features: moduleVersion.features ? [...moduleVersion.features] : [],
-                root: moduleVersion,
+                root: getModuleVersionWithModuleCached(moduleVersion.id),
                 isNewlyCreated: true, // Flag to indicate this is a new version
               };
 
+              //newModuleVersion.features = fetchFeatures(moduleVersion.id);
               newModuleVersions.push(newModuleVersion);
 
               // Initialize UI state
@@ -297,7 +300,7 @@ export default defineComponent({
               };
             } else {
               // Keep existing module version
-              newModuleVersions.push({ ...moduleVersion, isNewlyCreated: false });
+              newModuleVersions.push({ ...getModuleVersionWithModuleCached(moduleVersion.id), isNewlyCreated: false });
             }
           }
 
@@ -605,6 +608,7 @@ export default defineComponent({
         alertService.showHttpError(err.response);
       }
     };
+
     const getIfraComponentVersionWithInfraCached = infracomponenetVersionId => {
       const infracomponenetVersion = infraComponentVersionOptions.value.find(ifc => ifc.id === infracomponenetVersionId);
       if (!infracomponenetVersion) return null;
@@ -624,12 +628,61 @@ export default defineComponent({
       }
     };
 
+    const fetchModuleOptions = async () => {
+      try {
+        const res = await moduleService.retrieve();
+        moduleOptions.value = res.data;
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
+    };
+
+    const moduleVersionOptions = ref([]);
+    const fetchModuleVersionOptions = async () => {
+      try {
+        const res = await moduleVersionService.retrieve();
+        moduleVersionOptions.value = res.data;
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
+    };
+
+    const getModuleVersionWithModuleCached = moduleVersionId => {
+      // 1. Trouver la version de module dans le cache
+      const moduleVersion = moduleVersionOptions.value.find(mv => mv.id === moduleVersionId);
+
+      if (!moduleVersion) return null;
+
+      // 2. Trouver le module associé dans le cache
+      const module = moduleOptions.value.find(m => m.id === moduleVersion.module?.id);
+
+      // 3. Fusionner les données
+      return {
+        ...moduleVersion,
+        module: module ? { ...module } : null,
+      };
+    };
+
+    const fetchFeatures = async moduleVersionId => {
+      const res = await moduleVersionService.find(moduleVersionId);
+      features.value = res.features;
+      return {
+        features,
+      };
+    };
+
     onMounted(async () => {
       await fetchInfraComponentVersionOptions();
       await fetchInfraComponents();
+      await fetchModuleOptions();
+      await fetchModuleVersionOptions();
     });
 
     return {
+      fetchFeatures,
+      getModuleVersionWithModuleCached,
+      fetchModuleOptions,
+      fetchModuleVersionOptions,
       currentStep,
       newProductVersion,
       showInfraSelector,
