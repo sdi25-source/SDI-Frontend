@@ -3,36 +3,16 @@ import { defineConfig, normalizePath } from 'vite';
 
 import vue from '@vitejs/plugin-vue';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import { execSync } from 'child_process';
 
 const { getAbsoluteFSPath } = await import('swagger-ui-dist');
 const swaggerUiPath = getAbsoluteFSPath();
 
-function getGitVersion() {
-  try {
-    // Vérifier d'abord s'il y a un tag pointant directement sur HEAD
-    const tag = execSync('git tag --points-at HEAD').toString().trim();
-    if (tag) {
-      // Si un tag est trouvé, retourner le premier
-      return tag.split('\n')[0];
-    }
-    // Si aucun tag n'est associé à HEAD, essayer de trouver le dernier tag dans l'historique
-    try {
-      return execSync('git describe --tags --abbrev=0').toString().trim();
-    } catch {
-      // Si git describe échoue, lister tous les tags et prendre le dernier
-      const allTags = execSync('git tag').toString().trim();
-      if (allTags) {
-        // Trier les tags par ordre lexicographique ou version
-        const tags = allTags.split('\n').filter(tag => tag);
-        return tags.sort().reverse()[0] || 'unknown';
-      }
-      return 'unknown';
-    }
-  } catch {
-    // Fallback en cas d'erreur générale
-    return 'unknown';
-  }
+import { readFileSync } from 'fs';
+
+function getVersion() {
+  const packageJsonPath = fileURLToPath(new URL('./package.json', import.meta.url));
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
+  return packageJson.version;
 }
 
 // eslint-disable-next-line prefer-const
@@ -76,7 +56,7 @@ const config = defineConfig({
     I18N_HASH: '"generated_hash"',
     SERVER_API_URL: '"/"',
     APP_VERSION: `"${process.env.APP_VERSION ? process.env.APP_VERSION : 'DEV'}"`,
-    VERSION_P: JSON.stringify(getGitVersion()),
+    VERSION_P: JSON.stringify(getVersion()),
   },
   server: {
     host: true,
