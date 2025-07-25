@@ -137,8 +137,18 @@ export default defineComponent({
     };
 
     const saveNewDomaine = async () => {
-      if (!newDomaine.value.name) {
-        alertService.showAlert('Le champ nom est requis.', 'danger');
+      const domainName = newDomaine.value.name?.trim();
+
+      if (!domainName) {
+        alertService.showError('Le champ nom est requis.', 'danger');
+        return;
+      }
+
+      // 🔍 Vérification de la duplication
+      const existing = allDomaines.value.find(d => d.name.trim().toLowerCase() === domainName.toLowerCase());
+
+      if (existing) {
+        alertService.showError('Ce domaine existe déjà.', 'danger');
         return;
       }
 
@@ -163,7 +173,7 @@ export default defineComponent({
           notes: '',
         };
 
-        alertService.showAlert('Domaine ajouté avec succès.', 'success', { variant: 'success' });
+        alertService.showSuccess('Domaine ajouté avec succès.', 'success', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       }
@@ -216,7 +226,7 @@ export default defineComponent({
         const allIndex = allDomaines.value.findIndex(d => d.id === domaine.id);
         if (allIndex !== -1) allDomaines.value.splice(allIndex, 1, updated);
 
-        alertService.showAlert('Domaine mis à jour avec succès.', 'success', { variant: 'success' });
+        alertService.showSuccess('Domaine mis à jour avec succès.', 'success', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       }

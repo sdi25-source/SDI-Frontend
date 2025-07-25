@@ -168,8 +168,18 @@ export default defineComponent({
     };
 
     const saveNewComponentType = async () => {
-      if (!newComponentType.value.type) {
-        alertService().showAlert('Le champ type est requis.', 'danger');
+      const newType = newComponentType.value.type?.trim();
+
+      if (!newType) {
+        alertService().showError('Le champ type est requis.', 'danger');
+        return;
+      }
+
+      // 🔎 Vérifie si le type existe déjà
+      const exists = allComponentTypes.value.some(item => item.type?.trim().toLowerCase() === newType.toLowerCase());
+
+      if (exists) {
+        alertService().showError('Ce type de composant existe déjà.', 'danger');
         return;
       }
 
@@ -191,7 +201,7 @@ export default defineComponent({
           type: '',
         };
 
-        alertService().showAlert('Type de composant ajouté avec succès.', 'success');
+        alertService().showSuccess('Type de composant ajouté avec succès.', 'success');
       } catch (error) {
         alertService().showHttpError(error.response);
       }
@@ -243,7 +253,7 @@ export default defineComponent({
           allComponentTypes.value[allIndex] = updatedComponentType;
         }
 
-        alertService().showAlert('Type de composant mis à jour avec succès.', 'success');
+        alertService().showSuccess('Type de composant mis à jour avec succès.', 'success');
       } catch (error) {
         alertService().showHttpError(error.response);
       }

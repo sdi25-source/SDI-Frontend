@@ -172,7 +172,7 @@ export default defineComponent({
 
     const saveNewInfraComponentVersion = async () => {
       if (!newInfraComponentVersion.value.version) {
-        alertService().showAlert('Le champ version est requis.', 'danger');
+        alertService().showError('Le champ version est requis.', 'danger');
         return;
       }
 
@@ -198,7 +198,7 @@ export default defineComponent({
           infraComponent: null,
         };
 
-        alertService().showAlert('Version de composant ajoutée avec succès.', 'success');
+        alertService().showSuccess('Version de composant ajoutée avec succès.', 'success');
       } catch (error) {
         alertService().showHttpError(error.response);
       }
@@ -258,7 +258,7 @@ export default defineComponent({
           allInfraComponentVersions.value[allIndex] = updatedVersion;
         }
 
-        alertService().showAlert('Version de composant mise à jour avec succès.', 'success');
+        alertService().showSuccess('Version de composant mise à jour avec succès.', 'success');
       } catch (error) {
         alertService().showHttpError(error.response);
       }

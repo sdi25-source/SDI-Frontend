@@ -95,9 +95,7 @@ export default defineComponent({
         } else {
           const searchTermLower = searchTerm.value.toLowerCase();
           clientSizes.value = allClientSizes.value.filter(clientSize =>
-            Object.values(clientSize).some(
-              value => value && value.toString().toLowerCase().includes(searchTermLower)
-            )
+            Object.values(clientSize).some(value => value && value.toString().toLowerCase().includes(searchTermLower)),
           );
         }
         updateTotalItems();
@@ -162,8 +160,19 @@ export default defineComponent({
     };
 
     const saveNewClientSize = async () => {
-      if (!newClientSize.value.sizeName || !newClientSize.value.sizeCode) {
-        alertService.showAlert('Les champs Nom et Code sont requis.', 'danger');
+      const name = newClientSize.value.sizeName?.trim();
+      const code = newClientSize.value.sizeCode?.trim();
+
+      if (!name || !code) {
+        alertService.showError('Les champs Nom et Code sont requis.', 'danger');
+        return;
+      }
+
+      // ✅ Vérifie si le sizeName existe déjà (insensible à la casse)
+      const alreadyExists = allClientSizes.value.some(cs => cs.sizeName?.toLowerCase() === name.toLowerCase());
+
+      if (alreadyExists) {
+        alertService.showError('Ce nom de taille existe déjà.', 'danger');
         return;
       }
 
@@ -186,7 +195,7 @@ export default defineComponent({
           sizeDescription: '',
         };
 
-        alertService.showAlert('Taille de client ajoutée avec succès.', 'success');
+        alertService.showSuccess('Taille de client ajoutée avec succès.', 'success');
       } catch (error) {
         alertService.showHttpError(error.response);
       }
@@ -234,7 +243,7 @@ export default defineComponent({
           allClientSizes.value[allIndex] = updatedClientSize;
         }
 
-        alertService.showAlert('Taille de client mise à jour avec succès.', 'success');
+        alertService.showSuccess('Taille de client mise à jour avec succès.', 'success');
       } catch (error) {
         alertService.showHttpError(error.response);
       }
@@ -255,7 +264,7 @@ export default defineComponent({
           currentPage.value = totalPages.value;
         }
       },
-      { deep: true }
+      { deep: true },
     );
 
     onMounted(async () => {

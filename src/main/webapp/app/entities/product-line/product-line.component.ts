@@ -136,7 +136,16 @@ export default defineComponent({
 
     const saveNewProductLine = async () => {
       if (!newProductLine.value.name) {
-        alertService.showAlert('Le champ nom est requis.', 'danger');
+        alertService.showError('Le champ nom est requis.', 'danger');
+        return;
+      }
+
+      const existingName = allProductLines.value.find(
+        pl => pl.name.trim().toLowerCase() === newProductLine.value.name.trim().toLowerCase(),
+      );
+
+      if (existingName) {
+        alertService.showError('Ce nom existe déjà.', 'danger');
         return;
       }
 
@@ -149,9 +158,13 @@ export default defineComponent({
           originalData: JSON.parse(JSON.stringify(response)),
         };
 
-        productLines.value.push(added);
-        allProductLines.value.push(added);
+        // 👉 Ajout en haut
+        productLines.value.unshift(added);
+        allProductLines.value.unshift(added);
         updateTotalItems();
+
+        // 👉 Affiche la page 1
+        currentPage.value = 1;
 
         showAddRow.value = false;
         newProductLine.value = {
@@ -161,7 +174,7 @@ export default defineComponent({
           notes: '',
         };
 
-        alertService.showAlert('Ligne de produit ajoutée avec succès.', 'success', { variant: 'success' });
+        alertService.showSuccess('Ligne de produit ajoutée avec succès.', 'success', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       }
@@ -214,7 +227,7 @@ export default defineComponent({
         const allIndex = allProductLines.value.findIndex(pl => pl.id === productLine.id);
         if (allIndex !== -1) allProductLines.value.splice(allIndex, 1, updated);
 
-        alertService.showAlert('Ligne de produit mise à jour avec succès.', 'success', { variant: 'success' });
+        alertService.showSuccess('Ligne de produit mise à jour avec succès.', 'success', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       }

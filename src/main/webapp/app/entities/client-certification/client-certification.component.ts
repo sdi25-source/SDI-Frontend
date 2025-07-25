@@ -237,7 +237,7 @@ export default defineComponent({
 
     const saveNewClientCertification = async () => {
       if (!newClientCertification.value.client || !newClientCertification.value.certif) {
-        alertService.showAlert('Les champs client et certification sont requis.', 'danger');
+        alertService.showError('Les champs client et certification sont requis.', 'danger');
         return;
       }
 
@@ -270,7 +270,7 @@ export default defineComponent({
           notes: '',
         };
 
-        alertService.showAlert('Certification client ajoutée avec succès.', 'success', { variant: 'success' });
+        alertService.showSuccess('Certification client ajoutée avec succès.', 'success', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       }
@@ -307,7 +307,7 @@ export default defineComponent({
 
     const saveClientCertification = async clientCertification => {
       if (!clientCertification.client || !clientCertification.certif) {
-        alertService.showAlert('Les champs client et certification sont requis.', 'danger');
+        alertService.showError('Les champs client et certification sont requis.', 'danger');
         return;
       }
 
@@ -337,7 +337,7 @@ export default defineComponent({
         const allIndex = allClientCertifications.value.findIndex(cert => cert.id === clientCertification.id);
         if (allIndex !== -1) allClientCertifications.value.splice(allIndex, 1, updated);
 
-        alertService.showAlert('Certification client mise à jour avec succès.', 'success', { variant: 'success' });
+        alertService.showSuccess('Certification client mise à jour avec succès.', 'success', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       }

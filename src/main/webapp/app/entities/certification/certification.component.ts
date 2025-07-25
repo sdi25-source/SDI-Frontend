@@ -242,8 +242,18 @@ export default defineComponent({
     };
 
     const saveNewCertification = async () => {
-      if (!newCertification.value.name) {
-        alertService.showAlert('Le champ nom est requis.', 'danger');
+      const name = newCertification.value.name?.trim();
+
+      if (!name) {
+        alertService.showError('Le champ nom est requis.', 'danger');
+        return;
+      }
+
+      // 🔎 Vérifie si le nom de certification existe déjà (insensible à la casse)
+      const exists = allCertifications.value.some(item => item.name?.trim().toLowerCase() === name.toLowerCase());
+
+      if (exists) {
+        alertService.showError('Cette certification existe déjà.', 'danger');
         return;
       }
 
@@ -269,7 +279,7 @@ export default defineComponent({
           expireDate: '',
         };
 
-        alertService.showAlert('Certification ajoutée avec succès.', 'success', { variant: 'success' });
+        alertService.showSuccess('Certification ajoutée avec succès.', 'success', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       }
@@ -302,7 +312,7 @@ export default defineComponent({
 
     const saveCertification = async certification => {
       if (!certification.name) {
-        alertService.showAlert('Le champ nom est requis.', 'danger');
+        alertService.showError('Le champ nom est requis.', 'danger');
         return;
       }
 
@@ -330,7 +340,7 @@ export default defineComponent({
         const allIndex = allCertifications.value.findIndex(cert => cert.id === certification.id);
         if (allIndex !== -1) allCertifications.value.splice(allIndex, 1, updated);
 
-        alertService.showAlert('Certification mise à jour avec succès.', 'success', { variant: 'success' });
+        alertService.showSuccess('Certification mise à jour avec succès.', 'success', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       }
@@ -571,7 +581,7 @@ export default defineComponent({
 
     onMounted(async () => {
       await retrieveCertifications();
-   //   versionsModal.value = ref('versionsModal');
+      //   versionsModal.value = ref('versionsModal');
       removeEntity.value = ref('removeEntity');
       removeVersionEntity.value = ref('removeVersionEntity');
 

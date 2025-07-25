@@ -16,6 +16,13 @@ export default defineComponent({
     const alertService = inject('alertService', () => useAlertService(), true);
 
     const countries: Ref<ICountry[]> = ref([]);
+    const newCountry: Ref<ICountry> = ref({
+      id: null,
+      countryCode: '',
+      countryName: '',
+      createDate: new Date().toISOString().split('T')[0],
+      updateDate: new Date().toISOString().split('T')[0],
+    });
 
     const isFetching = ref(false);
 
@@ -62,8 +69,45 @@ export default defineComponent({
         alertService.showHttpError(error.response);
       }
     };
+    const saveNewCountry = async () => {
+      if (!newCountry.value.countryname || !newCountry.value.countryCode) {
+        alertService().showError('Les champs Code et Nom sont requis.');
+        return;
+      }
+
+      // Vérifier doublon local (optionnel)
+      const exists = countries.value.find(c => c.countryCode.toLowerCase() === newCountry.value.countryCode.toLowerCase());
+      if (exists) {
+        alertService().showError('Un pays avec ce code existe déjà.');
+        return;
+      }
+
+      try {
+        const res = await countryService().create(newCountry.value);
+        countries.value.push({
+          ...res,
+          isEditing: false,
+          showDropdown: false,
+          originalData: JSON.parse(JSON.stringify(res)),
+        });
+        alertService().showSuccess('Pays ajouté avec succès.');
+
+        // Reset
+        newCountry.value = {
+          id: null,
+          countryCode: '',
+          countryName: '',
+          createDate: new Date().toISOString().split('T')[0],
+          updateDate: new Date().toISOString().split('T')[0],
+        };
+      } catch (error) {
+        alertService().showHttpError(error.response);
+      }
+    };
 
     return {
+      saveNewCountry,
+      newCountry,
       countries,
       handleSyncList,
       isFetching,

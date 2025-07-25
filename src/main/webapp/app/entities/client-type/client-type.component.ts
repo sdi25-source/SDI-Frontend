@@ -166,8 +166,18 @@ export default defineComponent({
     };
 
     const saveNewClientType = async () => {
-      if (!newClientType.value.type) {
-        alertService().showAlert('Le champ type est requis.', 'danger');
+      const type = newClientType.value.type?.trim();
+
+      if (!type) {
+        alertService.showError('Le champ type est requis.', 'danger');
+        return;
+      }
+
+      // 🔎 Vérifie si le type existe déjà (insensible à la casse)
+      const exists = allClientTypes.value.some(item => item.type?.trim().toLowerCase() === type.toLowerCase());
+
+      if (exists) {
+        alertService.showError('Ce type de client existe déjà.', 'danger');
         return;
       }
 
@@ -192,9 +202,9 @@ export default defineComponent({
           notes: '',
         };
 
-        alertService().showAlert('Type de client ajouté avec succès.', 'success');
+        alertService.showSuccess('Type de client ajouté avec succès.', 'success');
       } catch (error) {
-        alertService().showHttpError(error.response);
+        alertService.showHttpError(error.response);
       }
     };
 
@@ -250,7 +260,7 @@ export default defineComponent({
           allClientTypes.value[allIndex] = updatedClientType;
         }
 
-        alertService().showAlert('Type de client mis à jour avec succès.', 'success');
+        alertService().showSuccess('Type de client mis à jour avec succès.', 'success');
       } catch (error) {
         alertService().showHttpError(error.response);
       }

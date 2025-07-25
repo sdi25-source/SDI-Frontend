@@ -145,8 +145,18 @@ export default defineComponent({
     };
 
     const saveNewClientEventType = async () => {
-      if (!newClientEventType.value.type) {
-        alertService.showAlert('Le champ type est requis.', 'danger');
+      const typeName = newClientEventType.value.type?.trim();
+
+      if (!typeName) {
+        alertService.showError('Le champ type est requis.', 'danger');
+        return;
+      }
+
+      // 🔍 Vérification de l'existence
+      const existingType = allClientEventTypes.value.find(t => t.type.trim().toLowerCase() === typeName.toLowerCase());
+
+      if (existingType) {
+        alertService.showError('Ce type existe déjà.', 'danger');
         return;
       }
 
@@ -171,7 +181,7 @@ export default defineComponent({
           updateDate: new Date().toISOString().split('T')[0],
         };
 
-        alertService.showAlert("Type d'événement ajouté avec succès.", 'success', { variant: 'success' });
+        alertService.showSuccess("Type d'événement ajouté avec succès.", 'success', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       }
@@ -202,7 +212,7 @@ export default defineComponent({
 
     const saveClientEventType = async clientEventType => {
       if (!clientEventType.type) {
-        alertService.showAlert('Le champ type est requis.', 'danger');
+        alertService.showError('Le champ type est requis.', 'danger');
         return;
       }
 
@@ -229,7 +239,7 @@ export default defineComponent({
         const allIndex = allClientEventTypes.value.findIndex(type => type.id === clientEventType.id);
         if (allIndex !== -1) allClientEventTypes.value.splice(allIndex, 1, updated);
 
-        alertService.showAlert("Type d'événement mis à jour avec succès.", 'success', { variant: 'success' });
+        alertService.showSuccess("Type d'événement mis à jour avec succès.", 'success', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       }

@@ -143,8 +143,18 @@ export default defineComponent({
     };
 
     const saveNewDeployementType = async () => {
-      if (!newDeployementType.value.type) {
-        alertService.showAlert('Le champ type est requis.', 'danger');
+      const newType = newDeployementType.value.type?.trim();
+
+      if (!newType) {
+        alertService.showError('Le champ type est requis.', 'danger');
+        return;
+      }
+
+      // 🔍 Vérifie si le type existe déjà (insensible à la casse)
+      const alreadyExists = allDeployementTypes.value.some(dt => dt.type?.toLowerCase() === newType.toLowerCase());
+
+      if (alreadyExists) {
+        alertService.showError('Ce type de déploiement existe déjà.', 'danger');
         return;
       }
 
@@ -169,7 +179,7 @@ export default defineComponent({
           updateDate: new Date().toISOString().split('T')[0],
         };
 
-        alertService.showAlert('Type de déploiement ajouté avec succès.', 'success', { variant: 'success' });
+        alertService.showSuccess('Type de déploiement ajouté avec succès.', 'success', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       }
@@ -200,7 +210,7 @@ export default defineComponent({
 
     const saveDeployementType = async deployementType => {
       if (!deployementType.type) {
-        alertService.showAlert('Le champ type est requis.', 'danger');
+        alertService.showError('Le champ type est requis.', 'danger');
         return;
       }
 
@@ -227,7 +237,7 @@ export default defineComponent({
         const allIndex = allDeployementTypes.value.findIndex(dt => dt.id === deployementType.id);
         if (allIndex !== -1) allDeployementTypes.value.splice(allIndex, 1, updated);
 
-        alertService.showAlert('Type de déploiement mis à jour avec succès.', 'success', { variant: 'success' });
+        alertService.showSuccess('Type de déploiement mis à jour avec succès.', 'success', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       }
