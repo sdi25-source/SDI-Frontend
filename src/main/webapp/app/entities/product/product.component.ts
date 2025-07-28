@@ -14,9 +14,9 @@ import InfraComponentService from '@/entities/infra-component/infra-component.se
 import type { IInfraComponent } from '@/shared/model/infra-component.model.ts';
 import type { IComponentType } from '@/shared/model/component-type.model.ts';
 import CertificationService from '@/entities/certification/certification.service.ts';
-import type { ICertification } from '@/shared/model/certification.model.ts';
 import CertificationVersionService from '@/entities/certification/certification-version.service.ts';
 import type AccountService from '@/account/account.service.ts';
+import jsPDF from 'jspdf';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -135,15 +135,14 @@ export default defineComponent({
     const showAddModuleVersionForm = ref(false);
     const selectedProductLineFilter = ref(null);
 
-
-    const isEditingModuleVersion = ref(false)
-    const editingModuleVersionData = ref(null)
+    const isEditingModuleVersion = ref(false);
+    const editingModuleVersionData = ref(null);
 
     // Delete modals
-    const showVersionDeleteModal = ref(false)
-    const showModuleVersionDeleteModal = ref(false)
-    const versionToDelete = ref(null)
-    const moduleVersionToDelete = ref(null)
+    const showVersionDeleteModal = ref(false);
+    const showModuleVersionDeleteModal = ref(false);
+    const versionToDelete = ref(null);
+    const moduleVersionToDelete = ref(null);
 
     // New item templates
     const newProduct = ref({
@@ -298,9 +297,9 @@ export default defineComponent({
             ...fullComponentVersion,
             infraComponent: infraComponent
               ? {
-                ...infraComponent,
-                componentType: componentType || null,
-              }
+                  ...infraComponent,
+                  componentType: componentType || null,
+                }
               : null,
           };
         })
@@ -337,11 +336,11 @@ export default defineComponent({
           // Enrichir les modules de chaque produit
           const modulesWithExpansion = product.modules
             ? product.modules.map(mod => ({
-              ...mod,
-              isExpanded: false,
-              versions: [],
-              isLoadingVersions: false,
-            }))
+                ...mod,
+                isExpanded: false,
+                versions: [],
+                isLoadingVersions: false,
+              }))
             : [];
           return {
             ...product,
@@ -533,7 +532,6 @@ export default defineComponent({
 
         // Fetch product versions
         await fetchProductVersions(product.id);
-
       }
     };
 
@@ -726,16 +724,16 @@ export default defineComponent({
           // Initialize with root's configuration
           versionInfraComponents.value = rootVersion.infraComponentVersions
             ? rootVersion.infraComponentVersions.map(icv => ({
-              ...icv,
-              id: icv.id,
-            }))
+                ...icv,
+                id: icv.id,
+              }))
             : [];
 
           versionModuleVersions.value = rootVersion.moduleVersions
             ? rootVersion.moduleVersions.map(mv => ({
-              ...mv,
-              id: mv.id,
-            }))
+                ...mv,
+                id: mv.id,
+              }))
             : [];
         } catch (error) {
           alertService.showHttpError(error.response);
@@ -1192,8 +1190,8 @@ export default defineComponent({
       const latestVersion = await fetchLatestNonClientVersion();
       newVersion.value.root = latestVersion;
       newVersion.value.version = incrementVersion(latestVersion);
-      newVersion.moduleVersions = [];
-      newVersion.infraComponentVersions = [];
+      newVersion.value.moduleVersions = [];
+      newVersion.value.infraComponentVersions = [];
     };
 
     const updateTotalVersionItems = () => {
@@ -1268,15 +1266,15 @@ export default defineComponent({
           const rootVersion = await productVersionService().find(newVersion.value.root.id);
           versionInfraComponents.value = rootVersion.infraComponentVersions
             ? rootVersion.infraComponentVersions.map(icv => ({
-              ...icv,
-              id: icv.id,
-            }))
+                ...icv,
+                id: icv.id,
+              }))
             : [];
           versionModuleVersions.value = rootVersion.moduleVersions
             ? rootVersion.moduleVersions.map(mv => ({
-              ...mv,
-              id: mv.id,
-            }))
+                ...mv,
+                id: mv.id,
+              }))
             : [];
         } catch (error) {
           alertService.showHttpError(error.response);
@@ -1337,28 +1335,28 @@ export default defineComponent({
     };
 
     // Module version methods
-    const editModuleVersion = (moduleVersion) => {
-      editingModuleVersionData.value = { ...moduleVersion }
-      isEditingModuleVersion.value = true
-    }
+    const editModuleVersion = moduleVersion => {
+      editingModuleVersionData.value = { ...moduleVersion };
+      isEditingModuleVersion.value = true;
+    };
 
-    const prepareRemoveModuleVersion = (moduleVersion) => {
-      moduleVersionToDelete.value = moduleVersion
-      showModuleVersionDeleteModal.value = true
-    }
+    const prepareRemoveModuleVersion = moduleVersion => {
+      moduleVersionToDelete.value = moduleVersion;
+      showModuleVersionDeleteModal.value = true;
+    };
 
-    const saveEditModuleVersion = async (moduleVersion) => {
-      if (!editingModuleVersionData.value) return
+    const saveEditModuleVersion = async moduleVersion => {
+      if (!editingModuleVersionData.value) return;
 
       try {
         // Simulate API call
-        console.log('Saving module version:', editingModuleVersionData.value)
+        console.log('Saving module version:', editingModuleVersionData.value);
 
         // Update the module version in the selected version
         if (selectedVersion.value && selectedVersion.value.moduleVersions) {
-          const index = selectedVersion.value.moduleVersions.findIndex(mv => mv.id === moduleVersion.id)
+          const index = selectedVersion.value.moduleVersions.findIndex(mv => mv.id === moduleVersion.id);
           if (index !== -1) {
-            selectedVersion.value.moduleVersions[index] = { ...editingModuleVersionData.value }
+            selectedVersion.value.moduleVersions[index] = { ...editingModuleVersionData.value };
           }
         }
 
@@ -1366,44 +1364,42 @@ export default defineComponent({
         editingModuleVersionData.value = null;
         alertService.showInfo('Module Version updated successfully.', { variant: 'success' });
       } catch (error) {
-        console.error('Error saving module version:', error)
+        console.error('Error saving module version:', error);
         alertService.showError('Error saving Module Version.', { variant: 'error' });
-
       }
-    }
+    };
 
     const cancelEditModuleVersion = () => {
-      isEditingModuleVersion.value = false
-      editingModuleVersionData.value = null
-    }
+      isEditingModuleVersion.value = false;
+      editingModuleVersionData.value = null;
+    };
 
     const closeModuleVersionDeleteModal = () => {
-      showModuleVersionDeleteModal.value = false
-      moduleVersionToDelete.value = null
-    }
+      showModuleVersionDeleteModal.value = false;
+      moduleVersionToDelete.value = null;
+    };
 
     const confirmRemoveModuleVersion = async () => {
-      if (!moduleVersionToDelete.value) return
+      if (!moduleVersionToDelete.value) return;
 
       try {
         // Simulate API call
-        console.log('Deleting module version:', moduleVersionToDelete.value)
+        console.log('Deleting module version:', moduleVersionToDelete.value);
 
         // Remove from selected version's module versions
         if (selectedVersion.value && selectedVersion.value.moduleVersions) {
           selectedVersion.value.moduleVersions = selectedVersion.value.moduleVersions.filter(
-            mv => mv.id !== moduleVersionToDelete.value.id
-          )
+            mv => mv.id !== moduleVersionToDelete.value.id,
+          );
         }
 
         closeModuleVersionDeleteModal();
         alertService.showSuccess('Module Version deleted successfully.', { variant: 'success' });
       } catch (error) {
-        console.error('Error deleting module version:', error)
+        console.error('Error deleting module version:', error);
         alertService.showError('Error deleting Module Version.', { variant: 'error' });
       }
-    }
-
+    };
 
     const cancelNewModuleVersion = () => {
       showAddModuleVersionRow.value = false;
@@ -1969,16 +1965,16 @@ export default defineComponent({
             // Update versionInfraComponents and versionModuleVersions with root's configuration
             versionInfraComponents.value = rootVersion.infraComponentVersions
               ? rootVersion.infraComponentVersions.map(icv => ({
-                ...icv,
-                id: icv.id, // Ensure ID is included
-              }))
+                  ...icv,
+                  id: icv.id, // Ensure ID is included
+                }))
               : [];
 
             versionModuleVersions.value = rootVersion.moduleVersions
               ? rootVersion.moduleVersions.map(mv => ({
-                ...mv,
-                id: mv.id, // Ensure ID is included
-              }))
+                  ...mv,
+                  id: mv.id, // Ensure ID is included
+                }))
               : [];
 
             alertService.showInfo('Configuration du root appliquée automatiquement', { variant: 'info' });
@@ -2110,6 +2106,250 @@ export default defineComponent({
 
     const showModulesSection = () => {
       activeVersionSettingsSection.value = 'modules';
+    };
+
+    const exportProductToPDF = async product => {
+      try {
+        // Créer une nouvelle instance jsPDF
+        const doc = new jsPDF();
+        let yPosition = 20;
+        const pageHeight = doc.internal.pageSize.height;
+        const margin = 20;
+
+        // Fonction pour ajouter une nouvelle page si nécessaire
+        const checkPageBreak = (requiredSpace = 20) => {
+          if (yPosition + requiredSpace > pageHeight - margin) {
+            doc.addPage();
+            yPosition = 20;
+            return true;
+          }
+          return false;
+        };
+
+        // Fonction pour ajouter du texte avec retour à la ligne automatique
+        const addWrappedText = (text, x, y, maxWidth, fontSize = 10) => {
+          doc.setFontSize(fontSize);
+          const lines = doc.splitTextToSize(text || 'N/A', maxWidth);
+          doc.text(lines, x, y);
+          return lines.length * (fontSize * 0.4); // Retourne la hauteur utilisée
+        };
+
+        // En-tête du document
+        doc.setFillColor(12, 45, 87); // Couleur #0c2d57
+        doc.rect(0, 0, doc.internal.pageSize.width, 40, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.setFont(undefined, 'bold');
+        doc.text(product.name, margin, 25);
+
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'normal');
+        doc.text(`${new Date().toLocaleDateString()}`, margin, 35);
+
+        yPosition = 60;
+        doc.setTextColor(0, 0, 0);
+
+        // Informations générales du produit
+        doc.setFontSize(15);
+        doc.setFont(undefined, 'bold');
+        doc.text('General Information', margin, yPosition);
+        yPosition += 15;
+
+        // Ligne de séparation
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, yPosition, doc.internal.pageSize.width - margin, yPosition);
+        yPosition += 10;
+
+        // Détails du produit
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'bold');
+        doc.text('Description:', margin, yPosition);
+        yPosition += 7;
+        doc.setFont(undefined, 'normal');
+        const descHeight = addWrappedText(product.description, margin, yPosition, 160);
+        yPosition += descHeight + 5;
+
+        // Product Lines
+        if (product.productLines && product.productLines.length > 0) {
+          checkPageBreak(20);
+          doc.setFont(undefined, 'bold');
+          doc.text('Product Lines:', margin, yPosition);
+          yPosition += 7;
+          doc.setFont(undefined, 'normal');
+          product.productLines.forEach(line => {
+            doc.text(`• ${line.name}`, margin + 5, yPosition);
+            yPosition += 6;
+          });
+          yPosition += 5;
+        }
+
+        // Récupérer les versions du produit
+        const versionsRes = await productVersionService().retrieve();
+        const productVersionsList = versionsRes.data.filter(pv => pv.product?.id === product.id);
+
+        if (productVersionsList.length > 0) {
+          checkPageBreak(30);
+
+          // Section Versions
+          doc.setFontSize(15);
+          doc.setFont(undefined, 'bold');
+          doc.text('PRODUCT VERSIONS', margin, yPosition);
+          yPosition += 10;
+
+          doc.setDrawColor(200, 200, 200);
+          doc.line(margin, yPosition, doc.internal.pageSize.width - margin, yPosition);
+          yPosition += 10;
+
+          for (const version of productVersionsList) {
+            checkPageBreak(40);
+
+            // En-tête de version
+            doc.setFillColor(240, 240, 240);
+            doc.rect(margin, yPosition - 5, doc.internal.pageSize.width - 2 * margin, 15, 'F');
+
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Version ${version.version}`, margin + 5, yPosition + 5);
+            yPosition += 20;
+
+            // Notes de version
+            if (version.notes) {
+              doc.setFontSize(10);
+              doc.setFont(undefined, 'bold');
+              doc.text('Notes:', margin + 5, yPosition);
+              yPosition += 5;
+              doc.setFont(undefined, 'normal');
+              const notesHeight = addWrappedText(version.notes, margin + 5, yPosition, 150, 10);
+              yPosition += notesHeight + 5;
+            }
+
+            // Modules de cette version
+            if (version.moduleVersions && version.moduleVersions.length > 0) {
+              checkPageBreak(20);
+              doc.setFontSize(12);
+              doc.setFont(undefined, 'bold');
+              doc.text('Modules:', margin + 5, yPosition);
+              yPosition += 8;
+
+              for (const moduleVersion of version.moduleVersions) {
+                checkPageBreak(15);
+
+                // Récupérer les détails du module
+                const moduleDetails = getModuleVersionWithModuleCached(moduleVersion.id);
+                if (moduleDetails && moduleDetails.module) {
+                  doc.setFontSize(10);
+                  doc.setFont(undefined, 'bold');
+                  doc.text(`• ${moduleDetails.module.name} v${moduleVersion.version}`, margin + 10, yPosition);
+                  yPosition += 6;
+
+                  if (moduleDetails.notes) {
+                    doc.setFont(undefined, 'normal');
+                    const moduleNotesHeight = addWrappedText(`  ${moduleDetails.notes}`, margin + 15, yPosition, 140, 9);
+                    yPosition += moduleNotesHeight + 3;
+                  }
+
+                  // Features du module (si disponibles)
+                  try {
+                    const moduleRes = await moduleVersionService().find(moduleVersion.id);
+                    if (moduleRes.features && moduleRes.features.length > 0) {
+                      checkPageBreak(10);
+                      doc.setFont(undefined, 'bold');
+                      doc.text('  Features:', margin + 15, yPosition);
+                      yPosition += 5;
+
+                      moduleRes.features.forEach(feature => {
+                        checkPageBreak(8);
+                        doc.setFont(undefined, 'normal');
+                        doc.text(`    - ${feature.name}`, margin + 20, yPosition);
+                        yPosition += 5;
+                        if (feature.description) {
+                          const featureDescHeight = addWrappedText(`      ${feature.description}`, margin + 25, yPosition, 120, 8);
+                          yPosition += featureDescHeight + 2;
+                        }
+                      });
+                    }
+                  } catch (error) {
+                    console.warn('Could not fetch features for module:', moduleVersion.id);
+                  }
+                  yPosition += 3;
+                }
+              }
+            }
+
+            // Composants d'infrastructure de cette version
+            if (version.infraComponentVersions && version.infraComponentVersions.length > 0) {
+              checkPageBreak(20);
+              doc.setFontSize(12);
+              doc.setFont(undefined, 'bold');
+              doc.text('Infrastructure Components:', margin + 5, yPosition);
+              yPosition += 8;
+
+              version.infraComponentVersions.forEach(component => {
+                checkPageBreak(10);
+                const componentDetails = getIfraComponentVersionWithInfraCached(component.id);
+                if (componentDetails && componentDetails.infraComponent) {
+                  doc.setFontSize(10);
+                  doc.setFont(undefined, 'normal');
+                  const componentType = componentDetails.infraComponent.componentType?.type || 'Unknown';
+                  doc.text(`• ${componentDetails.infraComponent.name} v${component.version} (${componentType})`, margin + 10, yPosition);
+                  yPosition += 6;
+
+                  if (component.description) {
+                    const compDescHeight = addWrappedText(`  ${component.description}`, margin + 15, yPosition, 140, 9);
+                    yPosition += compDescHeight + 3;
+                  }
+                }
+              });
+            }
+            yPosition += 10;
+          }
+        }
+
+        // Certifications du produit
+        if (product.certifications && product.certifications.length > 0) {
+          checkPageBreak(30);
+
+          doc.setFontSize(15);
+          doc.setFont(undefined, 'bold');
+          doc.text('CERTIFICATIONS', margin, yPosition);
+          yPosition += 10;
+
+          doc.setDrawColor(200, 200, 200);
+          doc.line(margin, yPosition, doc.internal.pageSize.width - margin, yPosition);
+          yPosition += 10;
+
+          product.certifications.forEach(cert => {
+            checkPageBreak(10);
+            const certDetails = getCertificationCached(cert.id);
+            if (certDetails && certDetails.certification) {
+              doc.setFontSize(12);
+              doc.setFont(undefined, 'normal');
+              doc.text(`• ${certDetails.certification.name} v${cert.version}`, margin + 5, yPosition);
+              yPosition += 8;
+            }
+          });
+        }
+
+        // Pied de page sur chaque page
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          doc.setFontSize(8);
+          doc.setTextColor(128, 128, 128);
+          doc.text(`Page ${i} of ${totalPages}`, doc.internal.pageSize.width - 40, doc.internal.pageSize.height - 10);
+          doc.text(`${product.name}`, margin, doc.internal.pageSize.height - 10);
+        }
+
+        // Sauvegarder le PDF
+        const fileName = `${product.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toLocaleDateString()}.pdf`;
+        doc.save(fileName);
+
+        alertService.showInfo('PDF exporté avec succès', { variant: 'success' });
+      } catch (error) {
+        console.error("Erreur lors de l'export PDF:", error);
+        alertService.showInfo("Erreur lors de l'export PDF", { variant: 'danger' });
+      }
     };
 
     return {
@@ -2335,6 +2575,7 @@ export default defineComponent({
       applyFilters,
       resetFilters,
       handleSearch,
+      exportProductToPDF,
     };
   },
   methods: {
