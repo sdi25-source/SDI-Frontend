@@ -2456,7 +2456,6 @@ export default defineComponent({
         const fileName = `S2M ${product.name.replace(/[^a-z0-9]/gi, ' ')}_${new Date().toISOString().split('T')[0]}.pdf`;
         doc.save(fileName);
 
-        alertService.showInfo('PDF exporté avec succès', { variant: 'success' });
       } catch (error) {
         console.error("Erreur lors de l'export PDF:", error);
         alertService.showInfo("Erreur lors de l'export PDF", { variant: 'danger' });
