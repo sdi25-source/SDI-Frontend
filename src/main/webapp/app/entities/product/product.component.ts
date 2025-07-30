@@ -2108,244 +2108,372 @@ export default defineComponent({
       activeVersionSettingsSection.value = 'modules';
     };
 
-    const exportProductToPDF = async product => {
+
+// Configuration de l'entreprise - À personnaliser selon vos besoins
+    const COMPANY_CONFIG = {
+      name: "S2M - Société Maghrébine de Monétique",
+      logo: "/Users/mac/Documents/SDI/SDI-Frontend/src/main/webapp/content/images/s2m.svg",
+      address: "123 Rue de l'Innovation, 75001 Paris",
+      phone: "+33 1 23 45 67 89",
+      email: "contact@votreentreprise.com",
+      website: "www.votreentreprise.com",
+      font: 'Times',
+      colors: {
+        darkBlue: [25, 25, 112],
+        black: [0, 0, 0],
+        lightGray: [220, 220, 220],
+        white: [255, 255, 255]
+      }
+    };
+
+    const exportProductToPDF = async (product) => {
       try {
-        // Créer une nouvelle instance jsPDF
         const doc = new jsPDF();
         let yPosition = 20;
         const pageHeight = doc.internal.pageSize.height;
+        const pageWidth = doc.internal.pageSize.width;
         const margin = 20;
+        const footerHeight = 20;
 
-        // Fonction pour ajouter une nouvelle page si nécessaire
+        // Set default font
+        doc.setFont(COMPANY_CONFIG.font);
+
+        // Helper to add text with specific style
+        const addStyledText = (text, x, y, options = {}) => {
+          const {
+            fontSize = 10,
+            fontStyle = 'normal',
+            color = COMPANY_CONFIG.colors.black,
+            maxWidth = pageWidth - 2 * margin,
+            align = 'left',
+            lineHeight = 1.2
+          } = options;
+
+          doc.setFontSize(fontSize);
+          doc.setFont(COMPANY_CONFIG.font, fontStyle);
+          doc.setTextColor(...color);
+
+          const lines = doc.splitTextToSize(text || 'N/A', maxWidth);
+          doc.text(lines, x, y, { align, lineHeightFactor: lineHeight });
+          return lines.length * (fontSize * lineHeight * 0.35); // Approximate height
+        };
+
+        // Function to add the unique first page header
+        const addFirstPageHeader = () => {
+          doc.setFont(COMPANY_CONFIG.font);
+          doc.setTextColor(...COMPANY_CONFIG.colors.darkBlue);
+
+          // Product Name (Top Left)
+          addStyledText(product.name, margin, 25, { fontSize: 20, fontStyle: 'bold' });
+          // Subtitle below product name
+          addStyledText("Rapport de Configuration Produit", margin, 35, { fontSize: 10, fontStyle: 'normal' });
+
+          // Company Logo and Name (Top Right)
+          const logoSize = 15; // Small logo size
+          const companyNameText = COMPANY_CONFIG.name;
+          const companyNameFontSize = 10; // Medium/small font size for company name
+          const companyNameWidth = doc.getTextWidth(companyNameText, { fontSize: companyNameFontSize, font: COMPANY_CONFIG.font, fontStyle: 'bold' });
+
+          // Position for logo and company name
+          const companyX = pageWidth - margin - companyNameWidth;
+          const companyY = 25;
+
+          // Company Name
+          addStyledText(companyNameText, pageWidth - margin, companyY, {
+            fontSize: companyNameFontSize,
+            fontStyle: 'bold',
+            align: 'right'
+          });
+
+
+          // Date (below company name)
+          addStyledText(`${new Date().toLocaleDateString('fr-FR')}`, pageWidth - margin, companyY + 10, {
+            fontSize: 8,
+            align: 'right'
+          });
+
+          // Simple line separator
+          doc.setDrawColor(...COMPANY_CONFIG.colors.darkBlue);
+          doc.setLineWidth(0.5);
+          doc.line(margin, 45, pageWidth - margin, 45);
+        };
+
+        // Function to add a generic header for subsequent pages
+        const addGenericHeader = () => {
+          doc.setFont(COMPANY_CONFIG.font);
+          doc.setTextColor(...COMPANY_CONFIG.colors.darkBlue);
+          doc.setFontSize(10);
+          doc.setFont(undefined, 'bold');
+          doc.text(product.name, margin, 20); // Product name on subsequent pages
+          doc.setFont(undefined, 'normal');
+          doc.text(COMPANY_CONFIG.name, pageWidth - margin, 20, { align: 'right' }); // Company name on subsequent pages
+          doc.setDrawColor(...COMPANY_CONFIG.colors.lightGray);
+          doc.setLineWidth(0.2);
+          doc.line(margin, 25, pageWidth - margin, 25);
+        };
+
+        // Function to add the "header" at the bottom of the page (footer)
+        const addBottomHeader = (productName, currentPage, totalPages) => {
+          doc.setFont(COMPANY_CONFIG.font);
+          doc.setTextColor(...COMPANY_CONFIG.colors.darkBlue);
+          doc.setFontSize(9);
+
+          // Line separator above the footer content
+          doc.setDrawColor(...COMPANY_CONFIG.colors.lightGray);
+          doc.setLineWidth(0.2);
+          doc.line(margin, pageHeight - footerHeight + 5, pageWidth - margin, pageHeight - footerHeight + 5);
+
+          // Product Name on the left
+          addStyledText(productName, margin, pageHeight - footerHeight + 12, {
+            fontSize: 9,
+            fontStyle: 'bold',
+            color: COMPANY_CONFIG.colors.darkBlue
+          });
+
+          // Pagination on the right
+          addStyledText(`Page ${currentPage} sur ${totalPages}`, pageWidth - margin, pageHeight - footerHeight + 12, {
+            fontSize: 9,
+            align: 'right',
+            color: COMPANY_CONFIG.colors.darkBlue
+          });
+        };
+
+        // Function to add a section title
+        const addSectionTitle = (title, y) => {
+          doc.setFont(COMPANY_CONFIG.font, 'bold');
+          doc.setTextColor(...COMPANY_CONFIG.colors.darkBlue);
+          doc.setFontSize(14);
+          doc.text(title, margin, y);
+          doc.setDrawColor(...COMPANY_CONFIG.colors.lightGray);
+          doc.setLineWidth(0.2);
+          doc.line(margin, y + 5, pageWidth - margin, y + 5);
+          return y + 15;
+        };
+
+        // Function to draw a small table with dynamic row heights
+        const drawTable = (headers, data, startY, columnWidths) => {
+          let currentY = startY;
+          const cellPadding = 2;
+          const headerHeight = 8;
+          const minRowHeight = 7; // Minimum height for a row
+
+          // Draw header row
+          doc.setFillColor(...COMPANY_CONFIG.colors.darkBlue);
+          doc.rect(margin, currentY, pageWidth - 2 * margin, headerHeight, 'F');
+          let currentX = margin;
+          headers.forEach((header, i) => {
+            addStyledText(header, currentX + cellPadding, currentY + cellPadding + 1, {
+              fontSize: 8,
+              fontStyle: 'bold',
+              color: COMPANY_CONFIG.colors.white,
+              maxWidth: columnWidths[i] - 2 * cellPadding
+            });
+            currentX += columnWidths[i];
+          });
+          currentY += headerHeight;
+
+          // Draw data rows
+          data.forEach(row => {
+            let maxCurrentRowContentHeight = 0;
+            const contentStartY = currentY + cellPadding + 1; // Y position for content within the row
+
+            // Calculate max height needed for this row
+            currentX = margin;
+            headers.forEach((header, i) => {
+              const cellText = row[header] || '';
+              // Temporarily set font for height calculation
+              doc.setFontSize(8);
+              doc.setFont(COMPANY_CONFIG.font, 'normal');
+              const lines = doc.splitTextToSize(cellText, columnWidths[i] - 2 * cellPadding);
+              const contentHeight = lines.length * (8 * 1.2 * 0.35); // fontSize * lineHeight * factor
+              maxCurrentRowContentHeight = Math.max(maxCurrentRowContentHeight, contentHeight);
+            });
+
+            const actualRowHeight = Math.max(minRowHeight, maxCurrentRowContentHeight + 2 * cellPadding); // Add padding for top/bottom
+
+            // Check for page break before drawing the row
+            checkPageBreak(actualRowHeight + 5); // Add some buffer for next row
+
+            // Draw the row content
+            currentX = margin;
+            doc.setDrawColor(...COMPANY_CONFIG.colors.lightGray);
+            doc.setLineWidth(0.1);
+            doc.rect(margin, currentY, pageWidth - 2 * margin, actualRowHeight); // Row border
+
+            headers.forEach((header, i) => {
+              const cellText = row[header] || '';
+              addStyledText(cellText, currentX + cellPadding, currentY + cellPadding + 1, {
+                fontSize: 8,
+                maxWidth: columnWidths[i] - 2 * cellPadding
+              });
+              currentX += columnWidths[i];
+            });
+            currentY += actualRowHeight;
+          });
+          return currentY + 5; // Add some space after the table
+        };
+
+        // Function to add a new page if necessary
         const checkPageBreak = (requiredSpace = 20) => {
-          if (yPosition + requiredSpace > pageHeight - margin) {
-            doc.addPage();
-            yPosition = 20;
+          if (yPosition + requiredSpace > pageHeight - margin - footerHeight) { // Account for footer height
+            doc.addPage(); // Add new page
+            addGenericHeader(); // Add generic header to new page
+            yPosition = 35; // Position after generic header
             return true;
           }
           return false;
         };
 
-        // Fonction pour ajouter du texte avec retour à la ligne automatique
-        const addWrappedText = (text, x, y, maxWidth, fontSize = 10) => {
-          doc.setFontSize(fontSize);
-          const lines = doc.splitTextToSize(text || 'N/A', maxWidth);
-          doc.text(lines, x, y);
-          return lines.length * (fontSize * 0.4); // Retourne la hauteur utilisée
-        };
+        // Initial header for the first page
+        addFirstPageHeader();
+        yPosition = 60; // Start content below the first page header
 
-        // En-tête du document
-        doc.setFillColor(12, 45, 87); // Couleur #0c2d57
-        doc.rect(0, 0, doc.internal.pageSize.width, 40, 'F');
+        // General Information
+        yPosition = addSectionTitle('INFORMATIONS GÉNÉRALES', yPosition);
 
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(24);
-        doc.setFont(undefined, 'bold');
-        doc.text(product.name, margin, 25);
+        // Description
+        addStyledText('Description:', margin, yPosition, { fontStyle: 'bold' });
+        yPosition += 5;
+        yPosition += addStyledText(product.description, margin + 5, yPosition, { maxWidth: pageWidth - 2 * margin - 5 }) + 5;
 
-        doc.setFontSize(12);
-        doc.setFont(undefined, 'normal');
-        doc.text(`${new Date().toLocaleDateString()}`, margin, 35);
-
-        yPosition = 60;
-        doc.setTextColor(0, 0, 0);
-
-        // Informations générales du produit
-        doc.setFontSize(15);
-        doc.setFont(undefined, 'bold');
-        doc.text('General Information', margin, yPosition);
-        yPosition += 15;
-
-        // Ligne de séparation
-        doc.setDrawColor(200, 200, 200);
-        doc.line(margin, yPosition, doc.internal.pageSize.width - margin, yPosition);
+        // Dates
+        addStyledText('Dates:', margin, yPosition, { fontStyle: 'bold' });
+        yPosition += 5;
+        addStyledText(`Créé le: ${formatDate(product.createDate)}`, margin + 5, yPosition);
+        yPosition += 5;
+        addStyledText(`Mis à jour le: ${formatDate(product.updateDate)}`, margin + 5, yPosition);
         yPosition += 10;
 
-        // Détails du produit
-        doc.setFontSize(12);
-        doc.setFont(undefined, 'bold');
-        doc.text('Description:', margin, yPosition);
-        yPosition += 7;
-        doc.setFont(undefined, 'normal');
-        const descHeight = addWrappedText(product.description, margin, yPosition, 160);
-        yPosition += descHeight + 5;
-
-        // Product Lines
+        // Product Lines (listed)
         if (product.productLines && product.productLines.length > 0) {
-          checkPageBreak(20);
-          doc.setFont(undefined, 'bold');
-          doc.text('Product Lines:', margin, yPosition);
-          yPosition += 7;
-          doc.setFont(undefined, 'normal');
+          addStyledText('Lignes de Produit:', margin, yPosition, { fontStyle: 'bold' });
+          yPosition += 5;
           product.productLines.forEach(line => {
-            doc.text(`• ${line.name}`, margin + 5, yPosition);
+            addStyledText(`• ${line.name}`, margin + 10, yPosition);
             yPosition += 6;
           });
           yPosition += 5;
         }
 
-        // Récupérer les versions du produit
+        // Modules du produit (listed, not table)
+        if (product.modules && product.modules.length > 0) {
+          checkPageBreak(30);
+          addStyledText('Modules du Produit:', margin, yPosition, { fontStyle: 'bold' });
+          yPosition += 5;
+          product.modules.forEach(mod => {
+            addStyledText(`• ${mod.name} (${mod.description || 'N/A'})`, margin + 10, yPosition);
+            yPosition += 6;
+          });
+          yPosition += 5;
+        }
+
+        // Product Versions Section
         const versionsRes = await productVersionService().retrieve();
         const productVersionsList = versionsRes.data.filter(pv => pv.product?.id === product.id);
 
         if (productVersionsList.length > 0) {
-          checkPageBreak(30);
-
-          // Section Versions
-          doc.setFontSize(15);
-          doc.setFont(undefined, 'bold');
-          doc.text('PRODUCT VERSIONS', margin, yPosition);
-          yPosition += 10;
-
-          doc.setDrawColor(200, 200, 200);
-          doc.line(margin, yPosition, doc.internal.pageSize.width - margin, yPosition);
-          yPosition += 10;
+          checkPageBreak(40);
+          yPosition = addSectionTitle('VERSIONS DU PRODUIT', yPosition);
 
           for (const version of productVersionsList) {
-            checkPageBreak(40);
+            checkPageBreak(50);
+            addStyledText(`Version ${version.version}`, margin, yPosition, {
+              fontSize: 12,
+              fontStyle: 'bold',
+              color: COMPANY_CONFIG.colors.darkBlue
+            });
+            addStyledText(`(Créée le: ${formatDate(version.createDate)})`, pageWidth - margin, yPosition, {
+              fontSize: 9,
+              align: 'right'
+            });
+            yPosition += 10;
 
-            // En-tête de version
-            doc.setFillColor(240, 240, 240);
-            doc.rect(margin, yPosition - 5, doc.internal.pageSize.width - 2 * margin, 15, 'F');
-
-            doc.setFontSize(14);
-            doc.setFont(undefined, 'bold');
-            doc.text(`Version ${version.version}`, margin + 5, yPosition + 5);
-            yPosition += 20;
-
-            // Notes de version
             if (version.notes) {
-              doc.setFontSize(10);
-              doc.setFont(undefined, 'bold');
-              doc.text('Notes:', margin + 5, yPosition);
+              addStyledText('Notes:', margin + 5, yPosition, { fontStyle: 'bold' });
               yPosition += 5;
-              doc.setFont(undefined, 'normal');
-              const notesHeight = addWrappedText(version.notes, margin + 5, yPosition, 150, 10);
-              yPosition += notesHeight + 5;
+              yPosition += addStyledText(version.notes, margin + 10, yPosition, { maxWidth: pageWidth - 2 * margin - 10 }) + 5;
             }
 
-            // Modules de cette version
+            // Modules de cette version (TABLE avec Features avec retour à la ligne)
             if (version.moduleVersions && version.moduleVersions.length > 0) {
-              checkPageBreak(20);
-              doc.setFontSize(12);
-              doc.setFont(undefined, 'bold');
-              doc.text('Modules:', margin + 5, yPosition);
-              yPosition += 8;
+              checkPageBreak(30);
+              addStyledText('Modules de la Version:', margin + 5, yPosition, { fontStyle: 'bold' });
+              yPosition += 10;
 
-              for (const moduleVersion of version.moduleVersions) {
-                checkPageBreak(15);
-
-                // Récupérer les détails du module
-                const moduleDetails = getModuleVersionWithModuleCached(moduleVersion.id);
-                if (moduleDetails && moduleDetails.module) {
-                  doc.setFontSize(10);
-                  doc.setFont(undefined, 'bold');
-                  doc.text(`• ${moduleDetails.module.name} v${moduleVersion.version}`, margin + 10, yPosition);
-                  yPosition += 6;
-
-                  if (moduleDetails.notes) {
-                    doc.setFont(undefined, 'normal');
-                    const moduleNotesHeight = addWrappedText(`  ${moduleDetails.notes}`, margin + 15, yPosition, 140, 9);
-                    yPosition += moduleNotesHeight + 3;
+              const moduleTableHeaders = ['Nom du Module', 'Version', 'Notes', 'Fonctionnalités'];
+              const moduleTableData = await Promise.all(version.moduleVersions.map(async mv => {
+                const moduleDetails = getModuleVersionWithModuleCached(mv.id);
+                let featuresText = 'N/A';
+                try {
+                  const moduleRes = await moduleVersionService().find(mv.id);
+                  if (moduleRes.features && moduleRes.features.length > 0) {
+                    featuresText = moduleRes.features.map(f => f.name).join('\n'); // Use \n for line breaks
                   }
-
-                  // Features du module (si disponibles)
-                  try {
-                    const moduleRes = await moduleVersionService().find(moduleVersion.id);
-                    if (moduleRes.features && moduleRes.features.length > 0) {
-                      checkPageBreak(10);
-                      doc.setFont(undefined, 'bold');
-                      doc.text('  Features:', margin + 15, yPosition);
-                      yPosition += 5;
-
-                      moduleRes.features.forEach(feature => {
-                        checkPageBreak(8);
-                        doc.setFont(undefined, 'normal');
-                        doc.text(`    - ${feature.name}`, margin + 20, yPosition);
-                        yPosition += 5;
-                        if (feature.description) {
-                          const featureDescHeight = addWrappedText(`      ${feature.description}`, margin + 25, yPosition, 120, 8);
-                          yPosition += featureDescHeight + 2;
-                        }
-                      });
-                    }
-                  } catch (error) {
-                    console.warn('Could not fetch features for module:', moduleVersion.id);
-                  }
-                  yPosition += 3;
+                } catch (error) {
+                  console.warn('Could not fetch features for module:', mv.id);
                 }
-              }
+                return {
+                  'Nom du Module': moduleDetails?.module?.name || 'N/A',
+                  'Version': mv.version || 'N/A',
+                  'Notes': mv.notes || 'N/A',
+                  'Fonctionnalités': featuresText
+                };
+              }));
+              // Adjust widths for 4 columns
+              const moduleColumnWidths = [45, 25, 50, pageWidth - 2 * margin - 120];
+              yPosition = drawTable(moduleTableHeaders, moduleTableData, yPosition, moduleColumnWidths);
             }
 
-            // Composants d'infrastructure de cette version
+            // Infrastructure Components of this version (TABLE)
             if (version.infraComponentVersions && version.infraComponentVersions.length > 0) {
-              checkPageBreak(20);
-              doc.setFontSize(12);
-              doc.setFont(undefined, 'bold');
-              doc.text('Infrastructure Components:', margin + 5, yPosition);
-              yPosition += 8;
+              checkPageBreak(30);
+              addStyledText('Composants d\'Infrastructure de la Version:', margin + 5, yPosition, { fontStyle: 'bold' });
+              yPosition += 10;
 
-              version.infraComponentVersions.forEach(component => {
-                checkPageBreak(10);
-                const componentDetails = getIfraComponentVersionWithInfraCached(component.id);
-                if (componentDetails && componentDetails.infraComponent) {
-                  doc.setFontSize(10);
-                  doc.setFont(undefined, 'normal');
-                  const componentType = componentDetails.infraComponent.componentType?.type || 'Unknown';
-                  doc.text(`• ${componentDetails.infraComponent.name} v${component.version} (${componentType})`, margin + 10, yPosition);
-                  yPosition += 6;
-
-                  if (component.description) {
-                    const compDescHeight = addWrappedText(`  ${component.description}`, margin + 15, yPosition, 140, 9);
-                    yPosition += compDescHeight + 3;
-                  }
-                }
+              const infraTableHeaders = ['Nom du Composant', 'Version', 'Type'];
+              const infraTableData = version.infraComponentVersions.map(comp => {
+                const compDetails = getIfraComponentVersionWithInfraCached(comp.id);
+                return {
+                  'Nom du Composant': compDetails?.infraComponent?.name || 'N/A',
+                  'Version': comp.version || 'N/A',
+                  'Type': compDetails?.infraComponent?.componentType?.type || 'N/A'
+                };
               });
+              const infraColumnWidths = [70, 30, pageWidth - 2 * margin - 100]; // Adjust widths
+              yPosition = drawTable(infraTableHeaders, infraTableData, yPosition, infraColumnWidths);
             }
             yPosition += 10;
           }
         }
 
-        // Certifications du produit
+        // Certifications
         if (product.certifications && product.certifications.length > 0) {
-          checkPageBreak(30);
-
-          doc.setFontSize(15);
-          doc.setFont(undefined, 'bold');
-          doc.text('CERTIFICATIONS', margin, yPosition);
-          yPosition += 10;
-
-          doc.setDrawColor(200, 200, 200);
-          doc.line(margin, yPosition, doc.internal.pageSize.width - margin, yPosition);
-          yPosition += 10;
+          checkPageBreak(40);
+          yPosition = addSectionTitle('CERTIFICATIONS', yPosition);
 
           product.certifications.forEach(cert => {
-            checkPageBreak(10);
+            checkPageBreak(15);
             const certDetails = getCertificationCached(cert.id);
             if (certDetails && certDetails.certification) {
-              doc.setFontSize(12);
-              doc.setFont(undefined, 'normal');
-              doc.text(`• ${certDetails.certification.name} v${cert.version}`, margin + 5, yPosition);
+              addStyledText(`• ${certDetails.certification.name} v${cert.version}`, margin + 10, yPosition);
               yPosition += 8;
             }
           });
         }
 
-        // Pied de page sur chaque page
+        // Add bottom header to all pages (after all content is rendered)
         const totalPages = doc.internal.getNumberOfPages();
         for (let i = 1; i <= totalPages; i++) {
           doc.setPage(i);
-          doc.setFontSize(8);
-          doc.setTextColor(128, 128, 128);
-          doc.text(`Page ${i} of ${totalPages}`, doc.internal.pageSize.width - 40, doc.internal.pageSize.height - 10);
-          doc.text(`${product.name}`, margin, doc.internal.pageSize.height - 10);
+          addBottomHeader(product.name, i, totalPages);
         }
 
-        // Sauvegarder le PDF
-        const fileName = `${product.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toLocaleDateString()}.pdf`;
+        // Save the PDF
+        const fileName = `${COMPANY_CONFIG.name.replace(/\s+/g, '_')}_${product.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
         doc.save(fileName);
 
         alertService.showInfo('PDF exporté avec succès', { variant: 'success' });
+
       } catch (error) {
         console.error("Erreur lors de l'export PDF:", error);
         alertService.showInfo("Erreur lors de l'export PDF", { variant: 'danger' });

@@ -84,6 +84,7 @@ export default class ProductService {
     });
   }
 
+
   public retrieveProductOverviews(): Promise<ProductOverview[]> {
     return new Promise<ProductOverview[]>((resolve, reject) => {
       axios
