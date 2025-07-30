@@ -2108,25 +2108,18 @@ export default defineComponent({
       activeVersionSettingsSection.value = 'modules';
     };
 
-
-// Configuration de l'entreprise - À personnaliser selon vos besoins
     const COMPANY_CONFIG = {
-      name: "S2M - Société Maghrébine de Monétique",
-      logo: "/Users/mac/Documents/SDI/SDI-Frontend/src/main/webapp/content/images/s2m.svg",
-      address: "123 Rue de l'Innovation, 75001 Paris",
-      phone: "+33 1 23 45 67 89",
-      email: "contact@votreentreprise.com",
-      website: "www.votreentreprise.com",
+      name: 'S2M - Société Maghrébine de Monétique',
       font: 'Times',
       colors: {
         darkBlue: [25, 25, 112],
         black: [0, 0, 0],
         lightGray: [220, 220, 220],
-        white: [255, 255, 255]
-      }
+        white: [255, 255, 255],
+      },
     };
 
-    const exportProductToPDF = async (product) => {
+    const exportProductToPDF = async product => {
       try {
         const doc = new jsPDF();
         let yPosition = 20;
@@ -2146,7 +2139,7 @@ export default defineComponent({
             color = COMPANY_CONFIG.colors.black,
             maxWidth = pageWidth - 2 * margin,
             align = 'left',
-            lineHeight = 1.2
+            lineHeight = 1.2,
           } = options;
 
           doc.setFontSize(fontSize);
@@ -2166,13 +2159,17 @@ export default defineComponent({
           // Product Name (Top Left)
           addStyledText(product.name, margin, 25, { fontSize: 20, fontStyle: 'bold' });
           // Subtitle below product name
-          addStyledText("Rapport de Configuration Produit", margin, 35, { fontSize: 10, fontStyle: 'normal' });
+          addStyledText('Product configuration report', margin, 35, { fontSize: 10, fontStyle: 'normal' });
 
           // Company Logo and Name (Top Right)
           const logoSize = 15; // Small logo size
           const companyNameText = COMPANY_CONFIG.name;
           const companyNameFontSize = 10; // Medium/small font size for company name
-          const companyNameWidth = doc.getTextWidth(companyNameText, { fontSize: companyNameFontSize, font: COMPANY_CONFIG.font, fontStyle: 'bold' });
+          const companyNameWidth = doc.getTextWidth(companyNameText, {
+            fontSize: companyNameFontSize,
+            font: COMPANY_CONFIG.font,
+            fontStyle: 'bold',
+          });
 
           // Position for logo and company name
           const companyX = pageWidth - margin - companyNameWidth;
@@ -2182,14 +2179,13 @@ export default defineComponent({
           addStyledText(companyNameText, pageWidth - margin, companyY, {
             fontSize: companyNameFontSize,
             fontStyle: 'bold',
-            align: 'right'
+            align: 'right',
           });
-
 
           // Date (below company name)
           addStyledText(`${new Date().toLocaleDateString('fr-FR')}`, pageWidth - margin, companyY + 10, {
             fontSize: 8,
-            align: 'right'
+            align: 'right',
           });
 
           // Simple line separator
@@ -2204,9 +2200,9 @@ export default defineComponent({
           doc.setTextColor(...COMPANY_CONFIG.colors.darkBlue);
           doc.setFontSize(10);
           doc.setFont(undefined, 'bold');
-          doc.text(product.name, margin, 20); // Product name on subsequent pages
+          doc.text(product.name, margin, 20);
           doc.setFont(undefined, 'normal');
-          doc.text(COMPANY_CONFIG.name, pageWidth - margin, 20, { align: 'right' }); // Company name on subsequent pages
+          doc.text(COMPANY_CONFIG.name, pageWidth - margin, 20, { align: 'right' });
           doc.setDrawColor(...COMPANY_CONFIG.colors.lightGray);
           doc.setLineWidth(0.2);
           doc.line(margin, 25, pageWidth - margin, 25);
@@ -2227,14 +2223,14 @@ export default defineComponent({
           addStyledText(productName, margin, pageHeight - footerHeight + 12, {
             fontSize: 9,
             fontStyle: 'bold',
-            color: COMPANY_CONFIG.colors.darkBlue
+            color: COMPANY_CONFIG.colors.darkBlue,
           });
 
           // Pagination on the right
           addStyledText(`Page ${currentPage} sur ${totalPages}`, pageWidth - margin, pageHeight - footerHeight + 12, {
             fontSize: 9,
             align: 'right',
-            color: COMPANY_CONFIG.colors.darkBlue
+            color: COMPANY_CONFIG.colors.darkBlue,
           });
         };
 
@@ -2266,7 +2262,7 @@ export default defineComponent({
               fontSize: 8,
               fontStyle: 'bold',
               color: COMPANY_CONFIG.colors.white,
-              maxWidth: columnWidths[i] - 2 * cellPadding
+              maxWidth: columnWidths[i] - 2 * cellPadding,
             });
             currentX += columnWidths[i];
           });
@@ -2304,7 +2300,7 @@ export default defineComponent({
               const cellText = row[header] || '';
               addStyledText(cellText, currentX + cellPadding, currentY + cellPadding + 1, {
                 fontSize: 8,
-                maxWidth: columnWidths[i] - 2 * cellPadding
+                maxWidth: columnWidths[i] - 2 * cellPadding,
               });
               currentX += columnWidths[i];
             });
@@ -2315,7 +2311,8 @@ export default defineComponent({
 
         // Function to add a new page if necessary
         const checkPageBreak = (requiredSpace = 20) => {
-          if (yPosition + requiredSpace > pageHeight - margin - footerHeight) { // Account for footer height
+          if (yPosition + requiredSpace > pageHeight - margin - footerHeight) {
+            // Account for footer height
             doc.addPage(); // Add new page
             addGenericHeader(); // Add generic header to new page
             yPosition = 35; // Position after generic header
@@ -2329,24 +2326,16 @@ export default defineComponent({
         yPosition = 60; // Start content below the first page header
 
         // General Information
-        yPosition = addSectionTitle('INFORMATIONS GÉNÉRALES', yPosition);
+        yPosition = addSectionTitle('GENERALS INFORMATIONS', yPosition);
 
         // Description
         addStyledText('Description:', margin, yPosition, { fontStyle: 'bold' });
         yPosition += 5;
         yPosition += addStyledText(product.description, margin + 5, yPosition, { maxWidth: pageWidth - 2 * margin - 5 }) + 5;
 
-        // Dates
-        addStyledText('Dates:', margin, yPosition, { fontStyle: 'bold' });
-        yPosition += 5;
-        addStyledText(`Créé le: ${formatDate(product.createDate)}`, margin + 5, yPosition);
-        yPosition += 5;
-        addStyledText(`Mis à jour le: ${formatDate(product.updateDate)}`, margin + 5, yPosition);
-        yPosition += 10;
-
         // Product Lines (listed)
         if (product.productLines && product.productLines.length > 0) {
-          addStyledText('Lignes de Produit:', margin, yPosition, { fontStyle: 'bold' });
+          addStyledText('Product Lines :', margin, yPosition, { fontStyle: 'bold' });
           yPosition += 5;
           product.productLines.forEach(line => {
             addStyledText(`• ${line.name}`, margin + 10, yPosition);
@@ -2358,7 +2347,7 @@ export default defineComponent({
         // Modules du produit (listed, not table)
         if (product.modules && product.modules.length > 0) {
           checkPageBreak(30);
-          addStyledText('Modules du Produit:', margin, yPosition, { fontStyle: 'bold' });
+          addStyledText('Product Modules :', margin, yPosition, { fontStyle: 'bold' });
           yPosition += 5;
           product.modules.forEach(mod => {
             addStyledText(`• ${mod.name} (${mod.description || 'N/A'})`, margin + 10, yPosition);
@@ -2373,52 +2362,47 @@ export default defineComponent({
 
         if (productVersionsList.length > 0) {
           checkPageBreak(40);
-          yPosition = addSectionTitle('VERSIONS DU PRODUIT', yPosition);
+          yPosition = addSectionTitle('PRODUCT VERSIONS', yPosition);
 
           for (const version of productVersionsList) {
             checkPageBreak(50);
-            addStyledText(`Version ${version.version}`, margin, yPosition, {
+            addStyledText(`${product.name} - ${version.version}`, margin, yPosition, {
               fontSize: 12,
               fontStyle: 'bold',
-              color: COMPANY_CONFIG.colors.darkBlue
+              color: COMPANY_CONFIG.colors.darkBlue,
             });
-            addStyledText(`(Créée le: ${formatDate(version.createDate)})`, pageWidth - margin, yPosition, {
+            addStyledText(`(Created : ${formatDate(version.createDate)})`, pageWidth - margin, yPosition, {
               fontSize: 9,
-              align: 'right'
+              align: 'right',
             });
             yPosition += 10;
-
-            if (version.notes) {
-              addStyledText('Notes:', margin + 5, yPosition, { fontStyle: 'bold' });
-              yPosition += 5;
-              yPosition += addStyledText(version.notes, margin + 10, yPosition, { maxWidth: pageWidth - 2 * margin - 10 }) + 5;
-            }
 
             // Modules de cette version (TABLE avec Features avec retour à la ligne)
             if (version.moduleVersions && version.moduleVersions.length > 0) {
               checkPageBreak(30);
-              addStyledText('Modules de la Version:', margin + 5, yPosition, { fontStyle: 'bold' });
+              addStyledText('Modules Version:', margin + 5, yPosition, { fontStyle: 'bold' });
               yPosition += 10;
 
-              const moduleTableHeaders = ['Nom du Module', 'Version', 'Notes', 'Fonctionnalités'];
-              const moduleTableData = await Promise.all(version.moduleVersions.map(async mv => {
-                const moduleDetails = getModuleVersionWithModuleCached(mv.id);
-                let featuresText = 'N/A';
-                try {
-                  const moduleRes = await moduleVersionService().find(mv.id);
-                  if (moduleRes.features && moduleRes.features.length > 0) {
-                    featuresText = moduleRes.features.map(f => f.name).join('\n'); // Use \n for line breaks
+              const moduleTableHeaders = ['Module Name', 'Version', 'Features'];
+              const moduleTableData = await Promise.all(
+                version.moduleVersions.map(async mv => {
+                  const moduleDetails = getModuleVersionWithModuleCached(mv.id);
+                  let featuresText = 'N/A';
+                  try {
+                    const moduleRes = await moduleVersionService().find(mv.id);
+                    if (moduleRes.features && moduleRes.features.length > 0) {
+                      featuresText = moduleRes.features.map(f => f.name).join('\n'); // Use \n for line breaks
+                    }
+                  } catch (error) {
+                    console.warn('Could not fetch features for module:', mv.id);
                   }
-                } catch (error) {
-                  console.warn('Could not fetch features for module:', mv.id);
-                }
-                return {
-                  'Nom du Module': moduleDetails?.module?.name || 'N/A',
-                  'Version': mv.version || 'N/A',
-                  'Notes': mv.notes || 'N/A',
-                  'Fonctionnalités': featuresText
-                };
-              }));
+                  return {
+                    'Module Name': moduleDetails?.module?.name || 'N/A',
+                    Version: mv.version || 'N/A',
+                    Features: featuresText,
+                  };
+                }),
+              );
               // Adjust widths for 4 columns
               const moduleColumnWidths = [45, 25, 50, pageWidth - 2 * margin - 120];
               yPosition = drawTable(moduleTableHeaders, moduleTableData, yPosition, moduleColumnWidths);
@@ -2427,16 +2411,16 @@ export default defineComponent({
             // Infrastructure Components of this version (TABLE)
             if (version.infraComponentVersions && version.infraComponentVersions.length > 0) {
               checkPageBreak(30);
-              addStyledText('Composants d\'Infrastructure de la Version:', margin + 5, yPosition, { fontStyle: 'bold' });
+              addStyledText('Infrastructures Components Version:', margin + 5, yPosition, { fontStyle: 'bold' });
               yPosition += 10;
 
-              const infraTableHeaders = ['Nom du Composant', 'Version', 'Type'];
+              const infraTableHeaders = ['Component Name', 'Version', 'Type'];
               const infraTableData = version.infraComponentVersions.map(comp => {
                 const compDetails = getIfraComponentVersionWithInfraCached(comp.id);
                 return {
-                  'Nom du Composant': compDetails?.infraComponent?.name || 'N/A',
-                  'Version': comp.version || 'N/A',
-                  'Type': compDetails?.infraComponent?.componentType?.type || 'N/A'
+                  'Component Name': compDetails?.infraComponent?.name || 'N/A',
+                  Version: comp.version || 'N/A',
+                  Type: compDetails?.infraComponent?.componentType?.type || 'N/A',
                 };
               });
               const infraColumnWidths = [70, 30, pageWidth - 2 * margin - 100]; // Adjust widths
@@ -2455,7 +2439,7 @@ export default defineComponent({
             checkPageBreak(15);
             const certDetails = getCertificationCached(cert.id);
             if (certDetails && certDetails.certification) {
-              addStyledText(`• ${certDetails.certification.name} v${cert.version}`, margin + 10, yPosition);
+              addStyledText(`• ${certDetails.certification.name}  ${cert.version}`, margin + 10, yPosition);
               yPosition += 8;
             }
           });
@@ -2469,11 +2453,10 @@ export default defineComponent({
         }
 
         // Save the PDF
-        const fileName = `${COMPANY_CONFIG.name.replace(/\s+/g, '_')}_${product.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+        const fileName = `S2M ${product.name.replace(/[^a-z0-9]/gi, ' ')}_${new Date().toISOString().split('T')[0]}.pdf`;
         doc.save(fileName);
 
         alertService.showInfo('PDF exporté avec succès', { variant: 'success' });
-
       } catch (error) {
         console.error("Erreur lors de l'export PDF:", error);
         alertService.showInfo("Erreur lors de l'export PDF", { variant: 'danger' });
