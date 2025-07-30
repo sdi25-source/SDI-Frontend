@@ -1,11 +1,11 @@
-import { type Ref, defineComponent, inject, onMounted, ref, computed, watch } from 'vue';
+import { defineComponent, inject, onMounted, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ClientService from './client.service';
 import ClientTypeService from '../client-type/client-type.service';
 import useDataUtils from '@/shared/data/data-utils.service';
 import { useAlertService } from '@/shared/alert/alert.service';
-import ClientSizeService from '@/entities/client-size/client-size.service.ts';
-import type AccountService from '@/account/account.service.ts';
+import ClientSizeService from '@/entities/client-size/client-size.service';
+import AccountService from '@/account/account.service';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -16,10 +16,10 @@ export default defineComponent({
     const clientService = inject('clientService', () => new ClientService());
     const clientTypeService = inject('clientTypeService', () => new ClientTypeService());
     const clientSizeService = inject('clientSizeService', () => new ClientSizeService());
-    const accountService = inject<AccountService>('accountService');
+    const accountService = inject('accountService', () => new AccountService());
     const alertService = inject('alertService', () => useAlertService(), true);
 
-    const hasAnyAuthorityValues: Ref<any> = ref({});
+    const hasAnyAuthorityValues = ref({});
     const clients = ref([]);
     const allClients = ref([]);
     const clientTypes = ref([]);
@@ -30,18 +30,26 @@ export default defineComponent({
     const selectedClientTypeFilter = ref(null);
     const selectedClientSizeFilter = ref(null);
 
+    // Actions dropdown
+    const showActionsDropdown = ref(false);
+
+    // Export/Import states
+    const isExporting = ref(false);
+    const isImporting = ref(false);
+    const importPreview = ref([]);
+    const fileInput = ref(null);
+    const importModal = ref(null);
+
     // Pagination
     const currentPage = ref(1);
     const itemsPerPage = ref(10);
     const totalItems = ref(0);
-
     const isFetching = ref(false);
     const showAddRow = ref(false);
     const showDetailseModal = ref(false);
     const showCreateModal = ref(false);
     const showEditModal = ref(false);
     const selectedClientId = ref(null);
-
     const removeId = ref(null);
     const removeEntity = ref(null);
 
@@ -55,6 +63,192 @@ export default defineComponent({
       updateDate: new Date().toISOString().split('T')[0],
       notes: '',
     });
+
+    // Actions dropdown methods
+    const toggleActionsDropdown = () => {
+      showActionsDropdown.value = !showActionsDropdown.value;
+    };
+
+    const closeActionsDropdown = () => {
+      showActionsDropdown.value = false;
+    };
+
+    // Export methods
+    const escapeCSVField = field => {
+      if (field === null || field === undefined) return '';
+      const stringField = String(field);
+      if (stringField.includes(',') || stringField.includes('"') || stringField.includes('\n')) {
+        return `"${stringField.replace(/"/g, '""')}"`;
+      }
+      return stringField;
+    };
+
+    const convertToCSV = data => {
+      const headers = [
+        'Name',
+        'Code',
+        'Main Contact',
+        'Main Email',
+        'Phone',
+        'Client type',
+        'Client size',
+        'Created at'
+      ];
+
+      const csvContent = [
+        headers.join(','),
+        ...data.map(client =>
+          [
+            escapeCSVField(client.name),
+            escapeCSVField(client.code),
+            escapeCSVField(client.mainContactName),
+            escapeCSVField(client.mainContactEmail),
+            escapeCSVField(client.mainContactPhoneNumber),
+            escapeCSVField(client.clientType?.type),
+            escapeCSVField(client.size?.sizeName),
+            escapeCSVField(client.createDate),
+          ].join(','),
+        ),
+      ].join('\n');
+
+      return csvContent;
+    };
+
+    const downloadCSV = (csvContent, filename) => {
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    const exportToCSV = async () => {
+      if (!clients.value || clients.value.length === 0) {
+        alertService.showError('Aucune donnée à exporter');
+        return;
+      }
+
+      isExporting.value = true;
+      try {
+        const dataToExport = clients.value;
+        const csvContent = convertToCSV(dataToExport);
+        const today = new Date().toISOString().split('T')[0];
+        const filename = `clients_export_${today}.csv`;
+
+        downloadCSV(csvContent, filename);
+        alertService.showSuccess(`Export réussi : ${dataToExport.length} clients exportés`);
+      } catch (error) {
+        console.error("Erreur lors de l'export:", error);
+        alertService.showError("Erreur lors de l'export des données");
+      } finally {
+        isExporting.value = false;
+      }
+    };
+
+    // Import methods
+    const openImportModal = () => {
+      importModal.value.show();
+    };
+
+    const closeImportModal = () => {
+      importModal.value.hide();
+      importPreview.value = [];
+      if (fileInput.value) {
+        fileInput.value.value = '';
+      }
+    };
+
+    const parseCSV = csvText => {
+      const lines = csvText.split('\n').filter(line => line.trim());
+      if (lines.length < 2) return [];
+
+      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+      const data = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+        if (values.length >= 4) {
+          data.push({
+            name: values[0] || '',
+            code: values[1] || '',
+            mainContactName: values[2] || '',
+            mainContactEmail: values[3] || '',
+            mainContactPhoneNumber: values[4] || '',
+            clientTypeId: null,
+            sizeId: null,
+          });
+        }
+      }
+
+      return data;
+    };
+
+    const handleFileSelect = event => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!file.name.toLowerCase().endsWith('.csv')) {
+        alertService.showError('Veuillez sélectionner un fichier CSV');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const csvText = e.target.result;
+          const parsedData = parseCSV(csvText);
+          importPreview.value = parsedData;
+
+          if (parsedData.length === 0) {
+            alertService.showError('Le fichier CSV ne contient pas de données valides');
+          }
+        } catch (error) {
+          console.error('Erreur lors de la lecture du fichier:', error);
+          alertService.showError('Erreur lors de la lecture du fichier CSV');
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    const processImport = async () => {
+      if (importPreview.value.length === 0) return;
+
+      isImporting.value = true;
+      try {
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (const clientData of importPreview.value) {
+          try {
+            await clientService().create(clientData);
+            successCount++;
+          } catch (error) {
+            console.error('Erreur lors de la création du client:', error);
+            errorCount++;
+          }
+        }
+
+        if (successCount > 0) {
+          alertService.showSuccess(`${successCount} clients importés avec succès`);
+          await retrieveClients();
+        }
+
+        if (errorCount > 0) {
+          alertService.showWarning(`${errorCount} clients n'ont pas pu être importés`);
+        }
+
+        closeImportModal();
+      } catch (error) {
+        console.error("Erreur lors de l'import:", error);
+        alertService.showError("Erreur lors de l'import des données");
+      } finally {
+        isImporting.value = false;
+      }
+    };
 
     // Computed properties pour la pagination
     const paginatedClients = computed(() => {
@@ -151,7 +345,6 @@ export default defineComponent({
       if (searchTimeout.value) {
         clearTimeout(searchTimeout.value);
       }
-
       searchTimeout.value = setTimeout(() => {
         applyFilters();
       }, 300);
@@ -201,7 +394,6 @@ export default defineComponent({
             return client;
           }),
         );
-
         clients.value = clientsWithDetails;
         allClients.value = clientsWithDetails;
       } catch (err) {
@@ -259,7 +451,12 @@ export default defineComponent({
       await retrieveClientTypes();
       await retrieveClientSizes();
       await retrieveClients();
+
+      // Close dropdown when clicking outside
       document.addEventListener('click', event => {
+        if (!event.target.closest('.dropdown')) {
+          showActionsDropdown.value = false;
+        }
         if (!event.target.closest('.dropdown-menu-container')) {
           clients.value.forEach(item => {
             item.showDropdown = false;
@@ -306,6 +503,21 @@ export default defineComponent({
       resetFilters,
       accountService,
       hasAnyAuthorityValues,
+      // Actions dropdown
+      showActionsDropdown,
+      toggleActionsDropdown,
+      closeActionsDropdown,
+      // Export/Import
+      isExporting,
+      isImporting,
+      exportToCSV,
+      openImportModal,
+      closeImportModal,
+      handleFileSelect,
+      processImport,
+      importPreview,
+      fileInput,
+      importModal,
       ...dataUtils,
     };
   },
@@ -318,7 +530,7 @@ export default defineComponent({
       this.selectedClientId = id;
       this.showEditModal = true;
     },
-    hasAnyAuthority(authorities: any): boolean {
+    hasAnyAuthority(authorities) {
       this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then(value => {
         if (this.hasAnyAuthorityValues[authorities] !== value) {
           this.hasAnyAuthorityValues = { ...this.hasAnyAuthorityValues, [authorities]: value };
