@@ -95,6 +95,14 @@
               </div>
               <div class="col-md-3 mb-3 pb-2">
                 <div class="detail-group">
+                  <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.country')"></label>
+                  <p class="mb-0 fw-medium">
+                    {{ client.country?.countryname }}
+                  </p>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3 pb-2">
+                <div class="detail-group">
                   <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.address')"></label>
                   <p class="mb-0 fw-medium">{{ client.address }}</p>
                 </div>

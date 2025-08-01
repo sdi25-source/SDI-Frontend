@@ -7,6 +7,9 @@ import useDataUtils from '@/shared/data/data-utils.service';
 import { type IClient } from '@/shared/model/client.model';
 import { useAlertService } from '@/shared/alert/alert.service';
 import type AccountService from '@/account/account.service.ts';
+import ClientSizeService from '@/entities/client-size/client-size.service.ts';
+import ClientTypeService from '@/entities/client-type/client-type.service.ts';
+import CountryService from '@/entities/country/country.service.ts';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -15,6 +18,9 @@ export default defineComponent({
     const clientService = inject('clientService', () => new ClientService());
     const alertService = inject('alertService', () => useAlertService(), true);
     const accountService = inject<AccountService>('accountService');
+    const clientSizeService = inject('clientSizeService', () => new ClientSizeService());
+    const clientTypeService = inject('clientTypeService', () => new ClientTypeService());
+    const countryService = inject('countryService', () => new CountryService());
 
     const dataUtils = useDataUtils();
 
@@ -32,6 +38,9 @@ export default defineComponent({
       try {
         const res = await clientService().find(Number(clientId));
         client.value = res;
+        client.value.size = await clientSizeService().find(client.value.size.id);
+        client.value.clientType = await clientTypeService().find(client.value.clientType.id);
+        client.value.country = await countryService().find(client.value.country.id);
       } catch (error) {
         alertService.showHttpError(error.response);
       }

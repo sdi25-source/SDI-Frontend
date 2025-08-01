@@ -314,6 +314,7 @@ export default defineComponent({
 
   methods: {
     save(): void {
+      console.log('client : ', this.client);
       this.isSaving = true;
       this.client.createDate = new Date().toISOString().split('T')[0];
       this.client.updateDate = new Date().toISOString().split('T')[0];

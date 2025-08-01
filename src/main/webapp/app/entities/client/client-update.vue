@@ -227,10 +227,10 @@
 
             <div class="form-group">
               <label class="label-c" v-text="t$('sdiFrontendApp.client.country')"></label>
-              <select class="form-control" :id="'country-select'">
+              <select class="form-control" id="country-select" v-model="client.country">
                 <option value="" disabled selected></option>
                 <option v-for="country in countries" :key="country.id" :value="country">
-                  {{ country.countryFlag }}{{ ' ' }}{{ country.countryname }}
+                  {{ country.countryFlag }} {{ country.countryname }}
                 </option>
               </select>
             </div>
