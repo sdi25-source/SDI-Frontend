@@ -1,13 +1,11 @@
 <template>
-  <div class="dashboard-content">
+  <div class="dashboard-content pt-lg-5">
     <div class="dashboard-header"></div>
-
     <div v-if="loading" class="loading-overlay">
       <div class="loading-spinner"></div>
       <p class="loading-message">Client Dashboard is loading ...</p>
     </div>
-
-    <!-- Module Overview Section -->
+    <!-- Clients Overview Section -->
     <div class="dashboard-section shadow">
       <div class="section-header">
         <h2>Clients Overview</h2>
@@ -22,31 +20,20 @@
       </div>
       <div class="section-content">
         <div class="horizontal-scroll-container" ref="scrollContainer" @scroll="checkScrollPosition">
-          <div class="module-grid-horizontal">
-            <div class="module-card" v-for="client in clients" :key="client.id">
+          <div class="client-cards">
+            <div class="client-card" v-for="client in clients" :key="client.id">
               <i class="bi bi-arrow-up-right card-arrow" @click="selectClient(client)"></i>
-
-              <div class="module-header">
-                <div class="module-icon">
-                  <i :class="client.icon"></i>
-                </div>
-                <div class="module-title">
-                  <h4>{{ client.name }}</h4>
-                  <span class="module-badge" :class="client.badgeClass">{{ client.type }}</span>
-                </div>
+              <div class="client-icon">
+                <i :class="client.icon"></i>
               </div>
-              <div class="module-stats">
-                <div class="module-stat">
-                  <span class="stat-value">{{ client.products }}</span>
-                  <span class="stat-label">Products</span>
-                </div>
-                <div class="module-stat">
-                  <span class="stat-value">{{ client.requestsOfChanges }}</span>
-                  <span class="stat-label">Requests</span>
-                </div>
-                <div class="module-stat">
-                  <span class="stat-value">{{ client.deployments }}</span>
-                  <span class="stat-label">Deployements</span>
+              <div class="client-info">
+                <h4>{{ client.name }}</h4>
+                <p>Type: {{ client.type || 'N/A' }}</p>
+                <p>
+                  {{ client.products }} products • {{ client.deployments }} deployments
+                </p>
+                <div class="client-status" :class="client.badgeClass">
+                  {{ client.requestsOfChanges }} requests
                 </div>
               </div>
             </div>
@@ -57,8 +44,14 @@
 
     <!-- Dashboard Content - Conditional Display -->
     <div class="dashboard-content">
-      <div v-if="!selectedClient" class="section d-flex justify-content-center align-items-center" style="height: 60vh">
-        <img src="../../../../content/images/Dataanalysis.svg" width="600" height="500" />
+      <div v-if="!selectedClient" class="section">
+        <div class="chart-container">
+          <h4 class="chart-title">Client portfolio growth ({{ currentYear }})</h4>
+          <div class="chart-wrapper">
+            <canvas ref="clientsEvolutionChart" width="800" height="400"></canvas>
+          </div>
+          <div v-if="clientsEvolutionData.labels.length === 0" class="no-data-message">No data available for the evolution of clients</div>
+        </div>
       </div>
 
       <!-- Charts Section -->
@@ -76,23 +69,22 @@
               <div class="chart-wrapper">
                 <canvas ref="productDeploymentsChart" width="400" height="400"></canvas>
               </div>
-              <div v-if="productDeploymentsChartData.labels && productDeploymentsChartData.labels.length === 0" class="no-data-message">
+              <div v-if="productDeploymentsChartData.labels.length === 0" class="no-data-message">
                 No product deployment data available
               </div>
             </div>
           </div>
 
-          <!-- Right Chart - Request of Changes by Month and Level -->
+          <!-- Right Chart - Request of Changes by Customization Level -->
           <div class="col-md-6">
             <div class="chart-container">
               <h4 class="chart-title">Request of Changes by Customization Level</h4>
               <div class="chart-wrapper">
                 <canvas ref="requestChangesChart" width="400" height="400"></canvas>
               </div>
-              <div v-if="!requestChangesChartData.datasets || requestChangesChartData.datasets.length === 0" class="no-data-message">
+              <div v-if="requestChangesChartData.datasets.length === 0" class="no-data-message">
                 No request of changes data available
               </div>
-
               <!-- Summary Stats -->
               <div class="request-stats mt-3">
                 <div class="stats-grid">
@@ -157,40 +149,6 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Existing styles... */
-.module-badge.default {
-  background-color: #f0f0f0;
-  color: #333;
-}
-.module-badge.finance {
-  background-color: #e6f7ee;
-  color: #0ca678;
-}
-.module-badge.insurance {
-  background-color: #e0f7fa;
-  color: #0288d1;
-}
-.module-badge.security {
-  background-color: #fff9db;
-  color: #f59f00;
-}
-.module-badge.analytics {
-  background-color: #e7f5ff;
-  color: #1c7ed6;
-}
-.module-badge.communication {
-  background-color: #f3e5f5;
-  color: #9c27b0;
-}
-.module-badge.health {
-  background-color: #fce4ec;
-  color: #e91e63;
-}
-.module-badge.logistics {
-  background-color: #e8f5e8;
-  color: #4caf50;
-}
-
 .dashboard-content {
   flex: 1;
   margin-left: 20px;
@@ -204,21 +162,15 @@
   margin-bottom: 20px;
 }
 
-.card-arrow {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 0.8rem;
-  color: #0c2d57;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.card-arrow:hover {
-  color: #1c7ed6;
-}
-
 .dashboard-section {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.section {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
@@ -298,38 +250,32 @@
   background: #999;
 }
 
-.module-grid-horizontal {
+.client-cards {
   display: flex;
   gap: 15px;
   padding: 5px 0;
   min-width: fit-content;
 }
 
-.module-card {
+.client-card {
   background-color: #f8f9fa;
   border-radius: 8px;
   padding: 15px;
+  display: flex;
+  align-items: center;
   min-width: 280px;
   max-width: 280px;
   flex-shrink: 0;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
 }
 
-.module-card:hover {
+.client-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.module-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.module-icon {
+.client-icon {
   width: 40px;
   height: 40px;
   border-radius: 8px;
@@ -340,19 +286,23 @@
   margin-right: 12px;
 }
 
-.module-icon i {
+.client-icon i {
   font-size: 20px;
   color: white;
 }
 
-.module-title h4 {
+.client-info h4 {
   margin: 0 0 5px;
   font-size: 16px;
-  font-weight: 600;
-  color: #333;
 }
 
-.module-badge {
+.client-info p {
+  margin: 0 0 5px;
+  font-size: 12px;
+  color: #777;
+}
+
+.client-status {
   display: inline-block;
   padding: 3px 8px;
   border-radius: 4px;
@@ -360,28 +310,53 @@
   font-weight: 500;
 }
 
-.module-stats {
-  display: flex;
-  justify-content: space-between;
+.client-status.finance {
+  background-color: #e6f7ee;
+  color: #0ca678;
 }
 
-.module-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+.client-status.insurance {
+  background-color: #e0f7fa;
+  color: #0288d1;
 }
 
-.stat-value {
-  font-size: 18px;
-  font-weight: 600;
+.client-status.security {
+  background-color: #fff9db;
+  color: #f59f00;
+}
+
+.client-status.analytics {
+  background-color: #e7f5ff;
+  color: #1c7ed6;
+}
+
+.client-status.communication {
+  background-color: #f3e5f5;
+  color: #9c27b0;
+}
+
+.client-status.health {
+  background-color: #fce4ec;
+  color: #e91e63;
+}
+
+.client-status.logistics {
+  background-color: #e8f5e8;
+  color: #4caf50;
+}
+
+.card-arrow {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.8rem;
   color: #0c2d57;
+  cursor: pointer;
+  transition: color 0.3s ease;
 }
 
-.stat-label {
-  font-size: 12px;
-  color: #777;
-  margin-top: 2px;
+.card-arrow:hover {
+  color: #1c7ed6;
 }
 
 .charts-section {
@@ -429,44 +404,8 @@
   height: 100%;
   color: #777;
   font-style: italic;
-}
-
-/* Customization Legend */
-.customization-legend {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 10px;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.legend-color {
-  width: 16px;
-  height: 16px;
-  border-radius: 3px;
-}
-
-.legend-color.basic {
-  background-color: rgba(255, 193, 7, 0.8);
-}
-
-.legend-color.intermediate {
-  background-color: rgba(40, 167, 69, 0.8);
-}
-
-.legend-color.advanced {
-  background-color: rgba(220, 53, 69, 0.8);
-}
-
-.legend-text {
-  font-size: 12px;
-  color: #666;
-  font-weight: 500;
+  text-align: center;
+  font-size: 14px;
 }
 
 /* Request Stats */
@@ -505,7 +444,7 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .module-card {
+  .client-card {
     min-width: 250px;
     max-width: 250px;
   }
@@ -531,8 +470,8 @@
     margin-bottom: 20px;
   }
 
-  .customization-legend {
-    gap: 10px;
+  .chart-title {
+    font-size: 14px;
   }
 
   .stats-grid {
@@ -542,27 +481,31 @@
 }
 
 @media (max-width: 480px) {
-  .module-card {
+  .client-card {
     min-width: 220px;
     max-width: 220px;
     padding: 12px;
   }
 
-  .module-icon {
+  .client-icon {
     width: 35px;
     height: 35px;
   }
 
-  .module-icon i {
+  .client-icon i {
     font-size: 18px;
   }
 
-  .module-title h4 {
+  .client-info h4 {
     font-size: 14px;
   }
 
-  .stat-value {
-    font-size: 16px;
+  .client-info p {
+    font-size: 11px;
+  }
+
+  .client-status {
+    font-size: 11px;
   }
 
   .chart-container {
@@ -571,12 +514,11 @@
   }
 
   .chart-title {
-    font-size: 14px;
+    font-size: 13px;
   }
 
-  .customization-legend {
-    flex-direction: column;
-    gap: 5px;
+  .no-data-message {
+    font-size: 12px;
   }
 }
 </style>

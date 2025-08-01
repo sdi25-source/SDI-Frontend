@@ -8,39 +8,12 @@ import ClientService from '@/entities/client/client.service';
 import ProductDeployementService from '@/entities/product-deployement/product-deployement.service';
 import ProductDeployementDetailService from '@/entities/product-deployement-detail/product-deployement-detail.service';
 import RequestOfChangeService from '@/entities/request-of-change/request-of-change.service';
-
-import type { IClient } from '@/shared/model/client.model';
-import type { IProductDeployement } from '@/shared/model/product-deployement.model';
-import type { IProductDeployementDetail } from '@/shared/model/product-deployement-detail.model';
-import type { IRequestOfChange } from '@/shared/model/request-of-change.model';
 import ClientSizeService from '@/entities/client-size/client-size.service.ts';
 import ClientTypeService from '@/entities/client-type/client-type.service.ts';
 import CustomisationLevelService from '@/entities/customisation-level/customisation-level.service.ts';
 import ProductVersionService from '@/entities/product-version/product-version.service.ts';
 import ModuleVersionService from '@/entities/module-version/module-version.service.ts';
 import ModuleService from '@/entities/module/module.service.ts';
-
-// Client overview interface
-interface ClientOverview {
-  id: number;
-  name: string;
-  type: string;
-  badgeClass: string;
-  icon: string;
-  products: number;
-  requestsOfChanges: number;
-  deployments: number;
-}
-
-// Interface pour les points du scatter plot
-interface ScatterPoint {
-  x: number; // timestamp
-  y: number; // valeur (toujours 1 pour un point)
-  r: number; // rayon du cercle
-  date: string; // date formatée pour l'affichage
-  requestId: number; // ID de la demande
-  description?: string; // description optionnelle
-}
 
 export default defineComponent({
   name: 'DashClientsComponent',
@@ -50,27 +23,31 @@ export default defineComponent({
     const { t } = useI18n();
 
     // Scroll refs
-    const scrollContainer = ref<HTMLElement | null>(null);
+    const scrollContainer = ref(null);
     const isAtStart = ref(true);
     const isAtEnd = ref(false);
 
     // Data refs
-    const clients = ref<ClientOverview[]>([]);
+    const clients = ref([]);
     const loading = ref(true);
 
     // Charts related refs
-    const selectedClient = ref<ClientOverview | null>(null);
-    const clientProductDeployments = ref<IProductDeployement[]>([]);
+    const selectedClient = ref(null);
+    const clientProductDeployments = ref([]);
+    const productDeploymentsChart = ref(null);
+    const requestChangesChart = ref(null);
+    const clientsEvolutionChart = ref(null);
 
-    const productDeploymentsChart = ref<HTMLCanvasElement | null>(null);
-    const requestChangesChart = ref<HTMLCanvasElement | null>(null);
-    const productDeploymentsChartInstance = ref<Chart | null>(null);
-    const requestChangesChartInstance = ref<Chart | null>(null);
+    const productDeploymentsChartInstance = ref(null);
+    const requestChangesChartInstance = ref(null);
+    const clientsEvolutionChartInstance = ref(null);
 
     // Initialiser correctement les données
     const productDeploymentsChartData = ref({ labels: [], datasets: [] });
     const requestChangesChartData = ref({ datasets: [] }); // Pas de labels pour scatter plot
+    const clientsEvolutionData = ref({ labels: [], datasets: [] });
     const totalRequests = ref({ basic: 0, intermediate: 0, advanced: 0 });
+    const currentYear = ref(new Date().getFullYear());
 
     // Services
     const clientService = new ClientService();
@@ -87,12 +64,12 @@ export default defineComponent({
       try {
         loading.value = true;
         const res = await clientService.retrieve();
-        const clientsData: IClient[] = res.data;
+        const clientsData = res.data;
 
         clients.value = await Promise.all(
           clientsData.map(async (client, index) => {
-            const deployments = await countClientDeployments(client.id!);
-            const products = await countClientProducts(client.id!);
+            const deployments = await countClientDeployments(client.id);
+            const products = await countClientProducts(client.id);
             const requestOfChanges = await countClientRequestOfChanges(client.id);
 
             if (client.size?.id) {
@@ -102,6 +79,7 @@ export default defineComponent({
                 console.error('Erreur de chargement du client size:', sizeError);
               }
             }
+
             if (client.clientType?.id) {
               try {
                 client.clientType = await clientTypeService().find(client.clientType.id);
@@ -111,10 +89,10 @@ export default defineComponent({
             }
 
             return {
-              id: client.id!,
+              id: client.id,
               name: client.name || 'Unknown Client',
               type: client.clientType?.type,
-              badgeClass: getClientBadgeClass(1),
+              badgeClass: getClientBadgeClass(index),
               icon: 'bi-building',
               products: products,
               requestsOfChanges: requestOfChanges,
@@ -130,11 +108,90 @@ export default defineComponent({
       }
     };
 
-    const countClientDeployments = async (clientId: number): Promise<number> => {
+    const loadClientsEvolutionData = async () => {
+      try {
+        // Récupérer tous les clients avec leurs dates de création
+        const allClients = await clientService.retrieve();
+        const clientsData = allClients.data || allClients;
+
+        // Filtrer les clients de l'année courante
+        const currentYearClients = clientsData.filter(client => {
+          if (!client.createDate) return false;
+          const clientYear = new Date(client.createDate).getFullYear();
+          return clientYear === currentYear.value;
+        });
+
+        // Trier les clients par date de création
+        currentYearClients.sort((a, b) => {
+          return new Date(a.createDate).getTime() - new Date(b.createDate).getTime();
+        });
+
+        // Grouper par mois et calculer le cumul
+        const monthlyCount = Array(12).fill(0);
+        const cumulativeCount = Array(12).fill(0);
+        const clientsByMonth = Array(12).fill(null).map(() => []); // Stocker les noms des clients
+        const monthNames = [
+          'Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun',
+          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        ];
+
+        // Compter les clients par mois et stocker leurs noms
+        currentYearClients.forEach(client => {
+          const month = new Date(client.createDate).getMonth();
+          monthlyCount[month]++;
+          clientsByMonth[month].push(client.name); // Stocker le nom du client
+        });
+
+        // Calculer le cumul
+        let cumul = 0;
+        for (let i = 0; i < 12; i++) {
+          cumul += monthlyCount[i];
+          cumulativeCount[i] = cumul;
+        }
+
+        // Créer les données du graphique
+        clientsEvolutionData.value = {
+          labels: monthNames,
+          datasets: [
+            {
+              label: 'Clients created per month',
+              data: monthlyCount,
+              backgroundColor: 'rgba(12, 166, 120, 0.8)',
+              borderColor: 'rgba(12, 166, 120, 1)',
+              borderWidth: 2,
+              type: 'bar',
+              order: 2,
+              clientNames: clientsByMonth // Ajouter les noms des clients
+            },
+            {
+              label: 'Cumulative growth',
+              data: cumulativeCount,
+              backgroundColor: 'rgba(12, 45, 87, 0.2)',
+              borderColor: 'rgba(12, 45, 87, 1)',
+              borderWidth: 3,
+              type: 'line',
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: 'rgba(12, 45, 87, 1)',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 8,
+              order: 1
+            }
+          ]
+        };
+      } catch (error) {
+        console.error('Error loading clients evolution data:', error);
+        clientsEvolutionData.value = { labels: [], datasets: [] };
+      }
+    };
+
+    const countClientDeployments = async (clientId) => {
       try {
         // Fetch all product deployments
         const res = await productDeployementService.retrieve();
-        const deployments = res.data.filter((pd: IProductDeployement) => pd.client?.id === clientId);
+        const deployments = res.data.filter((pd) => pd.client?.id === clientId);
 
         // If no deployments found, return 0
         if (!deployments.length) {
@@ -143,10 +200,10 @@ export default defineComponent({
 
         // Fetch all product deployment details
         const productDeploymentDetailsRes = await productDeployementDetailService.retrieve();
-        const allDetails: IProductDeployementDetail[] = productDeploymentDetailsRes.data;
+        const allDetails = productDeploymentDetailsRes.data;
 
         // Count details for all deployments
-        const detailsCount = deployments.reduce((count, deployment: IProductDeployement) => {
+        const detailsCount = deployments.reduce((count, deployment) => {
           const deploymentDetails = allDetails.filter(detail => detail.productDeployement?.id === deployment.id);
           return count + deploymentDetails.length;
         }, 0);
@@ -158,11 +215,11 @@ export default defineComponent({
       }
     };
 
-    const countClientProducts = async (clientId: number): Promise<number> => {
+    const countClientProducts = async (clientId) => {
       try {
         const res = await productDeployementService.retrieve();
-        const deployments = res.data.filter((pd: IProductDeployement) => pd.client?.id === clientId);
-        const uniqueProducts = new Set(deployments.map((pd: IProductDeployement) => pd.id));
+        const deployments = res.data.filter((pd) => pd.client?.id === clientId);
+        const uniqueProducts = new Set(deployments.map((pd) => pd.id));
         return uniqueProducts.size;
       } catch (error) {
         console.error('Error counting client products:', error);
@@ -170,10 +227,10 @@ export default defineComponent({
       }
     };
 
-    const countClientRequestOfChanges = async (clientId: number): Promise<number> => {
+    const countClientRequestOfChanges = async (clientId) => {
       try {
         const res = await requestOfChangeService.retrieve();
-        const requestsOfChanges = res.data.filter((req: IRequestOfChange) => req.client?.id === clientId);
+        const requestsOfChanges = res.data.filter((req) => req.client?.id === clientId);
         return requestsOfChanges.length;
       } catch (error) {
         console.error('Error counting client RequestsOfChanges:', error);
@@ -181,35 +238,30 @@ export default defineComponent({
       }
     };
 
-    const getClientBadgeClass = (index: number): string => {
+    const getClientBadgeClass = (index) => {
       const classes = ['finance', 'insurance', 'security', 'analytics', 'communication', 'health', 'logistics'];
       return classes[index % classes.length];
     };
 
-    const getClientIcon = (index: number): string => {
-      const icons = ['bi-building', 'bi-shield-check', 'bi-graph-up', 'bi-chat-dots', 'bi-heart-pulse', 'bi-truck'];
-      return icons[index % icons.length];
-    };
-
-    const selectClient = async (client: ClientOverview) => {
+    const selectClient = async (client) => {
       // D'abord détruire les graphiques existants
       destroyCharts();
-
       selectedClient.value = client;
       await nextTick();
-
       // Charger les données
       await loadClientChartsData(client);
-
       // Attendre un peu puis créer les nouveaux graphiques
       setTimeout(() => {
         createCharts();
       }, 150);
     };
 
-    const closeCharts = () => {
+    const closeCharts = async () => {
       selectedClient.value = null;
       destroyCharts();
+      await fetchClients();
+      await loadClientsEvolutionData();
+      createCharts();
     };
 
     const destroyCharts = () => {
@@ -221,13 +273,13 @@ export default defineComponent({
         requestChangesChartInstance.value.destroy();
         requestChangesChartInstance.value = null;
       }
-      // Attendre un peu avant de recréer
-      setTimeout(() => {
-        // Les graphiques sont maintenant prêts à être recréés
-      }, 100);
+      if (clientsEvolutionChartInstance.value) {
+        clientsEvolutionChartInstance.value.destroy();
+        clientsEvolutionChartInstance.value = null;
+      }
     };
 
-    const loadClientChartsData = async (client: ClientOverview) => {
+    const loadClientChartsData = async (client) => {
       try {
         await loadProductDeploymentsChartData(client.id);
         await loadRequestChangesScatterData(client.id);
@@ -237,11 +289,10 @@ export default defineComponent({
       }
     };
 
-    const loadProductDeploymentsChartData = async (clientId: number) => {
+    const loadProductDeploymentsChartData = async (clientId) => {
       try {
         const productDeploymentsRes = await productDeployementService.retrieve();
-        const productDeployments = productDeploymentsRes.data.filter((pd: IProductDeployement) => pd.client?.id === clientId);
-
+        const productDeployments = productDeploymentsRes.data.filter((pd) => pd.client?.id === clientId);
         clientProductDeployments.value = productDeployments;
 
         if (productDeployments.length === 0) {
@@ -250,11 +301,12 @@ export default defineComponent({
         }
 
         const productDeploymentDetailsRes = await productDeployementDetailService.retrieve();
-        const allDetails: IProductDeployementDetail[] = productDeploymentDetailsRes.data;
-        const deploymentDetailCounts = new Map<string, number>();
-        const deploymentDetailsMap = new Map<string, { name: string; version: string; date: string }[]>();
+        const allDetails = productDeploymentDetailsRes.data;
 
-        productDeployments.forEach((deployment: IProductDeployement) => {
+        const deploymentDetailCounts = new Map();
+        const deploymentDetailsMap = new Map();
+
+        productDeployments.forEach((deployment) => {
           const deploymentName = `${deployment.product?.name || 'Unknown Product'} - ${deployment.refContract || 'No Contract'}`;
           const details = allDetails.filter(detail => detail.productDeployement?.id === deployment.id);
           const detailsCount = details.length;
@@ -265,10 +317,10 @@ export default defineComponent({
             version: 'v ' + detail.productVersion?.version || 'Unknown Version',
             date: detail.startDeployementDate
               ? new Date(detail.startDeployementDate).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                })
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })
               : 'No Date',
           }));
 
@@ -277,7 +329,6 @@ export default defineComponent({
         });
 
         const filteredEntries = Array.from(deploymentDetailCounts.entries()).filter(([_, count]) => count > 0);
-
         if (filteredEntries.length === 0) {
           productDeploymentsChartData.value = { labels: [], datasets: [] };
           return;
@@ -305,13 +356,11 @@ export default defineComponent({
       }
     };
 
-    const loadRequestChangesScatterData = async (clientId: number) => {
+    const loadRequestChangesScatterData = async (clientId) => {
       try {
         // Get all request of changes for this client
         const requestChangesRes = await requestOfChangeService.retrieve();
-        const clientRequests = requestChangesRes.data.filter((req: IRequestOfChange) => req.client?.id === clientId);
-
-        console.log('Client requests found:', clientRequests);
+        const clientRequests = requestChangesRes.data.filter((req) => req.client?.id === clientId);
 
         if (clientRequests.length === 0) {
           requestChangesChartData.value = { datasets: [] };
@@ -320,9 +369,9 @@ export default defineComponent({
         }
 
         // Préparer les points pour le scatter plot
-        const basicPoints: ScatterPoint[] = [];
-        const intermediatePoints: ScatterPoint[] = [];
-        const advancedPoints: ScatterPoint[] = [];
+        const basicPoints = [];
+        const intermediatePoints = [];
+        const advancedPoints = [];
 
         // Initialize totals
         let totalBasic = 0;
@@ -330,12 +379,6 @@ export default defineComponent({
         let totalAdvanced = 0;
 
         for (const request of clientRequests) {
-          console.log('Processing request:', {
-            id: request.id,
-            createDate: request.createDate,
-            customisationLevel: request.customisationLevel,
-          });
-
           if (request.createDate) {
             const date = new Date(request.createDate);
             const timestamp = date.getTime();
@@ -355,15 +398,12 @@ export default defineComponent({
                   customisationLevelData.name?.toLowerCase() ||
                   customisationLevelData.type?.toLowerCase() ||
                   '';
-                console.log('Customization level fetched:', customizationLevel);
               } catch (error) {
                 console.error('Error fetching customization level:', error);
               }
             } else if (typeof request.customisationLevel === 'string') {
               customizationLevel = request.customisationLevel.toLowerCase();
             }
-
-            console.log('Customization level extracted:', customizationLevel);
 
             // Récupérer le produit et la version associés
             let productName = 'Unknown Product';
@@ -387,11 +427,12 @@ export default defineComponent({
               ) || [];
 
             // Créer un point pour le scatter plot
-            const point: ScatterPoint = {
+            const point = {
               x: timestamp,
               y: 1, // Toujours 1 pour un point
               r: 10, // Rayon du cercle
               date: formattedDate,
+              requestId: request.id,
               productName,
               productVersion,
               moduleNames,
@@ -413,15 +454,12 @@ export default defineComponent({
               if (requestIndex % 3 === 0) {
                 basicPoints.push(point);
                 totalBasic++;
-                console.log('No level found, assigned to basic:', customizationLevel);
               } else if (requestIndex % 3 === 1) {
                 intermediatePoints.push(point);
                 totalIntermediate++;
-                console.log('No level found, assigned to intermediate:', customizationLevel);
               } else {
                 advancedPoints.push(point);
                 totalAdvanced++;
-                console.log('No level found, assigned to advanced:', customizationLevel);
               }
             }
           }
@@ -433,12 +471,6 @@ export default defineComponent({
           intermediate: totalIntermediate,
           advanced: totalAdvanced,
         };
-
-        console.log('Scatter points prepared:', {
-          basic: basicPoints.length,
-          intermediate: intermediatePoints.length,
-          advanced: advancedPoints.length,
-        });
 
         // Préparer les données pour le graphique
         requestChangesChartData.value = {
@@ -479,7 +511,7 @@ export default defineComponent({
       }
     };
 
-    const generateColors = (count: number): string[] => {
+    const generateColors = (count) => {
       const baseColors = [
         'rgba(12, 45, 87, 0.8)',
         'rgba(149, 160, 244, 0.8)',
@@ -491,8 +523,7 @@ export default defineComponent({
         'rgba(255, 87, 34, 0.8)',
       ];
 
-      const result: string[] = [];
-
+      const result = [];
       for (let i = 0; i < count; i++) {
         if (i < baseColors.length) {
           result.push(baseColors[i]);
@@ -501,7 +532,6 @@ export default defineComponent({
           result.push(`hsla(${hue}, 70%, 60%, 0.8)`);
         }
       }
-
       return result;
     };
 
@@ -509,6 +539,7 @@ export default defineComponent({
       destroyCharts();
       createProductDeploymentsChart();
       createRequestChangesScatterChart();
+      createClientsEvolutionChart();
     };
 
     const createProductDeploymentsChart = () => {
@@ -536,7 +567,7 @@ export default defineComponent({
                   label: function (context) {
                     const label = context.label || '';
                     const value = context.parsed;
-                    const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
                     const percentage = ((value / total) * 100).toFixed(1);
                     const deploymentDetails = context.dataset.deploymentDetails?.[label] || [];
 
@@ -582,7 +613,7 @@ export default defineComponent({
               tooltip: {
                 callbacks: {
                   label: function (context) {
-                    const point = context.raw as ScatterPoint;
+                    const point = context.raw;
                     const tooltipLines = [
                       `Date: ${point.date}`,
                       `Product: ${point.productName || 'Unknown'} - ${point.productVersion || 'Unknown'}`,
@@ -618,7 +649,7 @@ export default defineComponent({
                 ticks: {
                   callback: function (value) {
                     // Convert timestamp back to readable date
-                    const date = new Date(value as number);
+                    const date = new Date(value);
                     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
                   },
                 },
@@ -641,6 +672,98 @@ export default defineComponent({
               intersect: true,
             },
           },
+        });
+      }
+    };
+
+    const createClientsEvolutionChart = () => {
+      // Clients Evolution Chart - Combinaison de barres et ligne cumulative
+      if (clientsEvolutionChart.value && clientsEvolutionData.value.labels.length > 0) {
+        clientsEvolutionChartInstance.value = new Chart(clientsEvolutionChart.value, {
+          type: 'bar',
+          data: clientsEvolutionData.value,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                  usePointStyle: true,
+                  padding: 20
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const datasetLabel = context.dataset.label || '';
+                    const value = context.parsed.y;
+
+                    if (datasetLabel.includes('Cumulative')) {
+                      return `${datasetLabel}: ${value} client${value > 1 ? 's' : ''}`;
+                    } else {
+                      const monthIndex = context.dataIndex;
+                      const clientNames = context.dataset.clientNames?.[monthIndex] || [];
+
+                      let tooltip = `${datasetLabel}: ${value} client${value > 1 ? 's' : ''}`;
+
+                      if (clientNames.length > 0) {
+                        tooltip += '\nAdded clients:';
+                        clientNames.forEach(name => {
+                          tooltip += `\n• ${name}`;
+                        });
+                      }
+
+                      return tooltip.split('\n');
+                    }
+                  },
+                  title: function(context) {
+                    return `${context[0].label} ${currentYear.value}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1,
+                  callback: function(value) {
+                    return Number.isInteger(value) ? value : '';
+                  }
+                },
+                title: {
+                  display: true,
+                  text: 'Number of clients',
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
+                },
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.1)'
+                }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: `month - ${currentYear.value}`,
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
+                },
+                grid: {
+                  display: false
+                }
+              }
+            },
+            animation: {
+              duration: 1000,
+              easing: 'easeInOutQuart'
+            }
+          }
         });
       }
     };
@@ -668,7 +791,9 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      fetchClients();
+      await fetchClients();
+      await loadClientsEvolutionData();
+      createCharts();
       checkScrollPosition();
       await fetchModuleOptions();
       await fetchModuleVersionOptions();
@@ -697,7 +822,6 @@ export default defineComponent({
     const getModuleVersionWithModuleCached = moduleVersionId => {
       // 1. Trouver la version de module dans le cache
       const moduleVersion = moduleVersionOptions.value.find(mv => mv.id === moduleVersionId);
-
       if (!moduleVersion) return null;
 
       // 2. Trouver le module associé dans le cache
@@ -725,9 +849,12 @@ export default defineComponent({
       closeCharts,
       productDeploymentsChart,
       requestChangesChart,
+      clientsEvolutionChart,
       productDeploymentsChartData,
       requestChangesChartData,
+      clientsEvolutionData,
       totalRequests,
+      currentYear,
       t$: t,
     };
   },

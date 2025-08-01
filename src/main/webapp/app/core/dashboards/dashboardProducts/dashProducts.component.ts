@@ -38,11 +38,14 @@ export default defineComponent({
     const selectedProduct = ref<ProductOverview | null>(null);
     const clientsChart = ref<HTMLCanvasElement | null>(null);
     const versionsChart = ref<HTMLCanvasElement | null>(null);
+    const productsEvolutionChart = ref<HTMLCanvasElement | null>(null);
     const clientsChartInstance = ref<Chart | null>(null);
     const versionsChartInstance = ref<Chart | null>(null);
+    const productsEvolutionChartInstance = ref<Chart | null>(null);
     const clientsChartData = ref({ labels: [], datasets: [] });
     const versionsChartData = ref({ labels: [], datasets: [] });
-
+    const productsEvolutionData = ref({ labels: [], datasets: [] });
+    const currentYear = ref(new Date().getFullYear());
     const loading = ref(true);
 
     const productService = new ProductService();
@@ -76,6 +79,85 @@ export default defineComponent({
       }
     };
 
+    const loadProductsEvolutionData = async () => {
+      try {
+        // Récupérer tous les produits avec leurs dates de création
+        const allProducts = await productService.retrieve();
+        const productsData = allProducts.data || allProducts;
+
+        // Filtrer les produits de l'année courante
+        const currentYearProducts = productsData.filter(product => {
+          if (!product.createDate) return false;
+          const productYear = new Date(product.createDate).getFullYear();
+          return productYear === currentYear.value;
+        });
+
+        // Trier les produits par date de création
+        currentYearProducts.sort((a, b) => {
+          return new Date(a.createDate).getTime() - new Date(b.createDate).getTime();
+        });
+
+        // Grouper par mois et calculer le cumul
+        const monthlyCount = Array(12).fill(0);
+        const cumulativeCount = Array(12).fill(0);
+        const productsByMonth = Array(12).fill(null).map(() => []); // Stocker les noms des produits
+        const monthNames = [
+          'Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun',
+          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        ];
+
+        // Compter les produits par mois et stocker leurs noms
+        currentYearProducts.forEach(product => {
+          const month = new Date(product.createDate).getMonth();
+          monthlyCount[month]++;
+          productsByMonth[month].push(product.name); // Stocker le nom du produit
+        });
+
+        // Calculer le cumul
+        let cumul = 0;
+        for (let i = 0; i < 12; i++) {
+          cumul += monthlyCount[i];
+          cumulativeCount[i] = cumul;
+        }
+
+        // Créer les données du graphique
+        productsEvolutionData.value = {
+          labels: monthNames,
+          datasets: [
+            {
+              label: 'Products created per month',
+              data: monthlyCount,
+              backgroundColor: 'rgba(245, 159, 0, 0.8)',
+              borderColor: 'rgba(245, 159, 0, 1)',
+              borderWidth: 2,
+              type: 'bar',
+              order: 2,
+              productNames: productsByMonth // Ajouter les noms des produits
+            },
+            {
+              label: 'Cumulative growth',
+              data: cumulativeCount,
+              backgroundColor: 'rgba(12, 45, 87, 0.2)',
+              borderColor: 'rgba(12, 45, 87, 1)',
+              borderWidth: 3,
+              type: 'line',
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: 'rgba(12, 45, 87, 1)',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 8,
+              order: 1
+            }
+          ]
+        };
+      } catch (error) {
+        console.error('Error loading products evolution data:', error);
+        productsEvolutionData.value = { labels: [], datasets: [] };
+      }
+    };
+
     const selectProduct = async (product: ProductOverview) => {
       selectedProduct.value = product;
       await nextTick();
@@ -83,9 +165,12 @@ export default defineComponent({
       createCharts();
     };
 
-    const closeCharts = () => {
+    const closeCharts = async () => {
       selectedProduct.value = null;
       destroyCharts();
+      await fetchProducts();
+      await loadProductsEvolutionData();
+      createCharts();
     };
 
     const destroyCharts = () => {
@@ -96,6 +181,10 @@ export default defineComponent({
       if (versionsChartInstance.value) {
         versionsChartInstance.value.destroy();
         versionsChartInstance.value = null;
+      }
+      if (productsEvolutionChartInstance.value) {
+        productsEvolutionChartInstance.value.destroy();
+        productsEvolutionChartInstance.value = null;
       }
     };
 
@@ -167,7 +256,6 @@ export default defineComponent({
 
         // Filter out clients with 0 modules
         const filteredEntries = Array.from(clientModuleCount.entries()).filter(([_, count]) => count > 0);
-
         if (filteredEntries.length === 0) {
           clientsChartData.value = { labels: [], datasets: [] };
           return;
@@ -175,7 +263,6 @@ export default defineComponent({
 
         // Sort by module count (descending) for better visualization
         const sortedEntries = filteredEntries.sort((a, b) => b[1] - a[1]);
-
         const labels = sortedEntries.map(entry => entry[0]);
         const data = sortedEntries.map(entry => entry[1]);
         const backgroundColors = generateColors(labels.length);
@@ -201,6 +288,7 @@ export default defineComponent({
         clientsChartData.value = { labels: [], datasets: [] };
       }
     };
+
     const loadVersionsChartData = async (productName: string) => {
       try {
         // Get all product versions for the selected product
@@ -277,7 +365,6 @@ export default defineComponent({
       ];
 
       const result: string[] = [];
-
       for (let i = 0; i < count; i++) {
         if (i < baseColors.length) {
           result.push(baseColors[i]);
@@ -286,7 +373,6 @@ export default defineComponent({
           result.push(`hsla(${hue}, 70%, 60%, 0.8)`);
         }
       }
-
       return result;
     };
 
@@ -441,6 +527,96 @@ export default defineComponent({
           },
         });
       }
+
+      // Products Evolution Chart - Combinaison de barres et ligne cumulative
+      if (productsEvolutionChart.value && productsEvolutionData.value.labels.length > 0) {
+        productsEvolutionChartInstance.value = new Chart(productsEvolutionChart.value, {
+          type: 'bar',
+          data: productsEvolutionData.value,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                  usePointStyle: true,
+                  padding: 20
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const datasetLabel = context.dataset.label || '';
+                    const value = context.parsed.y;
+
+                    if (datasetLabel.includes('Cumulative')) {
+                      return `${datasetLabel}: ${value} product${value > 1 ? 's' : ''}`;
+                    } else {
+                      const monthIndex = context.dataIndex;
+                      const productNames = context.dataset.productNames?.[monthIndex] || [];
+
+                      let tooltip = `${datasetLabel}: ${value} product${value > 1 ? 's' : ''}`;
+
+                      if (productNames.length > 0) {
+                        tooltip += '\nAdded products:';
+                        productNames.forEach(name => {
+                          tooltip += `\n• ${name}`;
+                        });
+                      }
+
+                      return tooltip.split('\n');
+                    }
+                  },
+                  title: function(context) {
+                    return `${context[0].label} ${currentYear.value}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1,
+                  callback: function(value) {
+                    return Number.isInteger(value) ? value : '';
+                  }
+                },
+                title: {
+                  display: true,
+                  text: 'Number of products',
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
+                },
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.1)'
+                }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: `month - ${currentYear.value}`,
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
+                },
+                grid: {
+                  display: false
+                }
+              }
+            },
+            animation: {
+              duration: 1000,
+              easing: 'easeInOutQuart'
+            }
+          }
+        });
+      }
     };
 
     const scrollLeft = () => {
@@ -472,7 +648,9 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      fetchProducts();
+      await fetchProducts();
+      await loadProductsEvolutionData();
+      createCharts();
       checkScrollPosition();
       await fetchModuleOptions();
       await fetchModuleVersionOptions();
@@ -543,6 +721,7 @@ export default defineComponent({
         if (!lastVersion?.moduleVersions) {
           return 0;
         }
+
         let totalFeatures = 0;
         for (const moduleVersion of lastVersion.moduleVersions) {
           if (moduleVersion.id) {
@@ -568,6 +747,7 @@ export default defineComponent({
         if (!lastVersion || !lastVersion.id) {
           return 0;
         }
+
         const res = await productDeployementDetailService.retrieve();
         const filteredDeployements = res.data.filter(detail => detail.productVersion?.id === lastVersion.id);
         console.log(filteredDeployements);
@@ -577,7 +757,6 @@ export default defineComponent({
         return 0;
       }
     };
-
 
     const moduleOptions = ref([]);
     const fetchModuleOptions = async () => {
@@ -602,7 +781,6 @@ export default defineComponent({
     const getModuleVersionWithModuleCached = moduleVersionId => {
       // 1. Trouver la version de module dans le cache
       const moduleVersion = moduleVersionOptions.value.find(mv => mv.id === moduleVersionId);
-
       if (!moduleVersion) return null;
 
       // 2. Trouver le module associé dans le cache
@@ -646,8 +824,11 @@ export default defineComponent({
       closeCharts,
       clientsChart,
       versionsChart,
+      productsEvolutionChart,
       clientsChartData,
       versionsChartData,
+      productsEvolutionData,
+      currentYear,
     };
   },
 });

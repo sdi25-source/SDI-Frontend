@@ -41,8 +41,14 @@
 
     <!-- Dashboard Content - Conditional Display -->
     <div class="dashboard-content">
-      <div v-if="!selectedProduct" class="section d-flex justify-content-center align-items-center" style="height: 60vh">
-        <img src="../../../../content/images/Dataanalysis.svg" width="600" height="500" />
+      <div v-if="!selectedProduct" class="section">
+        <div class="chart-container">
+          <h4 class="chart-title">Product portfolio growth ({{ currentYear }})</h4>
+          <div class="chart-wrapper">
+            <canvas ref="productsEvolutionChart" width="800" height="400"></canvas>
+          </div>
+          <div v-if="productsEvolutionData.labels.length === 0" class="no-data-message">No data available for the evolution of products</div>
+        </div>
       </div>
 
       <!-- Charts Section -->
@@ -122,6 +128,7 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
 .dashboard-content {
   flex: 1;
   margin-left: 20px;
@@ -136,6 +143,14 @@
 }
 
 .dashboard-section {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.section {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
@@ -362,6 +377,8 @@
   height: 100%;
   color: #777;
   font-style: italic;
+  text-align: center;
+  font-size: 14px;
 }
 
 @media (max-width: 768px) {
@@ -389,6 +406,12 @@
   .chart-container {
     height: 400px;
     margin-bottom: 20px;
+    padding: 15px;
+  }
+
+  .chart-title {
+    font-size: 14px;
+    margin-bottom: 10px;
   }
 }
 
@@ -426,7 +449,12 @@
   }
 
   .chart-title {
-    font-size: 14px;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .no-data-message {
+    font-size: 12px;
   }
 }
 </style>
