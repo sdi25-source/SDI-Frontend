@@ -289,9 +289,7 @@
         <div class="mb-3">
           <label for="csvFile" class="form-label">Select a CSV file</label>
           <input type="file" class="form-control" id="csvFile" accept=".csv" @change="handleFileSelect" ref="fileInput" />
-          <small class="form-text text-muted">
-            The file must contain the columns: name, code, main contact, email, telephone
-          </small>
+          <small class="form-text text-muted"> The file must contain the columns: name, code, main contact, email, telephone </small>
         </div>
         <div v-if="importPreview.length > 0" class="mt-3">
           <h6>Data preview ({{ importPreview.length }} lignes) :</h6>

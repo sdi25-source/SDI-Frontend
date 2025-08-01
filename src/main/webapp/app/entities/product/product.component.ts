@@ -306,6 +306,8 @@ export default defineComponent({
         .filter(Boolean); // Filtrer les entrées non trouvées
     });
 
+
+
     // Get filtered modules based on selected version
     const getFilteredModules = computed(() => {
       if (!selectedProduct.value) return [];
@@ -326,6 +328,10 @@ export default defineComponent({
         return selectedProduct.value.modules || [];
       }
     });
+
+
+
+
 
     // Methods
     const retrieveProducts = async () => {
@@ -359,6 +365,8 @@ export default defineComponent({
       }
     };
 
+
+
     const retrieveCertificationsVersions = async () => {
       try {
         const res = await certificationVersionService().retrieve();
@@ -367,6 +375,7 @@ export default defineComponent({
         alertService.showHttpError(err.response);
       }
     };
+
 
     const retrieveCertifications = async () => {
       try {
@@ -997,19 +1006,14 @@ export default defineComponent({
 
     // Version management methods
     const editVersion = version => {
-      // Créer une copie pour l'édition
       editingVersionData.value = { ...version };
       isEditingVersion.value = true;
-
-      // Ne pas ouvrir le modal de paramètres automatiquement
-      // Le modal sera ouvert uniquement via le bouton de paramètres
     };
 
     const saveEditVersion = async version => {
       if (!editingVersionData.value) return;
 
       try {
-        // Mettre à jour les champs modifiables
         const updatedVersion = {
           ...version,
           version: editingVersionData.value.version,
@@ -1942,13 +1946,10 @@ export default defineComponent({
 
     watch(selectedVersion, newVersion => {
       if (newVersion) {
-        // Update tabs when a version is selected
         tabs.value = ['Modules Version', 'Configuration'];
-        // Mettre à jour les configurations et modules en fonction de la version sélectionnée
         versionInfraComponents.value = newVersion.infraComponentVersions || [];
         versionModuleVersions.value = newVersion.moduleVersions || [];
       } else {
-        // Reset tabs when no version is selected
         tabs.value = ['Product Versions'];
       }
     });
@@ -2112,7 +2113,7 @@ export default defineComponent({
       name: 'S2M - Société Maghrébine de Monétique',
       font: 'Times',
       colors: {
-        darkBlue: [25, 25, 112],
+        darkBlue: [12, 45, 87],
         black: [0, 0, 0],
         lightGray: [220, 220, 220],
         white: [255, 255, 255],

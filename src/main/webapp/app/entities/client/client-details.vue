@@ -97,7 +97,7 @@
                 <div class="detail-group">
                   <label class="text-muted small mb-1" v-text="t$('sdiFrontendApp.client.country')"></label>
                   <p class="mb-0 fw-medium">
-                    {{ client.country?.countryname }}
+                    {{ client.country?.countryFlag }} {{ client.country?.countryname }}
                   </p>
                 </div>
               </div>

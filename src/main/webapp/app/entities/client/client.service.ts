@@ -6,6 +6,19 @@ import type { ClientOverview } from '@/shared/model/ClientOverview.model.ts';
 const baseApiUrl = 'api/clients';
 
 export default class ClientService {
+  public getClientData(id: number): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      axios
+        .get(`${baseApiUrl}/clientData/${id}`)
+        .then(res => {
+          resolve(res.data);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
   public generateClientReport(id: number): Promise<Blob> {
     return new Promise<Blob>((resolve, reject) => {
       axios
