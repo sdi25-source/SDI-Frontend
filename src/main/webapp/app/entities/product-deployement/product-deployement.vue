@@ -1076,80 +1076,132 @@
     </div>
 
     <!-- Delete Confirmation Modals -->
-    <b-modal ref="removeEntity" id="removeEntity" centered title-class="text-danger">
-      <template #modal-title>
-        <div class="d-flex align-items-center">
-          <font-awesome-icon icon="exclamation-triangle" class="text-danger mr-2"></font-awesome-icon>
-          <span
-            id="sdiFrontendApp.productDeployment.delete.question"
-            data-cy="productDeploymentDeleteDialogHeading"
-            v-text="t$('entity.delete.title')"
-            class="font-weight-bold"
-          ></span>
-        </div>
-      </template>
-      <div class="modal-body">
-        <p
-          id="jhi-delete-productDeployment-heading"
-          class="mb-0"
-          v-text="t$('sdiFrontendApp.productDeployment.delete.question', { id: removeId })"
-        ></p>
-      </div>
-      <template #modal-footer>
-        <div class="w-100">
-          <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-secondary" v-text="t$('entity.action.cancel')" @click="closeDialog()"></button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              id="jhi-confirm-delete-productDeployment"
-              data-cy="entityConfirmDeleteButton"
-              v-text="t$('entity.action.delete')"
-              @click="removeProductDeployment()"
-            ></button>
-          </div>
-        </div>
-      </template>
-    </b-modal>
-
-    <b-modal ref="removeDetailEntity" id="removeDetailEntity" centered title-class="text-danger">
-      <template #modal-title>
-        <div class="d-flex align-items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            fill="currentColor"
-            class="bi bi-exclamation-triangle-fill text-danger mr-2"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"
-            />
-          </svg>
-          <span class="font-weight-bold">Deletion confirmation</span>
-        </div>
-      </template>
-      <div class="modal-body">
-        <p class="mb-0">Are you sure you want to delete this deployment detail ?</p>
-      </div>
-      <template #modal-footer>
-        <div class="w-100">
-          <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-secondary" @click="closeDetailDialog()">Cancel</button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              id="jhi-confirm-delete-productDeployementDetail"
-              data-cy="entityConfirmDeleteButton"
-              @click="removeProductDeployementDetail()"
+    <div class="modal-backdrop" v-if="removeEntity" @click="closeDialog()"></div>
+    <div class="modal-container" v-if="removeEntity" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              class="bi bi-exclamation-triangle mr-2"
+              viewBox="0 0 16 16"
             >
-              Delete
-            </button>
-          </div>
+              <path
+                d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
+              />
+              <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+            </svg>
+            <span v-text="t$('entity.delete.title')"></span>
+          </h5>
+          <button type="button" class="close-button" @click="closeDialog()" aria-label="Fermer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              class="icon"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
-      </template>
-    </b-modal>
+
+        <div class="modal-body">
+          <p>
+            <strong v-text="t$('sdiFrontendApp.productDeployement.delete.question', {})"></strong>
+          </p>
+          <p v-text="t$('entity.delete.irreversible')"></p>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary rounded-2"
+            @click="closeDialog()"
+            v-text="t$('sdiFrontendApp.requestOfChange.delete.cancel')"
+          ></button>
+          <button
+            type="button"
+            class="btn btn-danger rounded-2"
+            @click="removeProductDeployment()"
+            v-text="t$('sdiFrontendApp.requestOfChange.delete.delete')"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" v-if="removeDetailEntity" @click="closeDetailDialog()"></div>
+    <div class="modal-container" v-if="removeDetailEntity" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              class="bi bi-exclamation-triangle mr-2"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
+              />
+              <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+            </svg>
+            <span v-text="t$('entity.delete.title')"></span>
+          </h5>
+          <button type="button" class="close-button" @click="closeDetailDialog()" aria-label="Fermer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              class="icon"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <p>
+            <strong v-text="t$('sdiFrontendApp.productDeployementDetail.delete.question', {})"></strong>
+          </p>
+          <p v-text="t$('entity.delete.irreversible')"></p>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary rounded-2"
+            @click="closeDetailDialog()"
+            v-text="t$('sdiFrontendApp.requestOfChange.delete.cancel')"
+          ></button>
+          <button
+            type="button"
+            class="btn btn-danger rounded-2"
+            @click="removeProductDeployementDetail()"
+            v-text="t$('sdiFrontendApp.requestOfChange.delete.delete')"
+          ></button>
+        </div>
+      </div>
+    </div>
+
   </div>
   <div class="section"></div>
   <div class="section"></div>

@@ -578,18 +578,20 @@ export default defineComponent({
     const handleSyncList = () => retrieveProductDeployments()
 
     const prepareRemove = (instance) => {
-      removeId.value = instance.id
-      removeEntity.value.show()
+      removeId.value = instance.id;
+      removeEntity.value = true;
     }
 
-    const closeDialog = () => removeEntity.value.hide()
+    const closeDialog = () => {
+      removeEntity.value = false;
+    }
 
     const removeProductDeployment = async () => {
       try {
         await productDeploymentService().delete(removeId.value)
-        alertService.showInfo(t$("sdiFrontendApp.productDeployment.deleted", { param: removeId.value }).toString(), {
-          variant: "danger",
-        })
+        // alertService.showInfo(t$("sdiFrontendApp.productDeployment.deleted", { param: removeId.value }).toString(), {
+        //   variant: "danger",
+        // })
 
         productDeployments.value = productDeployments.value.filter((pd) => pd.id !== removeId.value)
         allProductDeployments.value = allProductDeployments.value.filter((pd) => pd.id !== removeId.value)
@@ -860,15 +862,17 @@ export default defineComponent({
 
     const prepareRemoveDetail = (instance) => {
       removeDetailId.value = instance.id
-      removeDetailEntity.value.show()
+      removeDetailEntity.value = true;
     }
 
-    const closeDetailDialog = () => removeDetailEntity.value.hide()
+    const closeDetailDialog = () => {
+      removeDetailEntity.value = false;
+    }
 
     const removeProductDeployementDetail = async () => {
       try {
         await productDeployementDetailService().delete(removeDetailId.value)
-        alertService.showInfo("Détail supprimé avec succès", { variant: "success" })
+       // alertService.showInfo("Détail supprimé avec succès", { variant: "success" })
 
         productDeployementDetails.value = productDeployementDetails.value.filter(
           (detail) => detail.id !== removeDetailId.value,

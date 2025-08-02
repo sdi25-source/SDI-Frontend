@@ -447,11 +447,11 @@ export default defineComponent({
 
     const prepareRemove = instance => {
       removeId.value = instance.id;
-      removeEntity.value.show();
+      removeEntity.value = true;
     };
 
     const closeDialog = () => {
-      removeEntity.value.hide();
+      removeEntity.value = false;
     };
 
     const removeProduct = async () => {
@@ -1052,21 +1052,12 @@ export default defineComponent({
       }
 
       removeVersionId.value = version.id;
-
-      // Vérifier si removeVersionEntity est disponible
-      if (removeVersionEntity.value) {
-        removeVersionEntity.value.show();
-      } else {
-        // Fallback si le modal n'est pas disponible
-        if (confirm(`Êtes-vous sûr de vouloir supprimer la version ${version.version} ?`)) {
-          removeProductVersion();
-        }
-      }
+      removeVersionEntity.value = true;
     };
 
     const closeVersionDialog = () => {
       if (removeVersionEntity.value) {
-        removeVersionEntity.value.hide();
+        removeVersionEntity.value = false;
       }
     };
 
@@ -1081,7 +1072,7 @@ export default defineComponent({
         await productVersionService().delete(removeVersionId.value);
 
         const message = t$('sdiFrontendApp.productVersion.deleted', { param: removeVersionId.value }).toString();
-        alertService.showInfo(message, { variant: 'success' });
+     //   alertService.showInfo(message, { variant: 'success' });
 
         // Réinitialiser la sélection si la version supprimée était sélectionnée
         if (selectedVersion.value && selectedVersion.value.id === removeVersionId.value) {
@@ -1531,18 +1522,12 @@ export default defineComponent({
 
     const prepareRemoveModule = module => {
       removeModuleId.value = module.id;
-      if (removeModuleEntity.value) {
-        removeModuleEntity.value.show();
-      } else {
-        if (confirm(`Êtes-vous sûr de vouloir supprimer le module ${module.name} ?`)) {
-          removeModuleConfirm();
-        }
-      }
+      removeModuleEntity.value = true;
     };
 
     const closeModuleDialog = () => {
       if (removeModuleEntity.value) {
-        removeModuleEntity.value.hide();
+        removeModuleEntity.value = false;
       }
     };
 
@@ -1577,7 +1562,7 @@ export default defineComponent({
         removeModuleId.value = null;
         closeModuleDialog();
 
-        alertService.showInfo('Module supprimé avec succès', { variant: 'success' });
+       // alertService.showInfo('Module supprimé avec succès', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       } finally {

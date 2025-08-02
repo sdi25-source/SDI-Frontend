@@ -20,7 +20,7 @@ export default defineComponent({
 
     // Pagination
     const currentPage = ref(1);
-    const itemsPerPage = ref(10);
+    const itemsPerPage = ref(20);
     const totalItems = ref(0);
 
     const isFetching = ref(false);
@@ -134,18 +134,18 @@ export default defineComponent({
 
     const prepareRemove = (instance: IClientSize) => {
       removeId.value = instance.id;
-      removeEntity.value.show();
+      removeEntity.value = true;
     };
 
     const closeDialog = () => {
-      removeEntity.value.hide();
+      removeEntity.value = false;
     };
 
     const removeClientSize = async () => {
       try {
         await clientSizeService().delete(removeId.value);
         const message = t$('sdiFrontendApp.clientSize.deleted', { param: removeId.value }).toString();
-        alertService.showInfo(message, { variant: 'danger' });
+       // alertService.showInfo(message, { variant: 'danger' });
 
         // Mettre à jour les listes
         clientSizes.value = clientSizes.value.filter(cs => cs.id !== removeId.value);

@@ -159,7 +159,8 @@
       "value": "Value"
     },
     "delete": {
-      "title": "Confirm delete operation"
+      "title": "Confirm delete operation",
+      "irreversible": "This action is irreversible."
     },
     "validation": {
       "required": "This field is required.",

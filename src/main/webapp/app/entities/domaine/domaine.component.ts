@@ -115,15 +115,17 @@ export default defineComponent({
     const prepareRemove = (instance: IDomaine) => {
       domaines.value.forEach(d => (d.showDropdown = false));
       removeId.value = instance.id;
-      removeEntity.value.show();
+      removeEntity.value = true;
     };
 
-    const closeDialog = () => removeEntity.value.hide();
+    const closeDialog = () => {
+      removeEntity.value = false;
+    }
 
     const removeDomaine = async () => {
       try {
         await domaineService().delete(removeId.value);
-        alertService.showInfo(t$('sdiFrontendApp.domaine.deleted', { param: removeId.value }).toString(), { variant: 'danger' });
+       // alertService.showInfo(t$('sdiFrontendApp.domaine.deleted', { param: removeId.value }).toString(), { variant: 'danger' });
 
         domaines.value = domaines.value.filter(d => d.id !== removeId.value);
         allDomaines.value = allDomaines.value.filter(d => d.id !== removeId.value);

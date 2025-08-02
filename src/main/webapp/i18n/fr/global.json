@@ -154,7 +154,8 @@
       "value": "Valeur"
     },
     "delete": {
-      "title": "Confirmation de suppression"
+      "title": "Confirmation de suppression",
+      "irreversible": "Cette action est irréversible."
     },
     "validation": {
       "required": "Ce champ est obligatoire.",
