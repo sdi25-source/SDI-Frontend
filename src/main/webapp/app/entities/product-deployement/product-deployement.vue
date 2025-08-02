@@ -36,7 +36,6 @@
         </div>
       </div>
 
-
       <!-- Filters and Actions -->
       <div class="d-flex align-items-center">
         <!-- Filters -->
@@ -118,7 +117,6 @@
             <th scope="col"><span v-text="t$('sdiFrontendApp.productDeployement.refContract')"></span></th>
             <th scope="col"><span v-text="t$('sdiFrontendApp.productDeployement.client')"></span></th>
             <th scope="col"><span>Produit</span></th>
-
             <th scope="col" width="220" class="text-center" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
           </tr>
           </thead>
@@ -164,16 +162,6 @@
                 {{ productDeployment.product ? productDeployment.product.name : productDeployment.productName }}
               </template>
             </td>
-            <!--
-            <td class="text-truncate" style="max-width: 250px" :title="productDeployment.notes">
-              <template v-if="productDeployment.isEditing">
-                <input v-model="productDeployment.notes" type="text" class="form-control-borderless" @click.stop />
-              </template>
-              <template v-else>
-                {{ productDeployment.notes }}
-              </template>
-            </td>
-            -->
             <td class="text-center" @click.stop v-if="hasAnyAuthority('ROLE_USER')">
               <div class="btn-group">
                 <template v-if="productDeployment.isEditing">
@@ -278,9 +266,6 @@
                 </option>
               </select>
             </td>
-            <!--
-            <td><input type="text" class="form-control-borderless" v-model="newProductDeployment.notes" placeholder="Notes" /></td>
-            -->
             <td class="text-center">
               <div class="action-icons">
                 <div class="icon-container save-container" @click="saveNewProductDeployment" title="Enregistrer">
@@ -303,7 +288,7 @@
             </td>
           </tr>
           <tr v-if="paginatedProductDeployments.length === 0 && !showAddRow">
-            <td colspan="5" class="empty-message">No deployement available</td>
+            <td colspan="4" class="empty-message">No deployement available</td>
           </tr>
           </tbody>
         </table>
@@ -501,6 +486,9 @@
                 <table class="table table-hover">
                   <thead class="thead-light">
                   <tr>
+                    <!--<th scope="col" width="30">
+                      <span class="text-muted small" style="font-size: 0.7rem;">Select</span>
+                    </th>-->
                     <th scope="col">Deployement</th>
                     <th scope="col">Start date</th>
                     <th scope="col">End date</th>
@@ -511,7 +499,24 @@
                   </thead>
                   <tbody>
                   <!-- Existing detail rows -->
-                  <tr v-for="detail in paginatedProductDeployementDetails" :key="detail.id" class="align-middle">
+                  <tr
+                    v-for="detail in paginatedProductDeployementDetails"
+                    :key="detail.id"
+                    class="align-middle"
+                    :class="{ 'detail-selected-for-config': selectedDetailForConfiguration && selectedDetailForConfiguration.id === detail.id }"
+                    @click="selectDetailForConfiguration(detail)"
+                    style="cursor: pointer"
+                  >
+                    <!--<td @click.stop>
+                      <input
+                        type="checkbox"
+                        :checked="selectedDetailForConfiguration && selectedDetailForConfiguration.id === detail.id"
+                        @change="selectDetailForConfiguration(detail)"
+                        title="Select for configuration view"
+                        class="detail-config-checkbox"
+                        readonly
+                      />
+                    </td>-->
                     <td class="text-truncate" style="max-width: 250px" :title="detail.notes">
                       <template v-if="detail.isEditing">
                         <input v-model="detail.notes" type="text" class="form-control" @click.stop />
@@ -651,6 +656,28 @@
                           <div class="icon-container view-container" @click="viewDetailInfo(detail)" title="Voir les détails">
                             <font-awesome-icon icon="eye"></font-awesome-icon>
                           </div>
+                          <!-- NOUVEAU: Icône de navigation vers la vue détaillée -->
+                          <router-link
+                            :to="{ name: 'ProductDeployementDetailView', params: { productDeployementDetailId: detail.id } }"
+                            custom
+                            v-slot="{ navigate }"
+                          >
+                            <div @click="navigate" class="icon-container navigate-container" title="Voir la page détaillée">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                class="bi bi-arrow-right"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"
+                                />
+                              </svg>
+                            </div>
+                          </router-link>
                         </template>
                       </div>
                     </td>
@@ -658,6 +685,9 @@
 
                   <!-- Add new detail row -->
                   <tr v-if="showAddDetailRow" class="add-row">
+                    <!--<td>
+                      <input type="checkbox" disabled style="opacity: 0.3" />
+                    </td>-->
                     <td>
                       <input type="text" class="form-control" v-model="newProductDeployementDetail.notes" placeholder="Deployement" />
                     </td>
@@ -719,7 +749,7 @@
 
                   <!-- Message if no data -->
                   <tr v-if="productDeployementDetails.length === 0 && !showAddDetailRow">
-                      <td colspan="6" class="empty-message">No details available</td>
+                    <td colspan="7" class="empty-message">No details available</td>
                   </tr>
                   </tbody>
                 </table>
@@ -728,7 +758,15 @@
               <!-- Configuration Tab -->
               <div class="configuration-tab" v-show="activeTab === 'configuration'">
                 <div class="d-flex justify-content-between mb-3">
-                  <h6 class="mb-0">Infrastructure configuration</h6>
+                  <h6 class="mb-0">
+                    Infrastructure configuration
+                    <span v-if="selectedDetailForConfiguration" class="text-muted ml-2">
+                      (for {{ selectedDetailForConfiguration.productVersion?.version || 'N/A' }})
+                    </span>
+                    <span v-else class="text-muted ml-2">
+                      (click on a deployment detail row to see its specific configuration)
+                    </span>
+                  </h6>
                 </div>
                 <table class="table table-hover">
                   <thead class="thead-light">
@@ -753,7 +791,20 @@
 
                   <!-- Message if no infrastructure data -->
                   <tr v-if="getInfraComponentVersionsForSelectedProduct().length === 0">
-                    <td colspan="2" class="empty-message">No configured infrastructure</td>
+                    <td colspan="2" class="text-center py-4">
+                      <div class="empty-state">
+                        <span v-if="selectedDetailForConfiguration">
+                          No configured infrastructure for this product version
+                        </span>
+                        <span v-else>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-cursor-fill text-muted mb-2" viewBox="0 0 16 16">
+                            <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 5 0 0 1 .557.103z"/>
+                          </svg>
+                          <h5 class="text-muted">No deployment selected</h5>
+                          <p class="text-muted">Click on a deployment detail row to view its infrastructure configuration</p>
+                        </span>
+                      </div>
+                    </td>
                   </tr>
                   </tbody>
                 </table>
@@ -1276,6 +1327,21 @@
 .selected-row {
   background-color: rgba(0, 0, 0, 0.05);
   border-left: 4px solid #000;
+}
+
+/* NOUVEAU: Styles pour la sélection de détail pour configuration */
+.detail-selected-for-config {
+  background-color: rgba(0, 123, 255, 0.1);
+  border-left: 4px solid #007bff;
+}
+
+.detail-config-checkbox {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+.detail-config-checkbox:checked {
+  accent-color: #007bff;
 }
 
 /* Filter styles */
@@ -1988,5 +2054,13 @@
 
 .module-version {
   font-size: 0.75rem;
+}
+
+.navigate-container {
+  color: #131f3a;
+}
+
+.navigate-container:hover {
+  background-color: rgba(0, 123, 255, 0.1);
 }
 </style>

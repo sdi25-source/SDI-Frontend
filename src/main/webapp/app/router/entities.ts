@@ -179,6 +179,12 @@ export default {
       component: ProductVersionUpdate,
     },
     {
+      path: '/product-deployement-detail/:detailId/view',
+      name: 'ProductDeployementDetailView',
+      component: ProductDeployementDetailDetails,
+
+    },
+    {
       path: 'product-version/:productVersionId/edit',
       name: 'ProductVersionEdit',
       component: ProductVersionUpdate,
