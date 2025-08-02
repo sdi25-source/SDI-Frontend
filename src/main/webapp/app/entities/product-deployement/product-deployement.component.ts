@@ -1,3 +1,5 @@
+"use client"
+
 import { defineComponent, ref, computed, watch, onMounted, inject } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRouter } from "vue-router"
@@ -17,6 +19,7 @@ import InfraComponentService from "../infra-component/infra-component.service"
 import type AccountService from "@/account/account.service.ts"
 import CertificationVersionService from "@/entities/certification/certification-version.service.ts"
 import CertificationService from "@/entities/certification/certification.service.ts"
+
 export default defineComponent({
   name: "ProductDeployment",
   setup() {
@@ -83,6 +86,9 @@ export default defineComponent({
     const selectedAllowedModuleVersions = ref([])
     const showModuleSelector = ref(false)
     const availableModuleVersions = ref([])
+
+    // NOUVEAU: État pour la sélection de détail spécifique pour la configuration
+    const selectedDetailForConfiguration = ref(null)
 
     // AJOUT DES CACHES COMME DANS LE COMPOSANT PRODUCT
     const moduleOptions = ref([])
@@ -229,6 +235,7 @@ export default defineComponent({
         selectedProductDeployment.value = null
         productDeployementDetails.value = []
         allProductDeployementDetails.value = []
+        selectedDetailForConfiguration.value = null
       } else {
         // Sélectionner le nouveau déploiement
         selectedProductDeployment.value = {
@@ -242,8 +249,22 @@ export default defineComponent({
           refContract: productDeployment.refContract,
         }
 
+        // Réinitialiser la sélection de détail pour la configuration
+        selectedDetailForConfiguration.value = null
+
         // Charger les détails du déploiement
         loadDeploymentDetails()
+      }
+    }
+
+    // NOUVELLE FONCTION - Sélectionner un détail pour voir sa configuration
+    const selectDetailForConfiguration = (detail) => {
+      // Désélectionner si c'est le même détail
+      if (selectedDetailForConfiguration.value && selectedDetailForConfiguration.value.id === detail.id) {
+        selectedDetailForConfiguration.value = null
+      } else {
+        selectedDetailForConfiguration.value = detail
+        console.log("Détail sélectionné pour configuration:", detail)
       }
     }
 
@@ -300,6 +321,7 @@ export default defineComponent({
       productDeployementDetails.value = []
       allProductDeployementDetails.value = []
       showAddDetailRow.value = false
+      selectedDetailForConfiguration.value = null
     }
 
     // NOUVELLE FONCTION - Charger les détails du déploiement
@@ -878,6 +900,11 @@ export default defineComponent({
         )
         updateDetailTotalItems()
 
+        // Si le détail supprimé était sélectionné pour la configuration, le désélectionner
+        if (selectedDetailForConfiguration.value && selectedDetailForConfiguration.value.id === removeDetailId.value) {
+          selectedDetailForConfiguration.value = null
+        }
+
         removeDetailId.value = null
         closeDetailDialog()
       } catch (error) {
@@ -1009,6 +1036,11 @@ export default defineComponent({
         const allIndex = allProductDeployementDetails.value.findIndex((d) => d.id === detail.id)
         if (allIndex !== -1) allProductDeployementDetails.value.splice(allIndex, 1, updated)
 
+        // Mettre à jour la sélection pour la configuration si nécessaire
+        if (selectedDetailForConfiguration.value && selectedDetailForConfiguration.value.id === detail.id) {
+          selectedDetailForConfiguration.value = updated
+        }
+
         alertService.showAlert("Détail mis à jour avec succès.", "success", { variant: "success" })
       } catch (error) {
         alertService.showHttpError(error.response)
@@ -1085,11 +1117,15 @@ export default defineComponent({
       selectedInfraInfo.value = null
     }
 
-    // Récupérer les infraComponentVersions depuis le productVersion sélectionné et les enrichir
-    const getInfraComponentVersionsForSelectedProduct = () => {
-      // Trouver la version du produit correspondant au déploiement sélectionné
+    // FONCTION MODIFIÉE - Récupérer les infraComponentVersions pour le détail sélectionné
+    const getInfraComponentVersionsForSelectedDetail = () => {
+      if (!selectedDetailForConfiguration.value?.productVersion?.id) {
+        return []
+      }
+
+      // Trouver la version du produit correspondant au détail sélectionné
       const productVersion = productVersions.value.find(
-        (pv) => pv.product && pv.product.id === selectedProductDeployment.value?.productId,
+        (pv) => pv.id === selectedDetailForConfiguration.value.productVersion.id,
       )
 
       if (!productVersion || !productVersion.infraComponentVersions) {
@@ -1113,6 +1149,17 @@ export default defineComponent({
           }
         })
         .filter((icv) => icv.infraComponent && icv.infraComponent.name) // Filtrer ceux qui ont un nom
+    }
+
+    // FONCTION MODIFIÉE - Récupérer les infraComponentVersions depuis le productVersion sélectionné et les enrichir
+    const getInfraComponentVersionsForSelectedProduct = () => {
+      // Si un détail est sélectionné pour la configuration, utiliser sa configuration spécifique
+      if (selectedDetailForConfiguration.value) {
+        return getInfraComponentVersionsForSelectedDetail()
+      }
+
+      // MODIFICATION: Si aucun détail n'est sélectionné, ne rien afficher
+      return []
     }
 
     const closeCertificationsModal = () => {
@@ -1257,6 +1304,10 @@ export default defineComponent({
       retrieveCertificationsVersions,
       addCertificationToProduct,
 
+      // NOUVEAU: Sélection de détail pour configuration
+      selectedDetailForConfiguration,
+      selectDetailForConfiguration,
+
       // État des détails
       productDeployementDetails,
       deployementTypes,
@@ -1336,12 +1387,12 @@ export default defineComponent({
   },
   methods: {
     hasAnyAuthority(authorities: any): boolean {
-      this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then(value => {
+      this.accountService.hasAnyAuthorityAndCheckAuth(authorities).then((value) => {
         if (this.hasAnyAuthorityValues[authorities] !== value) {
-          this.hasAnyAuthorityValues = { ...this.hasAnyAuthorityValues, [authorities]: value };
+          this.hasAnyAuthorityValues = { ...this.hasAnyAuthorityValues, [authorities]: value }
         }
-      });
-      return this.hasAnyAuthorityValues[authorities] ?? false;
+      })
+      return this.hasAnyAuthorityValues[authorities] ?? false
     },
   },
 })
