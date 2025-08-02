@@ -1,30 +1,34 @@
 {
   "settings": {
-    "title": "Profil de l'utilisateur [<strong>{ username }</strong>]",
+    "title": "Gérez vos informations personnelles et vos préférences de compte",
+    "layoutTitle" : "Informations personnelles",
+    "password" : "Mot de passe",
     "form": {
       "firstname": "Prénom",
       "firstname.placeholder": "Votre prénom",
       "lastname": "Nom",
       "lastname.placeholder": "Votre nom",
       "language": "Langue",
-      "button": "Sauvegarder"
+      "button": "Enregistrer",
+      "cancel": "Annuler",
+      "update": "Modifier"
     },
     "messages": {
       "error": {
-        "fail": "<strong>Une erreur est survenue !</strong> Votre profil n'a pas été sauvegardé.",
-        "emailexists": "<strong>Cet email est déjà utilisé !</strong> Veuillez en choisir un autre."
+        "fail": "Une erreur est survenue ! Les paramètres n'ont pas pu être enregistrés.",
+        "emailexists": "L'email est déjà utilisé ! Veuillez en choisir un autre."
       },
-      "success": "<strong>Votre profil a été sauvegardé !</strong>",
+      "success": "Paramètres enregistrés !",
       "validate": {
         "firstname": {
           "required": "Votre prénom est requis.",
-          "minlength": "Votre prénom doit comporter au moins un caractère.",
-          "maxlength": "Votre prénom ne doit pas comporter plus de 50 caractères."
+          "minlength": "Votre prénom doit contenir au moins 1 caractère.",
+          "maxlength": "Votre prénom ne peut pas dépasser 50 caractères."
         },
         "lastname": {
           "required": "Votre nom est requis.",
-          "minlength": "Votre nom doit comporter au moins un caractère.",
-          "maxlength": "Votre nom ne doit pas comporter plus de 50 caractères."
+          "minlength": "Votre nom doit contenir au moins 1 caractère.",
+          "maxlength": "Votre nom ne peut pas dépasser 50 caractères."
         }
       }
     }

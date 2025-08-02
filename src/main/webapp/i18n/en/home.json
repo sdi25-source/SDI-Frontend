@@ -13,6 +13,12 @@
       "chat": "JHipster public chat room",
       "follow": "follow {'@'}jhipster on Twitter"
     },
+    "welcome" : "Welcome, ",
+    "toyour": "to your ",
+    "admin": "Admin",
+    "dm": "Delivery Manager",
+    "commercial": "Commercial",
+    "space": "Space",
     "like": "If you like JHipster, don't forget to give us a star on",
     "github": "GitHub",
     "adminHomeTitle": "Admin Space",
@@ -30,6 +36,6 @@
     "equipeDdesc": "Oversees customizations, product versions, and deployments.",
     "equipeA": "Administration",
     "equipeAdesc": "Manages users, their roles, and validates system data.",
-    "refTitle": "+110 références clients accompagnées."
+    "refTitle": "+110 accompanied customer references."
   }
 }

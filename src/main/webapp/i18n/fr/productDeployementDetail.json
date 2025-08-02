@@ -2,31 +2,31 @@
   "sdiFrontendApp": {
     "productDeployementDetail": {
       "home": {
-        "title": "ProductDeployementDetails",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Product Deployement Detail",
-        "createOrEditLabel": "Créer ou éditer un Product Deployement Detail",
-        "notFound": "Aucun Product Deployement Detail trouvé"
+        "title": "Détails des Déploiements de Produit",
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer un nouveau détail de déploiement de produit",
+        "createOrEditLabel": "Créer ou modifier un détail de déploiement de produit",
+        "notFound": "Aucun détail de déploiement de produit trouvé"
       },
-      "created": "Un nouveau Product Deployement Detail a été créé avec l'identifiant { param }",
-      "updated": "Le Product Deployement Detail avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Product Deployement Detail avec l'identifiant { param } a été supprimé",
+      "created": "Un nouveau détail de déploiement de produit a été créé avec l'identifiant { param }",
+      "updated": "Un détail de déploiement de produit a été mis à jour avec l'identifiant { param }",
+      "deleted": "Un détail de déploiement de produit a été supprimé avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Product Deployement Detail { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer le détail de déploiement de produit { id } ?"
       },
       "detail": {
-        "title": "Product Deployement Detail"
+        "title": "Détail de Déploiement de Produit"
       },
       "id": "ID",
-      "startDeployementDate": "Start Deployement Date",
-      "endDeployementDate": "End Deployement Date",
+      "startDeployementDate": "Date de début du déploiement",
+      "endDeployementDate": "Date de fin du déploiement",
       "notes": "Notes",
-      "moduleDeployement": "Module Deployement",
-      "productDeployement": "Product Deployement",
-      "infraComponentVersion": "Infra Component Version",
-      "allowedModuleVersion": "Allowed Module Version",
-      "productVersion": "Product Version",
-      "deployementType": "Deployement Type"
+      "moduleDeployement": "Déploiement du module",
+      "productDeployement": "Déploiement du produit",
+      "infraComponentVersion": "Version du composant infra",
+      "allowedModuleVersion": "Version de module autorisée",
+      "productVersion": "Version du produit",
+      "deployementType": "Type de déploiement"
     }
   }
 }

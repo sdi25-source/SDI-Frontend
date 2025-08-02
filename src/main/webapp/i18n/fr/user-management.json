@@ -2,32 +2,33 @@
   "userManagement": {
     "home": {
       "title": "Utilisateurs",
-      "refreshListLabel": "Actualiser la liste",
+      "refreshListLabel": "Rafraîchir la liste",
       "createLabel": "Créer un nouvel utilisateur",
-      "createOrEditLabel": "Créer ou éditer un utilisateur",
+      "createOrEditLabel": "Créer ou modifier un utilisateur",
       "createUserTitle": "Créer un nouveau compte",
-      "updateUserTitle": "Mettre à jour un compte utilisateur"
+      "updateUserTitle": "Mettre à jour le compte utilisateur",
+      "new": "Nouveau"
     },
-    "created": "L'utilisateur { param } a été créé.",
-    "updated": "L'utilisateur { param } a été mis à jour.",
-    "deleted": "L'utilisateur { param } a été supprimé.",
+    "created": "Un nouvel utilisateur a été créé avec l’identifiant { param }",
+    "updated": "Un utilisateur a été mis à jour avec l’identifiant { param }",
+    "deleted": "Un utilisateur a été supprimé avec l’identifiant { param }",
     "delete": {
-      "question": "Êtes-vous certain de vouloir supprimer l'utilisateur { login } ?"
+      "question": "Êtes-vous sûr de vouloir supprimer l’utilisateur { login } ?"
     },
     "detail": {
       "title": "Utilisateur"
     },
-    "login": "Login",
+    "login": "Identifiant",
     "firstName": "Prénom",
     "lastName": "Nom",
     "email": "Email",
     "activated": "Activé",
     "deactivated": "Désactivé",
-    "profiles": "Droits",
+    "profiles": "Profils",
     "langKey": "Langue",
     "createdBy": "Créé par",
-    "createdDate": "Créé le",
+    "createdDate": "Date de création",
     "lastModifiedBy": "Modifié par",
-    "lastModifiedDate": "Modifié le"
+    "lastModifiedDate": "Date de modification"
   }
 }

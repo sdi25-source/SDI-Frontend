@@ -2,29 +2,29 @@
   "sdiFrontendApp": {
     "clientCertification": {
       "home": {
-        "title": "ClientCertifications",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Client Certification",
-        "createOrEditLabel": "Créer ou éditer un Client Certification",
-        "notFound": "Aucun Client Certification trouvé"
+        "title": "Certifications des clients",
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer une nouvelle certification client",
+        "createOrEditLabel": "Créer ou modifier une certification client",
+        "notFound": "Aucune certification client trouvée"
       },
-      "created": "Un nouveau Client Certification a été créé avec l'identifiant { param }",
-      "updated": "Le Client Certification avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Client Certification avec l'identifiant { param } a été supprimé",
+      "created": "Une nouvelle certification client a été créée avec l'identifiant { param }",
+      "updated": "Une certification client a été mise à jour avec l'identifiant { param }",
+      "deleted": "Une certification client a été supprimée avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Client Certification { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer la certification client { id } ?"
       },
       "detail": {
-        "title": "Client Certification"
+        "title": "Certification client"
       },
       "id": "ID",
       "certification": "Certification",
-      "certificationDate": "Certification Date",
-      "createDate": "Create Date",
-      "updateDate": "Update Date",
+      "certificationDate": "Date de certification",
+      "createDate": "Date de création",
+      "updateDate": "Date de mise à jour",
       "notes": "Notes",
       "client": "Client",
-      "certif": "Certif"
+      "certif": "Certification"
     }
   }
 }

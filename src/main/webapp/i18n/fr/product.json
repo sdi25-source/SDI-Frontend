@@ -2,30 +2,67 @@
   "sdiFrontendApp": {
     "product": {
       "home": {
-        "title": "Products",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Product",
-        "createOrEditLabel": "Créer ou éditer un Product",
-        "notFound": "Aucun Product trouvé"
+        "title": "Produits",
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer un nouveau produit",
+        "createOrEditLabel": "Créer ou modifier un produit",
+        "notFound": "Aucun produit trouvé"
       },
-      "created": "Un nouveau Product a été créé avec l'identifiant { param }",
-      "updated": "Le Product avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Product avec l'identifiant { param } a été supprimé",
+      "created": "Un nouveau produit a été créé avec l’identifiant { param }",
+      "updated": "Un produit a été mis à jour avec l’identifiant { param }",
+      "deleted": "Un produit a été supprimé avec l’identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Product { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer le produit { id } ?"
       },
       "detail": {
-        "title": "Product"
+        "title": "Produit"
       },
       "id": "ID",
-      "name": "Name",
+      "name": "Nom",
       "logo": "Logo",
       "description": "Description",
-      "createDate": "Create Date",
-      "updateDate": "Update Date",
-      "productLine": "Product Line",
+      "createDate": "Date de création",
+      "updateDate": "Date de mise à jour",
+      "productLine": "Ligne de produit",
       "module": "Module",
-      "infraComponentVersion": "Infra Component Version"
+      "infraComponentVersion": "Version du composant infra",
+      "config": "Configuration"
+    },
+    "moduleVersion": {
+      "home": {
+        "title": "Versions des modules"
+      },
+      "add": "Ajouter une version de module",
+      "module": "Module",
+      "version": "Version",
+      "versionPlaceholder": "ex. : 1.0.0",
+      "notes": "Notes",
+      "notesPlaceholder": "Saisir des notes",
+      "features": "Fonctionnalités",
+      "viewFeatures": "Voir les fonctionnalités de cette version de module",
+      "noModules": "Aucun module disponible pour cette version",
+      "requiredFields": "Le module et la version sont requis",
+      "createdAndAssigned": "Version du module créée et assignée à la version du produit"
+    },
+    "productVersion": {
+      "backToVersions": "Retour aux versions"
+    }
+  },
+  "global": {
+    "form": {
+      "selectModulePlaceholder": "Sélectionnez un module",
+      "required": "Ce champ est requis"
+    },
+    "table": {
+      "actions": "Actions"
+    }
+  },
+  "entity": {
+    "action": {
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "edit": "Modifier",
+      "delete": "Supprimer"
     }
   }
 }

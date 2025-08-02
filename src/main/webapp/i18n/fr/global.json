@@ -1,78 +1,105 @@
 {
   "global": {
     "title": "SDI",
-    "browsehappy": "Vous utilisez un <strong>ancien</strong> navigateur. Veuillez <a href=\"http://browsehappy.com/?locale=fr\">mettre à jour votre navigateur</a> pour une meilleure expérience.",
+    "browsehappy": "Vous utilisez un navigateur <strong>obsolète</strong>. Veuillez <a href=\"http://browsehappy.com/?locale=fr\">mettre à jour votre navigateur</a> pour améliorer votre expérience.",
     "menu": {
       "home": "Accueil",
-      "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
+      "jhipster-needle-menu-add-element": "JHipster ajoutera d'autres éléments de menu ici (ne pas traduire !)",
       "entities": {
+        "dashboards": "tableaux de bord",
+        "customerDash": "Tableau de bord des clients",
+        "productDash": "Tableau de bord des produits",
+        "clientLoading": "Le tableau de bord client se charge ...",
+        "productLoading": "Le tableau de bord product se charge ...",
         "main": "Entités",
-        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
-        "deployementType": "Deployement Type",
-        "customisationLevel": "Customisation Level",
-        "product": "Product",
-        "productLine": "Product Line",
-        "module": "Module",
-        "domaine": "Domaine",
-        "feature": "Feature",
-        "deployements": "Deployements",
-        "productDeployement": "Product Deployement",
-        "moduleDeployement": "Module Deployement",
-        "featureDeployement": "Feature Deployement",
-        "region": "Region",
-        "clientCertification": "Client Certification",
-        "clientSize": "Client Size",
-        "client": "Client",
-        "clientType": "Client Type",
+        "jhipster-needle-menu-add-entry": "JHipster ajoutera d'autres entités ici (ne pas traduire !)",
+        "deployementType": "Type de déploiement",
+        "customisationLevel": "Niveau de personnalisation",
+        "product": "Produits",
+        "productLine": "Ligne de produits",
+        "module": "Modules",
+        "domaine": "Domaines",
+        "feature": "Fonctionnalités",
+        "deployements": "Déploiements",
+        "productDeployement": "Déploiements de produits",
+        "moduleDeployement": "Déploiements de modules",
+        "featureDeployement": "Déploiements de fonctionnalités",
+        "region": "Régions",
+        "clientCertification": "Certification client",
+        "clientSize": "Taille du client",
+        "client": "Clients",
+        "clientType": "Type de client",
         "certification": "Certification",
-        "clientEvent": "Client Event",
-        "clientEventType": "Client Event Type",
-        "country": "Country",
+        "clientEvent": "Événements client",
+        "clientEventType": "Type d'événement client",
+        "country": "Pays",
         "ha": "HA",
-        "db": "DB",
-        "host": "HOST",
+        "db": "BD",
+        "host": "HÔTE",
         "os": "OS",
         "hsm": "HSM",
-        "applicationServer": "Application Server",
-        "actionRequest": "Action Request",
-        "productVersion": "Product Version",
-        "moduleVersion": "Module Version",
-        "featureVersion": "Feature Version",
-        "productDeployementUpgrade": "Product Deployement Details",
+        "applicationServer": "Serveur d'applications",
+        "actionRequest": "Demande d'action",
+        "productVersion": "Versions des produits",
+        "moduleVersion": "Versions des modules",
+        "featureVersion": "Versions des fonctionnalités",
+        "productDeployementUpgrade": "Détails des déploiements produits",
         "customisation": "Personnalisations",
-        "req": "demande de modifications",
-        "componentType": "Component Type",
-        "infraComponent": "Infra Component",
-        "infraComponentVersion": "Infra Component Version",
-        "parameters": "Paramètres",
-        "parametersClient": "Paramètres Clients",
-        "features": "Features",
+        "req": "Demandes de changement",
+        "componentType": "Type de composant",
+        "Components": "Composants",
+        "ComponentVersion": "Versions des composants",
         "infrastructure": "Infrastructure",
-        "alert": "Alertes Client",
-        "productDeployementDetail": "Product Deployement Detail",
-        "requestOfChange": "Request Of Change"
+        "alert": "Alertes client",
+        "parameters": "Paramètres",
+        "parametersClient": "Paramètres clients",
+        "features": "Fonctionnalités",
+        "requests": "Demandes",
+        "noDataC": "Aucune donnée disponible pour l'évolution des clients",
+        "analyticsDash": "Tableau de bord analytique",
+        "distribution": "Répartition des déploiements produits",
+        "RequestCustomisation": "Demandes de modifications par niveau de personnalisation",
+        "noDataProductAv": "Aucune donnée de déploiement produit disponible",
+        "noDataRequestAv": "Aucune demande de changement disponible",
+        "basic": "Basique",
+        "intermediate": "Intermédiaire",
+        "advanced": "Avancée",
+        "clientsOverview": "Aperçu des clients",
+        "productsOverview": "Aperçu des produits",
+        "clientGrowth": "Croissance du portefeuille client",
+        "lastVersion": "Dernière version",
+        "deploy": "Déployé",
+        "times": "fois",
+        "customer": "Client",
+        "productGrowth": "Croissance du portefeuille produit",
+        "noDataP": "Aucune donnée disponible pour l'évolution des produits",
+        "clientDistByMD": "Répartition des clients par modules déployés",
+        "noClientDataForPV": "Aucune donnée client disponible pour la dernière version",
+        "moduleEvoByPV": "Évolution des modules par version de produit",
+        "noDataForV": "Aucune donnée disponible pour cette version"
       },
       "account": {
         "main": "Compte",
-        "settings": "Profil",
+        "settings": "Paramètres",
         "password": "Mot de passe",
         "sessions": "Sessions",
-        "login": "S'authentifier",
+        "login": "Connexion",
         "logout": "Déconnexion",
-        "register": "Créer un compte",
-        "profil": "Profile"
+        "register": "Inscription",
+        "profil": "Profil",
+        "profile": "Profil"
       },
       "admin": {
         "main": "Administration",
         "userManagement": "Gestion des utilisateurs",
         "tracker": "Suivi des utilisateurs",
         "metrics": "Métriques",
-        "health": "Diagnostics",
+        "health": "Santé",
         "configuration": "Configuration",
-        "logs": "Logs",
+        "logs": "Journaux",
         "apidocs": "API",
         "database": "Base de données",
-        "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)"
+        "jhipster-needle-menu-add-admin-element": "JHipster ajoutera d'autres éléments ici (ne pas traduire !)"
       },
       "language": "Langue"
     },
@@ -84,44 +111,50 @@
       "newpassword.label": "Nouveau mot de passe",
       "newpassword.placeholder": "Nouveau mot de passe",
       "confirmpassword.label": "Confirmation du nouveau mot de passe",
-      "confirmpassword.placeholder": "Confirmation du nouveau mot de passe",
+      "confirmpassword.placeholder": "Confirmez le nouveau mot de passe",
       "email.label": "Email",
       "email.placeholder": "Votre email",
-      "profile.label": "Profile",
-      "profile.select": "Choisir un profile"
+      "profile.label": "Profil",
+      "profile.select": "Choisissez un profil"
     },
     "messages": {
       "info": {
         "authenticated": {
-          "prefix": "Si vous voulez vous ",
-          "link": "connecter",
-          "suffix": ", vous pouvez utiliser les comptes par défaut : <br/> - Administrateur (nom d'utilisateur=\"admin\" et mot de passe =\"admin\") <br/> - Utilisateur (nom d'utilisateur=\"user\" et mot de passe =\"user\")."
+          "prefix": "Si vous souhaitez ",
+          "link": "vous connecter",
+          "suffix": ", vous pouvez essayer les comptes par défaut :<br/>- Administrateur (login=\"admin\" et mot de passe=\"admin\") <br/>- Utilisateur (login=\"user\" et mot de passe=\"user\")."
         },
         "register": {
           "noaccount": "Vous n'avez pas encore de compte ?",
-          "link": "Créer un compte"
+          "link": "Créer un nouveau compte"
         }
       },
       "error": {
-        "dontmatch": "Le nouveau mot de passe et sa confirmation ne sont pas égaux !"
+        "dontmatch": "Le mot de passe et sa confirmation ne correspondent pas !"
       },
       "validate": {
+        "password": {
+          "required": "Le mot de passe est requis.",
+          "minlength": "Le mot de passe doit contenir au moins 4 caractères.",
+          "maxlength": "Le mot de passe ne peut pas dépasser 50 caractères.",
+          "strength": "Solidité du mot de passe :"
+        },
         "newpassword": {
           "required": "Votre mot de passe est requis.",
-          "minlength": "Votre mot de passe doit comporter au moins 4 caractères.",
-          "maxlength": "Votre mot de passe ne doit pas comporter plus de 50 caractères.",
-          "strength": "Robustesse du mot de passe :"
+          "minlength": "Votre mot de passe doit contenir au moins 4 caractères.",
+          "maxlength": "Votre mot de passe ne peut pas dépasser 50 caractères.",
+          "strength": "Solidité du mot de passe :"
         },
         "confirmpassword": {
-          "required": "Votre confirmation du mot de passe est requise.",
-          "minlength": "Votre confirmation du mot de passe doit comporter au moins 4 caractères.",
-          "maxlength": "Votre confirmation du mot de passe ne doit pas comporter plus de 50 caractères."
+          "required": "La confirmation du mot de passe est requise.",
+          "minlength": "La confirmation du mot de passe doit contenir au moins 4 caractères.",
+          "maxlength": "La confirmation du mot de passe ne peut pas dépasser 50 caractères."
         },
         "email": {
           "required": "Votre email est requis.",
-          "minlength": "Votre email doit comporter au moins 5 caractères.",
-          "maxlength": "Votre email ne doit pas comporter plus de 50 caractères.",
-          "invalid": "Votre email n'est pas valide."
+          "invalid": "Votre email est invalide.",
+          "minlength": "Votre email doit contenir au moins 5 caractères.",
+          "maxlength": "Votre email ne peut pas dépasser 50 caractères."
         }
       }
     },
@@ -131,66 +164,66 @@
     "ribbon": {
       "dev": "Développement"
     },
-    "item-count": "Affichage { first } - { second } de { total } items.",
+    "item-count": "Affichage de { first } à { second } sur { total } éléments.",
     "actions": "Actions",
     "others": "Autres",
     "new": "Nouveau"
   },
   "entity": {
     "action": {
-      "addblob": "Ajouter blob",
-      "addimage": "Ajouter image",
+      "addblob": "Ajouter un blob",
+      "addimage": "Ajouter une image",
       "back": "Retour",
       "cancel": "Annuler",
-      "edit": "Editer",
       "delete": "Supprimer",
+      "edit": "Modifier",
       "open": "Ouvrir",
-      "save": "Sauvegarder",
+      "save": "Enregistrer",
       "view": "Voir",
-      "show": "Show { otherEntity }"
+      "show": "Afficher { otherEntity }"
     },
     "detail": {
-      "field": "Champs",
+      "field": "Champ",
       "value": "Valeur"
     },
     "delete": {
-      "title": "Confirmation de suppression",
+      "title": "Confirmer la suppression",
       "irreversible": "Cette action est irréversible."
     },
     "validation": {
-      "required": "Ce champ est obligatoire.",
-      "minlength": "Ce champ doit faire au minimum { min } caractères.",
-      "maxlength": "Ce champ doit faire moins de { max } caractères.",
-      "min": "Ce champ doit être supérieur à { min }.",
-      "max": "Ce champ doit être inférieur à { max }.",
-      "minbytes": "Ce champ doit être supérieur à { min } bytes.",
-      "maxbytes": "Ce champ doit être inférieur à { max } bytes.",
-      "pattern": "Ce champ doit suivre l'expression régulière { pattern }.",
+      "required": "Ce champ est requis.",
+      "minlength": "Ce champ doit contenir au moins { min } caractères.",
+      "maxlength": "Ce champ ne peut pas dépasser { max } caractères.",
+      "min": "Ce champ doit être au moins { min }.",
+      "max": "Ce champ ne peut pas dépasser { max }.",
+      "minbytes": "Ce champ doit contenir au moins { min } octets.",
+      "maxbytes": "Ce champ ne peut pas dépasser { max } octets.",
+      "pattern": "Ce champ doit correspondre au motif { pattern }.",
       "number": "Ce champ doit être un nombre.",
       "datetimelocal": "Ce champ doit être une date et une heure.",
-      "patternLogin": "Ce champ ne peut contenir que des lettres, des chiffres ou des adresses e-mail."
+      "patternLogin": "Ce champ ne peut contenir que des lettres, chiffres et adresses email."
     },
     "filters": {
-      "set": "Following filters are set",
-      "clear": "Clear filter",
-      "clearAll": "Clear all filters"
+      "set": "Filtres appliqués",
+      "clear": "Effacer le filtre",
+      "clearAll": "Effacer tous les filtres"
     }
   },
   "error": {
     "internalServerError": "Erreur interne du serveur",
-    "server.not.reachable": "Serveur inaccessible",
+    "server.not.reachable": "Le serveur est inaccessible",
     "url.not.found": "Non trouvé",
     "NotNull": "Le champ { fieldName } ne peut pas être vide !",
-    "Size": "Le champ { fieldName } ne respecte pas les critères minimum et maximum !",
-    "userexists": "Login déjà utilisé !",
-    "emailexists": "Email déjà utilisé !",
-    "idexists": "Une nouvelle entité { entityName } ne peut pas avoir d'identifiant !",
-    "idnull": "Identifiant invalide",
-    "idinvalid": "Invalid Id",
-    "idnotfound": "ID cannot be found",
+    "Size": "Le champ { fieldName } ne respecte pas les contraintes de taille min/max !",
+    "userexists": "Le nom d'utilisateur est déjà utilisé !",
+    "emailexists": "L'email est déjà utilisé !",
+    "idexists": "Un nouvel objet { entityName } ne peut pas déjà avoir un ID",
+    "idnull": "ID invalide",
+    "idinvalid": "ID invalide",
+    "idnotfound": "ID introuvable",
     "file": {
       "could.not.extract": "Impossible d'extraire le fichier",
-      "not.image": "Le fichier doit être une image et non du type \"{ fileType }\""
+      "not.image": "Le fichier devait être une image, mais a été détecté comme étant \"{ fileType }\""
     }
   }
 }

@@ -86,17 +86,17 @@
                 <span v-text="t$('home.di')"></span>
               </div>
               <h1 class="mb-4">
-                <span>Welcome, </span> <span class="accent-text">{{ user.firstName }}</span> <br />
-                <span>to your </span>
-                <span v-if="hasAnyAuthority('ROLE_ADMIN')">Admin</span>
+                <span>{{ t$('home.welcome') }}</span> <span class="accent-text">{{ user.firstName }}</span> <br />
+                <span> {{ t$('home.toyour') }} </span>
+                <span v-if="hasAnyAuthority('ROLE_ADMIN')">{{ t$('home.admin') }}</span>
                 <span v-if="hasAnyAuthority('ROLE_ADMIN') && (hasAnyAuthority('ROLE_USER') || hasAnyAuthority('ROLE_COMMERCIAL'))">
                   &
                 </span>
-                <span v-if="hasAnyAuthority('ROLE_USER')">Delivery Manager</span>
+                <span v-if="hasAnyAuthority('ROLE_USER')">{{ t$('home.dm') }}</span>
                 <span v-if="hasAnyAuthority('ROLE_USER') && hasAnyAuthority('ROLE_COMMERCIAL')"> & </span>
-                <span v-if="hasAnyAuthority('ROLE_COMMERCIAL')">Commercial</span>
+                <span v-if="hasAnyAuthority('ROLE_COMMERCIAL')">{{ t$('home.commercial') }}</span>
                 <br />
-                Space
+                {{ t$('home.space') }}
               </h1>
               <span class="mb-4 mb-md-5" v-if="hasAnyAuthority('ROLE_ADMIN')"> {{ t$('home.equipeAdesc') }} </span><br />
               <span class="mb-4 mb-md-5" v-if="hasAnyAuthority('ROLE_USER')"> {{ t$('home.equipeDdesc') }} </span><br />

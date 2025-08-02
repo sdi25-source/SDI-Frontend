@@ -2,27 +2,27 @@
   "sdiFrontendApp": {
     "infraComponent": {
       "home": {
-        "title": "InfraComponents",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Infra Component",
-        "createOrEditLabel": "Créer ou éditer un Infra Component",
-        "notFound": "Aucun Infra Component trouvé"
+        "title": "Composants d'Infrastructure",
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer un nouveau composant d'infrastructure",
+        "createOrEditLabel": "Créer ou modifier un composant d'infrastructure",
+        "notFound": "Aucun composant d'infrastructure trouvé"
       },
-      "created": "Un nouveau Infra Component a été créé avec l'identifiant { param }",
-      "updated": "Le Infra Component avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Infra Component avec l'identifiant { param } a été supprimé",
+      "created": "Un nouveau composant d'infrastructure a été créé avec l'identifiant { param }",
+      "updated": "Un composant d'infrastructure a été mis à jour avec l'identifiant { param }",
+      "deleted": "Un composant d'infrastructure a été supprimé avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Infra Component { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer le composant d'infrastructure { id } ?"
       },
       "detail": {
-        "title": "Infra Component"
+        "title": "Composant d'Infrastructure"
       },
       "id": "ID",
-      "name": "Name",
-      "vendor": "Vendor",
+      "name": "Nom",
+      "vendor": "Fournisseur",
       "notes": "Notes",
-      "createDate": "Create Date",
-      "componentType": "Component Type"
+      "createDate": "Date de création",
+      "componentType": "Type de composant"
     },
     "versions": "Versions"
   }

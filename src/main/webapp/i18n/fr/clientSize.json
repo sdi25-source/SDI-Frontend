@@ -2,27 +2,27 @@
   "sdiFrontendApp": {
     "clientSize": {
       "home": {
-        "title": "ClientSizes",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Client Size",
-        "createOrEditLabel": "Créer ou éditer un Client Size",
-        "notFound": "Aucun Client Size trouvé"
+        "title": "Tailles des clients",
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer une nouvelle taille de client",
+        "createOrEditLabel": "Créer ou modifier une taille de client",
+        "notFound": "Aucune taille de client trouvée"
       },
-      "created": "Un nouveau Client Size a été créé avec l'identifiant { param }",
-      "updated": "Le Client Size avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Client Size avec l'identifiant { param } a été supprimé",
+      "created": "Une nouvelle taille de client a été créée avec l'identifiant { param }",
+      "updated": "Une taille de client a été mise à jour avec l'identifiant { param }",
+      "deleted": "Une taille de client a été supprimée avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Client Size { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer la taille de client { id } ?"
       },
       "detail": {
-        "title": "Client Size"
+        "title": "Taille de client"
       },
       "id": "ID",
-      "sizeName": "Size Name",
-      "sizeCode": "Size Code",
-      "sizeDescription": "Size Description",
-      "createDate": "Create Date",
-      "updateDate": "Update Date",
+      "sizeName": "Nom de la taille",
+      "sizeCode": "Code de la taille",
+      "sizeDescription": "Description de la taille",
+      "createDate": "Date de création",
+      "updateDate": "Date de mise à jour",
       "notes": "Notes",
       "client": "Client"
     }

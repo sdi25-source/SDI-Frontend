@@ -9,17 +9,17 @@
           <div class="nav-item" :class="{ active: activeTab === 'profile' }">
             <div class="nav-content" @click="setActiveTab('profile')">
               <i class="nav-icon">👤</i>
-              <span class="nav-label">Personal information</span>
+              <span class="nav-label">{{ t$('settings.layoutTitle') }}</span>
             </div>
             <button v-if="activeTab === 'profile'" class="edit-btn rounded-2" @click="toggleEditMode" :class="{ editing: isEditing }">
-              {{ isEditing ? 'Cancel' : 'Update' }}
+              {{ isEditing ? t$('settings.form.cancel') : t$('settings.form.update') }}
             </button>
           </div>
 
           <div class="nav-item" :class="{ active: activeTab === 'password' }" @click="setActiveTab('password')">
             <div class="nav-content">
               <i class="nav-icon">🔒</i>
-              <span class="nav-label">Password</span>
+              <span class="nav-label">{{ t$('settings.password') }}</span>
             </div>
           </div>
         </div>
@@ -43,6 +43,7 @@
 import { defineComponent, ref } from 'vue';
 import ProfileSettings from '../settings/settings.vue';
 import PasswordSettings from '../change-password/change-password.vue';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
   name: 'AccountLayout',
@@ -71,6 +72,7 @@ export default defineComponent({
     };
 
     return {
+      t$: useI18n().t,
       activeTab,
       isEditing,
       setActiveTab,

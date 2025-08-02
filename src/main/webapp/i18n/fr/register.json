@@ -1,28 +1,28 @@
 {
   "register": {
-    "title": "S'inscrire",
-    "subTitle": "Inscrivez-vous, pour continuer",
+    "title": "Inscription",
+    "subTitle": "Inscrivez-vous pour continuer",
     "form": {
-      "button": "Enregistrement",
-      "authority": "-- Choisir un rôle --",
-      "user": " Manager de déploiement",
+      "button": "S'inscrire",
+      "authority": "-Choisissez un rôle-",
+      "user": " Responsable Livraison",
       "commercial": " Commercial",
       "profile": "profil"
     },
     "messages": {
       "validate": {
         "login": {
-          "required": "Votre nom d'utilisateur est obligatoire.",
-          "minlength": "Votre nom d'utilisateur doit contenir plus d'un caractère.",
-          "maxlength": "Votre nom d'utilisateur ne peut pas contenir plus de 50 caractères.",
-          "pattern": "Votre nom d'utilisateur est invalide."
+          "required": "Votre nom d’utilisateur est requis.",
+          "minlength": "Votre nom d’utilisateur doit contenir au moins 1 caractère.",
+          "maxlength": "Votre nom d’utilisateur ne peut pas dépasser 50 caractères.",
+          "pattern": "Votre nom d’utilisateur est invalide."
         }
       },
-      "success": "<strong>Compte enregistré !</strong> Merci de vérifier votre email de confirmation.",
+      "success": "Inscription enregistrée ! Veuillez vérifier votre email pour confirmation.",
       "error": {
-        "fail": "<strong>Compte non créé !</strong> Merci d'essayer à nouveau plus tard.",
-        "userexists": "<strong>Ce compte utilisateur existe déjà !</strong> Veuillez en choisir un autre.",
-        "emailexists": "<strong>Cet email est déjà utilisé !</strong> Veuillez en choisir un autre."
+        "fail": "Échec de l’inscription ! Veuillez réessayer plus tard.",
+        "userexists": "Nom d’utilisateur déjà enregistré ! Veuillez en choisir un autre.",
+        "emailexists": "L’email est déjà utilisé ! Veuillez en choisir un autre."
       }
     }
   }

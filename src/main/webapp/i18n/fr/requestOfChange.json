@@ -1,41 +1,46 @@
 {
   "sdiFrontendApp": {
     "requestOfChange": {
+      "requestRejected": "Cette demande a été rejetée.",
+      "customizationNotApplicable": "La personnalisation ne peut pas être appliquée à ",
+      "requestApproved": "Cette demande a été acceptée.",
+      "approvedExplanation": "La personnalisation a été approuvée pour",
+      "noModules": "Aucun module affecté",
       "home": {
-        "title": "RequestOfChanges",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Request Of Change",
-        "createOrEditLabel": "Créer ou éditer un Request Of Change",
-        "notFound": "Aucun Request Of Change trouvé"
+        "title": "Demandes de changement",
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer une nouvelle demande de changement",
+        "editLabel": "Modifier une demande de changement",
+        "notFound": "Aucune demande de changement trouvée"
       },
-      "created": "Un nouveau Request Of Change a été créé avec l'identifiant { param }",
-      "updated": "Le Request Of Change avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Request Of Change avec l'identifiant { param } a été supprimé",
+      "created": "Une nouvelle demande de changement a été créée avec l'identifiant { param }",
+      "updated": "Une demande de changement a été mise à jour avec l'identifiant { param }",
+      "deleted": "Une demande de changement a été supprimée avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Request Of Change { id } ?",
+        "question": "Êtes-vous sûr de vouloir supprimer la demande de changement { id } ?",
         "cancel": "Annuler",
         "delete": "Supprimer"
       },
       "detail": {
-        "title": "Request Of Change"
+        "title": "Demande de changement"
       },
       "id": "ID",
-      "title": "Title",
-      "keywords": "Keywords",
-      "status": "Status",
+      "title": "Titre",
+      "keywords": "Mots-clés",
+      "status": "Statut",
       "description": "Description",
-      "createDate": "Créé le",
-      "updateDate": "Update Date",
+      "createDate": "Créée le",
+      "updateDate": "Date de mise à jour",
       "productVersion": "Produit",
-      "client": "Customer",
+      "client": "Client",
       "moduleVersion": "Modules affectés",
-      "customisationLevel": "Customisation Level",
+      "customisationLevel": "Niveau de personnalisation",
       "back": "Retour à la liste",
       "noModule": "Aucun module associé à cette demande",
       "Approuver": "Approuver",
       "Rejeter": "Rejeter",
-      "MarkOut": "Marquer comme terminé",
-      "AddNewProduct": "Ajouter une nouvelle version du produit",
+      "MarkOut": "Marquer comme hors service",
+      "AddNewProduct": "Ajouter une nouvelle version de produit",
       "RemettreEnattente": "Remettre en attente"
     }
   }

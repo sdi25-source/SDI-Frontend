@@ -1,13 +1,17 @@
 {
   "settings": {
-    "title": "User settings for [<strong>{ username }</strong>]",
+    "title": "Manage your personal information and account preferences",
+    "layoutTitle" : "Personal informations",
+    "password" : "Password",
     "form": {
       "firstname": "First Name",
       "firstname.placeholder": "Your first name",
       "lastname": "Last Name",
       "lastname.placeholder": "Your last name",
       "language": "Language",
-      "button": "Save"
+      "button": "Save",
+      "cancel": "Cancel",
+      "update": "Update"
     },
     "messages": {
       "error": {

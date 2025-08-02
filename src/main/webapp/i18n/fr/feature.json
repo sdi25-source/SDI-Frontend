@@ -2,29 +2,29 @@
   "sdiFrontendApp": {
     "feature": {
       "home": {
-        "title": "Features",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Feature",
-        "createOrEditLabel": "Créer ou éditer un Feature",
-        "notFound": "Aucun Feature trouvé"
+        "title": "Fonctionnalités",
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer une nouvelle fonctionnalité",
+        "createOrEditLabel": "Créer ou modifier une fonctionnalité",
+        "notFound": "Aucune fonctionnalité trouvée"
       },
-      "created": "Un nouveau Feature a été créé avec l'identifiant { param }",
-      "updated": "Le Feature avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Feature avec l'identifiant { param } a été supprimé",
+      "created": "Une nouvelle fonctionnalité a été créée avec l'identifiant { param }",
+      "updated": "Une fonctionnalité a été mise à jour avec l'identifiant { param }",
+      "deleted": "Une fonctionnalité a été supprimée avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Feature { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer la fonctionnalité { id } ?"
       },
       "detail": {
-        "title": "Feature"
+        "title": "Fonctionnalité"
       },
       "id": "ID",
-      "name": "Name",
-      "apiVersion": "Api Version",
+      "name": "Nom",
+      "apiVersion": "Version de l'API",
       "description": "Description",
-      "createDate": "Create Date",
-      "updateDate": "Update Date",
-      "featureDeployement": "Feature Deployement",
-      "moduleVersion": "Module Version"
+      "createDate": "Date de création",
+      "updateDate": "Date de mise à jour",
+      "featureDeployement": "Déploiement de la fonctionnalité",
+      "moduleVersion": "Version du module"
     }
   }
 }

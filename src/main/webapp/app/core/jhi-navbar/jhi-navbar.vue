@@ -12,17 +12,17 @@
         <ul>
           <!-- Dashboards -->
           <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'dash' }">
-            <a href="#" class="no-link-style"><span>Dashboards</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <a href="#" class="no-link-style"><span>{{ t$('global.menu.entities.dashboards') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <div class="entities-menu-container">
                 <div class="entities-category">
                   <b-dropdown-item to="dashClients">
-                    <span>Customers Dashboard</span>
+                    <span>{{ t$('global.menu.entities.customerDash') }}</span>
                   </b-dropdown-item>
                 </div>
                 <div class="entities-category">
                   <b-dropdown-item to="dashProducts">
-                    <span>Products Dashboard</span>
+                    <span>{{ t$('global.menu.entities.productDash') }}</span>
                   </b-dropdown-item>
                 </div>
               </div>
@@ -79,6 +79,26 @@
             </ul>
           </li>
 
+          <li class="dropdown" v-if="authenticated">
+            <a href="#" class="no-link-style">
+              <font-awesome-icon icon="flag" />
+             <i class="bi bi-chevron-down toggle-dropdown pl-1"></i>
+            </a>
+            <ul>
+              <li
+                v-for="(value, key) in languages"
+                :key="`lang-${key}`"
+                @click="changeLanguage(key)"
+                :class="{ active: isActiveLanguage(key) }"
+              >
+                <router-link to="" class="d-flex align-items-center gap-1 no-link-style">
+                  <span>{{value.flag}} {{" "}}{{ value.name }}</span>
+                </router-link>
+              </li>
+            </ul>
+          </li>
+
+
           <!-- Home (Unauthenticated) -->
           <li>
             <router-link to="/" exact class="nav-link active" v-if="!authenticated" :class="{ active: activeMenu === 'home' }">
@@ -89,7 +109,7 @@
           <!-- Account (Unauthenticated) -->
           <li class="dropdown" v-if="!authenticated" :class="{ active: activeMenu === 'account' }">
             <a href="#" class="no-link-style">
-              <span>{{ t$('global.menu.account.main') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i>
+              <span>{{ t$('global.menu.account.main') }}</span> <i class="bi bi-chevron-down toggle-dropdown pl-1"></i>
             </a>
             <ul>
               <li>
@@ -102,6 +122,23 @@
                 <router-link to="/register" class="d-flex align-items-center gap-1 no-link-style" @click="setActiveMenu('account')">
                   <font-awesome-icon icon="user-plus" />
                   <span>{{ t$('global.menu.account.register') }}</span>
+                </router-link>
+              </li>
+            </ul>
+          </li>
+          <li class="dropdown" v-if="!authenticated">
+            <a href="#" class="no-link-style">
+              <span>{{ t$('global.menu.language') }}</span> <i class="bi bi-chevron-down toggle-dropdown pl-1"></i>
+            </a>
+            <ul>
+              <li
+                v-for="(value, key) in languages"
+                :key="`lang-${key}`"
+                @click="changeLanguage(key)"
+                :class="{ active: isActiveLanguage(key) }"
+              >
+                <router-link to="" class="d-flex align-items-center gap-1 no-link-style">
+                  <span>{{value.flag}} {{" "}}{{ value.name }}</span>
                 </router-link>
               </li>
             </ul>

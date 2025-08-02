@@ -3,26 +3,26 @@
     "module": {
       "home": {
         "title": "Modules",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Module",
-        "createOrEditLabel": "Créer ou éditer un Module",
-        "notFound": "Aucun Module trouvé"
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer un nouveau module",
+        "createOrEditLabel": "Créer ou modifier un module",
+        "notFound": "Aucun module trouvé"
       },
-      "created": "Un nouveau Module a été créé avec l'identifiant { param }",
-      "updated": "Le Module avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Module avec l'identifiant { param } a été supprimé",
+      "created": "Un nouveau module a été créé avec l'identifiant { param }",
+      "updated": "Un module a été mis à jour avec l'identifiant { param }",
+      "deleted": "Un module a été supprimé avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Module { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer le module { id } ?"
       },
       "detail": {
         "title": "Module"
       },
       "id": "ID",
-      "name": "Name",
+      "name": "Nom",
       "description": "Description",
-      "createDate": "Create Date",
-      "updateDate": "Update Date",
-      "product": "Product"
+      "createDate": "Date de création",
+      "updateDate": "Date de mise à jour",
+      "product": "Produit"
     }
   }
 }
