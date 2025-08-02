@@ -2,7 +2,7 @@ import { type Ref, computed, defineComponent, inject, ref, onMounted, nextTick }
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useVuelidate } from '@vuelidate/core';
-import { email, maxLength, minLength, required } from '@vuelidate/validators';
+import { email, helpers, maxLength, minLength, required } from '@vuelidate/validators';
 import ClientService from './client.service';
 import useDataUtils from '@/shared/data/data-utils.service';
 import { useValidation } from '@/shared/composables';
@@ -14,6 +14,8 @@ import { type IClientSize } from '@/shared/model/client-size.model';
 import ClientTypeService from '@/entities/client-type/client-type.service';
 import { type IClientType } from '@/shared/model/client-type.model';
 import { Client, type IClient } from '@/shared/model/client.model';
+import intlTelInput from 'intl-tel-input';
+import 'intl-tel-input/build/css/intlTelInput.css';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -25,7 +27,7 @@ export default defineComponent({
     const client: Ref<IClient> = ref(new Client());
     const logoPreview = ref<string | null>(null);
     const logoSize = ref<number | null>(null);
-
+    const phoneInput = ref(null);
     const countryService = inject('countryService', () => new CountryService());
     const countries: Ref<ICountry[]> = ref([]);
     const clientSizeService = inject('clientSizeService', () => new ClientSizeService());
@@ -87,6 +89,7 @@ export default defineComponent({
           clientTypes.value = res.data;
         });
     };
+    const isDigitsOnly = helpers.regex(/^\d*$/);
 
     initRelationships();
 
@@ -135,6 +138,18 @@ export default defineComponent({
     const decompressLogo = (base64: string): string => {
       return base64.startsWith('data:image') ? base64 : `data:image/jpeg;base64,${base64}`;
     };
+    function onCardNumberInput(event: Event) {
+      const input = event.target as HTMLInputElement;
+      // Supprimer tout sauf les chiffres
+      let val = input.value.replace(/\D/g, '');
+      // Tronquer à 16 caractères max
+      if (val.length > 16) {
+        val = val.slice(0, 16);
+      }
+      // Mettre à jour la valeur
+      input.value = val;
+      client.value.currentCardHolderNumber = val;
+    }
 
     // Gestion du changement de fichier
     const onLogoChange = async (event: Event) => {
@@ -215,7 +230,6 @@ export default defineComponent({
       }
     };
 
-
     const insertCode = () => {
       const selection = window.getSelection();
       if (selection && selection.rangeCount > 0) {
@@ -250,7 +264,12 @@ export default defineComponent({
         minLength: minLength(5),
         maxLength: maxLength(50),
       },
-      currentCardHolderNumber: {},
+      currentCardHolderNumber: {
+        required,
+        isDigitsOnly,
+        minLength: minLength(16),
+        maxLength: maxLength(16),
+      },
       currentBruncheNumber: {},
       currentCustomersNumber: {},
       mainContactPhoneNumber: {},
@@ -266,20 +285,40 @@ export default defineComponent({
     const v$ = useVuelidate(validationRules, client as any);
 
     onMounted(() => {
-      if (editorContent.value) {
-        editorContent.value.addEventListener('paste', (e) => {
-          e.preventDefault();
-          const text = e.clipboardData?.getData('text/plain') || '';
-          document.execCommand('insertText', false, text);
-          updateNotes();
-        });
-      }
+      nextTick(() => {
+        const inputEl = phoneInput.value?.$el?.tagName === 'INPUT' ? phoneInput.value.$el : phoneInput.value?.$el?.querySelector('input');
+
+        if (inputEl) {
+          let itiInstance;
+          itiInstance = intlTelInput(inputEl, {
+            initialCountry: 'ma',
+            preferredCountries: ['ma', 'fr', 'us'],
+            separateDialCode: true,
+            utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js',
+          });
+
+          if (client.value.mainContactPhoneNumber) {
+            itiInstance.setNumber(client.value.mainContactPhoneNumber);
+          }
+
+          const updatePhoneValue = () => {
+            const fullNumber = itiInstance.getNumber();
+            v$.value.mainContactPhoneNumber.$model = fullNumber;
+            client.value.mainContactPhoneNumber = fullNumber;
+          };
+
+          inputEl.addEventListener('input', updatePhoneValue);
+          inputEl.addEventListener('countrychange', updatePhoneValue);
+        }
+      });
     });
 
     return {
       clientService,
       alertService,
       client,
+      onCardNumberInput,
+      phoneInput,
       logoPreview,
       logoSize,
       previousState,
@@ -314,7 +353,14 @@ export default defineComponent({
 
   methods: {
     save(): void {
-      console.log('client : ', this.client);
+      // 🔹 Forcer la dernière valeur avant envoi
+      let itiInstance;
+      if (itiInstance) {
+        this.client.mainContactPhoneNumber = itiInstance;
+      }
+
+      console.log('Numéro envoyé au backend :', this.client.mainContactPhoneNumber);
+
       this.isSaving = true;
       this.client.createDate = new Date().toISOString().split('T')[0];
       this.client.updateDate = new Date().toISOString().split('T')[0];

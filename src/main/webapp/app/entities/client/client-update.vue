@@ -123,6 +123,8 @@
                   name="currentCardHolderNumber"
                   id="client-currentCardHolderNumber"
                   data-cy="currentCardHolderNumber"
+                  maxlength="16"
+                  @input="onCardNumberInput"
                   :state="v$.currentCardHolderNumber.$anyDirty ? !v$.currentCardHolderNumber.$invalid : null"
                   v-model.number="v$.currentCardHolderNumber.$model"
                 ></b-form-input>
@@ -178,13 +180,13 @@
               ></label>
               <div class="input-with-validation">
                 <b-form-input
-                  type="text"
+                  ref="phoneInput"
+                  type="tel"
                   name="mainContactPhoneNumber"
                   id="client-mainContactPhoneNumber"
                   data-cy="mainContactPhoneNumber"
                   :state="v$.mainContactPhoneNumber.$anyDirty ? !v$.mainContactPhoneNumber.$invalid : null"
-                  v-model="v$.mainContactPhoneNumber.$model"
-                ></b-form-input>
+                />
                 <span class="valid-check" v-if="v$.mainContactPhoneNumber.$anyDirty && !v$.mainContactPhoneNumber.$invalid">
                   <font-awesome-icon icon="check" class="text-success" />
                 </span>
@@ -336,7 +338,7 @@
                     class="editor-content"
                     contenteditable="true"
                     :lang="'en'"
-                    style="direction: ltr; text-align: left;"
+                    style="direction: ltr; text-align: left"
                     @input="updateNotes"
                     @keyup="updateToolbarState"
                     @mouseup="updateToolbarState"
