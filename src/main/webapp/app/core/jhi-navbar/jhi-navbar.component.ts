@@ -86,7 +86,7 @@ export default defineComponent({
     const toggleDropdown = () => {
       dropdownOpen.value = !dropdownOpen.value;
     };
-
+    const isHovered = ref(false);
     return {
       logout,
       subIsActive,
@@ -107,6 +107,7 @@ export default defineComponent({
       activeMenu,
       setActiveMenu,
       toggleDropdown,
+      isHovered,
       t$: useI18n().t,
     };
   },

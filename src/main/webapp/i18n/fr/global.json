@@ -167,7 +167,8 @@
     "item-count": "Affichage de { first } à { second } sur { total } éléments.",
     "actions": "Actions",
     "others": "Autres",
-    "new": "Nouveau"
+    "new": "Nouveau",
+    "rights": "Tous droits réservés"
   },
   "entity": {
     "action": {

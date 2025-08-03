@@ -167,7 +167,8 @@
     "item-count": "Showing { first } - { second } of { total } items.",
     "actions": "Actions",
     "others": "Others",
-    "new": "New"
+    "new": "New",
+    "rights": "All Rights Reserved"
   },
   "entity": {
     "action": {
