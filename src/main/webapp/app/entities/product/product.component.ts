@@ -2160,11 +2160,11 @@ export default defineComponent({
           });
 
           // Contact infos
-          addStyledText('contact : +212 (0) 522 87 83 00', pageWidth - margin, 40, {
+          addStyledText('+212 (0) 522 87 83 00', pageWidth - margin, 40, {
             fontSize: 9,
             align: 'right',
           });
-          addStyledText('email : contact@s2m.ma', pageWidth - margin, 45, {
+          addStyledText('contact@s2m.ma', pageWidth - margin, 45, {
             fontSize: 9,
             align: 'right',
           });

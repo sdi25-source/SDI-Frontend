@@ -115,19 +115,26 @@ export default defineComponent({
         doc.setFont('times', 'bold');
         doc.text('CLIENT REPORT', margin, 25);
 
-        doc.setFontSize(12);
+        doc.setFontSize(16);
         doc.setFont('times', 'normal');
-        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, margin, 35);
+        doc.text(clientData.client.name || 'N/A', margin, 35);
+
+        doc.setFontSize(10);
+        doc.text(`${new Date().toLocaleDateString()}`, margin+1, 42);
 
         yPosition = 50;
         doc.setTextColor(0, 0, 0);
 
         // S2M Logo
-        doc.addImage(S2MLogo, 'PNG', doc.internal.pageSize.width - 38, 15, 17, 15);
+        doc.addImage(S2MLogo, 'PNG', doc.internal.pageSize.width - 41, 15, 20, 17);
         doc.setFontSize(12);
         doc.setFont('times', 'normal');
-        doc.text('contact : +212 (0) 522 87 83 00', 137, 35);
-        doc.text('email : contact@s2m.ma', 148, 30);
+        doc.text('+212 (0) 522 87 83 00', 151, 38);
+        doc.setFontSize(12);
+        doc.setFont('times', 'normal');
+        doc.text('S2M - Société Maghrébine de Monétique', 119, 32);
+        doc.text('contact@s2m.ma', 160, 43);
+
 
         doc.setDrawColor(200, 200, 200);
         doc.line(margin, yPosition, doc.internal.pageSize.width - margin, yPosition);
@@ -304,7 +311,7 @@ export default defineComponent({
           doc.setFont('times', 'normal');
           doc.setTextColor(128, 128, 128);
           doc.text(`Page ${i} of ${totalPages}`, doc.internal.pageSize.width - 40, doc.internal.pageSize.height - 10);
-          doc.text(`Client: ${clientData.client.name}`, margin, doc.internal.pageSize.height - 10);
+          doc.text(`${clientData.client.name}`, margin, doc.internal.pageSize.height - 10);
         }
 
         // Generate PDF Blob
