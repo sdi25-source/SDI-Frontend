@@ -6,7 +6,7 @@
           <div class="col-lg-6">
             <div class="hero-content" data-aos="fade-up" data-aos-delay="200">
               <div class="company-badge mb-4">
-                <img src="../../../content/images/s2m.svg" alt="Gear Icon" style="width: 60px; height: 40px; margin-right: 8px" />
+                <img src="../../../content/images/bgImage.png" alt="Gear Icon" style="width: 80px; height: 40px; margin-right: 8px; margin-top: 8px" />
                 <span v-text="t$('home.di')"></span>
               </div>
               <h1 class="mb-4">
@@ -82,7 +82,7 @@
           <div class="col-lg-6">
             <div class="hero-content" data-aos="fade-up" data-aos-delay="200">
               <div class="company-badge mb-4">
-                <img src="../../../content/images/s2m.svg" alt="Admin Icon" style="width: 60px; height: 40px; margin-right: 8px" />
+                <img src="../../../content/images/bgImage.png" alt="Gear Icon" style="width: 80px; height: 40px; margin-right: 8px; margin-top: 8px" />
                 <span v-text="t$('home.di')"></span>
               </div>
               <h1 class="mb-4">

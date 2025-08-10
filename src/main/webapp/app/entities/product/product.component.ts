@@ -17,6 +17,8 @@ import CertificationService from '@/entities/certification/certification.service
 import CertificationVersionService from '@/entities/certification/certification-version.service.ts';
 import type AccountService from '@/account/account.service.ts';
 import jsPDF from 'jspdf';
+import S2MLogo from '@/../content/images/bgImage.png';
+
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -2147,29 +2149,28 @@ export default defineComponent({
           // Subtitle below product name
           addStyledText('Product configuration report', margin, 35, { fontSize: 10, fontStyle: 'normal' });
 
-          // Company Logo and Name (Top Right)
-          const logoSize = 15; // Small logo size
-          const companyNameText = COMPANY_CONFIG.name;
-          const companyNameFontSize = 10; // Medium/small font size for company name
-          const companyNameWidth = doc.getTextWidth(companyNameText, {
-            fontSize: companyNameFontSize,
-            font: COMPANY_CONFIG.font,
-            fontStyle: 'bold',
-          });
+          // S2M Logo (Top Right)
+          doc.addImage(S2MLogo, 'PNG', pageWidth - 38, 17, 20, 15);
 
-          // Position for logo and company name
-          const companyX = pageWidth - margin - companyNameWidth;
-          const companyY = 25;
-
-          // Company Name
-          addStyledText(companyNameText, pageWidth - margin, companyY, {
-            fontSize: companyNameFontSize,
+          // Company Name and Infos (Top Right)
+          addStyledText(COMPANY_CONFIG.name, pageWidth - margin, 35, {
+            fontSize: 10,
             fontStyle: 'bold',
             align: 'right',
           });
 
-          // Date (below company name)
-          addStyledText(`${new Date().toLocaleDateString('fr-FR')}`, pageWidth - margin, companyY + 10, {
+          // Contact infos
+          addStyledText('contact : +212 (0) 522 87 83 00', pageWidth - margin, 40, {
+            fontSize: 9,
+            align: 'right',
+          });
+          addStyledText('email : contact@s2m.ma', pageWidth - margin, 45, {
+            fontSize: 9,
+            align: 'right',
+          });
+
+          // Date (below contact infos)
+          addStyledText(`${new Date().toLocaleDateString('fr-FR')}`, pageWidth - margin, 50, {
             fontSize: 8,
             align: 'right',
           });
@@ -2177,7 +2178,7 @@ export default defineComponent({
           // Simple line separator
           doc.setDrawColor(...COMPANY_CONFIG.colors.darkBlue);
           doc.setLineWidth(0.5);
-          doc.line(margin, 45, pageWidth - margin, 45);
+          doc.line(margin, 55, pageWidth - margin, 55);
         };
 
         // Function to add a generic header for subsequent pages
@@ -2194,7 +2195,7 @@ export default defineComponent({
           doc.line(margin, 25, pageWidth - margin, 25);
         };
 
-        // Function to add the "header" at the bottom of the page (footer)
+        // Function to add the footer
         const addBottomHeader = (productName, currentPage, totalPages) => {
           doc.setFont(COMPANY_CONFIG.font);
           doc.setTextColor(...COMPANY_CONFIG.colors.darkBlue);
@@ -2237,7 +2238,7 @@ export default defineComponent({
           let currentY = startY;
           const cellPadding = 2;
           const headerHeight = 8;
-          const minRowHeight = 7; // Minimum height for a row
+          const minRowHeight = 7;
 
           // Draw header row
           doc.setFillColor(...COMPANY_CONFIG.colors.darkBlue);
@@ -2257,30 +2258,29 @@ export default defineComponent({
           // Draw data rows
           data.forEach(row => {
             let maxCurrentRowContentHeight = 0;
-            const contentStartY = currentY + cellPadding + 1; // Y position for content within the row
+            const contentStartY = currentY + cellPadding + 1;
 
             // Calculate max height needed for this row
             currentX = margin;
             headers.forEach((header, i) => {
               const cellText = row[header] || '';
-              // Temporarily set font for height calculation
               doc.setFontSize(8);
               doc.setFont(COMPANY_CONFIG.font, 'normal');
               const lines = doc.splitTextToSize(cellText, columnWidths[i] - 2 * cellPadding);
-              const contentHeight = lines.length * (8 * 1.2 * 0.35); // fontSize * lineHeight * factor
+              const contentHeight = lines.length * (8 * 1.2 * 0.35);
               maxCurrentRowContentHeight = Math.max(maxCurrentRowContentHeight, contentHeight);
             });
 
-            const actualRowHeight = Math.max(minRowHeight, maxCurrentRowContentHeight + 2 * cellPadding); // Add padding for top/bottom
+            const actualRowHeight = Math.max(minRowHeight, maxCurrentRowContentHeight + 2 * cellPadding);
 
             // Check for page break before drawing the row
-            checkPageBreak(actualRowHeight + 5); // Add some buffer for next row
+            checkPageBreak(actualRowHeight + 5);
 
             // Draw the row content
             currentX = margin;
             doc.setDrawColor(...COMPANY_CONFIG.colors.lightGray);
             doc.setLineWidth(0.1);
-            doc.rect(margin, currentY, pageWidth - 2 * margin, actualRowHeight); // Row border
+            doc.rect(margin, currentY, pageWidth - 2 * margin, actualRowHeight);
 
             headers.forEach((header, i) => {
               const cellText = row[header] || '';
@@ -2292,16 +2292,15 @@ export default defineComponent({
             });
             currentY += actualRowHeight;
           });
-          return currentY + 5; // Add some space after the table
+          return currentY + 5;
         };
 
         // Function to add a new page if necessary
         const checkPageBreak = (requiredSpace = 20) => {
           if (yPosition + requiredSpace > pageHeight - margin - footerHeight) {
-            // Account for footer height
-            doc.addPage(); // Add new page
-            addGenericHeader(); // Add generic header to new page
-            yPosition = 35; // Position after generic header
+            doc.addPage();
+            addGenericHeader();
+            yPosition = 35;
             return true;
           }
           return false;
@@ -2309,7 +2308,7 @@ export default defineComponent({
 
         // Initial header for the first page
         addFirstPageHeader();
-        yPosition = 60; // Start content below the first page header
+        yPosition = 70; // Ajusté pour laisser de l'espace après l'en-tête étendu
 
         // General Information
         yPosition = addSectionTitle('GENERALS INFORMATIONS', yPosition);
@@ -2319,9 +2318,9 @@ export default defineComponent({
         yPosition += 5;
         yPosition += addStyledText(product.description, margin + 5, yPosition, { maxWidth: pageWidth - 2 * margin - 5 }) + 5;
 
-        // Product Lines (listed)
+        // Product Lines
         if (product.productLines && product.productLines.length > 0) {
-          addStyledText('Product Lines :', margin, yPosition, { fontStyle: 'bold' });
+          addStyledText('Product Lines:', margin, yPosition, { fontStyle: 'bold' });
           yPosition += 5;
           product.productLines.forEach(line => {
             addStyledText(`• ${line.name}`, margin + 10, yPosition);
@@ -2330,10 +2329,10 @@ export default defineComponent({
           yPosition += 5;
         }
 
-        // Modules du produit (listed, not table)
+        // Modules du produit
         if (product.modules && product.modules.length > 0) {
           checkPageBreak(30);
-          addStyledText('Product Modules :', margin, yPosition, { fontStyle: 'bold' });
+          addStyledText('Product Modules:', margin, yPosition, { fontStyle: 'bold' });
           yPosition += 5;
           product.modules.forEach(mod => {
             addStyledText(`• ${mod.name} (${mod.description || 'N/A'})`, margin + 10, yPosition);
@@ -2357,13 +2356,13 @@ export default defineComponent({
               fontStyle: 'bold',
               color: COMPANY_CONFIG.colors.darkBlue,
             });
-            addStyledText(`(Created : ${formatDate(version.createDate)})`, pageWidth - margin, yPosition, {
+            addStyledText(`(Created: ${formatDate(version.createDate)})`, pageWidth - margin, yPosition, {
               fontSize: 9,
               align: 'right',
             });
             yPosition += 10;
 
-            // Modules de cette version (TABLE avec Features avec retour à la ligne)
+            // Modules de cette version
             if (version.moduleVersions && version.moduleVersions.length > 0) {
               checkPageBreak(30);
               addStyledText('Modules Version:', margin + 5, yPosition, { fontStyle: 'bold' });
@@ -2377,7 +2376,7 @@ export default defineComponent({
                   try {
                     const moduleRes = await moduleVersionService().find(mv.id);
                     if (moduleRes.features && moduleRes.features.length > 0) {
-                      featuresText = moduleRes.features.map(f => f.name).join('\n'); // Use \n for line breaks
+                      featuresText = moduleRes.features.map(f => f.name).join('\n');
                     }
                   } catch (error) {
                     console.warn('Could not fetch features for module:', mv.id);
@@ -2389,12 +2388,11 @@ export default defineComponent({
                   };
                 }),
               );
-              // Adjust widths for 4 columns
-              const moduleColumnWidths = [45, 25, 50, pageWidth - 2 * margin - 120];
+              const moduleColumnWidths = [70, 30, pageWidth - 2 * margin - 100];
               yPosition = drawTable(moduleTableHeaders, moduleTableData, yPosition, moduleColumnWidths);
             }
 
-            // Infrastructure Components of this version (TABLE)
+            // Infrastructure Components
             if (version.infraComponentVersions && version.infraComponentVersions.length > 0) {
               checkPageBreak(30);
               addStyledText('Infrastructures Components Version:', margin + 5, yPosition, { fontStyle: 'bold' });
@@ -2409,7 +2407,7 @@ export default defineComponent({
                   Type: compDetails?.infraComponent?.componentType?.type || 'N/A',
                 };
               });
-              const infraColumnWidths = [70, 30, pageWidth - 2 * margin - 100]; // Adjust widths
+              const infraColumnWidths = [70, 30, pageWidth - 2 * margin - 100];
               yPosition = drawTable(infraTableHeaders, infraTableData, yPosition, infraColumnWidths);
             }
             yPosition += 10;
@@ -2420,18 +2418,17 @@ export default defineComponent({
         if (product.certifications && product.certifications.length > 0) {
           checkPageBreak(40);
           yPosition = addSectionTitle('CERTIFICATIONS', yPosition);
-
           product.certifications.forEach(cert => {
             checkPageBreak(15);
             const certDetails = getCertificationCached(cert.id);
             if (certDetails && certDetails.certification) {
-              addStyledText(`• ${certDetails.certification.name}  ${cert.version}`, margin + 10, yPosition);
+              addStyledText(`• ${certDetails.certification.name} ${cert.version}`, margin + 10, yPosition);
               yPosition += 8;
             }
           });
         }
 
-        // Add bottom header to all pages (after all content is rendered)
+        // Add footer to all pages
         const totalPages = doc.internal.getNumberOfPages();
         for (let i = 1; i <= totalPages; i++) {
           doc.setPage(i);
@@ -2441,10 +2438,9 @@ export default defineComponent({
         // Save the PDF
         const fileName = `S2M ${product.name.replace(/[^a-z0-9]/gi, ' ')}_${new Date().toISOString().split('T')[0]}.pdf`;
         doc.save(fileName);
-
       } catch (error) {
-        console.error("Erreur lors de l'export PDF:", error);
-        alertService.showInfo("Erreur lors de l'export PDF", { variant: 'danger' });
+        console.error('Erreur lors de l\'export PDF:', error);
+        alertService.showInfo('Erreur lors de l\'export PDF', { variant: 'danger' });
       }
     };
 

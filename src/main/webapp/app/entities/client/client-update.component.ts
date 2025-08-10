@@ -2,7 +2,7 @@ import { type Ref, computed, defineComponent, inject, ref, onMounted, nextTick }
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useVuelidate } from '@vuelidate/core';
-import { email, maxLength, minLength, required } from '@vuelidate/validators';
+import { email, helpers, maxLength, minLength, required } from '@vuelidate/validators';
 import ClientService from './client.service';
 import useDataUtils from '@/shared/data/data-utils.service';
 import { useValidation } from '@/shared/composables';
@@ -236,12 +236,11 @@ export default defineComponent({
       }
     };
 
+    const isDigitsOnly = helpers.regex(/^\+?\d*$/);
     const validations = useValidation();
     const validationRules = {
       clientLogo: {},
-      name: {
-        required: validations.required(t$('entity.validation.required').toString()),
-      },
+      name: { required: validations.required(t$('entity.validation.required').toString()) },
       code: {},
       mainContactName: {},
       mainContactEmail: {
@@ -250,7 +249,12 @@ export default defineComponent({
         minLength: minLength(5),
         maxLength: maxLength(50),
       },
-      currentCardHolderNumber: {},
+      currentCardHolderNumber: {
+        required,
+        isDigitsOnly,
+        minLength: minLength(16),
+        maxLength: maxLength(16),
+      },
       currentBruncheNumber: {},
       currentCustomersNumber: {},
       mainContactPhoneNumber: {},

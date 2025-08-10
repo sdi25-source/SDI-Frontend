@@ -113,7 +113,7 @@
           <!-- Notes section - SECTION MODIFIÉE POUR AFFICHER LE HTML FORMATÉ -->
           <div class="mb-4 pb-3 mt-4">
             <label class="fw-bold mb-2" v-text="t$('sdiFrontendApp.client.notes')"></label>
-            <div class="notes-content" v-html="client.notes || 'Aucune note disponible'"></div>
+            <div class="notes-content" v-html="client.notes"></div>
           </div>
 
           <!-- Modal Footer with Buttons -->

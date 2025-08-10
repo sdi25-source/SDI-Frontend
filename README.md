@@ -75,7 +75,6 @@ For further instructions on how to develop with JHipster, have a look at [Using 
 ### Client tests
 
 Unit tests are run by [Vitest][]. They're located near components and can be run with:
-
 ```
 ./npmw test
 ```
