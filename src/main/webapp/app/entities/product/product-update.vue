@@ -110,7 +110,7 @@
           <div class="form-group">
             <label v-text="t$('sdiFrontendApp.product.productLine')" for="product-productLine"></label>
             <select
-              class="form-control"
+              class="form-select"
               id="product-productLines"
               data-cy="productLine"
               multiple

@@ -147,36 +147,59 @@
                   <span :title="product.description">{{ product.description }}</span>
                 </template>
               </td>
-              <td>
+              <td style="overflow: visible">
                 <template v-if="product.isEditing">
-                  <select
-                    v-model="editProductLineIds"
-                    multiple
-                    class="form-control-borderless"
-                    @change="updateEditProductLines(product)"
-                    @click.stop
-                  >
-                    <option v-for="productLine in productLineOptions" :key="productLine.id" :value="productLine.id">
-                      {{ productLine.name }}
-                    </option>
-                  </select>
-                  <div v-if="product.productLines && product.productLines.length > 0" class="selected-items mt-2">
-                    <span v-for="line in product.productLines" :key="line.id" class="badge badge-primary mr-1">
+                  <div class="dropdown position-static">
+                    <button
+                      class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
+                      type="button"
+                      data-bs-toggle="dropdown"
+                      data-bs-auto-close="outside"
+                      aria-expanded="false"
+                    >
+                      {{
+                        editProductLineIds.length
+                          ? editProductLineIds.map(id => productLineOptions.find(pl => pl.id === id)?.name).join(', ')
+                          : 'Sélectionner des lignes produits'
+                      }}
+                    </button>
+
+                    <ul class="dropdown-menu p-2" @click.stop style="max-height: 260px; overflow-y: auto">
+                      <li v-for="productLine in productLineOptions" :key="productLine.id">
+                        <label class="dropdown-item d-flex align-items-center">
+                          <input
+                            class="form-check-input me-2"
+                            type="checkbox"
+                            :value="productLine.id"
+                            v-model="editProductLineIds"
+                            @change="updateEditProductLines(product)"
+                          />
+                          <span>{{ productLine.name }}</span>
+                        </label>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div v-if="product.productLines?.length" class="mt-2">
+                    <span v-for="line in product.productLines" :key="line.id" class="badge bg-primary me-1">
                       {{ line.name }}
-                      <button type="button" class="close ml-1" @click.stop="removeEditProductLine(product, line.id)">&times;</button>
+                      <button
+                        type="button"
+                        class="btn-close btn-close-white btn-sm ms-1"
+                        style="font-size: 0.6rem"
+                        @click.stop="removeEditProductLine(product, line.id)"
+                      ></button>
                     </span>
                   </div>
                 </template>
+
                 <template v-else>
-                  <span
-                    v-for="(productLine, i) in product.productLines"
-                    :key="productLine.id"
-                    class="badge badge-light alert-secondary ml-2"
-                  >
-                    {{ productLine.name }}
+                  <span v-for="pl in product.productLines" :key="pl.id" class="badge bg-secondary ms-2">
+                    {{ pl.name }}
                   </span>
                 </template>
               </td>
+
               <td class="text-center" @click.stop>
                 <div class="action-icons">
                   <template v-if="product.isEditing">
@@ -750,11 +773,7 @@
                     <tr v-for="(module, index) in getFilteredModules" :key="index">
                       <td class="pl-5">
                         <template v-if="isEditingModuleVersion && editingModuleVersionData && editingModuleVersionData.id === module.id">
-                          <select
-                            v-model="editingModuleVersionData.module"
-                            class="form-control-borderless"
-                            @click.stop
-                          >
+                          <select v-model="editingModuleVersionData.module" class="form-control-borderless" @click.stop>
                             <option v-for="moduleOption in moduleOptions" :key="moduleOption.id" :value="{ id: moduleOption.id }">
                               {{ moduleOption.name }}
                             </option>
@@ -799,15 +818,38 @@
                               <font-awesome-icon icon="save"></font-awesome-icon>
                             </div>
                             <div class="icon-container cancel-container" @click="cancelEditModuleVersion" title="Annuler">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                class="bi bi-x"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+                                />
                               </svg>
                             </div>
                           </template>
                           <template v-else>
-                            <div class="icon-container edit-container" @click="editModuleVersion(module)" :title="t$('entity.action.edit')" v-if="hasAnyAuthority('ROLE_USER')">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-                                <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+                            <div
+                              class="icon-container edit-container"
+                              @click="editModuleVersion(module)"
+                              :title="t$('entity.action.edit')"
+                              v-if="hasAnyAuthority('ROLE_USER')"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                fill="currentColor"
+                                class="bi bi-pencil-fill"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                                />
                               </svg>
                             </div>
                             <div
@@ -816,12 +858,32 @@
                               :title="t$('entity.action.delete')"
                               v-if="hasAnyAuthority('ROLE_USER')"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                fill="currentColor"
+                                class="bi bi-x"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+                                />
                               </svg>
                             </div>
                             <div class="icon-container save-container" @click="openModuleFeaturesModal(module)" title="features">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon"
+                              >
                                 <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
                                 <polyline points="2 17 12 22 22 17"></polyline>
                                 <polyline points="2 12 12 17 22 12"></polyline>
@@ -2042,9 +2104,7 @@
             <button type="button" class="button button-danger" @click="confirmRemoveModuleVersion">Delete</button>
           </div>
         </div>
-
       </div>
-
     </div>
     <div class="section"></div>
     <div class="section"></div>

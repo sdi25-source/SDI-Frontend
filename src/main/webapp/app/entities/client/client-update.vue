@@ -88,26 +88,52 @@
                 </span>
               </div>
             </div>
+            <!-- Wrapper (optionnel : container) -->
+            <div class="container">
+              <div class="form-group">
+                <div class="row gap">
+                  <div class="col-12 col-md-6 form-group">
+                    <!-- Email -->
+                    <label class="label-c" for="client-mainContactEmail">{{ t$('sdiFrontendApp.client.mainContactEmail') }}</label>
+                    <div class="input-with-validation">
+                      <b-form-input
+                        type="email"
+                        id="client-mainContactEmail"
+                        :state="v$.mainContactEmail.$anyDirty ? !v$.mainContactEmail.$invalid : null"
+                        v-model="v$.mainContactEmail.$model"
+                      />
+                      <span class="valid-check" v-if="v$.mainContactEmail.$anyDirty && !v$.mainContactEmail.$invalid">
+                        <font-awesome-icon icon="check" class="text-success" />
+                      </span>
+                    </div>
+                    <div v-if="v$.mainContactEmail.$anyDirty && v$.mainContactEmail.$invalid">
+                      <small class="form-text text-danger" v-for="error of v$.mainContactEmail.$errors" :key="error.$uid">
+                        {{ error.$message }}
+                      </small>
+                    </div>
+                  </div>
 
-            <div class="form-group">
-              <label class="label-c" v-text="t$('sdiFrontendApp.client.mainContactEmail')" for="client-mainContactEmail"></label>
-              <div class="input-with-validation">
-                <b-form-input
-                  type="email"
-                  name="mainContactEmail"
-                  id="client-mainContactEmail"
-                  data-cy="mainContactEmail"
-                  :state="v$.mainContactEmail.$anyDirty ? !v$.mainContactEmail.$invalid : null"
-                  v-model="v$.mainContactEmail.$model"
-                ></b-form-input>
-                <span class="valid-check" v-if="v$.mainContactEmail.$anyDirty && !v$.mainContactEmail.$invalid">
-                  <font-awesome-icon icon="check" class="text-success" />
-                </span>
-              </div>
-              <div v-if="v$.mainContactEmail.$anyDirty && v$.mainContactEmail.$invalid">
-                <small class="form-text text-danger" v-for="error of v$.mainContactEmail.$errors" :key="error.$uid">
-                  {{ error.$message }}
-                </small>
+                  <div class="col-12 col-md-6 form-group">
+                    <!-- Phone -->
+                    <label class="label-c" for="client-mainContactPhoneNumber">{{
+                      t$('sdiFrontendApp.client.mainContactPhoneNumber')
+                    }}</label>
+                    <div class="input-with-validation">
+                      <input
+                        ref="phoneInput"
+                        type="tel"
+                        class="form-control"
+                        id="client-mainContactPhoneNumber"
+                        :class="{ 'is-invalid': v$.mainContactPhoneNumber.$invalid && v$.mainContactPhoneNumber.$dirty }"
+                        :state="v$.mainContactPhoneNumber.$anyDirty ? !v$.mainContactPhoneNumber.$invalid : null"
+                        v-model="v$.mainContactPhoneNumber.$model"
+                      />
+                      <span v-if="v$.mainContactPhoneNumber.$dirty && !v$.mainContactPhoneNumber.$invalid">
+                        <font-awesome-icon icon="check" class="text-success" />
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -173,27 +199,6 @@
             </div>
 
             <div class="form-group">
-              <label
-                class="label-c"
-                v-text="t$('sdiFrontendApp.client.mainContactPhoneNumber')"
-                for="client-mainContactPhoneNumber"
-              ></label>
-              <div class="input-with-validation">
-                <b-form-input
-                  ref="phoneInput"
-                  type="tel"
-                  name="mainContactPhoneNumber"
-                  id="client-mainContactPhoneNumber"
-                  data-cy="mainContactPhoneNumber"
-                  :state="v$.mainContactPhoneNumber.$anyDirty ? !v$.mainContactPhoneNumber.$invalid : null"
-                />
-                <span class="valid-check" v-if="v$.mainContactPhoneNumber.$anyDirty && !v$.mainContactPhoneNumber.$invalid">
-                  <font-awesome-icon icon="check" class="text-success" />
-                </span>
-              </div>
-            </div>
-
-            <div class="form-group">
               <label class="label-c" v-text="t$('sdiFrontendApp.client.website')" for="client-url"></label>
               <div class="input-with-validation">
                 <b-form-input
@@ -225,16 +230,6 @@
                   <font-awesome-icon icon="check" class="text-success" />
                 </span>
               </div>
-            </div>
-
-            <div class="form-group">
-              <label class="label-c" v-text="t$('sdiFrontendApp.client.country')"></label>
-              <select class="form-control" id="country-select" v-model="client.country">
-                <option value="" disabled selected></option>
-                <option v-for="country in countries" :key="country.id" :value="country">
-                  {{ country.countryFlag }} {{ country.countryname }}
-                </option>
-              </select>
             </div>
 
             <div class="form-group">

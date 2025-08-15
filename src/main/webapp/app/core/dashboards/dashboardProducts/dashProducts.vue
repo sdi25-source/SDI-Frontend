@@ -47,7 +47,9 @@
           <div class="chart-wrapper">
             <canvas ref="productsEvolutionChart" width="800" height="400"></canvas>
           </div>
-          <div v-if="productsEvolutionData.labels.length === 0" class="no-data-message">No data available for the evolution of products</div>
+          <div v-if="productsEvolutionData.labels.length === 0" class="no-data-message">
+            No data available for the evolution of products
+          </div>
         </div>
       </div>
 
@@ -58,31 +60,49 @@
           <button @click="closeCharts" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i> Close</button>
         </div>
 
-        <div class="row">
-          <!-- Left Chart - Clients Distribution -->
-          <div class="col-md-6">
-            <div class="chart-container">
-              <h4 class="chart-title">
-                Clients Distribution by Module Deployments (Latest Version:
-                {{ selectedProduct.name || 'N/A' }}
-                v{{ latestVersions.get(selectedProduct.name)?.version || 'N/A' }})
-              </h4>
-              <div class="chart-wrapper">
-                <canvas ref="clientsChart" width="400" height="400"></canvas>
-              </div>
-              <div v-if="clientsChartData.labels.length === 0" class="no-data-message">No client data available for the latest version</div>
-            </div>
-          </div>
+        <div class="card p-3">
+          <h4 class="mb-4">
+            Clients Distribution by Module Deployments (Latest Version:
+            {{ selectedProduct.name || 'N/A' }}
+            v{{ latestVersions.get(selectedProduct.name)?.version || 'N/A' }})
+          </h4>
 
-          <!-- Right Chart - Product Versions -->
-          <div class="col-md-6">
-            <div class="chart-container">
-              <h4 class="chart-title">Module Evolution by Product Version</h4>
-              <div class="chart-wrapper">
-                <canvas ref="versionsChart" width="400" height="400"></canvas>
-              </div>
-              <div v-if="versionsChartData.labels.length === 0" class="no-data-message">No version data available</div>
+          <table class="table table-hover">
+            <tbody>
+              <template v-for="client in productDeployementComponent.client" :key="client.id">
+                <!-- Ligne client -->
+                <tr>
+                  <td style="width: 50px">
+                    <img
+                      :src="productDeployementComponent.client.clientLogo || '/assets/placeholders/client-logo-placeholder.png'"
+                      alt="logo client"
+                      style="width: 40px; height: 40px; object-fit: contain; margin-right: 10px"
+                    />
+                  </td>
+                  <td>{{ productDeployementComponent.client.name }}</td>
+                  <!--   <td style="width: 250px">
+                    <select class="form-select" v-model="selectedDeployments[client.id]" @change="onDeploymentChange(client.id)">
+                      <option value="">-- Select Deployment --</option>
+                      <option v-for="deploy in client.deployments" :key="deploy.id" :value="deploy.id">
+                        {{ productDeployementComponent }}
+                      </option>
+                    </select>
+                  </td> -->
+                </tr>
+              </template>
+            </tbody>
+          </table>
+          <div v-if="clientsChartData.labels.length === 0" class="no-data-message">{{ t$('global.menu.entities.noClientDataForPV') }}</div>
+        </div>
+
+        <!-- Right Chart - Product Versions -->
+        <div class="card p-3 mb-4">
+          <div class="chart-container">
+            <h4 class="mb-4">Module Evolution by Product Version</h4>
+            <div class="chart-wrapper">
+              <canvas ref="versionsChart" width="400" height="400"></canvas>
             </div>
+            <div v-if="versionsChartData.labels.length === 0" class="no-data-message">No version data available</div>
           </div>
         </div>
       </div>
@@ -125,8 +145,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .dashboard-content {

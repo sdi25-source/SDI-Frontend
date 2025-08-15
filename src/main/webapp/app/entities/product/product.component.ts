@@ -41,7 +41,6 @@ export default defineComponent({
     const accountService = inject<AccountService>('accountService');
     const alertService = inject('alertService', () => useAlertService(), true);
 
-    // Data
     const hasAnyAuthorityValues: Ref<any> = ref({});
     const products = ref([]);
     const allProducts = ref([]);
@@ -306,8 +305,6 @@ export default defineComponent({
         .filter(Boolean); // Filtrer les entrées non trouvées
     });
 
-
-
     // Get filtered modules based on selected version
     const getFilteredModules = computed(() => {
       if (!selectedProduct.value) return [];
@@ -328,10 +325,6 @@ export default defineComponent({
         return selectedProduct.value.modules || [];
       }
     });
-
-
-
-
 
     // Methods
     const retrieveProducts = async () => {
@@ -365,8 +358,6 @@ export default defineComponent({
       }
     };
 
-
-
     const retrieveCertificationsVersions = async () => {
       try {
         const res = await certificationVersionService().retrieve();
@@ -375,7 +366,6 @@ export default defineComponent({
         alertService.showHttpError(err.response);
       }
     };
-
 
     const retrieveCertifications = async () => {
       try {
@@ -2456,7 +2446,6 @@ export default defineComponent({
         // Save the PDF
         const fileName = `S2M ${product.name.replace(/[^a-z0-9]/gi, ' ')}_${new Date().toISOString().split('T')[0]}.pdf`;
         doc.save(fileName);
-
       } catch (error) {
         console.error("Erreur lors de l'export PDF:", error);
         alertService.showInfo("Erreur lors de l'export PDF", { variant: 'danger' });

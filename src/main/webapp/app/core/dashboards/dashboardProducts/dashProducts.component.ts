@@ -14,9 +14,15 @@ import Chart from 'chart.js/auto';
 import type { IProductDeployement } from '@/shared/model/product-deployement.model.ts';
 import ProductDeployementService from '@/entities/product-deployement/product-deployement.service.ts';
 import ModuleService from '@/entities/module/module.service.ts';
+import productDeployementComponent from '@/entities/product-deployement/product-deployement.component.ts';
 
 export default defineComponent({
   name: 'DashProductsComponent',
+  computed: {
+    productDeployementComponent() {
+      return productDeployementComponent;
+    },
+  },
   setup() {
     const loginService = inject<LoginService>('loginService');
     const authenticated = inject<ComputedRef<boolean>>('authenticated');
@@ -81,6 +87,7 @@ export default defineComponent({
 
     const loadProductsEvolutionData = async () => {
       try {
+        loading.value = true;
         // Récupérer tous les produits avec leurs dates de création
         const allProducts = await productService.retrieve();
         const productsData = allProducts.data || allProducts;
@@ -100,11 +107,10 @@ export default defineComponent({
         // Grouper par mois et calculer le cumul
         const monthlyCount = Array(12).fill(0);
         const cumulativeCount = Array(12).fill(0);
-        const productsByMonth = Array(12).fill(null).map(() => []); // Stocker les noms des produits
-        const monthNames = [
-          'Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun',
-          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-        ];
+        const productsByMonth = Array(12)
+          .fill(null)
+          .map(() => []); // Stocker les noms des produits
+        const monthNames = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
         // Compter les produits par mois et stocker leurs noms
         currentYearProducts.forEach(product => {
@@ -132,7 +138,7 @@ export default defineComponent({
               borderWidth: 2,
               type: 'bar',
               order: 2,
-              productNames: productsByMonth // Ajouter les noms des produits
+              productNames: productsByMonth, // Ajouter les noms des produits
             },
             {
               label: 'Cumulative growth',
@@ -148,13 +154,15 @@ export default defineComponent({
               pointBorderWidth: 2,
               pointRadius: 6,
               pointHoverRadius: 8,
-              order: 1
-            }
-          ]
+              order: 1,
+            },
+          ],
         };
       } catch (error) {
         console.error('Error loading products evolution data:', error);
         productsEvolutionData.value = { labels: [], datasets: [] };
+      } finally {
+        loading.value = false;
       }
     };
 
@@ -242,7 +250,12 @@ export default defineComponent({
           console.log('moduleCount', moduleCount);
 
           // Collect module names
-          const moduleNames = detail.allowedModuleVersions?.map(mv => getModuleVersionWithModuleCached(mv.id).module?.name +' v'+getModuleVersionWithModuleCached(mv.id).version + "\n"|| 'Unknown Module') || [];
+          const moduleNames =
+            detail.allowedModuleVersions?.map(
+              mv =>
+                getModuleVersionWithModuleCached(mv.id).module?.name + ' v' + getModuleVersionWithModuleCached(mv.id).version + '\n' ||
+                'Unknown Module',
+            ) || [];
           const uniqueModuleNames = clientModuleNames.get(clientName) || new Set<string>();
           moduleNames.forEach(name => uniqueModuleNames.add(name));
           clientModuleNames.set(clientName, uniqueModuleNames);
@@ -276,10 +289,13 @@ export default defineComponent({
               backgroundColor: backgroundColors,
               borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
               borderWidth: 2,
-              moduleNames: Array.from(clientModuleNames.entries()).reduce((acc, [client, names]) => {
-                acc[client] = Array.from(names);
-                return acc;
-              }, {} as Record<string, string[]>), // Store module names per client
+              moduleNames: Array.from(clientModuleNames.entries()).reduce(
+                (acc, [client, names]) => {
+                  acc[client] = Array.from(names);
+                  return acc;
+                },
+                {} as Record<string, string[]>,
+              ), // Store module names per client
             },
           ],
         };
@@ -320,7 +336,7 @@ export default defineComponent({
         });
 
         // Extract version labels and module counts
-        const labels = sortedVersions.map(version => 'v '+ version.version || 'Unknown');
+        const labels = sortedVersions.map(version => 'v ' + version.version || 'Unknown');
         const data = sortedVersions.map(version => version.moduleVersions?.length || 0);
 
         // Generate colors for better visualization
@@ -542,12 +558,12 @@ export default defineComponent({
                 position: 'top',
                 labels: {
                   usePointStyle: true,
-                  padding: 20
-                }
+                  padding: 20,
+                },
               },
               tooltip: {
                 callbacks: {
-                  label: function(context) {
+                  label: function (context) {
                     const datasetLabel = context.dataset.label || '';
                     const value = context.parsed.y;
 
@@ -569,32 +585,32 @@ export default defineComponent({
                       return tooltip.split('\n');
                     }
                   },
-                  title: function(context) {
+                  title: function (context) {
                     return `${context[0].label} ${currentYear.value}`;
-                  }
-                }
-              }
+                  },
+                },
+              },
             },
             scales: {
               y: {
                 beginAtZero: true,
                 ticks: {
                   stepSize: 1,
-                  callback: function(value) {
+                  callback: function (value) {
                     return Number.isInteger(value) ? value : '';
-                  }
+                  },
                 },
                 title: {
                   display: true,
                   text: 'Number of products',
                   font: {
                     size: 14,
-                    weight: 'bold'
-                  }
+                    weight: 'bold',
+                  },
                 },
                 grid: {
-                  color: 'rgba(0, 0, 0, 0.1)'
-                }
+                  color: 'rgba(0, 0, 0, 0.1)',
+                },
               },
               x: {
                 title: {
@@ -602,19 +618,19 @@ export default defineComponent({
                   text: `month - ${currentYear.value}`,
                   font: {
                     size: 14,
-                    weight: 'bold'
-                  }
+                    weight: 'bold',
+                  },
                 },
                 grid: {
-                  display: false
-                }
-              }
+                  display: false,
+                },
+              },
             },
             animation: {
               duration: 1000,
-              easing: 'easeInOutQuart'
-            }
-          }
+              easing: 'easeInOutQuart',
+            },
+          },
         });
       }
     };
