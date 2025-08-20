@@ -15,10 +15,10 @@ import type { IInfraComponent } from '@/shared/model/infra-component.model.ts';
 import type { IComponentType } from '@/shared/model/component-type.model.ts';
 import CertificationService from '@/entities/certification/certification.service.ts';
 import CertificationVersionService from '@/entities/certification/certification-version.service.ts';
+import ClientCertificationService from '@/entities/client-certification/client-certification.service.ts';
 import type AccountService from '@/account/account.service.ts';
 import jsPDF from 'jspdf';
 import S2MLogo from '@/../content/images/bgImage.png';
-
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -40,6 +40,8 @@ export default defineComponent({
     const productLineService = inject('productLineService', () => new ProductLineService());
     const certificationService = inject('certificationService', () => new CertificationService());
     const certificationVersionService = inject('certificationVersionService', () => new CertificationVersionService());
+    const clientCertificationService = inject('clientCertificationService', () => new ClientCertificationService());
+
     const accountService = inject<AccountService>('accountService');
     const alertService = inject('alertService', () => useAlertService(), true);
 
@@ -53,7 +55,7 @@ export default defineComponent({
     const searchTerm = ref('');
     const searchTimeout = ref(null);
     const currentPage = ref(1);
-    const itemsPerPage = ref(10);
+    const itemsPerPage = ref(20);
     const totalItems = ref(0);
     const selectedProduct = ref(null);
     const selectedVersion = ref(null);
@@ -85,6 +87,9 @@ export default defineComponent({
     const certificationsOptionsVersions = ref([]);
     const selectedProductLineIds = ref([]);
     const editProductLineIds = ref([]);
+
+    const viewTabs = ref(false);
+
 
     // Product settings modal
     const showSettingsModal = ref(false);
@@ -308,8 +313,6 @@ export default defineComponent({
         .filter(Boolean); // Filtrer les entrées non trouvées
     });
 
-
-
     // Get filtered modules based on selected version
     const getFilteredModules = computed(() => {
       if (!selectedProduct.value) return [];
@@ -330,10 +333,6 @@ export default defineComponent({
         return selectedProduct.value.modules || [];
       }
     });
-
-
-
-
 
     // Methods
     const retrieveProducts = async () => {
@@ -367,8 +366,6 @@ export default defineComponent({
       }
     };
 
-
-
     const retrieveCertificationsVersions = async () => {
       try {
         const res = await certificationVersionService().retrieve();
@@ -377,7 +374,6 @@ export default defineComponent({
         alertService.showHttpError(err.response);
       }
     };
-
 
     const retrieveCertifications = async () => {
       try {
@@ -531,9 +527,12 @@ export default defineComponent({
         selectedProduct.value = null;
         selectedVersion.value = null;
         productVersions.value = [];
+        viewTabs.value = false;
       } else {
         selectedProduct.value = product;
         selectedVersion.value = null;
+        viewTabs.value = true;
+
 
         // Update breadcrumb
         breadcrumb.value = [
@@ -656,8 +655,19 @@ export default defineComponent({
 
     const openCertifications = product => {
       selectedProduct.value = product;
-      productCertifications.value = product.certifications || [];
+      loadProductClientCertifications(product.id);
       showCertificationsModal.value = true;
+    };
+
+    const loadProductClientCertifications = async productId => {
+      try {
+        const res = await clientCertificationService().retrieve();
+        console.log('testttt :', res.data);
+        // Filter client certifications for this specific product
+        productCertifications.value = res.data.filter(clientCert => clientCert.product && clientCert.product.id === productId);
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
     };
 
     const closeCertificationsModal = () => {
@@ -693,13 +703,8 @@ export default defineComponent({
     const saveCertificationsModal = async () => {
       try {
         if (selectedProduct.value) {
-          // Update existing product
-          selectedProduct.value.certifications = productCertifications.value;
-          await productService().update(selectedProduct.value);
-          await retrieveProducts();
-        } else {
-          newProduct.value.modules = productModules.value;
-          newProduct.value.certifications = productCertifications.value;
+          // The client certifications are already saved when added/removed
+          await retrieveProducts(); // Refresh the products list
         }
         closeCertificationsModal();
       } catch (error) {
@@ -821,21 +826,45 @@ export default defineComponent({
       productModules.value.splice(index, 1);
     };
 
-    const addCertificationToProduct = () => {
-      if (!selectedCertificationId.value) return;
+    const addCertificationToProduct = async () => {
+      if (!selectedCertificationId.value || !selectedProduct.value) return;
 
-      const certification = getCertificationById(selectedCertificationId.value);
-      if (certification) {
-        const exists = productCertifications.value.some(c => c.id === certification.id);
-        if (!exists) {
-          productCertifications.value.push(certification);
+      const certificationVersion = getCertificationById(selectedCertificationId.value);
+      if (certificationVersion) {
+        try {
+          const newClientCertification = {
+            certification: `${certificationVersion.certification.name}`,
+            certificationDate: new Date(),
+            createDate: new Date(),
+            client: null, // The client is actually the product in this context
+            certificationVersion: certificationVersion,
+            product: selectedProduct.value, // Associate with the current product
+            productDeployements: null,
+          };
+
+          const res = await clientCertificationService().create(newClientCertification);
+
+          // Add to local array
+          productCertifications.value.push(res.data);
+          selectedCertificationId.value = '';
+
+          await loadProductClientCertifications(selectedProduct.value.id);
+        } catch (error) {
+          alertService.showHttpError(error.response);
         }
-        selectedCertificationId.value = '';
       }
     };
 
-    const removeCertificationFromProduct = index => {
-      productCertifications.value.splice(index, 1);
+    const removeCertificationFromProduct = async index => {
+      try {
+        const clientCertification = productCertifications.value[index];
+        if (clientCertification.id) {
+          await clientCertificationService().delete(clientCertification.id);
+        }
+        productCertifications.value.splice(index, 1);
+      } catch (error) {
+        alertService.showHttpError(error.response);
+      }
     };
 
     const addInfraToProduct = () => {
@@ -979,6 +1008,7 @@ export default defineComponent({
           productLines: [],
           infraComponentVersions: [],
           modules: [],
+          certifications: [],
         };
         selectedProductLineIds.value = [];
 
@@ -1002,6 +1032,7 @@ export default defineComponent({
         productLines: [],
         infraComponentVersions: [],
         modules: [],
+        certifications: [],
       };
       selectedProductLineIds.value = [];
     };
@@ -1074,7 +1105,7 @@ export default defineComponent({
         await productVersionService().delete(removeVersionId.value);
 
         const message = t$('sdiFrontendApp.productVersion.deleted', { param: removeVersionId.value }).toString();
-     //   alertService.showInfo(message, { variant: 'success' });
+        //   alertService.showInfo(message, { variant: 'success' });
 
         // Réinitialiser la sélection si la version supprimée était sélectionnée
         if (selectedVersion.value && selectedVersion.value.id === removeVersionId.value) {
@@ -1564,7 +1595,7 @@ export default defineComponent({
         removeModuleId.value = null;
         closeModuleDialog();
 
-       // alertService.showInfo('Module supprimé avec succès', { variant: 'success' });
+        // alertService.showInfo('Module supprimé avec succès', { variant: 'success' });
       } catch (error) {
         alertService.showHttpError(error.response);
       } finally {
@@ -1871,6 +1902,7 @@ export default defineComponent({
       selectedProduct.value = null;
       selectedVersion.value = null;
       productVersions.value = [];
+      viewTabs.value =  false;
     };
 
     // Vercel Tabs functionality
@@ -2073,16 +2105,15 @@ export default defineComponent({
       };
     };
 
-    const getCertificationCached = certificationVersionId => {
-      const certificationVersion = certificationsOptionsVersions.value.find(mv => mv.id === certificationVersionId);
-      console.log('1', certificationVersion);
+    const getCertificationCached = clientCertificationId => {
+      const clientCertification = productCertifications.value.find(cc => cc.id === clientCertificationId);
 
-      if (!certificationVersion) return null;
+      if (!clientCertification || !clientCertification.certificationVersion) return null;
 
-      const certification = certificationsOptions.value.find(m => m.id === certificationVersion.certification?.id);
-      console.log('2', certification);
+      const certification = certificationsOptions.value.find(c => c.id === clientCertification.certificationVersion.certification?.id);
+
       return {
-        ...certificationVersion,
+        ...clientCertification.certificationVersion,
         certification: certification ? { ...certification } : null,
       };
     };
@@ -2413,19 +2444,33 @@ export default defineComponent({
             yPosition += 10;
           }
         }
-
         // Certifications
+        const res = await clientCertificationService().retrieve();
+        product.certifications = res.data.filter(clientCert => clientCert.product && clientCert.product.id === product.id);
+
         if (product.certifications && product.certifications.length > 0) {
           checkPageBreak(40);
           yPosition = addSectionTitle('CERTIFICATIONS', yPosition);
+
+          // Préparer les données pour la table
+          const certificationHeaders = ['Certification', 'Version', 'Added At'];
+          const certificationData = [];
+
           product.certifications.forEach(cert => {
-            checkPageBreak(15);
-            const certDetails = getCertificationCached(cert.id);
-            if (certDetails && certDetails.certification) {
-              addStyledText(`• ${certDetails.certification.name} ${cert.version}`, margin + 10, yPosition);
-              yPosition += 8;
-            }
+            certificationData.push({
+              Certification: cert.certification || 'N/A',
+              Version: cert.certificationVersion?.version || 'N/A',
+              'Added At': cert.certificationDate ? new Date(cert.certificationDate).toLocaleDateString() : 'N/A',
+            });
           });
+
+          // Définir les largeurs des colonnes (ajustées pour la largeur de page)
+          const certificationColumnWidths = [80, 40, 50]; // Total: 170px sur une largeur de page de ~170px
+
+          // Dessiner la table des certifications
+          if (certificationData.length > 0) {
+            yPosition = drawTable(certificationHeaders, certificationData, yPosition, certificationColumnWidths) + 10;
+          }
         }
 
         // Add footer to all pages
@@ -2439,8 +2484,8 @@ export default defineComponent({
         const fileName = `S2M ${product.name.replace(/[^a-z0-9]/gi, ' ')}_${new Date().toISOString().split('T')[0]}.pdf`;
         doc.save(fileName);
       } catch (error) {
-        console.error('Erreur lors de l\'export PDF:', error);
-        alertService.showInfo('Erreur lors de l\'export PDF', { variant: 'danger' });
+        console.error("Erreur lors de l'export PDF:", error);
+        alertService.showInfo("Erreur lors de l'export PDF", { variant: 'danger' });
       }
     };
 
@@ -2473,6 +2518,7 @@ export default defineComponent({
       currentPage,
       itemsPerPage,
       totalItems,
+      viewTabs,
       selectedProduct,
       selectedVersion,
       selectedModule,

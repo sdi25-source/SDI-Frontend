@@ -384,8 +384,361 @@
       </div>
     </div>
 
+    <!-- Product - Delete Confirmation Modal -->
+    <div class="modal-backdrop" v-if="removeEntity" @click="closeDialog()"></div>
+    <div class="modal-container" v-if="removeEntity" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              class="bi bi-exclamation-triangle mr-2"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
+              />
+              <path
+                d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"
+              />
+            </svg>
+            <span v-text="t$('entity.delete.title')"></span>
+          </h5>
+          <button type="button" class="close-button" @click="closeDialog()" aria-label="Fermer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              class="icon"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <p>
+            <strong v-text="t$('sdiFrontendApp.product.delete.question', {})"></strong>
+          </p>
+          <p v-text="t$('entity.delete.irreversible')"></p>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary rounded-2"
+            @click="closeDialog()"
+            v-text="t$('sdiFrontendApp.requestOfChange.delete.cancel')"
+          ></button>
+          <button
+            type="button"
+            class="btn btn-danger rounded-2"
+            @click="removeProduct()"
+            v-text="t$('sdiFrontendApp.requestOfChange.delete.delete')"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Settings Modal -->
+    <div class="modal-backdrop" v-if="showSettingsModal" @click="closeSettingsModal"></div>
+    <div class="modal-container" v-if="showSettingsModal" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Product modules</h5>
+          <button type="button" class="close-button" @click="closeSettingsModal" aria-label="Fermer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="icon"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Modules Section -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="icon"
+                >
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Available modules</span>
+              </div>
+              <button
+                class="button"
+                :class="{ 'button-primary': !showModuleSelector, 'button-secondary': showModuleSelector }"
+                @click="showModuleSelector = !showModuleSelector"
+                v-if="hasAnyAuthority('ROLE_USER')"
+              >
+                {{ showModuleSelector ? 'Close' : 'Add' }}
+              </button>
+            </div>
+            <div class="card-body">
+              <div v-if="showModuleSelector" class="selector-container">
+                <div class="select-wrapper">
+                  <select class="select" v-model="selectedModuleVersionId">
+                    <option value="">Select a module</option>
+                    <option v-for="module in moduleOptions" :key="module.id" :value="module.id">
+                      {{ module.name }}
+                    </option>
+                  </select>
+                </div>
+                <button class="button button-success" @click="addModuleToProduct" :disabled="!selectedModuleVersionId">Add</button>
+                <button
+                  class="button button-primary"
+                  v-if="!showNewModuleForm"
+                  @click="showNewModuleForm = true"
+                  title="Créer un nouveau module"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Formulaire d'ajout d'un nouveau module -->
+              <div v-if="showNewModuleForm" class="new-module-form mb-4">
+                <h6 class="mb-2">Create New Module</h6>
+                <div class="form-group mb-2">
+                  <label for="new-module-name">Name</label>
+                  <input
+                    type="text"
+                    id="new-module-name"
+                    class="form-control"
+                    v-model="newModuleInSettingsModal.name"
+                    placeholder="Name"
+                  />
+                </div>
+                <div class="form-group mb-3">
+                  <label for="new-module-desc">Description</label>
+                  <textarea
+                    id="new-module-desc"
+                    class="form-control"
+                    v-model="newModuleInSettingsModal.description"
+                    placeholder="Description"
+                    rows="2"
+                  ></textarea>
+                </div>
+                <div class="d-flex gap-2 justify-content-end">
+                  <button class="button button-secondary btn-sm" @click="cancelNewModuleInSettings">Cancel</button>
+                  <button class="button button-primary btn-sm" @click="addNewModuleFromSettingsModal">Add</button>
+                </div>
+              </div>
+              <div style="max-height: 300px; overflow-y: auto">
+                <table class="table table-hover" style="line-height: 0.1">
+                  <thead>
+                  <tr>
+                    <th scope="col" class="pl-5">Name</th>
+                    <th></th>
+                    <th scope="col" class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
+                  </tr>
+                  </thead>
+                  <tbody v-for="(module, index) in productModules" :key="index">
+                  <tr>
+                    <td class="pl-5">{{ module.name }}</td>
+                    <td></td>
+                    <td class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">
+                      <button class="button-icon" @click="removeModuleFromProduct(index)" aria-label="Supprimer">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="icon"
+                        >
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr v-if="productModules.length === 0">
+                    <td colspan="3" class="empty-message">No selected module</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="button button-secondary" @click="closeSettingsModal" v-if="hasAnyAuthority('ROLE_USER')">
+            Cancel
+          </button>
+          <button type="button" class="button button-primary" @click="saveSettingsModal" v-if="hasAnyAuthority('ROLE_USER')">Save</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Product certifications Modal -->
+    <div class="modal-backdrop" v-if="showCertificationsModal" @click="closeCertificationsModal"></div>
+    <div class="modal-container" v-if="showCertificationsModal" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Product Certifications</h5>
+          <button type="button" class="close-button" @click="closeCertificationsModal" aria-label="Fermer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="icon"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- certification Section -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="icon"
+                >
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Available certification</span>
+              </div>
+              <button
+                class="button"
+                :class="{ 'button-primary': !showCertificationSelector, 'button-secondary': showCertificationSelector }"
+                @click="showCertificationSelector = !showCertificationSelector"
+                v-if="hasAnyAuthority('ROLE_USER')"
+              >
+                {{ showCertificationSelector ? 'Close' : 'Add' }}
+              </button>
+            </div>
+
+            <div class="card-body">
+              <div v-if="showCertificationSelector" class="selector-container">
+                <div class="select-wrapper">
+                  <select class="select" v-model="selectedCertificationId">
+                    <option value="">Select a certifications</option>
+                    <option v-for="cert in certificationsOptionsVersions" :key="cert.id" :value="cert.id">
+                      {{ cert.certification.name }} {{ '-' }} {{ cert.version }}
+                    </option>
+                  </select>
+                </div>
+                <button class="button button-success" @click="addCertificationToProduct" :disabled="!selectedCertificationId">Add</button>
+              </div>
+              <div style="max-height: 400px; overflow-y: auto">
+                <table class="table table-hover" style="line-height: 1.2">
+                  <thead>
+                  <tr>
+                    <th scope="col" class="pl-5">Name</th>
+                    <th>Version</th>
+                    <th>Added at</th>
+                    <th scope="col" class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <!-- Liste des certifications -->
+                  <!-- Updated to display client certifications instead of certification versions -->
+                  <tr v-for="(clientCert, index) in productCertifications" :key="index">
+                    <td class="pl-5">{{ clientCert.certification }}</td>
+                    <td>{{ clientCert.certificationVersion?.version }}</td>
+                    <td>{{ clientCert.certificationDate }}</td>
+                    <td class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">
+                      <button class="button-icon" @click="removeCertificationFromProduct(index)" aria-label="Supprimer">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="icon"
+                        >
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr v-if="productCertifications.length === 0">
+                    <td colspan="3" class="empty-message">No selected certification</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+        </div>
+      </div>
+    </div>
+
+
+
     <!-- Detailed View Section (appears when a product is selected) -->
-    <div v-if="selectedProduct" class="mt-4 product-detail-view" style="transition: all 2s ease">
+    <div v-if="selectedProduct && viewTabs" class="mt-4 product-detail-view" style="transition: all 2s ease">
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center">
@@ -750,11 +1103,7 @@
                     <tr v-for="(module, index) in getFilteredModules" :key="index">
                       <td class="pl-5">
                         <template v-if="isEditingModuleVersion && editingModuleVersionData && editingModuleVersionData.id === module.id">
-                          <select
-                            v-model="editingModuleVersionData.module"
-                            class="form-control-borderless"
-                            @click.stop
-                          >
+                          <select v-model="editingModuleVersionData.module" class="form-control-borderless" @click.stop>
                             <option v-for="moduleOption in moduleOptions" :key="moduleOption.id" :value="{ id: moduleOption.id }">
                               {{ moduleOption.name }}
                             </option>
@@ -799,15 +1148,38 @@
                               <font-awesome-icon icon="save"></font-awesome-icon>
                             </div>
                             <div class="icon-container cancel-container" @click="cancelEditModuleVersion" title="Annuler">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                class="bi bi-x"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+                                />
                               </svg>
                             </div>
                           </template>
                           <template v-else>
-                            <div class="icon-container edit-container" @click="editModuleVersion(module)" :title="t$('entity.action.edit')" v-if="hasAnyAuthority('ROLE_USER')">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-                                <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+                            <div
+                              class="icon-container edit-container"
+                              @click="editModuleVersion(module)"
+                              :title="t$('entity.action.edit')"
+                              v-if="hasAnyAuthority('ROLE_USER')"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                fill="currentColor"
+                                class="bi bi-pencil-fill"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                                />
                               </svg>
                             </div>
                             <div
@@ -816,12 +1188,32 @@
                               :title="t$('entity.action.delete')"
                               v-if="hasAnyAuthority('ROLE_USER')"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                fill="currentColor"
+                                class="bi bi-x"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+                                />
                               </svg>
                             </div>
                             <div class="icon-container save-container" @click="openModuleFeaturesModal(module)" title="features">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon"
+                              >
                                 <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
                                 <polyline points="2 17 12 22 22 17"></polyline>
                                 <polyline points="2 12 12 17 22 12"></polyline>
@@ -947,293 +1339,6 @@
                 </table>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product certifications Modal -->
-      <div class="modal-backdrop" v-if="showCertificationsModal" @click="closeCertificationsModal"></div>
-      <div class="modal-container" v-if="showCertificationsModal" role="dialog" aria-modal="true">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Product Certifications</h5>
-            <button type="button" class="close-button" @click="closeCertificationsModal" aria-label="Fermer">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="icon"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          </div>
-
-          <div class="modal-body">
-            <!-- certification Section -->
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="icon"
-                  >
-                    <rect x="3" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="14" width="7" height="7"></rect>
-                    <rect x="3" y="14" width="7" height="7"></rect>
-                  </svg>
-                  <span>Available certification</span>
-                </div>
-                <button
-                  class="button"
-                  :class="{ 'button-primary': !showCertificationSelector, 'button-secondary': showCertificationSelector }"
-                  @click="showCertificationSelector = !showCertificationSelector"
-                  v-if="hasAnyAuthority('ROLE_USER')"
-                >
-                  {{ showCertificationSelector ? 'Close' : 'Add' }}
-                </button>
-              </div>
-
-              <div class="card-body">
-                <div v-if="showCertificationSelector" class="selector-container">
-                  <div class="select-wrapper">
-                    <select class="select" v-model="selectedCertificationId">
-                      <option value="">Select a certifications</option>
-                      <option v-for="cert in certificationsOptionsVersions" :key="cert.id" :value="cert.id">
-                        {{ cert.certification.name }} {{ '-' }} {{ cert.version }}
-                      </option>
-                    </select>
-                  </div>
-                  <button class="button button-success" @click="addCertificationToProduct" :disabled="!selectedCertificationId">Add</button>
-                </div>
-                <div style="max-height: 400px; overflow-y: auto">
-                  <table class="table table-hover" style="line-height: 1.2">
-                    <thead>
-                      <tr>
-                        <th scope="col" class="pl-5">Name</th>
-                        <th>Version</th>
-                        <th scope="col" class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <!-- Liste des certifications -->
-                      <tr v-for="(cert, index) in productCertifications" :key="index">
-                        <td class="pl-5">{{ getCertificationCached(cert.id).certification.name }}</td>
-                        <td>{{ cert.version }}</td>
-                        <td class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">
-                          <button class="button-icon" @click="removeCertificationFromProduct(index)" aria-label="Supprimer">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="18"
-                              height="18"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              class="icon"
-                            >
-                              <line x1="18" y1="6" x2="6" y2="18"></line>
-                              <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr v-if="productCertifications.length === 0">
-                        <td colspan="3" class="empty-message">No selected certification</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="button button-secondary" @click="closeCertificationsModal" v-if="hasAnyAuthority('ROLE_USER')">
-              Cancel
-            </button>
-            <button type="button" class="button button-primary" @click="saveCertificationsModal" v-if="hasAnyAuthority('ROLE_USER')">
-              Save
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product Settings Modal -->
-      <div class="modal-backdrop" v-if="showSettingsModal" @click="closeSettingsModal"></div>
-      <div class="modal-container" v-if="showSettingsModal" role="dialog" aria-modal="true">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Product modules</h5>
-            <button type="button" class="close-button" @click="closeSettingsModal" aria-label="Fermer">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="icon"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          </div>
-
-          <div class="modal-body">
-            <!-- Modules Section -->
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="icon"
-                  >
-                    <rect x="3" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="14" width="7" height="7"></rect>
-                    <rect x="3" y="14" width="7" height="7"></rect>
-                  </svg>
-                  <span>Available modules</span>
-                </div>
-                <button
-                  class="button"
-                  :class="{ 'button-primary': !showModuleSelector, 'button-secondary': showModuleSelector }"
-                  @click="showModuleSelector = !showModuleSelector"
-                  v-if="hasAnyAuthority('ROLE_USER')"
-                >
-                  {{ showModuleSelector ? 'Close' : 'Add' }}
-                </button>
-              </div>
-              <div class="card-body">
-                <div v-if="showModuleSelector" class="selector-container">
-                  <div class="select-wrapper">
-                    <select class="select" v-model="selectedModuleVersionId">
-                      <option value="">Select a module</option>
-                      <option v-for="module in moduleOptions" :key="module.id" :value="module.id">
-                        {{ module.name }}
-                      </option>
-                    </select>
-                  </div>
-                  <button class="button button-success" @click="addModuleToProduct" :disabled="!selectedModuleVersionId">Add</button>
-                  <button
-                    class="button button-primary"
-                    v-if="!showNewModuleForm"
-                    @click="showNewModuleForm = true"
-                    title="Créer un nouveau module"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
-                    </svg>
-                  </button>
-                </div>
-
-                <!-- Formulaire d'ajout d'un nouveau module -->
-                <div v-if="showNewModuleForm" class="new-module-form mb-4">
-                  <h6 class="mb-2">Create New Module</h6>
-                  <div class="form-group mb-2">
-                    <label for="new-module-name">Name</label>
-                    <input
-                      type="text"
-                      id="new-module-name"
-                      class="form-control"
-                      v-model="newModuleInSettingsModal.name"
-                      placeholder="Name"
-                    />
-                  </div>
-                  <div class="form-group mb-3">
-                    <label for="new-module-desc">Description</label>
-                    <textarea
-                      id="new-module-desc"
-                      class="form-control"
-                      v-model="newModuleInSettingsModal.description"
-                      placeholder="Description"
-                      rows="2"
-                    ></textarea>
-                  </div>
-                  <div class="d-flex gap-2 justify-content-end">
-                    <button class="button button-secondary btn-sm" @click="cancelNewModuleInSettings">Cancel</button>
-                    <button class="button button-primary btn-sm" @click="addNewModuleFromSettingsModal">Add</button>
-                  </div>
-                </div>
-                <div style="max-height: 300px; overflow-y: auto">
-                  <table class="table table-hover" style="line-height: 0.1">
-                    <thead>
-                      <tr>
-                        <th scope="col" class="pl-5">Name</th>
-                        <th></th>
-                        <th scope="col" class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody v-for="(module, index) in productModules" :key="index">
-                      <tr>
-                        <td class="pl-5">{{ module.name }}</td>
-                        <td></td>
-                        <td class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">
-                          <button class="button-icon" @click="removeModuleFromProduct(index)" aria-label="Supprimer">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="18"
-                              height="18"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              class="icon"
-                            >
-                              <line x1="18" y1="6" x2="6" y2="18"></line>
-                              <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr v-if="productModules.length === 0">
-                        <td colspan="3" class="empty-message">No selected module</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="button button-secondary" @click="closeSettingsModal" v-if="hasAnyAuthority('ROLE_USER')">
-              Cancel
-            </button>
-            <button type="button" class="button button-primary" @click="saveSettingsModal" v-if="hasAnyAuthority('ROLE_USER')">Save</button>
           </div>
         </div>
       </div>
@@ -1728,6 +1833,7 @@
           </div>
         </div>
       </div>
+
       <!-- Module Features Modal -->
       <div class="card modal fade show" v-if="showModuleFeaturesModal" style="display: block" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
@@ -1890,69 +1996,6 @@
         </div>
       </div>
 
-      <!-- Product - Delete Confirmation Modal -->
-      <div class="modal-backdrop" v-if="removeEntity" @click="closeDialog()"></div>
-      <div class="modal-container" v-if="removeEntity" role="dialog" aria-modal="true">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title text-danger">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="currentColor"
-                class="bi bi-exclamation-triangle mr-2"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
-                />
-                <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
-              </svg>
-              <span v-text="t$('entity.delete.title')"></span>
-            </h5>
-            <button type="button" class="close-button" @click="closeDialog()" aria-label="Fermer">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                class="icon"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          </div>
-
-          <div class="modal-body">
-            <p>
-              <strong v-text="t$('sdiFrontendApp.product.delete.question', {})"></strong>
-            </p>
-            <p v-text="t$('entity.delete.irreversible')"></p>
-          </div>
-
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary rounded-2"
-              @click="closeDialog()"
-              v-text="t$('sdiFrontendApp.requestOfChange.delete.cancel')"
-            ></button>
-            <button
-              type="button"
-              class="btn btn-danger rounded-2"
-              @click="removeProduct()"
-              v-text="t$('sdiFrontendApp.requestOfChange.delete.delete')"
-            ></button>
-          </div>
-        </div>
-      </div>
 
       <!-- Product Version - Delete Confirmation Modal -->
       <div class="modal-backdrop" v-if="removeVersionEntity" @click="closeVersionDialog()"></div>
@@ -1971,7 +2014,9 @@
                 <path
                   d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
                 />
-                <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                <path
+                  d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"
+                />
               </svg>
               <span v-text="t$('entity.delete.title')"></span>
             </h5>
@@ -2018,7 +2063,6 @@
         </div>
       </div>
 
-
       <!-- Module Delete Confirmation Modal -->
       <div class="modal-backdrop" v-if="removeModuleEntity" @click="closeModuleDialog()"></div>
       <div class="modal-container" v-if="removeModuleEntity" role="dialog" aria-modal="true">
@@ -2036,7 +2080,9 @@
                 <path
                   d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
                 />
-                <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                <path
+                  d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"
+                />
               </svg>
               <span v-text="t$('entity.delete.title')"></span>
             </h5>
@@ -2083,7 +2129,6 @@
         </div>
       </div>
 
-
       <!-- Delete Confirmation Modal for Module Version -->
       <div class="modal-backdrop" v-if="showModuleVersionDeleteModal" @click="closeModuleVersionDeleteModal()"></div>
       <div class="modal-container" v-if="showModuleVersionDeleteModal" role="dialog" aria-modal="true">
@@ -2101,7 +2146,9 @@
                 <path
                   d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
                 />
-                <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                <path
+                  d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"
+                />
               </svg>
               <span v-text="t$('entity.delete.title')"></span>
             </h5>
@@ -2147,7 +2194,6 @@
           </div>
         </div>
       </div>
-
     </div>
     <div class="section"></div>
     <div class="section"></div>
