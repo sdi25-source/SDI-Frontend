@@ -1,6 +1,5 @@
 import { URL, fileURLToPath } from 'node:url';
 import { defineConfig, normalizePath } from 'vite';
-
 import vue from '@vitejs/plugin-vue';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
@@ -15,8 +14,7 @@ function getVersion() {
   return packageJson.version;
 }
 
-// eslint-disable-next-line prefer-const
-const config = defineConfig({
+export default defineConfig({
   plugins: [
     vue(),
     viteStaticCopy({
@@ -42,6 +40,11 @@ const config = defineConfig({
     rollupOptions: {
       input: {
         app: fileURLToPath(new URL('./src/main/webapp/index.html', import.meta.url)),
+      },
+      output: {
+        sourcemapIgnoreList: (relativePath) => {
+          return relativePath.includes('swiper-bundle.min.js');
+        },
       },
     },
   },
@@ -70,8 +73,14 @@ const config = defineConfig({
       ]),
     ),
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        quietDeps: true,
+        silenceDeprecations: ['import', 'global-builtin', 'color-functions'],
+      },
+    },
+  },
+  logLevel: 'info',
 });
 
-// jhipster-needle-add-vite-config - JHipster will add custom config
-
-export default config;
