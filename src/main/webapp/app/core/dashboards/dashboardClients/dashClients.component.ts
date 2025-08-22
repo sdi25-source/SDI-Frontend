@@ -60,6 +60,10 @@ export default defineComponent({
     const clientSizeService = inject('clientSizeService', () => new ClientSizeService());
     const clientTypeService = inject('clientTypeService', () => new ClientTypeService());
 
+    // Popup state for monthly deployments point details
+    const showDeploymentsPopup = ref(false);
+    const selectedDeploymentsPoint = ref(null as null | { month: string; year: number; total: number; items: Array<{ product: string; version: string | undefined; startDate: string | undefined; contractRef: string | undefined; }>; });
+
     const fetchClients = async () => {
       try {
         loading.value = true;
@@ -156,8 +160,8 @@ export default defineComponent({
             {
               label: 'Clients created per month',
               data: monthlyCount,
-              backgroundColor: 'rgba(12, 166, 120, 0.8)',
-              borderColor: 'rgba(12, 166, 120, 1)',
+              backgroundColor: 'rgba(108, 117, 125, 0.6)',
+              borderColor: 'rgba(108, 117, 125, 1)',
               borderWidth: 2,
               type: 'bar',
               order: 2,
@@ -166,17 +170,17 @@ export default defineComponent({
             {
               label: 'Cumulative growth',
               data: cumulativeCount,
-              backgroundColor: 'rgba(12, 45, 87, 0.2)',
-              borderColor: 'rgba(12, 45, 87, 1)',
-              borderWidth: 3,
+              backgroundColor: 'rgba(108, 117, 125, 0.15)',
+              borderColor: 'rgba(73, 80, 87, 1)',
+              borderWidth: 2,
               type: 'line',
               fill: true,
-              tension: 0.4,
-              pointBackgroundColor: 'rgba(12, 45, 87, 1)',
+              tension: 0.3,
+              pointBackgroundColor: 'rgba(73, 80, 87, 1)',
               pointBorderColor: '#ffffff',
               pointBorderWidth: 2,
-              pointRadius: 6,
-              pointHoverRadius: 8,
+              pointRadius: 5,
+              pointHoverRadius: 7,
               order: 1
             }
           ]
@@ -289,6 +293,7 @@ export default defineComponent({
       }
     };
 
+    // Build monthly deployments evolution for selected client
     const loadProductDeploymentsChartData = async (clientId) => {
       try {
         const productDeploymentsRes = await productDeployementService.retrieve();
@@ -301,55 +306,44 @@ export default defineComponent({
         }
 
         const productDeploymentDetailsRes = await productDeployementDetailService.retrieve();
-        const allDetails = productDeploymentDetailsRes.data;
+        const allDetails = productDeploymentDetailsRes.data.filter((d) =>
+          productDeployments.some((pd) => pd.id === d.productDeployement?.id)
+        );
 
-        const deploymentDetailCounts = new Map();
-        const deploymentDetailsMap = new Map();
+        // Group per month of current year
+        const monthNames = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const labels = monthNames;
+        const counts = Array(12).fill(0);
+        const detailsByMonth: Array<Array<{ product: string; version: string | undefined; startDate: string | undefined; contractRef: string | undefined; }>> = Array(12).fill(null).map(() => []);
 
-        productDeployments.forEach((deployment) => {
-          const deploymentName = `${deployment.product?.name || 'Unknown Product'} - ${deployment.refContract || 'No Contract'}`;
-          const details = allDetails.filter(detail => detail.productDeployement?.id === deployment.id);
-          const detailsCount = details.length;
-
-          // Collecter les détails pour chaque déploiement
-          const deploymentInfo = details.map(detail => ({
-            name: deploymentName,
-            version: 'v ' + detail.productVersion?.version || 'Unknown Version',
-            date: detail.startDeployementDate
-              ? new Date(detail.startDeployementDate).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })
-              : 'No Date',
-          }));
-
-          deploymentDetailCounts.set(deploymentName, detailsCount);
-          deploymentDetailsMap.set(deploymentName, deploymentInfo);
+        allDetails.forEach(detail => {
+          if (!detail.startDeployementDate) return;
+          const date = new Date(detail.startDeployementDate);
+          const year = date.getFullYear();
+          if (year !== currentYear.value) return; // keep current year
+          const monthIdx = date.getMonth();
+          counts[monthIdx]++;
+          detailsByMonth[monthIdx].push({
+            product: detail.productDeployement?.product?.name || 'Unknown Product',
+            version: detail.productVersion?.version,
+            startDate: detail.startDeployementDate,
+            contractRef: detail.productDeployement?.refContract,
+          });
         });
-
-        const filteredEntries = Array.from(deploymentDetailCounts.entries()).filter(([_, count]) => count > 0);
-        if (filteredEntries.length === 0) {
-          productDeploymentsChartData.value = { labels: [], datasets: [] };
-          return;
-        }
-
-        const labels = filteredEntries.map(entry => entry[0]);
-        const data = filteredEntries.map(entry => entry[1]);
-        const backgroundColors = generateColors(labels.length);
 
         productDeploymentsChartData.value = {
           labels,
           datasets: [
             {
-              data,
-              backgroundColor: backgroundColors,
-              borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
+              label: 'Deployments per month',
+              data: counts,
+              backgroundColor: 'rgba(206, 212, 218, 0.7)', // gray-300
+              borderColor: 'rgba(108, 117, 125, 1)', // gray-600
               borderWidth: 2,
-              deploymentDetails: Object.fromEntries(deploymentDetailsMap), // Stocker les détails pour les tooltips
+              detailsByMonth, // custom for tooltip/click
             },
           ],
-        };
+        } as any;
       } catch (error) {
         console.error('Error loading product deployments chart data:', error);
         productDeploymentsChartData.value = { labels: [], datasets: [] };
@@ -478,8 +472,8 @@ export default defineComponent({
             {
               label: 'Basic',
               data: basicPoints,
-              backgroundColor: 'rgba(255, 193, 7, 0.7)',
-              borderColor: 'rgba(255, 193, 7, 1)',
+              backgroundColor: 'rgba(173, 181, 189, 0.7)',
+              borderColor: 'rgba(108, 117, 125, 1)',
               borderWidth: 2,
               pointRadius: 8,
               pointHoverRadius: 12,
@@ -487,8 +481,8 @@ export default defineComponent({
             {
               label: 'Intermediate',
               data: intermediatePoints,
-              backgroundColor: 'rgba(40, 167, 69, 0.7)',
-              borderColor: 'rgba(40, 167, 69, 1)',
+              backgroundColor: 'rgba(206, 212, 218, 0.7)',
+              borderColor: 'rgba(108, 117, 125, 1)',
               borderWidth: 2,
               pointRadius: 8,
               pointHoverRadius: 12,
@@ -496,8 +490,8 @@ export default defineComponent({
             {
               label: 'Advanced',
               data: advancedPoints,
-              backgroundColor: 'rgba(220, 53, 69, 0.7)',
-              borderColor: 'rgba(220, 53, 69, 1)',
+              backgroundColor: 'rgba(233, 236, 239, 0.9)',
+              borderColor: 'rgba(108, 117, 125, 1)',
               borderWidth: 2,
               pointRadius: 8,
               pointHoverRadius: 12,
@@ -513,24 +507,17 @@ export default defineComponent({
 
     const generateColors = (count) => {
       const baseColors = [
-        'rgba(12, 45, 87, 0.8)',
-        'rgba(149, 160, 244, 0.8)',
-        'rgba(12, 166, 120, 0.8)',
-        'rgba(245, 159, 0, 0.8)',
-        'rgba(2, 136, 209, 0.8)',
-        'rgba(28, 126, 214, 0.8)',
-        'rgba(156, 39, 176, 0.8)',
-        'rgba(255, 87, 34, 0.8)',
+        'rgba(108, 117, 125, 0.8)',
+        'rgba(173, 181, 189, 0.8)',
+        'rgba(206, 212, 218, 0.8)',
+        'rgba(233, 236, 239, 0.8)',
+        'rgba(134, 142, 150, 0.8)',
+        'rgba(73, 80, 87, 0.8)',
       ];
 
       const result = [];
       for (let i = 0; i < count; i++) {
-        if (i < baseColors.length) {
-          result.push(baseColors[i]);
-        } else {
-          const hue = ((i - baseColors.length) * 360) / (count - baseColors.length);
-          result.push(`hsla(${hue}, 70%, 60%, 0.8)`);
-        }
+        result.push(baseColors[i % baseColors.length]);
       }
       return result;
     };
@@ -549,44 +536,59 @@ export default defineComponent({
         productDeploymentsChartData.value.labels.length > 0
       ) {
         productDeploymentsChartInstance.value = new Chart(productDeploymentsChart.value, {
-          type: 'doughnut',
-          data: productDeploymentsChartData.value,
+          type: 'bar',
+          data: productDeploymentsChartData.value as any,
           options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: {
-                position: 'bottom',
-                labels: {
-                  padding: 20,
-                  usePointStyle: true,
-                },
-              },
+              legend: { display: false },
               tooltip: {
                 callbacks: {
+                  title: function (ctx) {
+                    const i = ctx[0].dataIndex;
+                    const month = productDeploymentsChartData.value.labels[i];
+                    return `${month} ${currentYear.value}`;
+                  },
                   label: function (context) {
-                    const label = context.label || '';
-                    const value = context.parsed;
-                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                    const percentage = ((value / total) * 100).toFixed(1);
-                    const deploymentDetails = context.dataset.deploymentDetails?.[label] || [];
-
-                    // Créer le tooltip avec les déploiements en format de liste
-                    const tooltipLines = [`${label}: ${value} deployment details (${percentage}%)`];
-
-                    if (deploymentDetails.length > 0) {
-                      tooltipLines.push('Deployments:');
-                      deploymentDetails.forEach((detail, index) => {
-                        tooltipLines.push(`- Deployment ${index + 1} - ${detail.version} - ${detail.date}`);
+                    const i = context.dataIndex;
+                    const total = context.parsed.y;
+                    const details = (context.dataset as any).detailsByMonth?.[i] || [];
+                    const lines = [`Total deployments: ${total}`];
+                    if (details.length) {
+                      lines.push('Details:');
+                      details.slice(0, 5).forEach(d => {
+                        lines.push(`- ${d.product} ${d.version ? 'v' + d.version : ''} (${new Date(d.startDate as any).toLocaleDateString('en-US')})`);
                       });
-                    } else {
-                      tooltipLines.push('No Deployments');
+                      if (details.length > 5) lines.push(`(+${details.length - 5} more)`);
                     }
-
-                    return tooltipLines;
+                    return lines;
                   },
                 },
               },
+            },
+            scales: {
+              x: { grid: { display: false } },
+              y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1 },
+                grid: { color: 'rgba(0,0,0,0.06)' },
+              },
+            },
+            onClick: (_evt, elements) => {
+              const el = elements?.[0];
+              if (!el) return;
+              const index = el.index;
+              const month = productDeploymentsChartData.value.labels[index] as string;
+              const details = (productDeploymentsChartData.value.datasets[0] as any).detailsByMonth[index] || [];
+              const total = (productDeploymentsChartData.value.datasets[0] as any).data[index] as number;
+              selectedDeploymentsPoint.value = {
+                month,
+                year: currentYear.value,
+                total,
+                items: details,
+              };
+              showDeploymentsPopup.value = true;
             },
           },
         });
@@ -760,7 +762,7 @@ export default defineComponent({
               }
             },
             animation: {
-              duration: 1000,
+              duration: 800,
               easing: 'easeInOutQuart'
             }
           }
@@ -834,6 +836,11 @@ export default defineComponent({
       };
     };
 
+    const closeDeploymentsPopup = () => {
+      showDeploymentsPopup.value = false;
+      selectedDeploymentsPoint.value = null;
+    };
+
     return {
       scrollContainer,
       clients,
@@ -856,6 +863,10 @@ export default defineComponent({
       totalRequests,
       currentYear,
       t$: t,
+      // popup bindings
+      showDeploymentsPopup,
+      selectedDeploymentsPoint,
+      closeDeploymentsPopup,
     };
   },
 });
