@@ -14,6 +14,7 @@ import CustomisationLevelService from '@/entities/customisation-level/customisat
 import ProductVersionService from '@/entities/product-version/product-version.service.ts';
 import ModuleVersionService from '@/entities/module-version/module-version.service.ts';
 import ModuleService from '@/entities/module/module.service.ts';
+import ModuleDeployementService from '@/entities/module-deployement/module-deployement.service.ts';
 
 export default defineComponent({
   name: 'DashClientsComponent',
@@ -49,6 +50,15 @@ export default defineComponent({
     const totalRequests = ref({ basic: 0, intermediate: 0, advanced: 0 });
     const currentYear = ref(new Date().getFullYear());
 
+    // Module deployments evolution chart refs
+    const moduleDeploymentsEvolutionChart = ref(null);
+    const moduleDeploymentsEvolutionChartInstance = ref(null);
+    const moduleDeploymentsEvolutionData = ref({ labels: [], datasets: [] });
+    
+    // Module popup functionality refs
+    const showModulePopup = ref(false);
+    const selectedModuleData = ref(null);
+
     // Services
     const clientService = new ClientService();
     const moduleVersionService = new ModuleVersionService();
@@ -59,6 +69,7 @@ export default defineComponent({
     const customisationLevelService = new CustomisationLevelService();
     const clientSizeService = inject('clientSizeService', () => new ClientSizeService());
     const clientTypeService = inject('clientTypeService', () => new ClientTypeService());
+    const moduleDeployementService = new ModuleDeployementService();
 
     const fetchClients = async () => {
       try {
@@ -277,12 +288,17 @@ export default defineComponent({
         clientsEvolutionChartInstance.value.destroy();
         clientsEvolutionChartInstance.value = null;
       }
+      if (moduleDeploymentsEvolutionChartInstance.value) {
+        moduleDeploymentsEvolutionChartInstance.value.destroy();
+        moduleDeploymentsEvolutionChartInstance.value = null;
+      }
     };
 
     const loadClientChartsData = async (client) => {
       try {
         await loadProductDeploymentsChartData(client.id);
         await loadRequestChangesScatterData(client.id);
+        await loadModuleDeploymentsEvolutionData(client.id);
       } catch (error) {
         console.error('Error loading client charts data:', error);
         alertService.showHttpError(error.response || error);
@@ -535,11 +551,112 @@ export default defineComponent({
       return result;
     };
 
+    const loadModuleDeploymentsEvolutionData = async (clientId) => {
+      try {
+        // Get all product deployments for this client
+        const productDeploymentsRes = await productDeployementService.retrieve();
+        const clientDeployments = productDeploymentsRes.data.filter((pd) => pd.client?.id === clientId);
+
+        if (clientDeployments.length === 0) {
+          moduleDeploymentsEvolutionData.value = { labels: [], datasets: [] };
+          return;
+        }
+
+        // Get all deployment details for client's deployments
+        const productDeploymentDetailsRes = await productDeployementDetailService.retrieve();
+        const clientDeploymentDetails = productDeploymentDetailsRes.data.filter((detail) =>
+          clientDeployments.some((deployment) => deployment.id === detail.productDeployement?.id),
+        );
+
+        // Get all module deployments for client's deployment details
+        const moduleDeploymentsRes = await moduleDeployementService.retrieve();
+        const clientModuleDeployments = moduleDeploymentsRes.data.filter((moduleDeployment) =>
+          clientDeploymentDetails.some((detail) => detail.id === moduleDeployment.productDeployementDetail?.id),
+        );
+
+        // Group module deployments by month
+        const monthlyModuleDeployments = Array(12).fill(0);
+        const modulesByMonth = Array(12).fill(null).map(() => new Map()); // Map to store unique modules per month
+        const monthNames = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        // Process each module deployment
+        for (const moduleDeployment of clientModuleDeployments) {
+          // Find the related deployment detail to get the date
+          const relatedDetail = clientDeploymentDetails.find(
+            (detail) => detail.id === moduleDeployment.productDeployementDetail?.id,
+          );
+
+          if (relatedDetail?.startDeployementDate && moduleDeployment.moduleVersion?.id) {
+            const deploymentDate = new Date(relatedDetail.startDeployementDate);
+            const month = deploymentDate.getMonth();
+            const year = deploymentDate.getFullYear();
+
+            // Only count deployments from current year
+            if (year === currentYear.value) {
+              try {
+                const moduleVersionRes = await moduleVersionService.find(moduleDeployment.moduleVersion.id);
+                const moduleVersion = moduleVersionRes.data || moduleVersionRes;
+
+                if (moduleVersion.module?.id) {
+                  const moduleRes = await moduleService.find(moduleVersion.module.id);
+                  const module = moduleRes.data || moduleRes;
+                  const moduleName = module.name || 'Unknown Module';
+
+                  // Add to monthly count if not already counted this month
+                  if (!modulesByMonth[month].has(moduleName)) {
+                    modulesByMonth[month].set(moduleName, {
+                      name: moduleName,
+                      version: moduleVersion.version || 'Unknown',
+                      date: deploymentDate.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      }),
+                      description: module.description || 'No description available',
+                    });
+                    monthlyModuleDeployments[month]++;
+                  }
+                }
+              } catch (error) {
+                console.error('Error fetching module details:', error);
+              }
+            }
+          }
+        }
+
+        // Prepare chart data
+        moduleDeploymentsEvolutionData.value = {
+          labels: monthNames,
+          datasets: [
+            {
+              label: 'Modules déployés par mois',
+              data: monthlyModuleDeployments,
+              backgroundColor: 'rgba(128, 128, 128, 0.6)',
+              borderColor: 'rgba(64, 64, 64, 1)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: 'rgba(64, 64, 64, 1)',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 10,
+              modulesByMonth, // Store modules for click handling
+            },
+          ],
+        };
+      } catch (error) {
+        console.error('Error loading module deployments evolution data:', error);
+        moduleDeploymentsEvolutionData.value = { labels: [], datasets: [] };
+      }
+    };
+
     const createCharts = () => {
       destroyCharts();
       createProductDeploymentsChart();
       createRequestChangesScatterChart();
       createClientsEvolutionChart();
+      createModuleDeploymentsEvolutionChart();
     };
 
     const createProductDeploymentsChart = () => {
@@ -768,6 +885,129 @@ export default defineComponent({
       }
     };
 
+    const createModuleDeploymentsEvolutionChart = () => {
+      if (moduleDeploymentsEvolutionChart.value && moduleDeploymentsEvolutionData.value.labels.length > 0) {
+        moduleDeploymentsEvolutionChartInstance.value = new Chart(moduleDeploymentsEvolutionChart.value, {
+          type: 'line',
+          data: moduleDeploymentsEvolutionData.value,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                  usePointStyle: true,
+                  padding: 20,
+                  color: '#666',
+                },
+              },
+              tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                titleColor: '#333',
+                bodyColor: '#666',
+                borderColor: '#ddd',
+                borderWidth: 1,
+                callbacks: {
+                  label: function (context) {
+                    const value = context.parsed.y;
+                    const monthIndex = context.dataIndex;
+                    const modules = context.dataset.modulesByMonth?.[monthIndex] || new Map();
+                    
+                    const tooltipLines = [`${value} module${value > 1 ? 's' : ''} déployé${value > 1 ? 's' : ''}`];
+                    
+                    if (modules.size > 0) {
+                      tooltipLines.push('Modules:');
+                      Array.from(modules.values()).forEach(module => {
+                        tooltipLines.push(`• ${module.name} v${module.version}`);
+                      });
+                    }
+                    
+                    return tooltipLines;
+                  },
+                  title: function (context) {
+                    return `${context[0].label} ${currentYear.value}`;
+                  },
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1,
+                  callback: function (value) {
+                    return Number.isInteger(value) ? value : '';
+                  },
+                  color: '#666',
+                },
+                title: {
+                  display: true,
+                  text: 'Nombre de modules',
+                  font: {
+                    size: 12,
+                    weight: 'bold',
+                  },
+                  color: '#666',
+                },
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.1)',
+                },
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: `Mois - ${currentYear.value}`,
+                  font: {
+                    size: 12,
+                    weight: 'bold',
+                  },
+                  color: '#666',
+                },
+                grid: {
+                  display: false,
+                },
+                ticks: {
+                  color: '#666',
+                },
+              },
+            },
+            onClick: (event, elements) => {
+              if (elements.length > 0) {
+                const element = elements[0];
+                const monthIndex = element.index;
+                const modules = moduleDeploymentsEvolutionData.value.datasets[0].modulesByMonth?.[monthIndex] || new Map();
+                
+                if (modules.size > 0) {
+                  const monthName = moduleDeploymentsEvolutionData.value.labels[monthIndex];
+                  showModuleMonthDetails(monthName, Array.from(modules.values()));
+                }
+              }
+            },
+            animation: {
+              duration: 1000,
+              easing: 'easeInOutQuart',
+            },
+          },
+        });
+      }
+    };
+
+    const showModuleMonthDetails = (monthName, modules) => {
+      selectedModuleData.value = {
+        monthName,
+        modules,
+        totalModules: modules.length,
+      };
+      showModulePopup.value = true;
+    };
+
+    const closeModulePopup = () => {
+      showModulePopup.value = false;
+      selectedModuleData.value = null;
+    };
+
     const scrollLeft = () => {
       if (scrollContainer.value) {
         scrollContainer.value.scrollBy({ left: -320, behavior: 'smooth' });
@@ -856,6 +1096,11 @@ export default defineComponent({
       totalRequests,
       currentYear,
       t$: t,
+      moduleDeploymentsEvolutionChart,
+      moduleDeploymentsEvolutionData,
+      showModulePopup,
+      selectedModuleData,
+      closeModulePopup,
     };
   },
 });
