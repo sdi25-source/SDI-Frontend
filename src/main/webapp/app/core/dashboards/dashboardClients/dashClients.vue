@@ -63,10 +63,10 @@
         </div>
 
         <div class="row">
-          <!-- Left Chart - Product Deployments Distribution -->
+          <!-- Left Chart - Monthly Deployments Evolution -->
           <div class="col-md-6">
             <div class="chart-container">
-              <h4 class="chart-title">{{ t$('global.menu.entities.distribution') }}</h4>
+              <h4 class="chart-title">Monthly Deployments</h4>
               <div class="chart-wrapper">
                 <canvas ref="productDeploymentsChart" width="400" height="400"></canvas>
               </div>
@@ -105,6 +105,32 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+    <!-- Deployments Details Popup (Gray/White) -->
+    <div v-if="showDeploymentsPopup" class="dw-popup-overlay" @click="closeDeploymentsPopup">
+      <div class="dw-popup" @click.stop>
+        <div class="dw-popup-header">
+          <h3>{{ selectedDeploymentsPoint?.month }} {{ selectedDeploymentsPoint?.year }} — Deployments ({{ selectedDeploymentsPoint?.total }})</h3>
+          <button class="dw-popup-close" @click="closeDeploymentsPopup">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div class="dw-popup-body">
+          <div v-if="!selectedDeploymentsPoint?.items?.length" class="dw-empty">No details</div>
+          <ul v-else class="dw-list">
+            <li v-for="(item, idx) in selectedDeploymentsPoint?.items" :key="idx" class="dw-item">
+              <div class="dw-line">
+                <span class="dw-product">{{ item.product }}</span>
+                <span class="dw-version" v-if="item.version">v{{ item.version }}</span>
+              </div>
+              <div class="dw-meta">
+                <span class="dw-date">{{ new Date(item.startDate as any).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) }}</span>
+                <span class="dw-contract" v-if="item.contractRef">#{{ item.contractRef }}</span>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -522,4 +548,102 @@
     font-size: 12px;
   }
 }
+/* Deployments Popup (Gray/White minimal) */
+.dw-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dw-popup {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  width: 92%;
+  max-width: 560px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.dw-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.dw-popup-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.dw-popup-close {
+  border: none;
+  background: transparent;
+  color: #6c757d;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.dw-popup-body {
+  padding: 12px 16px;
+  max-height: calc(80vh - 56px);
+  overflow: auto;
+  background: #fff;
+}
+
+.dw-empty {
+  text-align: center;
+  color: #868e96;
+  font-style: italic;
+  padding: 16px;
+}
+
+.dw-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dw-item {
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: #fafafa;
+}
+
+.dw-line {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.dw-product {
+  font-weight: 600;
+  color: #343a40;
+}
+
+.dw-version {
+  color: #6c757d;
+}
+
+.dw-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #6c757d;
+  margin-top: 4px;
+}
+
+/* keep existing responsive rules */
 </style>
