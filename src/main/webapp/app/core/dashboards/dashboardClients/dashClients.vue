@@ -63,15 +63,15 @@
         </div>
 
         <div class="row">
-          <!-- Left Chart - Product Deployments Distribution -->
+          <!-- Left Chart - Module Deployments Evolution -->
           <div class="col-md-6">
             <div class="chart-container">
-              <h4 class="chart-title">{{ t$('global.menu.entities.distribution') }}</h4>
+              <h4 class="chart-title">Évolution des déploiements de modules</h4>
               <div class="chart-wrapper">
-                <canvas ref="productDeploymentsChart" width="400" height="400"></canvas>
+                <canvas ref="moduleDeploymentsEvolutionChart" width="400" height="400"></canvas>
               </div>
-              <div v-if="productDeploymentsChartData.labels.length === 0" class="no-data-message">
-                {{ t$('global.menu.entities.noDataProductAv') }}
+              <div v-if="moduleDeploymentsEvolutionData.labels.length === 0" class="no-data-message">
+                Aucune donnée de déploiement de modules disponible
               </div>
             </div>
           </div>
@@ -102,6 +102,44 @@
                     <span class="stat-label">{{ t$('global.menu.entities.advanced') }}</span>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module Details Popup -->
+    <div v-if="showModulePopup" class="module-popup-overlay" @click="closeModulePopup">
+      <div class="module-popup" @click.stop>
+        <div class="popup-header">
+          <h3>Modules déployés - {{ selectedModuleData?.monthName }} {{ currentYear }}</h3>
+          <button @click="closeModulePopup" class="close-btn">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <div class="popup-content">
+          <div class="modules-summary">
+            <p>{{ selectedModuleData?.totalModules || 0 }} module(s) déployé(s) ce mois-ci</p>
+          </div>
+
+          <div class="modules-list">
+            <div v-if="!selectedModuleData?.modules || selectedModuleData.modules.length === 0"
+                 class="no-modules">
+              Aucun module déployé ce mois-ci
+            </div>
+            <div v-else
+                 v-for="(module, index) in selectedModuleData.modules"
+                 :key="index"
+                 class="module-item">
+              <div class="module-header">
+                <h4 class="module-name">{{ module.name }}</h4>
+                <span class="module-version">v{{ module.version }}</span>
+              </div>
+              <div class="module-details">
+                <p class="module-date">Déployé le: {{ module.date }}</p>
+                <p class="module-description">{{ module.description }}</p>
               </div>
             </div>
           </div>
@@ -520,6 +558,201 @@
 
   .no-data-message {
     font-size: 12px;
+  }
+}
+
+/* Module Popup Styles - Simple Gray and White Theme */
+.module-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(128, 128, 128, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.module-popup {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  animation: popupFadeIn 0.3s ease-out;
+}
+
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.popup-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.popup-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #666666;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background-color: #e9ecef;
+  color: #333333;
+}
+
+.popup-content {
+  padding: 20px;
+  max-height: calc(80vh - 80px);
+  overflow-y: auto;
+}
+
+.modules-summary {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.modules-summary p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555555;
+}
+
+.modules-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.no-modules {
+  text-align: center;
+  color: #888888;
+  font-style: italic;
+  padding: 40px 20px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.module-item {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+.module-item:hover {
+  background-color: #f8f9fa;
+  border-color: #cccccc;
+}
+
+.module-item:last-child {
+  margin-bottom: 0;
+}
+
+.module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.module-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333333;
+}
+
+.module-version {
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #dee2e6;
+}
+
+.module-details {
+  color: #666666;
+}
+
+.module-date {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.module-description {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #777777;
+}
+
+/* Responsive Design for Popup */
+@media (max-width: 768px) {
+  .module-popup {
+    width: 95%;
+    margin: 20px;
+  }
+
+  .popup-header {
+    padding: 12px 16px;
+  }
+
+  .popup-header h3 {
+    font-size: 16px;
+  }
+
+  .popup-content {
+    padding: 16px;
+  }
+
+  .module-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .module-version {
+    align-self: flex-end;
   }
 }
 </style>
