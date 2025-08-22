@@ -63,10 +63,10 @@
         </div>
 
         <div class="row">
-          <!-- Left Chart - Product Deployments Distribution -->
+          <!-- Left Chart - Modules monthly deployments (stacked) -->
           <div class="col-md-6">
             <div class="chart-container">
-              <h4 class="chart-title">{{ t$('global.menu.entities.distribution') }}</h4>
+              <h4 class="chart-title">Deployed Modules - Monthly</h4>
               <div class="chart-wrapper">
                 <canvas ref="productDeploymentsChart" width="400" height="400"></canvas>
               </div>
@@ -102,6 +102,42 @@
                     <span class="stat-label">{{ t$('global.menu.entities.advanced') }}</span>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simple Gray/White Module Details Popup -->
+    <div v-if="showModulePopup" class="simple-popup-overlay" @click="closeModulePopup">
+      <div class="simple-popup" @click.stop>
+        <div class="simple-popup-header">
+          <h3>{{ selectedModuleData?.name }}</h3>
+          <button @click="closeModulePopup" class="simple-popup-close"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="simple-popup-content">
+          <p class="simple-popup-desc">{{ selectedModuleData?.description || 'No description available' }}</p>
+          <div class="simple-stats">
+            <div class="simple-stat">
+              <span class="label">Versions</span><span class="value">{{ selectedModuleData?.totalVersions || 0 }}</span>
+            </div>
+            <div class="simple-stat">
+              <span class="label">Deployments</span><span class="value">{{ selectedModuleData?.deployments?.length || 0 }}</span>
+            </div>
+            <div class="simple-stat">
+              <span class="label">Last</span><span class="value">{{ selectedModuleData?.lastDeployment || 'N/A' }}</span>
+            </div>
+          </div>
+          <div class="simple-list">
+            <div v-if="!selectedModuleData?.deployments || selectedModuleData.deployments.length === 0" class="simple-empty">
+              No deployment history available
+            </div>
+            <div v-else v-for="(d, i) in selectedModuleData.deployments" :key="i" class="simple-item">
+              <div class="left">v{{ d.version }}</div>
+              <div class="right">
+                {{ new Date(d.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) }}
+                <span class="status" :class="(d.status || 'active').toLowerCase()">{{ d.status || 'Active' }}</span>
               </div>
             </div>
           </div>
@@ -146,8 +182,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .dashboard-content {
@@ -267,7 +307,9 @@
   min-width: 280px;
   max-width: 280px;
   flex-shrink: 0;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   position: relative;
 }
 
@@ -441,6 +483,133 @@
   font-size: 11px;
   color: #666;
   font-weight: 500;
+}
+
+/* Simple popup gray/white */
+.simple-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.simple-popup {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 560px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.simple-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.simple-popup-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.simple-popup-close {
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: #666;
+  cursor: pointer;
+}
+
+.simple-popup-content {
+  padding: 16px;
+  background: #fff;
+}
+
+.simple-popup-desc {
+  color: #555;
+  margin-bottom: 12px;
+}
+
+.simple-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.simple-stat {
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.simple-stat .label {
+  color: #666;
+  font-size: 12px;
+}
+.simple-stat .value {
+  color: #222;
+  font-weight: 600;
+}
+
+.simple-list {
+  max-height: 300px;
+  overflow: auto;
+}
+.simple-empty {
+  color: #777;
+  font-style: italic;
+  padding: 10px;
+  text-align: center;
+}
+.simple-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+.simple-item .left {
+  font-weight: 600;
+  color: #333;
+}
+.simple-item .right {
+  color: #555;
+}
+.simple-item .status.active {
+  background: #e6f4ea;
+  color: #1e7e34;
+  border: 1px solid #cce3d5;
+  padding: 2px 6px;
+  border-radius: 8px;
+  margin-left: 6px;
+  font-size: 11px;
+}
+.simple-item .status.inactive {
+  background: #fdecea;
+  color: #842029;
+  border: 1px solid #f5c2c7;
+  padding: 2px 6px;
+  border-radius: 8px;
+  margin-left: 6px;
+  font-size: 11px;
 }
 
 /* Responsive Design */
