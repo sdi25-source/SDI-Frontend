@@ -63,14 +63,14 @@
         </div>
 
         <div class="row">
-          <!-- Left Chart - Product Deployments Distribution -->
+          <!-- Left Chart - Monthly Deployments -->
           <div class="col-md-6">
             <div class="chart-container">
               <h4 class="chart-title">{{ t$('global.menu.entities.distribution') }}</h4>
               <div class="chart-wrapper">
                 <canvas ref="productDeploymentsChart" width="400" height="400"></canvas>
               </div>
-              <div v-if="productDeploymentsChartData.labels.length === 0" class="no-data-message">
+              <div v-if="!productDeploymentsChartData.labels || productDeploymentsChartData.labels.length === 0" class="no-data-message">
                 {{ t$('global.menu.entities.noDataProductAv') }}
               </div>
             </div>
@@ -105,6 +105,31 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simple grey/white popup for month details -->
+    <div v-if="showMonthPopup" class="month-popup-overlay" @click="showMonthPopup = false">
+      <div class="month-popup" @click.stop>
+        <div class="month-popup-header">
+          <h4>{{ selectedMonth }}</h4>
+          <button class="month-close" @click="showMonthPopup = false"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="month-popup-content">
+          <div v-if="!selectedMonthDetails || selectedMonthDetails.length === 0" class="no-data-message">No deployments</div>
+          <ul v-else class="month-list">
+            <li v-for="(d, i) in selectedMonthDetails" :key="i" class="month-item">
+              <div class="mi-left">
+                <span class="mi-product">{{ d.product }}</span>
+                <span class="mi-version">v{{ d.version }}</span>
+              </div>
+              <div class="mi-right">
+                <span class="mi-type">{{ d.type }}</span>
+                <span class="mi-date">{{ new Date(d.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) }}</span>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -442,6 +467,86 @@
   color: #666;
   font-weight: 500;
 }
+
+/* Simple grey/white popup styles */
+.month-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+.month-popup {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 640px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.month-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  background: #f8f9fa;
+}
+
+.month-close {
+  border: none;
+  background: transparent;
+  color: #6c757d;
+  cursor: pointer;
+}
+
+.month-popup-content {
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.month-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.month-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.mi-left {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.mi-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: #6c757d;
+}
+
+.mi-product { font-weight: 600; color: #343a40; }
+.mi-version { color: #6c757d; }
+.mi-type { color: #6c757d; }
+.mi-date { color: #6c757d; }
 
 /* Responsive Design */
 @media (max-width: 768px) {

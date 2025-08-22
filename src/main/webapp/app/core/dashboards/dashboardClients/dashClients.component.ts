@@ -262,6 +262,10 @@ export default defineComponent({
       await fetchClients();
       await loadClientsEvolutionData();
       createCharts();
+      // Close any open popup
+      showMonthPopup.value = false;
+      selectedMonth.value = '';
+      selectedMonthDetails.value = [];
     };
 
     const destroyCharts = () => {
@@ -281,7 +285,7 @@ export default defineComponent({
 
     const loadClientChartsData = async (client) => {
       try {
-        await loadProductDeploymentsChartData(client.id);
+        await loadMonthlyDeploymentsChartData(client.id);
         await loadRequestChangesScatterData(client.id);
       } catch (error) {
         console.error('Error loading client charts data:', error);
@@ -289,250 +293,104 @@ export default defineComponent({
       }
     };
 
-    const loadProductDeploymentsChartData = async (clientId) => {
-      try {
-        const productDeploymentsRes = await productDeployementService.retrieve();
-        const productDeployments = productDeploymentsRes.data.filter((pd) => pd.client?.id === clientId);
-        clientProductDeployments.value = productDeployments;
+    // Monthly deployments (based on ProductDeployementDetail startDeployementDate) for the last 12 months
+    const last12MonthsLabels = () => {
+      const labels: string[] = [];
+      const now = new Date();
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        labels.push(d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+      }
+      return labels;
+    };
 
-        if (productDeployments.length === 0) {
-          productDeploymentsChartData.value = { labels: [], datasets: [] };
+    const monthKeyFromDate = (dateStr: string) => {
+      const d = new Date(dateStr);
+      return `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`;
+    };
+
+    const monthKeyLabelsMap = () => {
+      const map: Record<string, string> = {};
+      const now = new Date();
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`;
+        map[key] = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      }
+      return map;
+    };
+
+    const monthlyDeploymentsData = ref<{ labels: string[]; datasets: any[] }>({ labels: [], datasets: [] });
+    const monthToDetails = ref<Record<string, any[]>>({});
+    const selectedMonth = ref('');
+    const selectedMonthDetails = ref<any[]>([]);
+    const showMonthPopup = ref(false);
+
+    const loadMonthlyDeploymentsChartData = async (clientId) => {
+      try {
+        const pdRes = await productDeployementService.retrieve();
+        const deployments = pdRes.data.filter((pd) => pd.client?.id === clientId);
+        if (!deployments.length) {
+          monthlyDeploymentsData.value = { labels: [], datasets: [] };
           return;
         }
 
-        const productDeploymentDetailsRes = await productDeployementDetailService.retrieve();
-        const allDetails = productDeploymentDetailsRes.data;
+        const pddRes = await productDeployementDetailService.retrieve();
+        const allDetails = pddRes.data.filter((detail) =>
+          deployments.some((d) => d.id === detail.productDeployement?.id)
+        );
 
-        const deploymentDetailCounts = new Map();
-        const deploymentDetailsMap = new Map();
+        const keyToCount: Record<string, number> = {};
+        const keyToDetails: Record<string, any[]> = {};
+        const keyToLabel = monthKeyLabelsMap();
 
-        productDeployments.forEach((deployment) => {
-          const deploymentName = `${deployment.product?.name || 'Unknown Product'} - ${deployment.refContract || 'No Contract'}`;
-          const details = allDetails.filter(detail => detail.productDeployement?.id === deployment.id);
-          const detailsCount = details.length;
-
-          // Collecter les détails pour chaque déploiement
-          const deploymentInfo = details.map(detail => ({
-            name: deploymentName,
-            version: 'v ' + detail.productVersion?.version || 'Unknown Version',
-            date: detail.startDeployementDate
-              ? new Date(detail.startDeployementDate).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })
-              : 'No Date',
-          }));
-
-          deploymentDetailCounts.set(deploymentName, detailsCount);
-          deploymentDetailsMap.set(deploymentName, deploymentInfo);
+        // initialize last 12 months to zero
+        Object.keys(keyToLabel).forEach((k) => {
+          keyToCount[k] = 0;
+          keyToDetails[k] = [];
         });
 
-        const filteredEntries = Array.from(deploymentDetailCounts.entries()).filter(([_, count]) => count > 0);
-        if (filteredEntries.length === 0) {
-          productDeploymentsChartData.value = { labels: [], datasets: [] };
-          return;
-        }
+        allDetails.forEach((detail) => {
+          const dateStr = detail.startDeployementDate || detail.createDate;
+          if (!dateStr) return;
+          const d = new Date(dateStr);
+          const now = new Date();
+          const startWindow = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+          const endWindow = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+          if (d < startWindow || d > endWindow) return;
+          const key = monthKeyFromDate(dateStr);
+          if (keyToCount[key] !== undefined) {
+            keyToCount[key] += 1;
+            keyToDetails[key].push({
+              product: detail.productDeployement?.product?.name || 'Unknown Product',
+              version: detail.productVersion?.version || 'Unknown Version',
+              type: detail.deployementType?.type || 'Standard',
+              date: detail.startDeployementDate || null,
+            });
+          }
+        });
 
-        const labels = filteredEntries.map(entry => entry[0]);
-        const data = filteredEntries.map(entry => entry[1]);
-        const backgroundColors = generateColors(labels.length);
+        const labels = last12MonthsLabels();
+        const data = Object.keys(keyToLabel).map((k) => keyToCount[k]);
 
-        productDeploymentsChartData.value = {
+        monthToDetails.value = keyToDetails;
+
+        monthlyDeploymentsData.value = {
           labels,
           datasets: [
             {
+              label: 'Deployments per month',
               data,
-              backgroundColor: backgroundColors,
-              borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
-              borderWidth: 2,
-              deploymentDetails: Object.fromEntries(deploymentDetailsMap), // Stocker les détails pour les tooltips
+              backgroundColor: Array(12).fill('rgba(108, 117, 125, 0.7)'), // grey
+              borderColor: Array(12).fill('rgba(108, 117, 125, 1)'),
+              borderWidth: 1,
             },
           ],
         };
-      } catch (error) {
-        console.error('Error loading product deployments chart data:', error);
-        productDeploymentsChartData.value = { labels: [], datasets: [] };
+      } catch (e) {
+        console.error('Error loading monthly deployments data:', e);
+        monthlyDeploymentsData.value = { labels: [], datasets: [] };
       }
-    };
-
-    const loadRequestChangesScatterData = async (clientId) => {
-      try {
-        // Get all request of changes for this client
-        const requestChangesRes = await requestOfChangeService.retrieve();
-        const clientRequests = requestChangesRes.data.filter((req) => req.client?.id === clientId);
-
-        if (clientRequests.length === 0) {
-          requestChangesChartData.value = { datasets: [] };
-          totalRequests.value = { basic: 0, intermediate: 0, advanced: 0 };
-          return;
-        }
-
-        // Préparer les points pour le scatter plot
-        const basicPoints = [];
-        const intermediatePoints = [];
-        const advancedPoints = [];
-
-        // Initialize totals
-        let totalBasic = 0;
-        let totalIntermediate = 0;
-        let totalAdvanced = 0;
-
-        for (const request of clientRequests) {
-          if (request.createDate) {
-            const date = new Date(request.createDate);
-            const timestamp = date.getTime();
-            const formattedDate = date.toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            });
-
-            // Get the customization level from the request
-            let customizationLevel = '';
-            if (request.customisationLevel?.id) {
-              try {
-                const customisationLevelData = await customisationLevelService.find(request.customisationLevel.id);
-                customizationLevel =
-                  customisationLevelData.level?.toLowerCase() ||
-                  customisationLevelData.name?.toLowerCase() ||
-                  customisationLevelData.type?.toLowerCase() ||
-                  '';
-              } catch (error) {
-                console.error('Error fetching customization level:', error);
-              }
-            } else if (typeof request.customisationLevel === 'string') {
-              customizationLevel = request.customisationLevel.toLowerCase();
-            }
-
-            // Récupérer le produit et la version associés
-            let productName = 'Unknown Product';
-            let productVersion = 'Unknown Version';
-            if (request.productVersion?.id) {
-              try {
-                const productVersionData = await productVersionService().find(request.productVersion.id);
-                productName = productVersionData.product?.name || 'Unknown Product';
-                productVersion = productVersionData.version || 'Unknown Version';
-              } catch (error) {
-                console.error(`Error fetching product version for request ${request.id}:`, error);
-              }
-            }
-
-            // Récupérer les noms des modules affectés
-            const moduleNames =
-              request.moduleVersions?.map(
-                mv =>
-                  getModuleVersionWithModuleCached(mv.id).module?.name + ' v' + getModuleVersionWithModuleCached(mv.id).version + '\n' ||
-                  'Unknown Module',
-              ) || [];
-
-            // Créer un point pour le scatter plot
-            const point = {
-              x: timestamp,
-              y: 1, // Toujours 1 pour un point
-              r: 10, // Rayon du cercle
-              date: formattedDate,
-              requestId: request.id,
-              productName,
-              productVersion,
-              moduleNames,
-            };
-
-            // Catégoriser en fonction du niveau
-            if (customizationLevel.includes('basic')) {
-              basicPoints.push(point);
-              totalBasic++;
-            } else if (customizationLevel === 'intermediate') {
-              intermediatePoints.push(point);
-              totalIntermediate++;
-            } else if (customizationLevel === 'advanced') {
-              advancedPoints.push(point);
-              totalAdvanced++;
-            } else {
-              // Si aucun niveau n'est reconnu, distribuer de manière équitable
-              const requestIndex = clientRequests.indexOf(request);
-              if (requestIndex % 3 === 0) {
-                basicPoints.push(point);
-                totalBasic++;
-              } else if (requestIndex % 3 === 1) {
-                intermediatePoints.push(point);
-                totalIntermediate++;
-              } else {
-                advancedPoints.push(point);
-                totalAdvanced++;
-              }
-            }
-          }
-        }
-
-        // Update totals
-        totalRequests.value = {
-          basic: totalBasic,
-          intermediate: totalIntermediate,
-          advanced: totalAdvanced,
-        };
-
-        // Préparer les données pour le graphique
-        requestChangesChartData.value = {
-          datasets: [
-            {
-              label: 'Basic',
-              data: basicPoints,
-              backgroundColor: 'rgba(255, 193, 7, 0.7)',
-              borderColor: 'rgba(255, 193, 7, 1)',
-              borderWidth: 2,
-              pointRadius: 8,
-              pointHoverRadius: 12,
-            },
-            {
-              label: 'Intermediate',
-              data: intermediatePoints,
-              backgroundColor: 'rgba(40, 167, 69, 0.7)',
-              borderColor: 'rgba(40, 167, 69, 1)',
-              borderWidth: 2,
-              pointRadius: 8,
-              pointHoverRadius: 12,
-            },
-            {
-              label: 'Advanced',
-              data: advancedPoints,
-              backgroundColor: 'rgba(220, 53, 69, 0.7)',
-              borderColor: 'rgba(220, 53, 69, 1)',
-              borderWidth: 2,
-              pointRadius: 8,
-              pointHoverRadius: 12,
-            },
-          ],
-        };
-      } catch (error) {
-        console.error('Error loading request changes scatter data:', error);
-        requestChangesChartData.value = { datasets: [] };
-        totalRequests.value = { basic: 0, intermediate: 0, advanced: 0 };
-      }
-    };
-
-    const generateColors = (count) => {
-      const baseColors = [
-        'rgba(12, 45, 87, 0.8)',
-        'rgba(149, 160, 244, 0.8)',
-        'rgba(12, 166, 120, 0.8)',
-        'rgba(245, 159, 0, 0.8)',
-        'rgba(2, 136, 209, 0.8)',
-        'rgba(28, 126, 214, 0.8)',
-        'rgba(156, 39, 176, 0.8)',
-        'rgba(255, 87, 34, 0.8)',
-      ];
-
-      const result = [];
-      for (let i = 0; i < count; i++) {
-        if (i < baseColors.length) {
-          result.push(baseColors[i]);
-        } else {
-          const hue = ((i - baseColors.length) * 360) / (count - baseColors.length);
-          result.push(`hsla(${hue}, 70%, 60%, 0.8)`);
-        }
-      }
-      return result;
     };
 
     const createCharts = () => {
@@ -545,48 +403,47 @@ export default defineComponent({
     const createProductDeploymentsChart = () => {
       if (
         productDeploymentsChart.value &&
-        productDeploymentsChartData.value.labels &&
-        productDeploymentsChartData.value.labels.length > 0
+        monthlyDeploymentsData.value.labels &&
+        monthlyDeploymentsData.value.labels.length > 0
       ) {
         productDeploymentsChartInstance.value = new Chart(productDeploymentsChart.value, {
-          type: 'doughnut',
-          data: productDeploymentsChartData.value,
+          type: 'bar',
+          data: monthlyDeploymentsData.value,
           options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: {
-                position: 'bottom',
-                labels: {
-                  padding: 20,
-                  usePointStyle: true,
-                },
-              },
+              legend: { display: false },
               tooltip: {
                 callbacks: {
+                  title: function (context) {
+                    return context[0].label;
+                  },
                   label: function (context) {
-                    const label = context.label || '';
-                    const value = context.parsed;
-                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                    const percentage = ((value / total) * 100).toFixed(1);
-                    const deploymentDetails = context.dataset.deploymentDetails?.[label] || [];
-
-                    // Créer le tooltip avec les déploiements en format de liste
-                    const tooltipLines = [`${label}: ${value} deployment details (${percentage}%)`];
-
-                    if (deploymentDetails.length > 0) {
-                      tooltipLines.push('Deployments:');
-                      deploymentDetails.forEach((detail, index) => {
-                        tooltipLines.push(`- Deployment ${index + 1} - ${detail.version} - ${detail.date}`);
-                      });
-                    } else {
-                      tooltipLines.push('No Deployments');
-                    }
-
-                    return tooltipLines;
+                    const value = context.parsed.y;
+                    return `Deployments: ${value}`;
                   },
                 },
               },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  precision: 0,
+                },
+              },
+            },
+            onClick: (_, elements) => {
+              if (!elements || elements.length === 0) return;
+              const index = elements[0].index;
+              const label = monthlyDeploymentsData.value.labels[index];
+              // derive key from label by reverse lookup
+              const keyLabelMap = monthKeyLabelsMap();
+              const key = Object.keys(keyLabelMap).find(k => keyLabelMap[k] === label) || '';
+              selectedMonth.value = label;
+              selectedMonthDetails.value = key ? (monthToDetails.value[key] || []) : [];
+              showMonthPopup.value = true;
             },
           },
         });
@@ -856,6 +713,10 @@ export default defineComponent({
       totalRequests,
       currentYear,
       t$: t,
+      // monthly deployments popup bindings
+      showMonthPopup,
+      selectedMonth,
+      selectedMonthDetails,
     };
   },
 });
