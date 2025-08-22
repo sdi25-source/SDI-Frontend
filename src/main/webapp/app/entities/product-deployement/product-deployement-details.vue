@@ -186,7 +186,7 @@
   </div>
 </template>
 
-<script lang="ts" src="./product-deployement-detail-view.component.ts"></script>
+<script lang="ts" src="./product-deployement-details.component.ts"></script>
 
 <style scoped>
 /* Loading Indicator Styles */
@@ -221,8 +221,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Button styles */

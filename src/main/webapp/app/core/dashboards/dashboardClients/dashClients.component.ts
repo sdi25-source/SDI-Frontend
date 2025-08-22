@@ -14,6 +14,7 @@ import CustomisationLevelService from '@/entities/customisation-level/customisat
 import ProductVersionService from '@/entities/product-version/product-version.service.ts';
 import ModuleVersionService from '@/entities/module-version/module-version.service.ts';
 import ModuleService from '@/entities/module/module.service.ts';
+import ModuleDeployementService from '@/entities/module-deployement/module-deployement.service.ts';
 
 export default defineComponent({
   name: 'DashClientsComponent',
@@ -59,6 +60,7 @@ export default defineComponent({
     const customisationLevelService = new CustomisationLevelService();
     const clientSizeService = inject('clientSizeService', () => new ClientSizeService());
     const clientTypeService = inject('clientTypeService', () => new ClientTypeService());
+    const moduleDeployementService = new ModuleDeployementService();
 
     const fetchClients = async () => {
       try {
@@ -129,11 +131,10 @@ export default defineComponent({
         // Grouper par mois et calculer le cumul
         const monthlyCount = Array(12).fill(0);
         const cumulativeCount = Array(12).fill(0);
-        const clientsByMonth = Array(12).fill(null).map(() => []); // Stocker les noms des clients
-        const monthNames = [
-          'Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun',
-          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-        ];
+        const clientsByMonth = Array(12)
+          .fill(null)
+          .map(() => []); // Stocker les noms des clients
+        const monthNames = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
         // Compter les clients par mois et stocker leurs noms
         currentYearClients.forEach(client => {
@@ -161,7 +162,7 @@ export default defineComponent({
               borderWidth: 2,
               type: 'bar',
               order: 2,
-              clientNames: clientsByMonth // Ajouter les noms des clients
+              clientNames: clientsByMonth, // Ajouter les noms des clients
             },
             {
               label: 'Cumulative growth',
@@ -177,9 +178,9 @@ export default defineComponent({
               pointBorderWidth: 2,
               pointRadius: 6,
               pointHoverRadius: 8,
-              order: 1
-            }
-          ]
+              order: 1,
+            },
+          ],
         };
       } catch (error) {
         console.error('Error loading clients evolution data:', error);
@@ -187,11 +188,11 @@ export default defineComponent({
       }
     };
 
-    const countClientDeployments = async (clientId) => {
+    const countClientDeployments = async clientId => {
       try {
         // Fetch all product deployments
         const res = await productDeployementService.retrieve();
-        const deployments = res.data.filter((pd) => pd.client?.id === clientId);
+        const deployments = res.data.filter(pd => pd.client?.id === clientId);
 
         // If no deployments found, return 0
         if (!deployments.length) {
@@ -215,11 +216,11 @@ export default defineComponent({
       }
     };
 
-    const countClientProducts = async (clientId) => {
+    const countClientProducts = async clientId => {
       try {
         const res = await productDeployementService.retrieve();
-        const deployments = res.data.filter((pd) => pd.client?.id === clientId);
-        const uniqueProducts = new Set(deployments.map((pd) => pd.id));
+        const deployments = res.data.filter(pd => pd.client?.id === clientId);
+        const uniqueProducts = new Set(deployments.map(pd => pd.id));
         return uniqueProducts.size;
       } catch (error) {
         console.error('Error counting client products:', error);
@@ -227,10 +228,10 @@ export default defineComponent({
       }
     };
 
-    const countClientRequestOfChanges = async (clientId) => {
+    const countClientRequestOfChanges = async clientId => {
       try {
         const res = await requestOfChangeService.retrieve();
-        const requestsOfChanges = res.data.filter((req) => req.client?.id === clientId);
+        const requestsOfChanges = res.data.filter(req => req.client?.id === clientId);
         return requestsOfChanges.length;
       } catch (error) {
         console.error('Error counting client RequestsOfChanges:', error);
@@ -238,12 +239,12 @@ export default defineComponent({
       }
     };
 
-    const getClientBadgeClass = (index) => {
+    const getClientBadgeClass = index => {
       const classes = ['finance', 'insurance', 'security', 'analytics', 'communication', 'health', 'logistics'];
       return classes[index % classes.length];
     };
 
-    const selectClient = async (client) => {
+    const selectClient = async client => {
       // D'abord détruire les graphiques existants
       destroyCharts();
       selectedClient.value = client;
@@ -279,7 +280,7 @@ export default defineComponent({
       }
     };
 
-    const loadClientChartsData = async (client) => {
+    const loadClientChartsData = async client => {
       try {
         await loadProductDeploymentsChartData(client.id);
         await loadRequestChangesScatterData(client.id);
@@ -289,10 +290,10 @@ export default defineComponent({
       }
     };
 
-    const loadProductDeploymentsChartData = async (clientId) => {
+    const loadProductDeploymentsChartData = async clientId => {
       try {
         const productDeploymentsRes = await productDeployementService.retrieve();
-        const productDeployments = productDeploymentsRes.data.filter((pd) => pd.client?.id === clientId);
+        const productDeployments = productDeploymentsRes.data.filter(pd => pd.client?.id === clientId);
         clientProductDeployments.value = productDeployments;
 
         if (productDeployments.length === 0) {
@@ -303,52 +304,84 @@ export default defineComponent({
         const productDeploymentDetailsRes = await productDeployementDetailService.retrieve();
         const allDetails = productDeploymentDetailsRes.data;
 
-        const deploymentDetailCounts = new Map();
-        const deploymentDetailsMap = new Map();
+        // Map des détails par id pour accès rapide
+        const detailIdToDetail = new Map(allDetails.map(d => [d.id, d]));
 
-        productDeployments.forEach((deployment) => {
-          const deploymentName = `${deployment.product?.name || 'Unknown Product'} - ${deployment.refContract || 'No Contract'}`;
-          const details = allDetails.filter(detail => detail.productDeployement?.id === deployment.id);
-          const detailsCount = details.length;
+        // Filtrer les détails qui appartiennent aux déploiements du client
+        const clientDetails = allDetails.filter(detail => productDeployments.some(depl => depl.id === detail.productDeployement?.id));
 
-          // Collecter les détails pour chaque déploiement
-          const deploymentInfo = details.map(detail => ({
-            name: deploymentName,
-            version: 'v ' + detail.productVersion?.version || 'Unknown Version',
-            date: detail.startDeployementDate
-              ? new Date(detail.startDeployementDate).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })
-              : 'No Date',
-          }));
+        // Récupérer tous les module deployments et filtrer par détails du client
+        const moduleDeploymentsRes = await moduleDeployementService.retrieve();
+        const allModuleDeployments = moduleDeploymentsRes.data;
+        const clientModuleDeployments = allModuleDeployments.filter(md =>
+          clientDetails.some(cd => cd.id === md.productDeployementDetail?.id),
+        );
 
-          deploymentDetailCounts.set(deploymentName, detailsCount);
-          deploymentDetailsMap.set(deploymentName, deploymentInfo);
-        });
-
-        const filteredEntries = Array.from(deploymentDetailCounts.entries()).filter(([_, count]) => count > 0);
-        if (filteredEntries.length === 0) {
+        if (clientModuleDeployments.length === 0) {
           productDeploymentsChartData.value = { labels: [], datasets: [] };
           return;
         }
 
-        const labels = filteredEntries.map(entry => entry[0]);
-        const data = filteredEntries.map(entry => entry[1]);
-        const backgroundColors = generateColors(labels.length);
+        // Préparer structures pour calcul mensuel par module
+        const monthNames = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const moduleNameToSeries = new Map(); // moduleName -> { data: number[12], detailsByMonth: Array<Array<DetailInfo>> }
+
+        for (const md of clientModuleDeployments) {
+          const relatedDetail = detailIdToDetail.get(md.productDeployementDetail?.id);
+          const startDate = relatedDetail?.startDeployementDate ? new Date(relatedDetail.startDeployementDate) : null;
+          if (!startDate) continue;
+          const monthIndex = startDate.getMonth();
+
+          // Récupérer le nom du module via le cache
+          let moduleName = 'Unknown Module';
+          let moduleDescription = '';
+          const moduleVersionId = md.moduleVersion?.id;
+          if (moduleVersionId) {
+            const mv = getModuleVersionWithModuleCached(moduleVersionId);
+            if (mv?.module?.name) {
+              moduleName = mv.module.name;
+              moduleDescription = mv.module.description || '';
+            }
+          }
+
+          if (!moduleNameToSeries.has(moduleName)) {
+            moduleNameToSeries.set(moduleName, {
+              description: moduleDescription,
+              data: Array(12).fill(0),
+              detailsByMonth: Array(12)
+                .fill(null)
+                .map(() => []),
+            });
+          }
+
+          const entry = moduleNameToSeries.get(moduleName);
+          entry.data[monthIndex] = (entry.data[monthIndex] || 0) + 1;
+          entry.detailsByMonth[monthIndex].push({
+            version: md.moduleVersion?.version || 'Unknown',
+            date: relatedDetail.startDeployementDate,
+            status: relatedDetail.status || 'Active',
+          });
+        }
+
+        // Construire les datasets par module
+        const moduleNames = Array.from(moduleNameToSeries.keys());
+        const colors = generateColors(moduleNames.length);
+        const datasets = moduleNames.map((name, idx) => {
+          const series = moduleNameToSeries.get(name);
+          return {
+            label: name,
+            data: series.data,
+            backgroundColor: colors[idx],
+            borderColor: colors[idx].replace('0.8', '1'),
+            borderWidth: 1,
+            detailsByMonth: series.detailsByMonth,
+            description: series.description,
+          };
+        });
 
         productDeploymentsChartData.value = {
-          labels,
-          datasets: [
-            {
-              data,
-              backgroundColor: backgroundColors,
-              borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
-              borderWidth: 2,
-              deploymentDetails: Object.fromEntries(deploymentDetailsMap), // Stocker les détails pour les tooltips
-            },
-          ],
+          labels: monthNames,
+          datasets,
         };
       } catch (error) {
         console.error('Error loading product deployments chart data:', error);
@@ -356,11 +389,11 @@ export default defineComponent({
       }
     };
 
-    const loadRequestChangesScatterData = async (clientId) => {
+    const loadRequestChangesScatterData = async clientId => {
       try {
         // Get all request of changes for this client
         const requestChangesRes = await requestOfChangeService.retrieve();
-        const clientRequests = requestChangesRes.data.filter((req) => req.client?.id === clientId);
+        const clientRequests = requestChangesRes.data.filter(req => req.client?.id === clientId);
 
         if (clientRequests.length === 0) {
           requestChangesChartData.value = { datasets: [] };
@@ -511,7 +544,7 @@ export default defineComponent({
       }
     };
 
-    const generateColors = (count) => {
+    const generateColors = count => {
       const baseColors = [
         'rgba(12, 45, 87, 0.8)',
         'rgba(149, 160, 244, 0.8)',
@@ -549,44 +582,58 @@ export default defineComponent({
         productDeploymentsChartData.value.labels.length > 0
       ) {
         productDeploymentsChartInstance.value = new Chart(productDeploymentsChart.value, {
-          type: 'doughnut',
+          type: 'bar',
           data: productDeploymentsChartData.value,
           options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
               legend: {
-                position: 'bottom',
+                position: 'top',
                 labels: {
-                  padding: 20,
+                  padding: 16,
                   usePointStyle: true,
                 },
               },
               tooltip: {
                 callbacks: {
+                  title: function (context) {
+                    const month = context[0]?.label || '';
+                    return `${month} - Modules`;
+                  },
                   label: function (context) {
-                    const label = context.label || '';
-                    const value = context.parsed;
-                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                    const percentage = ((value / total) * 100).toFixed(1);
-                    const deploymentDetails = context.dataset.deploymentDetails?.[label] || [];
-
-                    // Créer le tooltip avec les déploiements en format de liste
-                    const tooltipLines = [`${label}: ${value} deployment details (${percentage}%)`];
-
-                    if (deploymentDetails.length > 0) {
-                      tooltipLines.push('Deployments:');
-                      deploymentDetails.forEach((detail, index) => {
-                        tooltipLines.push(`- Deployment ${index + 1} - ${detail.version} - ${detail.date}`);
-                      });
-                    } else {
-                      tooltipLines.push('No Deployments');
-                    }
-
-                    return tooltipLines;
+                    const moduleName = context.dataset.label || '';
+                    const value = context.parsed.y || 0;
+                    return `${moduleName}: ${value}`;
                   },
                 },
               },
+            },
+            scales: {
+              x: {
+                stacked: true,
+              },
+              y: {
+                beginAtZero: true,
+                stacked: true,
+                ticks: {
+                  stepSize: 1,
+                  callback: function (value) {
+                    return Number.isInteger(value) ? value : '';
+                  },
+                },
+              },
+            },
+            onClick: (evt, elements, chart) => {
+              if (elements && elements.length > 0) {
+                const el = elements[0];
+                const datasetIndex = el.datasetIndex;
+                const dataIndex = el.index ?? el._index; // compat fallback
+                const moduleName = chart.data.datasets[datasetIndex]?.label;
+                if (moduleName !== undefined) {
+                  showModuleDetails(moduleName, dataIndex);
+                }
+              }
             },
           },
         });
@@ -691,12 +738,12 @@ export default defineComponent({
                 position: 'top',
                 labels: {
                   usePointStyle: true,
-                  padding: 20
-                }
+                  padding: 20,
+                },
               },
               tooltip: {
                 callbacks: {
-                  label: function(context) {
+                  label: function (context) {
                     const datasetLabel = context.dataset.label || '';
                     const value = context.parsed.y;
 
@@ -718,32 +765,32 @@ export default defineComponent({
                       return tooltip.split('\n');
                     }
                   },
-                  title: function(context) {
+                  title: function (context) {
                     return `${context[0].label} ${currentYear.value}`;
-                  }
-                }
-              }
+                  },
+                },
+              },
             },
             scales: {
               y: {
                 beginAtZero: true,
                 ticks: {
                   stepSize: 1,
-                  callback: function(value) {
+                  callback: function (value) {
                     return Number.isInteger(value) ? value : '';
-                  }
+                  },
                 },
                 title: {
                   display: true,
                   text: 'Number of clients',
                   font: {
                     size: 14,
-                    weight: 'bold'
-                  }
+                    weight: 'bold',
+                  },
                 },
                 grid: {
-                  color: 'rgba(0, 0, 0, 0.1)'
-                }
+                  color: 'rgba(0, 0, 0, 0.1)',
+                },
               },
               x: {
                 title: {
@@ -751,19 +798,19 @@ export default defineComponent({
                   text: `month - ${currentYear.value}`,
                   font: {
                     size: 14,
-                    weight: 'bold'
-                  }
+                    weight: 'bold',
+                  },
                 },
                 grid: {
-                  display: false
-                }
-              }
+                  display: false,
+                },
+              },
             },
             animation: {
               duration: 1000,
-              easing: 'easeInOutQuart'
-            }
-          }
+              easing: 'easeInOutQuart',
+            },
+          },
         });
       }
     };
@@ -834,6 +881,40 @@ export default defineComponent({
       };
     };
 
+    // Popup state for module details
+    const showModulePopup = ref(false);
+    const selectedModuleData = ref(null);
+
+    const showModuleDetails = (moduleName, monthIndex) => {
+      // Trouver le dataset du module
+      const dataset = productDeploymentsChartData.value.datasets.find(ds => ds.label === moduleName);
+      if (!dataset) return;
+
+      const monthDetails = Array.isArray(dataset.detailsByMonth?.[monthIndex]) ? dataset.detailsByMonth[monthIndex] : [];
+      const versionsSet = new Set(monthDetails.map(d => d.version || 'Unknown'));
+      const lastDeployment = monthDetails.length
+        ? new Date(Math.max(...monthDetails.map(d => new Date(d.date).getTime()))).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          })
+        : 'N/A';
+
+      selectedModuleData.value = {
+        name: moduleName,
+        description: dataset.description || '',
+        totalVersions: versionsSet.size,
+        deployments: monthDetails,
+        lastDeployment,
+      };
+      showModulePopup.value = true;
+    };
+
+    const closeModulePopup = () => {
+      showModulePopup.value = false;
+      selectedModuleData.value = null;
+    };
+
     return {
       scrollContainer,
       clients,
@@ -856,6 +937,11 @@ export default defineComponent({
       totalRequests,
       currentYear,
       t$: t,
+      // popup exports
+      showModulePopup,
+      selectedModuleData,
+      showModuleDetails,
+      closeModulePopup,
     };
   },
 });
