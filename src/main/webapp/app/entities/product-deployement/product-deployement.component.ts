@@ -1,5 +1,3 @@
-"use client"
-
 import { defineComponent, ref, computed, watch, onMounted, inject } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRouter } from "vue-router"
@@ -396,38 +394,95 @@ export default defineComponent({
       }
     }
 
-    // FONCTION CORRIGÉE - Sauvegarder les paramètres des modules
+    // FONCTION CORRIGÉE - Sauvegarder les paramètres des modules et créer les déploiements de modules
     const saveModuleSettingsAndCreateDeployments = async () => {
       try {
-        if (selectedDetail.value) {
-          // Mettre à jour le détail avec les modules autorisés
-          const detailToSave = {
-            ...selectedDetail.value,
-            allowedModuleVersions: selectedAllowedModuleVersions.value.map((mv) => ({
-              id: mv.id,
-              version: mv.version,
-              module: mv.module ? { id: mv.module.id, name: mv.module.name } : null,
-              productVersion: mv.productVersion,
-            })),
-          }
-
-          const response = await productDeployementDetailService().update(detailToSave)
-
-          // Mettre à jour le cache local
-          const detailIndex = productDeployementDetails.value.findIndex((d) => d.id === selectedDetail.value.id)
-          if (detailIndex !== -1) {
-            productDeployementDetails.value[detailIndex] = {
-              ...response,
-              allowedModuleVersions: selectedAllowedModuleVersions.value,
-            }
-          }
-
-          alertService.showInfo("Modules autorisés configurés avec succès", {
-            variant: "success",
-          })
+        if (!selectedDetail.value) {
+          alertService.showAlert("Aucun détail sélectionné.", "danger")
+          return
         }
+
+        // Mettre à jour le détail avec les modules autorisés
+        const detailToSave = {
+          ...selectedDetail.value,
+          allowedModuleVersions: selectedAllowedModuleVersions.value.map((mv) => ({
+            id: mv.id,
+            version: mv.version,
+            module: mv.module ? { id: mv.module.id, name: mv.module.name } : null,
+            productVersion: mv.productVersion,
+          })),
+        }
+
+        // Mettre à jour le ProductDeployementDetail
+        const detailResponse = await productDeployementDetailService().update(detailToSave)
+
+        // Récupérer tous les ModuleDeployements et filtrer par productDeployementDetail.id
+        const allModuleDeploymentsResponse = await moduleDeployementService().retrieve()
+        const existingModuleDeployments = allModuleDeploymentsResponse.data.filter(
+          (md) => md.productDeployementDetail?.id === selectedDetail.value.id
+        ) || []
+
+        // Créer ou mettre à jour les ModuleDeployements
+        const currentDate = new Date().toISOString().split("T")[0]
+        const moduleDeploymentsToCreate = selectedAllowedModuleVersions.value
+          .filter((mv) => !existingModuleDeployments.some((emd) => emd.moduleVersion?.id === mv.id))
+          .map((mv) => ({
+            code: `${selectedDetail.value.productDeployement?.refContract || 'UNKNOWN'}-${mv.module?.name || 'MOD'}-${mv.version || 'v1'}`,
+            notes: null,
+            createDate: currentDate,
+            updateDate: currentDate,
+            moduleVersion: { id: mv.id },
+            productDeployementDetail: { id: selectedDetail.value.id },
+          }))
+
+        // Créer les nouveaux ModuleDeployements
+        for (const moduleDeployment of moduleDeploymentsToCreate) {
+          await moduleDeployementService().create(moduleDeployment)
+        }
+
+        // Supprimer les ModuleDeployements qui ne sont plus dans allowedModuleVersions
+        const moduleDeploymentsToDelete = existingModuleDeployments.filter(
+          (emd) => !selectedAllowedModuleVersions.value.some((mv) => mv.id === emd.moduleVersion?.id)
+        )
+
+        for (const moduleDeployment of moduleDeploymentsToDelete) {
+          if (moduleDeployment.id) {
+            await moduleDeployementService().delete(moduleDeployment.id)
+          }
+        }
+
+        // Mettre à jour le cache local
+        const detailIndex = productDeployementDetails.value.findIndex((d) => d.id === selectedDetail.value.id)
+        if (detailIndex !== -1) {
+          productDeployementDetails.value[detailIndex] = {
+            ...detailResponse,
+            allowedModuleVersions: selectedAllowedModuleVersions.value,
+          }
+        }
+
+        const allDetailIndex = allProductDeployementDetails.value.findIndex((d) => d.id === selectedDetail.value.id)
+        if (allDetailIndex !== -1) {
+          allProductDeployementDetails.value[allDetailIndex] = {
+            ...detailResponse,
+            allowedModuleVersions: selectedAllowedModuleVersions.value,
+          }
+        }
+
+        // Si le détail mis à jour est sélectionné pour la configuration, le mettre à jour
+        if (selectedDetailForConfiguration.value && selectedDetailForConfiguration.value.id === selectedDetail.value.id) {
+          selectedDetailForConfiguration.value = {
+            ...detailResponse,
+            allowedModuleVersions: selectedAllowedModuleVersions.value,
+          }
+        }
+
+        alertService.showInfo("Modules configurés et déploiements créés avec succès", {
+          variant: "success",
+        })
+
         closeModuleSettingsModal()
       } catch (error) {
+        console.error("Erreur lors de la sauvegarde des paramètres des modules:", error)
         alertService.showHttpError(error.response)
       }
     }
@@ -894,7 +949,7 @@ export default defineComponent({
     const removeProductDeployementDetail = async () => {
       try {
         await productDeployementDetailService().delete(removeDetailId.value)
-       // alertService.showInfo("Détail supprimé avec succès", { variant: "success" })
+        // alertService.showInfo("Détail supprimé avec succès", { variant: "success" })
 
         productDeployementDetails.value = productDeployementDetails.value.filter(
           (detail) => detail.id !== removeDetailId.value,
