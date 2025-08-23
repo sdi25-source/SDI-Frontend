@@ -232,21 +232,12 @@
         </div>
 
         <div class="popup-content">
-          <div class="module-description">
-            <h4>Description</h4>
-            <p>{{ selectedModuleData?.description || 'No description available' }}</p>
-          </div>
-
-          <div class="module-stats">
-            <div class="stat-card">
-              <span class="stat-value">{{ selectedModuleData?.totalVersions || 0 }}</span>
-              <span class="stat-label">Total Versions</span>
+          <div class="description-deployment-container">
+            <div class="module-description">
+              <h4>Description</h4>
+              <p>{{ selectedModuleData?.description || 'No description available' }}</p>
             </div>
-            <div class="stat-card">
-              <span class="stat-value">{{ selectedModuleData?.deployments?.length || 0 }}</span>
-              <span class="stat-label">Deployments</span>
-            </div>
-            <div class="stat-card">
+            <div class="stat-card last-deployment-card">
               <span class="stat-value">{{ selectedModuleData?.lastDeployment || 'N/A' }}</span>
               <span class="stat-label">Last Deployment</span>
             </div>
@@ -265,13 +256,9 @@
                    class="deployment-history-item">
                 <div class="deployment-version">
                   <span class="version-badge">v{{ deployment.version }}</span>
-                  <span class="deployment-order">#{{ index + 1 }}</span>
                 </div>
                 <div class="deployment-details">
                   <span class="deployment-date">{{ formatDate(deployment.date) }}</span>
-                  <span class="deployment-status" :class="deployment.status?.toLowerCase()">
-                    {{ deployment.status || 'Active' }}
-                  </span>
                 </div>
               </div>
             </div>
@@ -279,7 +266,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -957,7 +943,7 @@
 
 .popup-header h3 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   color: #0c2d57;
 }
 
@@ -976,22 +962,36 @@
 .popup-content {
   padding: 20px;
 }
-
-.module-description {
+.description-deployment-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
   margin-bottom: 20px;
+}
+.module-description {
+  flex: 1;
+  min-width: 0;
 }
 
 .module-description h4 {
-  font-size: 1.1rem;
+  font-size: 1.0rem;
   margin-bottom: 10px;
   color: #333;
 }
 
-.module-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin-bottom: 20px;
+.module-description p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.last-deployment-card {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 10px;
+  text-align: center;
+  width: 150px;
+  flex-shrink: 0;
 }
 
 .stat-card {
@@ -1003,7 +1003,7 @@
 
 .stat-value {
   display: block;
-  font-size: 1.2rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: #0c2d57;
   margin-bottom: 5px;
@@ -1014,8 +1014,21 @@
   color: #666;
 }
 
+@media (max-width: 768px) {
+  .description-deployment-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .last-deployment-card {
+    width: 100%;
+    max-width: 150px;
+    margin: 0 auto;
+  }
+}
+
 .deployments-history h4 {
-  font-size: 1.1rem;
+  font-size: 1.0rem;
   margin-bottom: 10px;
   color: #333;
 }
