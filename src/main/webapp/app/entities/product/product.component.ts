@@ -41,6 +41,7 @@ export default defineComponent({
     const accountService = inject<AccountService>('accountService');
     const alertService = inject('alertService', () => useAlertService(), true);
 
+    // Data
     const hasAnyAuthorityValues: Ref<any> = ref({});
     const products = ref([]);
     const allProducts = ref([]);

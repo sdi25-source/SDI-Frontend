@@ -10,19 +10,17 @@ import ProductVersionService from '@/entities/product-version/product-version.se
 import ModuleVersionService from '@/entities/module-version/module-version.service.ts';
 import ProductDeployementDetailService from '@/entities/product-deployement-detail/product-deployement-detail.service.ts';
 import type { IProductDeployementDetail } from '@/shared/model/product-deployement-detail.model.ts';
-import Chart from 'chart.js/auto';
+import type Chart from 'chart.js/auto';
 import type { IProductDeployement } from '@/shared/model/product-deployement.model.ts';
 import ProductDeployementService from '@/entities/product-deployement/product-deployement.service.ts';
 import ModuleService from '@/entities/module/module.service.ts';
 import productDeployementComponent from '@/entities/product-deployement/product-deployement.component.ts';
+import productDeployementDetailComponent from '@/entities/product-deployement-detail/product-deployement-detail.component.ts';
+import ClientService from '@/entities/client/client.service.ts';
+import type { IClient } from '@/shared/model/client.model';
 
 export default defineComponent({
   name: 'DashProductsComponent',
-  computed: {
-    productDeployementComponent() {
-      return productDeployementComponent;
-    },
-  },
   setup() {
     const loginService = inject<LoginService>('loginService');
     const authenticated = inject<ComputedRef<boolean>>('authenticated');
@@ -60,12 +58,26 @@ export default defineComponent({
     const moduleVersionService = new ModuleVersionService();
     const moduleService = new ModuleService();
     const productDeployementService = new ProductDeployementService();
+    const clientService = new ClientService();
 
+    // ------ Clients / Déploiements / Modules ------
+    type ClientWithDeployments = {
+      id: number;
+      name: string;
+      clientLogo?: string | null;
+      deployments: Array<{ id: number; refContract: string }>;
+    };
+
+    const clients = ref<ClientWithDeployments[]>([]);
+    const selectedDeployments = ref<Record<number, number | ''>>({});
+    const expandedClientId = ref<number | null>(null);
+    const modulesCache = ref<Record<number, Array<{ id: number; moduleName: string; version: string; productVersion: string }>>>({});
+
+    // ------ Fonctions principales ------
     const fetchProducts = async () => {
       try {
         loading.value = true;
         products.value = await productService.retrieveProductOverviews();
-        // Fetch latest non-client version for each product
         for (const product of products.value) {
           const latest = await fetchLatestNonClientVersion(product.name);
           latestVersions.value.set(product.name, latest);
@@ -75,9 +87,8 @@ export default defineComponent({
           totalFeaturesPerProduct.value.set(product.name, totalFeatures);
           const totalDeployements = await countDeployements(product.name);
           totalDeployementsPerProduct.value.set(product.name, totalDeployements);
-          console.log(totalDeployementsPerProduct.value);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching product overviews:', error);
         alertService.showHttpError(error.response || error);
       } finally {
@@ -87,46 +98,35 @@ export default defineComponent({
 
     const loadProductsEvolutionData = async () => {
       try {
-        loading.value = true;
-        // Récupérer tous les produits avec leurs dates de création
         const allProducts = await productService.retrieve();
         const productsData = allProducts.data || allProducts;
-
-        // Filtrer les produits de l'année courante
-        const currentYearProducts = productsData.filter(product => {
+        const currentYearProducts = productsData.filter((product: any) => {
           if (!product.createDate) return false;
           const productYear = new Date(product.createDate).getFullYear();
           return productYear === currentYear.value;
         });
 
-        // Trier les produits par date de création
-        currentYearProducts.sort((a, b) => {
-          return new Date(a.createDate).getTime() - new Date(b.createDate).getTime();
-        });
+        currentYearProducts.sort((a: any, b: any) => new Date(a.createDate).getTime() - new Date(b.createDate).getTime());
 
-        // Grouper par mois et calculer le cumul
         const monthlyCount = Array(12).fill(0);
         const cumulativeCount = Array(12).fill(0);
         const productsByMonth = Array(12)
           .fill(null)
-          .map(() => []); // Stocker les noms des produits
+          .map(() => []);
         const monthNames = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-        // Compter les produits par mois et stocker leurs noms
-        currentYearProducts.forEach(product => {
+        currentYearProducts.forEach((product: any) => {
           const month = new Date(product.createDate).getMonth();
           monthlyCount[month]++;
-          productsByMonth[month].push(product.name); // Stocker le nom du produit
+          productsByMonth[month].push(product.name);
         });
 
-        // Calculer le cumul
         let cumul = 0;
         for (let i = 0; i < 12; i++) {
           cumul += monthlyCount[i];
           cumulativeCount[i] = cumul;
         }
 
-        // Créer les données du graphique
         productsEvolutionData.value = {
           labels: monthNames,
           datasets: [
@@ -138,7 +138,7 @@ export default defineComponent({
               borderWidth: 2,
               type: 'bar',
               order: 2,
-              productNames: productsByMonth, // Ajouter les noms des produits
+              productNames: productsByMonth,
             },
             {
               label: 'Cumulative growth',
@@ -161,21 +161,22 @@ export default defineComponent({
       } catch (error) {
         console.error('Error loading products evolution data:', error);
         productsEvolutionData.value = { labels: [], datasets: [] };
-      } finally {
-        loading.value = false;
       }
     };
 
     const selectProduct = async (product: ProductOverview) => {
       selectedProduct.value = product;
       await nextTick();
-      await loadChartsData(product);
+      await loadChartsData(product); // <-- charge aussi clients + déploiements
       createCharts();
     };
 
     const closeCharts = async () => {
       selectedProduct.value = null;
       destroyCharts();
+      clients.value = [];
+      selectedDeployments.value = {};
+      expandedClientId.value = null;
       await fetchProducts();
       await loadProductsEvolutionData();
       createCharts();
@@ -196,212 +197,79 @@ export default defineComponent({
       }
     };
 
+    // ----------------- Clients / Déploiements / Modules -----------------
     const loadChartsData = async (product: ProductOverview) => {
       try {
-        // Load clients data
-        await loadClientsChartData(product.name);
-        // Load versions data
-        await loadVersionsChartData(product.name);
-      } catch (error) {
-        console.error('Error loading charts data:', error);
-        alertService.showHttpError(error.response || error);
-      }
-    };
+        const deploymentsRes = await productDeployementService.retrieve();
+        const allDeployments: IProductDeployement[] = deploymentsRes.data || [];
 
-    const loadClientsChartData = async (productName: string) => {
-      try {
-        // Get the latest version for the selected product
-        const lastVersion = await fetchLatestNonClientVersion(productName);
-        if (!lastVersion) {
-          clientsChartData.value = { labels: [], datasets: [] };
-          return;
-        }
+        const filtered = allDeployments.filter(pd => pd.product?.id === product.id || pd.product?.name === product.name);
 
-        // Get all product deployment details for the selected product and latest version
-        const productDeploymentDetailsRes = await productDeployementDetailService.retrieve();
-        const productDeploymentDetails: IProductDeployementDetail[] = productDeploymentDetailsRes.data;
-
-        // Filter deployments for the selected product and latest version only
-        const productDeployments = productDeploymentDetails.filter(detail => detail.productVersion?.id === lastVersion.id);
-
-        // Get all product deployments to have access to client information
-        const productDeployementRes = await productDeployementService.retrieve();
-        const allProductDeployements: IProductDeployement[] = productDeployementRes.data;
-
-        // Group by client and count module deployments, and collect module names
-        const clientModuleCount = new Map<string, number>();
-        const clientModuleNames = new Map<string, Set<string>>(); // Stocke les noms uniques des modules par client
-
-        for (const detail of productDeployments) {
-          let clientName = 'Unknown Client';
-
-          // Find the corresponding ProductDeployement to get client info
-          if (detail.productDeployement?.id) {
-            const productDeployement = allProductDeployements.find(pd => pd.id === detail.productDeployement?.id);
-            if (productDeployement?.client?.name) {
-              clientName = productDeployement.client.name;
-            }
+        const byClient = new Map<number, ClientWithDeployments>();
+        for (const d of filtered) {
+          const c = d.client as IClient | undefined;
+          if (!c?.id) continue;
+          if (!byClient.has(c.id)) {
+            byClient.set(c.id, {
+              id: c.id,
+              name: c.name || 'Unknown Client',
+              clientLogo: c.clientLogo || null,
+              deployments: [],
+            });
           }
-
-          console.log('Client found:', clientName);
-
-          // Count modules
-          const moduleCount = detail.allowedModuleVersions?.length || 0;
-          console.log('moduleCount', moduleCount);
-
-          // Collect module names
-          const moduleNames =
-            detail.allowedModuleVersions?.map(
-              mv =>
-                getModuleVersionWithModuleCached(mv.id).module?.name + ' v' + getModuleVersionWithModuleCached(mv.id).version + '\n' ||
-                'Unknown Module',
-            ) || [];
-          const uniqueModuleNames = clientModuleNames.get(clientName) || new Set<string>();
-          moduleNames.forEach(name => uniqueModuleNames.add(name));
-          clientModuleNames.set(clientName, uniqueModuleNames);
-
-          if (clientModuleCount.has(clientName)) {
-            clientModuleCount.set(clientName, clientModuleCount.get(clientName)! + moduleCount);
-          } else {
-            clientModuleCount.set(clientName, moduleCount);
-          }
+          byClient.get(c.id)!.deployments.push({
+            id: d.id!,
+            refContract: (d as any).refContract || `Deployment #${d.id}`,
+          });
         }
 
-        // Filter out clients with 0 modules
-        const filteredEntries = Array.from(clientModuleCount.entries()).filter(([_, count]) => count > 0);
-        if (filteredEntries.length === 0) {
-          clientsChartData.value = { labels: [], datasets: [] };
-          return;
-        }
-
-        // Sort by module count (descending) for better visualization
-        const sortedEntries = filteredEntries.sort((a, b) => b[1] - a[1]);
-        const labels = sortedEntries.map(entry => entry[0]);
-        const data = sortedEntries.map(entry => entry[1]);
-        const backgroundColors = generateColors(labels.length);
-
-        // Store module names for use in chart options
-        clientsChartData.value = {
-          labels,
-          datasets: [
-            {
-              data,
-              backgroundColor: backgroundColors,
-              borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
-              borderWidth: 2,
-              moduleNames: Array.from(clientModuleNames.entries()).reduce(
-                (acc, [client, names]) => {
-                  acc[client] = Array.from(names);
-                  return acc;
-                },
-                {} as Record<string, string[]>,
-              ), // Store module names per client
-            },
-          ],
-        };
-      } catch (error) {
-        console.error('Error loading clients chart data:', error);
-        clientsChartData.value = { labels: [], datasets: [] };
+        clients.value = Array.from(byClient.values());
+        selectedDeployments.value = {};
+        expandedClientId.value = null;
+      } catch (e: any) {
+        console.error('Error loading clients/deployments for product:', e);
+        alertService.showHttpError(e.response || e);
+        clients.value = [];
       }
     };
 
-    const loadVersionsChartData = async (productName: string) => {
-      try {
-        // Get all product versions for the selected product
-        await fetchProductVersions(productName);
-
-        // Filter to get only non-client versions (standard versions)
-        const versionRegex = /^\d+\.\d+\.\d+$/;
-        const clientVersionRegex = /^[a-zA-Z]+_\d+\.\d+\.\d+$/;
-
-        const nonClientVersions = productVersions.value.filter(
-          (pv: IProductVersion) => pv.version && versionRegex.test(pv.version) && !clientVersionRegex.test(pv.version),
-        );
-
-        if (nonClientVersions.length === 0) {
-          versionsChartData.value = { labels: [], datasets: [] };
-          return;
-        }
-
-        // Sort versions chronologically
-        const sortedVersions = nonClientVersions.sort((a: IProductVersion, b: IProductVersion) => {
-          const versionA = a.version!.split('.').map(Number);
-          const versionB = b.version!.split('.').map(Number);
-          for (let i = 0; i < 3; i++) {
-            if (versionA[i] !== versionB[i]) {
-              return versionA[i] - versionB[i]; // Ascending order (oldest to newest)
-            }
-          }
-          return new Date(a.createDate || 0).getTime() - new Date(b.createDate || 0).getTime();
-        });
-
-        // Extract version labels and module counts
-        const labels = sortedVersions.map(version => 'v ' + version.version || 'Unknown');
-        const data = sortedVersions.map(version => version.moduleVersions?.length || 0);
-
-        // Generate colors for better visualization
-        const backgroundColors = generateGradientColors(labels.length);
-
-        versionsChartData.value = {
-          labels,
-          datasets: [
-            {
-              label: 'Number of Module Versions',
-              data,
-              backgroundColor: backgroundColors,
-              borderColor: '#0c2d57',
-              borderWidth: 2,
-              borderRadius: 8,
-              borderSkipped: false,
-            },
-          ],
-        };
-
-        console.log('Versions chart data:', {
-          labels,
-          data,
-          totalVersions: sortedVersions.length,
-        });
-      } catch (error) {
-        console.error('Error loading versions chart data:', error);
-        versionsChartData.value = { labels: [], datasets: [] };
+    const productDeployementDetailComponentHandler = async (clientId: number) => {
+      const deploymentId = selectedDeployments.value[clientId];
+      if (!deploymentId) {
+        expandedClientId.value = null;
+        return;
       }
-    };
+      expandedClientId.value = clientId;
 
-    const generateColors = (count: number): string[] => {
-      const baseColors = [
-        'rgba(12, 45, 87, 0.8)',
-        'rgba(149, 160, 244, 0.8)',
-        'rgba(12, 166, 120, 0.8)',
-        'rgba(245, 159, 0, 0.8)',
-        'rgba(2, 136, 209, 0.8)',
-        'rgba(28, 126, 214, 0.8)',
-        'rgba(156, 39, 176, 0.8)',
-        'rgba(255, 87, 34, 0.8)',
-      ];
+      if (!modulesCache.value[deploymentId]) {
+        try {
+          const res = await productDeployementDetailService.retrieve();
+          const allDetails: IProductDeployementDetail[] = res.data || [];
+          const details = allDetails.filter(d => d.productDeployement?.id === deploymentId);
 
-      const result: string[] = [];
-      for (let i = 0; i < count; i++) {
-        if (i < baseColors.length) {
-          result.push(baseColors[i]);
-        } else {
-          const hue = ((i - baseColors.length) * 360) / (count - baseColors.length);
-          result.push(`hsla(${hue}, 70%, 60%, 0.8)`);
+          modulesCache.value[deploymentId] = details.map(d => ({
+            id: d.id!,
+            moduleName: (d as any).moduleVersion?.module?.name ?? (d as any).moduleVersion?.moduleName ?? 'N/A',
+            version: (d as any).moduleVersion?.version ?? 'N/A',
+            productVersion: (d as any).productVersion?.version ?? 'N/A',
+          }));
+        } catch (err: any) {
+          console.error('Error loading deployment details:', err);
+          alertService.showHttpError(err.response || err);
+          modulesCache.value[deploymentId] = [];
         }
       }
-      return result;
     };
 
-    const generateGradientColors = (count: number) => {
-      const baseColor = 'rgba(12, 45, 87, ';
-      const result = [];
-      for (let i = 0; i < count; i++) {
-        const opacity = 0.3 + (0.7 * i) / Math.max(count - 1, 1);
-        result.push(baseColor + opacity + ')');
-      }
-      return result;
+    const getModules = (_clientId: number, deploymentId: number | '') => {
+      if (!deploymentId) return [];
+      return modulesCache.value[deploymentId] || [];
     };
 
+    // ----------------- Fin Clients / Déploiements / Modules -----------------
+
+    // TODO: ajouter ici vos fonctions existantes comme
+    // fetchLatestNonClientVersion, countModulesVersions, countTotalFeatures, countDeployements, createCharts, etc.
     const createCharts = () => {
       // Destroy existing charts
       destroyCharts();
@@ -635,43 +503,11 @@ export default defineComponent({
       }
     };
 
-    const scrollLeft = () => {
-      if (scrollContainer.value) {
-        scrollContainer.value.scrollBy({
-          left: -320,
-          behavior: 'smooth',
-        });
-      }
-    };
-
-    const scrollRight = () => {
-      if (scrollContainer.value) {
-        scrollContainer.value.scrollBy({
-          left: 320,
-          behavior: 'smooth',
-        });
-      }
-    };
-
-    const checkScrollPosition = () => {
-      if (scrollContainer.value) {
-        const scrollLeft = scrollContainer.value.scrollLeft;
-        const scrollWidth = scrollContainer.value.scrollWidth;
-        const clientWidth = scrollContainer.value.clientWidth;
-        isAtStart.value = scrollLeft === 0;
-        isAtEnd.value = scrollLeft + clientWidth >= scrollWidth - 1;
-      }
-    };
-
     onMounted(async () => {
       await fetchProducts();
       await loadProductsEvolutionData();
       createCharts();
-      checkScrollPosition();
-      await fetchModuleOptions();
-      await fetchModuleVersionOptions();
     });
-
     const openLogin = () => {
       loginService?.openLogin();
     };
@@ -773,6 +609,102 @@ export default defineComponent({
         return 0;
       }
     };
+    const loadClientsChartData = async (productName: string) => {
+      try {
+        // Get the latest version for the selected product
+        const lastVersion = await fetchLatestNonClientVersion(productName);
+        if (!lastVersion) {
+          clientsChartData.value = { labels: [], datasets: [] };
+          return;
+        }
+
+        // Get all product deployment details for the selected product and latest version
+        const productDeploymentDetailsRes = await productDeployementDetailService.retrieve();
+        const productDeploymentDetails: IProductDeployementDetail[] = productDeploymentDetailsRes.data;
+
+        // Filter deployments for the selected product and latest version only
+        const productDeployments = productDeploymentDetails.filter(detail => detail.productVersion?.id === lastVersion.id);
+
+        // Get all product deployments to have access to client information
+        const productDeployementRes = await productDeployementService.retrieve();
+        const allProductDeployements: IProductDeployement[] = productDeployementRes.data;
+
+        // Group by client and count module deployments, and collect module names
+        const clientModuleCount = new Map<string, number>();
+        const clientModuleNames = new Map<string, Set<string>>(); // Stocke les noms uniques des modules par client
+
+        for (const detail of productDeployments) {
+          let clientName = 'Unknown Client';
+
+          // Find the corresponding ProductDeployement to get client info
+          if (detail.productDeployement?.id) {
+            const productDeployement = allProductDeployements.find(pd => pd.id === detail.productDeployement?.id);
+            if (productDeployement?.client?.name) {
+              clientName = productDeployement.refContract;
+            }
+          }
+
+          console.log('Client found:', clientName);
+
+          // Count modules
+          const moduleCount = detail.allowedModuleVersions?.length || 0;
+          console.log('moduleCount', moduleCount);
+
+          // Collect module names
+          const moduleNames =
+            detail.allowedModuleVersions?.map(
+              mv =>
+                getModuleVersionWithModuleCached(mv.id).module?.name + ' v' + getModuleVersionWithModuleCached(mv.id).version + '\n' ||
+                'Unknown Module',
+            ) || [];
+          const uniqueModuleNames = clientModuleNames.get(clientName) || new Set<string>();
+          moduleNames.forEach(name => uniqueModuleNames.add(name));
+          clientModuleNames.set(clientName, uniqueModuleNames);
+
+          if (clientModuleCount.has(clientName)) {
+            clientModuleCount.set(clientName, clientModuleCount.get(clientName)! + moduleCount);
+          } else {
+            clientModuleCount.set(clientName, moduleCount);
+          }
+        }
+
+        // Filter out clients with 0 modules
+        const filteredEntries = Array.from(clientModuleCount.entries()).filter(([_, count]) => count > 0);
+        if (filteredEntries.length === 0) {
+          clientsChartData.value = { labels: [], datasets: [] };
+          return;
+        }
+
+        // Sort by module count (descending) for better visualization
+        const sortedEntries = filteredEntries.sort((a, b) => b[1] - a[1]);
+        const labels = sortedEntries.map(entry => entry[0]);
+        const data = sortedEntries.map(entry => entry[1]);
+        const backgroundColors = generateColors(labels.length);
+
+        // Store module names for use in chart options
+        clientsChartData.value = {
+          labels,
+          datasets: [
+            {
+              data,
+              backgroundColor: backgroundColors,
+              borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
+              borderWidth: 2,
+              moduleNames: Array.from(clientModuleNames.entries()).reduce(
+                (acc, [client, names]) => {
+                  acc[client] = Array.from(names);
+                  return acc;
+                },
+                {} as Record<string, string[]>,
+              ), // Store module names per client
+            },
+          ],
+        };
+      } catch (error) {
+        console.error('Error loading clients chart data:', error);
+        clientsChartData.value = { labels: [], datasets: [] };
+      }
+    };
 
     const moduleOptions = ref([]);
     const fetchModuleOptions = async () => {
@@ -810,34 +742,17 @@ export default defineComponent({
     };
 
     return {
+      t,
       scrollContainer,
-      products,
-      fetchLatestNonClientVersion,
-      fetchProductVersions,
-      countModulesVersions,
-      countTotalFeatures,
-      countDeployements,
       isAtStart,
       isAtEnd,
-      scrollLeft,
-      scrollRight,
-      checkScrollPosition,
-      authenticated,
-      username,
-      openLogin,
-      t$: t,
+      products,
+      productVersions,
       latestVersions,
       moduleVersionCounts,
       totalFeaturesPerProduct,
       totalDeployementsPerProduct,
-      loading,
-      fetchModuleOptions,
-      fetchModuleVersionOptions,
-      getModuleVersionWithModuleCached,
-      // Charts related
       selectedProduct,
-      selectProduct,
-      closeCharts,
       clientsChart,
       versionsChart,
       productsEvolutionChart,
@@ -845,6 +760,25 @@ export default defineComponent({
       versionsChartData,
       productsEvolutionData,
       currentYear,
+      loading,
+      selectProduct,
+      closeCharts,
+      // Clients / Déploiements / Modules
+      clients,
+      selectedDeployments,
+      expandedClientId,
+      getModules,
+      loadClientsChartData,
+      productDeployementDetailComponentHandler,
+      productDeployementDetailComponent: productDeployementDetailComponentHandler,
     };
+  },
+  computed: {
+    productDeployementDetailComponent() {
+      return productDeployementDetailComponent;
+    },
+    productDeployementComponent() {
+      return productDeployementComponent;
+    },
   },
 });

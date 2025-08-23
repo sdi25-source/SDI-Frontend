@@ -55,54 +55,118 @@
 
       <!-- Charts Section -->
       <div v-else class="charts-section">
-        <div class="charts-header d-flex justify-content-between align-items-center mb-4">
-          <h3>{{ selectedProduct.name }} - Analytics Dashboard</h3>
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="fw-bold">{{ selectedProduct.name }} - Analytics Dashboard</h3>
           <button @click="closeCharts" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i> Close</button>
         </div>
 
-        <div class="card p-3">
-          <h4 class="mb-4">
-            Clients Distribution by Module Deployments (Latest Version:
-            {{ selectedProduct.name || 'N/A' }}
-            v{{ latestVersions.get(selectedProduct.name)?.version || 'N/A' }})
-          </h4>
+        <div class="container-fluid">
+          <!-- Row for Table + Details + Chart -->
+          <div class="row g-4">
+            <!-- Left Table -->
+            <div class="col-lg-6">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                  <h4 class="card-title mb-4 text-primary fw-semibold">Clients Distribution & Module Deployments</h4>
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle text-center mb-0">
+                      <tbody>
+                        <template v-for="(client, idx) in clients" :key="client.id ?? client.name ?? idx">
+                          <tr>
+                            <!-- Colonne Logo -->
+                            <td class="align-middle" style="width: 56px">
+                              <img
+                                v-if="client.clientLogo"
+                                :src="client.clientLogo"
+                                :alt="`Logo ${client.name}`"
+                                style="height: 32px; width: 32px; object-fit: contain"
+                              />
+                              <div
+                                v-else
+                                class="d-inline-flex align-items-center justify-content-center bg-light text-muted border rounded"
+                                style="height: 32px; width: 32px; font-size: 10px"
+                                title="Pas de logo"
+                              >
+                                —
+                              </div>
+                            </td>
 
-          <table class="table table-hover">
-            <tbody>
-              <template v-for="client in productDeployementComponent.client" :key="client.id">
-                <!-- Ligne client -->
-                <tr>
-                  <td style="width: 50px">
-                    <img
-                      :src="productDeployementComponent.client.clientLogo || '/assets/placeholders/client-logo-placeholder.png'"
-                      alt="logo client"
-                      style="width: 40px; height: 40px; object-fit: contain; margin-right: 10px"
-                    />
-                  </td>
-                  <td>{{ productDeployementComponent.client.name }}</td>
-                  <!--   <td style="width: 250px">
-                    <select class="form-select" v-model="selectedDeployments[client.id]" @change="onDeploymentChange(client.id)">
-                      <option value="">-- Select Deployment --</option>
-                      <option v-for="deploy in client.deployments" :key="deploy.id" :value="deploy.id">
-                        {{ productDeployementComponent }}
-                      </option>
-                    </select>
-                  </td> -->
-                </tr>
-              </template>
-            </tbody>
-          </table>
-          <div v-if="clientsChartData.labels.length === 0" class="no-data-message">{{ t$('global.menu.entities.noClientDataForPV') }}</div>
-        </div>
+                            <!-- Colonne Nom du client -->
+                            <td class="align-middle">
+                              {{ client.name }}
+                            </td>
 
-        <!-- Right Chart - Product Versions -->
-        <div class="card p-3 mb-4">
-          <div class="chart-container">
-            <h4 class="mb-4">Module Evolution by Product Version</h4>
-            <div class="chart-wrapper">
-              <canvas ref="versionsChart" width="400" height="400"></canvas>
+                            <!-- Colonne Dernier déploiement (toggle up/down) -->
+                            <td
+                              class="align-middle"
+                              style="cursor: pointer"
+                              @click="
+                                expandedClientId =
+                                  expandedClientId === (client.id ?? client.name ?? idx) ? null : (client.id ?? client.name ?? idx)
+                              "
+                            >
+                              <span v-if="client.deployments && client.deployments.length" class="">
+                                {{ client.deployments[client.deployments.length - 1].refContract || 'N/A' }}
+                                <i
+                                  class="bi ms-2"
+                                  :class="expandedClientId === (client.id ?? client.name ?? idx) ? 'bi-chevron-up' : 'bi-chevron-down'"
+                                ></i>
+                              </span>
+                              <span v-else class="badge bg-secondary">N/A</span>
+                            </td>
+                          </tr>
+
+                          <!-- Ligne de détails (modules) -->
+                          <tr v-if="expandedClientId === (client.id ?? client.name ?? idx)">
+                            <td colspan="4" class="bg-light p-3">
+                              <div v-if="selectedDeployments[client.id] && getModules(client.id, selectedDeployments[client.id]).length">
+                                <table class="table table-sm table-hover mb-0">
+                                  <thead class="table-light">
+                                    <tr>
+                                      <th>Module</th>
+                                      <th>Version</th>
+                                      <th>Product Version</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr
+                                      v-for="(module, mIdx) in getModules(client.id, selectedDeployments[client.id])"
+                                      :key="module.id ?? module.moduleName ?? module.productVersion ?? mIdx"
+                                    >
+                                      <td>{{ module.moduleName || 'N/A' }}</td>
+                                      <td>{{ module.version || 'N/A' }}</td>
+                                      <td>{{ module.productVersion || 'N/A' }}</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                              <div v-else class="py-2 text-muted">Aucun module pour ce déploiement.</div>
+                            </td>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div v-if="clients.length === 0" class="text-center text-muted mt-3">
+                    {{ t$('global.menu.entities.noClientDataForPV') }}
+                  </div>
+                </div>
+              </div>
             </div>
-            <div v-if="versionsChartData.labels.length === 0" class="no-data-message">No version data available</div>
+
+            <!-- Right Chart -->
+            <div class="col-lg-6">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                  <h4 class="card-title mb-4 text-primary fw-semibold">Module Evolution by Product Version</h4>
+                  <div class="chart-wrapper" style="position: relative; height: 400px">
+                    <canvas ref="versionsChart"></canvas>
+                  </div>
+                  <div v-if="versionsChartData.labels.length === 0" class="text-center text-muted mt-3">No version data available</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

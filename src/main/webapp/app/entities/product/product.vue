@@ -151,7 +151,7 @@
                 <template v-if="product.isEditing">
                   <div class="dropdown position-static">
                     <button
-                      class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
+                      class="btn btn-secondary dropdown-toggle text-start"
                       type="button"
                       data-bs-toggle="dropdown"
                       data-bs-auto-close="outside"
@@ -168,7 +168,7 @@
                       <li v-for="productLine in productLineOptions" :key="productLine.id">
                         <label class="dropdown-item d-flex align-items-center">
                           <input
-                            class="form-check-input me-2"
+                            class="form-check-input"
                             type="checkbox"
                             :value="productLine.id"
                             v-model="editProductLineIds"
