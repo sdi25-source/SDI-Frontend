@@ -147,59 +147,36 @@
                   <span :title="product.description">{{ product.description }}</span>
                 </template>
               </td>
-              <td style="overflow: visible">
+              <td>
                 <template v-if="product.isEditing">
-                  <div class="dropdown position-static">
-                    <button
-                      class="btn btn-secondary dropdown-toggle text-start"
-                      type="button"
-                      data-bs-toggle="dropdown"
-                      data-bs-auto-close="outside"
-                      aria-expanded="false"
-                    >
-                      {{
-                        editProductLineIds.length
-                          ? editProductLineIds.map(id => productLineOptions.find(pl => pl.id === id)?.name).join(', ')
-                          : 'Sélectionner des lignes produits'
-                      }}
-                    </button>
-
-                    <ul class="dropdown-menu p-2" @click.stop style="max-height: 260px; overflow-y: auto">
-                      <li v-for="productLine in productLineOptions" :key="productLine.id">
-                        <label class="dropdown-item d-flex align-items-center">
-                          <input
-                            class="form-check-input"
-                            type="checkbox"
-                            :value="productLine.id"
-                            v-model="editProductLineIds"
-                            @change="updateEditProductLines(product)"
-                          />
-                          <span>{{ productLine.name }}</span>
-                        </label>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div v-if="product.productLines?.length" class="mt-2">
-                    <span v-for="line in product.productLines" :key="line.id" class="badge bg-primary me-1">
+                  <select
+                    v-model="editProductLineIds"
+                    multiple
+                    class="form-control-borderless"
+                    @change="updateEditProductLines(product)"
+                    @click.stop
+                  >
+                    <option v-for="productLine in productLineOptions" :key="productLine.id" :value="productLine.id">
+                      {{ productLine.name }}
+                    </option>
+                  </select>
+                  <div v-if="product.productLines && product.productLines.length > 0" class="selected-items mt-2">
+                    <span v-for="line in product.productLines" :key="line.id" class="badge badge-primary mr-1">
                       {{ line.name }}
-                      <button
-                        type="button"
-                        class="btn-close btn-close-white btn-sm ms-1"
-                        style="font-size: 0.6rem"
-                        @click.stop="removeEditProductLine(product, line.id)"
-                      ></button>
+                      <button type="button" class="close ml-1" @click.stop="removeEditProductLine(product, line.id)">&times;</button>
                     </span>
                   </div>
                 </template>
-
                 <template v-else>
-                  <span v-for="pl in product.productLines" :key="pl.id" class="badge bg-secondary ms-2">
-                    {{ pl.name }}
+                  <span
+                    v-for="(productLine, i) in product.productLines"
+                    :key="productLine.id"
+                    class="badge badge-light alert-secondary ml-2"
+                  >
+                    {{ productLine.name }}
                   </span>
                 </template>
               </td>
-
               <td class="text-center" @click.stop>
                 <div class="action-icons">
                   <template v-if="product.isEditing">
@@ -2016,7 +1993,6 @@
             ></button>
           </div>
         </div>
-        <<<<<<< HEAD =======
       </div>
 
       <!-- Product Version - Delete Confirmation Modal -->
@@ -2215,7 +2191,6 @@
             ></button>
           </div>
         </div>
-        >>>>>>> f349f6e073e9b09f2c58675edd5822dd9f39a673
       </div>
     </div>
     <div class="section"></div>

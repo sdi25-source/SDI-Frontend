@@ -1,7 +1,4 @@
 <template>
-  <RouterView />
-  <Toast position="top-center" />
-
   <div class="client-size-container section pt-5">
     <div class="navigation-bar d-flex align-items-center justify-content-between mb-4">
       <div class="d-flex align-items-center">
