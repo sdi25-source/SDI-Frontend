@@ -47,7 +47,7 @@
     <div class="dashboard-content">
       <div v-if="!selectedClient">
         <div class="chart-container">
-          <h4 class="chart-title">{{ t$('global.menu.entities.clientGrowth') }} ({{ currentYear }})</h4>
+          <h4 class="chart-title-left">{{ t$('global.menu.entities.clientGrowth') }} ({{ currentYear }})</h4>
           <div class="chart-wrapper">
             <canvas ref="clientsEvolutionChart" width="800" height="400"></canvas>
           </div>
@@ -66,7 +66,7 @@
           <!-- Left  -->
           <div class="col-md-6">
             <div class="chart-container shadow-md">
-              <h4 class="chart-title">{{ t$('global.menu.entities.distribution') }}</h4>
+              <h4 class="chart-title-center">{{ t$('global.menu.entities.distribution') }}</h4>
               <div v-if="productDeploymentsChartData.labels.length === 0" class="no-data-message">
                 {{ t$('global.menu.entities.noDataProductAv') }}
               </div>
@@ -101,7 +101,7 @@
           <!-- Right Chart - Request of Changes by Customization Level -->
           <div class="col-md-6">
             <div class="chart-container shadow-md">
-              <h4 class="chart-title">{{ t$('global.menu.entities.RequestCustomisation') }}</h4>
+              <h4 class="chart-title-center">{{ t$('global.menu.entities.RequestCustomisation') }}</h4>
               <div class="chart-wrapper">
                 <canvas ref="requestChangesChart" width="400" height="400"></canvas>
               </div>
@@ -131,7 +131,7 @@
 
         <!-- Contracts Table Section -->
         <div class="contracts-section pt-4">
-          <h4 class="chart-title">Deployments par products</h4>
+          <h4 class="chart-title-left">Deployments par products</h4>
           <div class="contracts-table">
             <div v-if="contracts.length === 0" class="no-data-message text-center py-4">
               No contracts available for this client
@@ -543,12 +543,20 @@
   flex-direction: column;
 }
 
-.chart-title {
+.chart-title-left {
   margin: 0 0 15px;
   font-size: 18px;
   font-weight: 600;
   color: #0c2d57;
   text-align: left;
+}
+
+.chart-title-center {
+  margin: 0 0 15px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #0c2d57;
+  text-align: center;
 }
 
 .chart-wrapper {
@@ -1130,9 +1138,6 @@
     margin-bottom: 20px;
   }
 
-  .chart-title {
-    font-size: 14px;
-  }
 
   .stats-grid {
     grid-template-columns: 1fr;
@@ -1212,10 +1217,6 @@
   .chart-container {
     height: 350px;
     padding: 15px;
-  }
-
-  .chart-title {
-    font-size: 13px;
   }
 
   .no-data-message {

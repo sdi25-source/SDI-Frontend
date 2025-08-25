@@ -48,6 +48,10 @@ export default defineComponent({
     const currentYear = ref(new Date().getFullYear());
     const loading = ref(true);
 
+    // Clients deployments refs
+    const clientsDeployments = ref<any[]>([]);
+    const expandedClients = ref(new Set());
+
     const productService = new ProductService();
     const productVersionService = new ProductVersionService();
     const productDeployementDetailService = new ProductDeployementDetailService();
@@ -59,7 +63,6 @@ export default defineComponent({
       try {
         loading.value = true;
         products.value = await productService.retrieveProductOverviews();
-        // Fetch latest non-client version for each product
         for (const product of products.value) {
           const latest = await fetchLatestNonClientVersion(product.name);
           latestVersions.value.set(product.name, latest);
@@ -69,7 +72,6 @@ export default defineComponent({
           totalFeaturesPerProduct.value.set(product.name, totalFeatures);
           const totalDeployements = await countDeployements(product.name);
           totalDeployementsPerProduct.value.set(product.name, totalDeployements);
-          console.log(totalDeployementsPerProduct.value);
         }
       } catch (error) {
         console.error('Error fetching product overviews:', error);
@@ -82,46 +84,30 @@ export default defineComponent({
     const loadProductsEvolutionData = async () => {
       try {
         loading.value = true;
-        // Récupérer tous les produits avec leurs dates de création
         const allProducts = await productService.retrieve();
         const productsData = allProducts.data || allProducts;
-
-        // Filtrer les produits de l'année courante
         const currentYearProducts = productsData.filter(product => {
           if (!product.createDate) return false;
           const productYear = new Date(product.createDate).getFullYear();
           return productYear === currentYear.value;
         });
-
-        // Trier les produits par date de création
         currentYearProducts.sort((a, b) => {
           return new Date(a.createDate).getTime() - new Date(b.createDate).getTime();
         });
-
-        // Grouper par mois et calculer le cumul
         const monthlyCount = Array(12).fill(0);
         const cumulativeCount = Array(12).fill(0);
-        const productsByMonth = Array(12).fill(null).map(() => []); // Stocker les noms des produits
-        const monthNames = [
-          'Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun',
-          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-        ];
-
-        // Compter les produits par mois et stocker leurs noms
+        const productsByMonth = Array(12).fill(null).map(() => []);
+        const monthNames = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         currentYearProducts.forEach(product => {
           const month = new Date(product.createDate).getMonth();
           monthlyCount[month]++;
-          productsByMonth[month].push(product.name); // Stocker le nom du produit
+          productsByMonth[month].push(product.name);
         });
-
-        // Calculer le cumul
         let cumul = 0;
         for (let i = 0; i < 12; i++) {
           cumul += monthlyCount[i];
           cumulativeCount[i] = cumul;
         }
-
-        // Créer les données du graphique
         productsEvolutionData.value = {
           labels: monthNames,
           datasets: [
@@ -133,7 +119,7 @@ export default defineComponent({
               borderWidth: 2,
               type: 'bar',
               order: 2,
-              productNames: productsByMonth // Ajouter les noms des produits
+              productNames: productsByMonth
             },
             {
               label: 'Cumulative growth',
@@ -165,11 +151,14 @@ export default defineComponent({
       selectedProduct.value = product;
       await nextTick();
       await loadChartsData(product);
+      await loadClientsDeployments(product.name);
       createCharts();
     };
 
     const closeCharts = async () => {
       selectedProduct.value = null;
+      clientsDeployments.value = [];
+      expandedClients.value.clear();
       destroyCharts();
       await fetchProducts();
       await loadProductsEvolutionData();
@@ -191,11 +180,59 @@ export default defineComponent({
       }
     };
 
+    const loadClientsDeployments = async (productName: string) => {
+      try {
+        const lastVersion = await fetchLatestNonClientVersion(productName);
+        if (!lastVersion) {
+          clientsDeployments.value = [];
+          return;
+        }
+        const productDeploymentDetailsRes = await productDeployementDetailService.retrieve();
+        const productDeploymentDetails: IProductDeployementDetail[] = productDeploymentDetailsRes.data;
+        const productDeployments = productDeploymentDetails.filter(detail => detail.productVersion?.id === lastVersion.id);
+        const productDeployementRes = await productDeployementService.retrieve();
+        const allProductDeployements: IProductDeployement[] = productDeployementRes.data;
+        const clientModules = new Map<string, any[]>();
+        for (const detail of productDeployments) {
+          let clientName = 'Unknown Client';
+          if (detail.productDeployement?.id) {
+            const productDeployement = allProductDeployements.find(pd => pd.id === detail.productDeployement?.id);
+            if (productDeployement?.client?.name) {
+              clientName = productDeployement.client.name;
+            }
+          }
+          const modules = detail.allowedModuleVersions?.map(mv => {
+            const moduleVersion = getModuleVersionWithModuleCached(mv.id);
+            return {
+              id: mv.id,
+              name: moduleVersion?.module?.name,
+              version: moduleVersion?.version
+            };
+          }).filter(mod => mod.name && mod.version) || [];
+          if (clientModules.has(clientName)) {
+            clientModules.set(clientName, [...clientModules.get(clientName)!, ...modules]);
+          } else {
+            clientModules.set(clientName, modules);
+          }
+        }
+        clientsDeployments.value = Array.from(clientModules.entries())
+          .map(([clientName, modules]) => ({
+            clientName,
+            modules: modules.filter((mod, index, self) =>
+              index === self.findIndex(m => m.id === mod.id)
+            )
+          }))
+          .filter(client => client.modules.length > 0)
+          .sort((a, b) => a.clientName.localeCompare(b.clientName));
+      } catch (error) {
+        console.error('Error loading clients deployments:', error);
+        clientsDeployments.value = [];
+      }
+    };
+
     const loadChartsData = async (product: ProductOverview) => {
       try {
-        // Load clients data
         await loadClientsChartData(product.name);
-        // Load versions data
         await loadVersionsChartData(product.name);
       } catch (error) {
         console.error('Error loading charts data:', error);
@@ -205,72 +242,46 @@ export default defineComponent({
 
     const loadClientsChartData = async (productName: string) => {
       try {
-        // Get the latest version for the selected product
         const lastVersion = await fetchLatestNonClientVersion(productName);
         if (!lastVersion) {
           clientsChartData.value = { labels: [], datasets: [] };
           return;
         }
-
-        // Get all product deployment details for the selected product and latest version
         const productDeploymentDetailsRes = await productDeployementDetailService.retrieve();
         const productDeploymentDetails: IProductDeployementDetail[] = productDeploymentDetailsRes.data;
-
-        // Filter deployments for the selected product and latest version only
         const productDeployments = productDeploymentDetails.filter(detail => detail.productVersion?.id === lastVersion.id);
-
-        // Get all product deployments to have access to client information
         const productDeployementRes = await productDeployementService.retrieve();
         const allProductDeployements: IProductDeployement[] = productDeployementRes.data;
-
-        // Group by client and count module deployments, and collect module names
         const clientModuleCount = new Map<string, number>();
-        const clientModuleNames = new Map<string, Set<string>>(); // Stocke les noms uniques des modules par client
-
+        const clientModuleNames = new Map<string, Set<string>>();
         for (const detail of productDeployments) {
           let clientName = 'Unknown Client';
-
-          // Find the corresponding ProductDeployement to get client info
           if (detail.productDeployement?.id) {
             const productDeployement = allProductDeployements.find(pd => pd.id === detail.productDeployement?.id);
             if (productDeployement?.client?.name) {
               clientName = productDeployement.client.name;
             }
           }
-
-          console.log('Client found:', clientName);
-
-          // Count modules
           const moduleCount = detail.allowedModuleVersions?.length || 0;
-          console.log('moduleCount', moduleCount);
-
-          // Collect module names
-          const moduleNames = detail.allowedModuleVersions?.map(mv => getModuleVersionWithModuleCached(mv.id).module?.name +' v'+getModuleVersionWithModuleCached(mv.id).version + "\n"|| 'Unknown Module') || [];
+          const moduleNames = detail.allowedModuleVersions?.map(mv => getModuleVersionWithModuleCached(mv.id).module?.name + ' v' + getModuleVersionWithModuleCached(mv.id).version || 'Unknown Module') || [];
           const uniqueModuleNames = clientModuleNames.get(clientName) || new Set<string>();
           moduleNames.forEach(name => uniqueModuleNames.add(name));
           clientModuleNames.set(clientName, uniqueModuleNames);
-
           if (clientModuleCount.has(clientName)) {
             clientModuleCount.set(clientName, clientModuleCount.get(clientName)! + moduleCount);
           } else {
             clientModuleCount.set(clientName, moduleCount);
           }
         }
-
-        // Filter out clients with 0 modules
         const filteredEntries = Array.from(clientModuleCount.entries()).filter(([_, count]) => count > 0);
         if (filteredEntries.length === 0) {
           clientsChartData.value = { labels: [], datasets: [] };
           return;
         }
-
-        // Sort by module count (descending) for better visualization
         const sortedEntries = filteredEntries.sort((a, b) => b[1] - a[1]);
         const labels = sortedEntries.map(entry => entry[0]);
         const data = sortedEntries.map(entry => entry[1]);
         const backgroundColors = generateColors(labels.length);
-
-        // Store module names for use in chart options
         clientsChartData.value = {
           labels,
           datasets: [
@@ -282,9 +293,9 @@ export default defineComponent({
               moduleNames: Array.from(clientModuleNames.entries()).reduce((acc, [client, names]) => {
                 acc[client] = Array.from(names);
                 return acc;
-              }, {} as Record<string, string[]>), // Store module names per client
-            },
-          ],
+              }, {} as Record<string, string[]>)
+            }
+          ]
         };
       } catch (error) {
         console.error('Error loading clients chart data:', error);
@@ -294,80 +305,89 @@ export default defineComponent({
 
     const loadVersionsChartData = async (productName: string) => {
       try {
-        // Get all product versions for the selected product
         await fetchProductVersions(productName);
-
-        // Filter to get only non-client versions (standard versions)
         const versionRegex = /^\d+\.\d+\.\d+$/;
         const clientVersionRegex = /^[a-zA-Z]+_\d+\.\d+\.\d+$/;
-
         const nonClientVersions = productVersions.value.filter(
-          (pv: IProductVersion) => pv.version && versionRegex.test(pv.version) && !clientVersionRegex.test(pv.version),
+          (pv: IProductVersion) => pv.version && versionRegex.test(pv.version) && !clientVersionRegex.test(pv.version)
         );
-
         if (nonClientVersions.length === 0) {
           versionsChartData.value = { labels: [], datasets: [] };
           return;
         }
-
-        // Sort versions chronologically
         const sortedVersions = nonClientVersions.sort((a: IProductVersion, b: IProductVersion) => {
           const versionA = a.version!.split('.').map(Number);
           const versionB = b.version!.split('.').map(Number);
           for (let i = 0; i < 3; i++) {
             if (versionA[i] !== versionB[i]) {
-              return versionA[i] - versionB[i]; // Ascending order (oldest to newest)
+              return versionA[i] - versionB[i];
             }
           }
           return new Date(a.createDate || 0).getTime() - new Date(b.createDate || 0).getTime();
         });
+        const labels = sortedVersions.map(version => 'v ' + version.version || 'Unknown');
 
-        // Extract version labels and module counts
-        const labels = sortedVersions.map(version => 'v '+ version.version || 'Unknown');
-        const data = sortedVersions.map(version => version.moduleVersions?.length || 0);
+        const moduleSets = sortedVersions.map(version => {
+          const names = version.moduleVersions?.map(mv => getModuleVersionWithModuleCached(mv.id)?.module?.name || 'Unknown') || [];
+          return new Set(names);
+        });
 
-        // Generate colors for better visualization
-        const backgroundColors = generateGradientColors(labels.length);
+        const totalData = moduleSets.map(set => set.size);
+
+        const addedData = [];
+        const addedNames = [];
+        for (let i = 0; i < moduleSets.length; i++) {
+          if (i === 0) {
+            addedData.push(totalData[0]);
+            addedNames.push(Array.from(moduleSets[0]));
+          } else {
+            const previous = moduleSets[i - 1];
+            const current = moduleSets[i];
+            const added = new Set([...current].filter(x => !previous.has(x)));
+            addedData.push(added.size);
+            addedNames.push(Array.from(added));
+          }
+        }
+
+        const allNames = moduleSets.map(set => Array.from(set));
 
         versionsChartData.value = {
           labels,
           datasets: [
             {
-              label: 'Number of Module Versions',
-              data,
-              backgroundColor: backgroundColors,
-              borderColor: '#0c2d57',
-              borderWidth: 2,
-              borderRadius: 8,
-              borderSkipped: false,
-            },
-          ],
+              label: 'Total Modules',
+              data: totalData,
+              backgroundColor: 'rgba(12, 45, 87, 0.2)',
+              borderColor: 'rgba(12, 45, 87, 1)',
+              borderWidth: 3,
+              type: 'line',
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: 'rgba(12, 45, 87, 1)',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 8,
+              order: 1,
+              allNames: allNames
+            }
+          ]
         };
-
-        console.log('Versions chart data:', {
-          labels,
-          data,
-          totalVersions: sortedVersions.length,
-        });
       } catch (error) {
         console.error('Error loading versions chart data:', error);
         versionsChartData.value = { labels: [], datasets: [] };
       }
     };
 
-    const generateColors = (count: number): string[] => {
+    const generateColors = (count: number) => {
       const baseColors = [
-        'rgba(12, 45, 87, 0.8)',
-        'rgba(149, 160, 244, 0.8)',
         'rgba(12, 166, 120, 0.8)',
         'rgba(245, 159, 0, 0.8)',
-        'rgba(2, 136, 209, 0.8)',
-        'rgba(28, 126, 214, 0.8)',
+        'rgba(29, 126, 214, 0.8)',
         'rgba(156, 39, 176, 0.8)',
-        'rgba(255, 87, 34, 0.8)',
+        'rgba(255, 87, 34, 0.8)'
       ];
-
-      const result: string[] = [];
+      const result = [];
       for (let i = 0; i < count; i++) {
         if (i < baseColors.length) {
           result.push(baseColors[i]);
@@ -380,20 +400,16 @@ export default defineComponent({
     };
 
     const generateGradientColors = (count: number) => {
-      const baseColor = 'rgba(12, 45, 87, ';
       const result = [];
       for (let i = 0; i < count; i++) {
-        const opacity = 0.3 + (0.7 * i) / Math.max(count - 1, 1);
-        result.push(baseColor + opacity + ')');
+        const hue = (i * 360) / count;
+        result.push(`hsla(${hue}, 70%, 60%, 0.8)`);
       }
       return result;
     };
 
     const createCharts = () => {
-      // Destroy existing charts
       destroyCharts();
-
-      // Create clients pie chart
       if (clientsChart.value && clientsChartData.value.labels.length > 0) {
         clientsChartInstance.value = new Chart(clientsChart.value, {
           type: 'doughnut',
@@ -420,13 +436,13 @@ export default defineComponent({
                           lineWidth: style.borderWidth,
                           pointStyle: 'circle',
                           hidden: !chart.getDataVisibility(i),
-                          index: i,
+                          index: i
                         };
                       });
                     }
                     return [];
-                  },
-                },
+                  }
+                }
               },
               tooltip: {
                 callbacks: {
@@ -437,101 +453,100 @@ export default defineComponent({
                     const percentage = ((value / total) * 100).toFixed(1);
                     const latestVersion = latestVersions.value.get(selectedProduct.value?.name || '')?.version || 'N/A';
                     const moduleNames = context.dataset.moduleNames?.[label] || [];
-
-                    // Créer le tooltip avec les modules en format de liste
                     const tooltipLines = [
                       `${label}: ${value} module(s) (${percentage}%)`,
-                      `Product: ${selectedProduct.value?.name} v${latestVersion}`,
+                      `Product: ${selectedProduct.value?.name} v${latestVersion}`
                     ];
-
                     if (moduleNames.length > 0) {
-                      tooltipLines.push('Modules:'); // Titre de la liste
+                      tooltipLines.push('Modules:');
                       moduleNames.forEach(module => {
-                        tooltipLines.push(`- ${module}`); // Chaque module sur une nouvelle ligne avec un tiret
+                        tooltipLines.push(`- ${module}`);
                       });
                     } else {
                       tooltipLines.push('No Modules');
                     }
-
                     return tooltipLines;
-                  },
-                },
-              },
-            },
-          },
+                  }
+                }
+              }
+            }
+          }
         });
       }
-
-      // Create versions line chart (unchanged)
       if (versionsChart.value && versionsChartData.value.labels.length > 0) {
         versionsChartInstance.value = new Chart(versionsChart.value, {
           type: 'line',
-          data: {
-            labels: versionsChartData.value.labels,
-            datasets: [
-              {
-                label: 'Number of Module Versions',
-                data: versionsChartData.value.datasets[0].data,
-                backgroundColor: 'rgba(12, 45, 87, 0.1)',
-                borderColor: '#0c2d57',
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#0c2d57',
-                pointBorderColor: '#ffffff',
-                pointBorderWidth: 2,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-              },
-            ],
-          },
+          data: versionsChartData.value,
           options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
               legend: {
-                display: false,
+                display: true,
+                position: 'top',
+                labels: {
+                  usePointStyle: true,
+                  padding: 20
+                }
               },
               tooltip: {
                 callbacks: {
                   label: function (context) {
-                    return `Module Versions: ${context.parsed.y}`;
-                  },
-                },
-              },
+                    const datasetLabel = context.dataset.label || '';
+                    const value = context.parsed.y;
+                    let lines = [`${datasetLabel}: ${value}`];
+                    if (datasetLabel === 'Added Modules') {
+                      const added = context.dataset.addedNames?.[context.dataIndex] || [];
+                      if (added.length > 0) {
+                        lines.push('Added Modules:');
+                        added.forEach(name => lines.push(`- ${name}`));
+                      } else {
+                        lines.push('No new modules added');
+                      }
+                    } else if (datasetLabel === 'Total Modules') {
+                      const all = context.dataset.allNames?.[context.dataIndex] || [];
+                      if (all.length > 0) {
+                        lines.push('All Modules:');
+                        all.forEach(name => lines.push(`- ${name}`));
+                      } else {
+                        lines.push('No modules');
+                      }
+                    }
+                    return lines;
+                  }
+                }
+              }
             },
             scales: {
               y: {
                 beginAtZero: true,
                 ticks: {
-                  stepSize: 1,
+                  stepSize: 1
                 },
                 title: {
                   display: true,
-                  text: 'Number of Module Versions',
-                },
+                  text: 'Number of Modules'
+                }
               },
               x: {
                 title: {
                   display: true,
-                  text: 'Product Versions (Chronological Order)',
-                },
-              },
+                  text: 'Product Versions (Chronological Order)'
+                }
+              }
             },
             elements: {
               line: {
-                tension: 0.4,
+                tension: 0.4
               },
               point: {
                 radius: 6,
-                hoverRadius: 8,
-              },
-            },
-          },
+                hoverRadius: 8
+              }
+            }
+          }
         });
       }
-
-      // Products Evolution Chart - Combinaison de barres et ligne cumulative
       if (productsEvolutionChart.value && productsEvolutionData.value.labels.length > 0) {
         productsEvolutionChartInstance.value = new Chart(productsEvolutionChart.value, {
           type: 'bar',
@@ -553,22 +568,18 @@ export default defineComponent({
                   label: function(context) {
                     const datasetLabel = context.dataset.label || '';
                     const value = context.parsed.y;
-
                     if (datasetLabel.includes('Cumulative')) {
                       return `${datasetLabel}: ${value} product${value > 1 ? 's' : ''}`;
                     } else {
                       const monthIndex = context.dataIndex;
                       const productNames = context.dataset.productNames?.[monthIndex] || [];
-
                       let tooltip = `${datasetLabel}: ${value} product${value > 1 ? 's' : ''}`;
-
                       if (productNames.length > 0) {
                         tooltip += '\nAdded products:';
                         productNames.forEach(name => {
                           tooltip += `\n• ${name}`;
                         });
                       }
-
                       return tooltip.split('\n');
                     }
                   },
@@ -622,21 +633,25 @@ export default defineComponent({
       }
     };
 
+    const toggleClientExpansion = (clientName: string) => {
+      const expanded = new Set(expandedClients.value);
+      if (expanded.has(clientName)) {
+        expanded.delete(clientName);
+      } else {
+        expanded.add(clientName);
+      }
+      expandedClients.value = expanded;
+    };
+
     const scrollLeft = () => {
       if (scrollContainer.value) {
-        scrollContainer.value.scrollBy({
-          left: -320,
-          behavior: 'smooth',
-        });
+        scrollContainer.value.scrollBy({ left: -320, behavior: 'smooth' });
       }
     };
 
     const scrollRight = () => {
       if (scrollContainer.value) {
-        scrollContainer.value.scrollBy({
-          left: 320,
-          behavior: 'smooth',
-        });
+        scrollContainer.value.scrollBy({ left: 320, behavior: 'smooth' });
       }
     };
 
@@ -650,20 +665,6 @@ export default defineComponent({
       }
     };
 
-    onMounted(async () => {
-      await fetchProducts();
-      await loadProductsEvolutionData();
-      createCharts();
-      checkScrollPosition();
-      await fetchModuleOptions();
-      await fetchModuleVersionOptions();
-    });
-
-    const openLogin = () => {
-      loginService?.openLogin();
-    };
-
-    // Fetch product versions for a specific product
     const fetchProductVersions = async (productName: string) => {
       try {
         const res = await productVersionService.retrieve();
@@ -673,22 +674,17 @@ export default defineComponent({
       }
     };
 
-    // Fetch the latest non-client version of a product
     const fetchLatestNonClientVersion = async (productName: string) => {
       try {
         const versionRegex = /^\d+\.\d+\.\d+$/;
         const clientVersionRegex = /^[a-zA-Z]+_\d+\.\d+\.\d+$/;
-
         await fetchProductVersions(productName);
-
         const nonClientVersions = productVersions.value.filter(
-          (pv: IProductVersion) => pv.version && versionRegex.test(pv.version) && !clientVersionRegex.test(pv.version),
+          (pv: IProductVersion) => pv.version && versionRegex.test(pv.version) && !clientVersionRegex.test(pv.version)
         );
-
         if (nonClientVersions.length === 0) {
           return null;
         }
-
         nonClientVersions.sort((a: IProductVersion, b: IProductVersion) => {
           const versionA = a.version!.split('.').map(Number);
           const versionB = b.version!.split('.').map(Number);
@@ -699,7 +695,6 @@ export default defineComponent({
           }
           return new Date(b.createDate || 0).getTime() - new Date(a.createDate || 0).getTime();
         });
-
         return nonClientVersions[0];
       } catch (error) {
         alertService.showHttpError(error.response || error);
@@ -724,7 +719,6 @@ export default defineComponent({
         if (!lastVersion?.moduleVersions) {
           return 0;
         }
-
         let totalFeatures = 0;
         for (const moduleVersion of lastVersion.moduleVersions) {
           if (moduleVersion.id) {
@@ -750,10 +744,8 @@ export default defineComponent({
         if (!lastVersion || !lastVersion.id) {
           return 0;
         }
-
         const res = await productDeployementDetailService.retrieve();
         const filteredDeployements = res.data.filter(detail => detail.productVersion?.id === lastVersion.id);
-        console.log(filteredDeployements);
         return filteredDeployements.length;
       } catch (error) {
         console.error(`Error counting deployements for ${productName}:`, error);
@@ -782,18 +774,26 @@ export default defineComponent({
     };
 
     const getModuleVersionWithModuleCached = moduleVersionId => {
-      // 1. Trouver la version de module dans le cache
       const moduleVersion = moduleVersionOptions.value.find(mv => mv.id === moduleVersionId);
       if (!moduleVersion) return null;
-
-      // 2. Trouver le module associé dans le cache
       const module = moduleOptions.value.find(m => m.id === moduleVersion.module?.id);
-
-      // 3. Fusionner les données
       return {
         ...moduleVersion,
-        module: module ? { ...module } : null,
+        module: module ? { ...module } : null
       };
+    };
+
+    onMounted(async () => {
+      await fetchProducts();
+      await loadProductsEvolutionData();
+      createCharts();
+      checkScrollPosition();
+      await fetchModuleOptions();
+      await fetchModuleVersionOptions();
+    });
+
+    const openLogin = () => {
+      loginService?.openLogin();
     };
 
     return {
@@ -821,7 +821,6 @@ export default defineComponent({
       fetchModuleOptions,
       fetchModuleVersionOptions,
       getModuleVersionWithModuleCached,
-      // Charts related
       selectedProduct,
       selectProduct,
       closeCharts,
@@ -832,6 +831,9 @@ export default defineComponent({
       versionsChartData,
       productsEvolutionData,
       currentYear,
+      clientsDeployments,
+      expandedClients,
+      toggleClientExpansion
     };
-  },
+  }
 });
