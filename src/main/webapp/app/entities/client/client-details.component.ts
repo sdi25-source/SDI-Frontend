@@ -11,6 +11,7 @@ import ClientSizeService from '@/entities/client-size/client-size.service.ts';
 import ClientTypeService from '@/entities/client-type/client-type.service.ts';
 import CountryService from '@/entities/country/country.service.ts';
 import jsPDF from 'jspdf';
+import S2MLogo from '@/../content/images/bgImage.png';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -108,35 +109,49 @@ export default defineComponent({
         };
 
         // Header
-        doc.setFillColor(12, 45, 87); // #0c2d57
-        doc.rect(0, 0, doc.internal.pageSize.width, 40, 'F');
 
-        doc.setTextColor(255, 255, 255);
+        doc.setTextColor(12, 45, 87);
         doc.setFontSize(24);
         doc.setFont('times', 'bold');
         doc.text('CLIENT REPORT', margin, 25);
 
-        doc.setFontSize(12);
+        doc.setFontSize(16);
         doc.setFont('times', 'normal');
-        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, margin, 35);
+        doc.text(clientData.client.name || 'N/A', margin, 35);
 
-        yPosition = 60;
+        doc.setFontSize(10);
+        doc.text(`${new Date().toLocaleDateString()}`, margin + 1, 42);
+
+        yPosition = 50;
         doc.setTextColor(0, 0, 0);
 
-        // Client Logo (if available)
-        if (clientData.client.clientLogo) {
-          try {
-            doc.addImage(clientData.client.clientLogo, 'PNG', doc.internal.pageSize.width - 60, 10, 40, 40);
-          } catch (error) {
-            console.warn('Could not add client logo:', error);
-          }
-        }
+        // S2M Logo
+        doc.addImage(S2MLogo, 'PNG', doc.internal.pageSize.width - 41, 15, 20, 17);
+        doc.setFontSize(12);
+        doc.setFont('times', 'normal');
+        doc.text('+212 (0) 522 87 83 00', 151, 38);
+        doc.setFontSize(12);
+        doc.setFont('times', 'normal');
+        doc.text('S2M - Société Maghrébine de Monétique', 119, 32);
+        doc.text('contact@s2m.ma', 160, 43);
+
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, yPosition, doc.internal.pageSize.width - margin, yPosition);
+        yPosition += 18;
 
         // Client Information Section
         doc.setFontSize(18);
         doc.setFont('times', 'bold');
         doc.text('CLIENT INFORMATION', margin, yPosition);
-        yPosition += 15;
+        yPosition += 10;
+
+        if (clientData.client.clientLogo) {
+          try {
+            doc.addImage(clientData.client.clientLogo, 'PNG', doc.internal.pageSize.width - 50, 80, 30, 30);
+          } catch (error) {
+            console.warn('Could not add client logo:', error);
+          }
+        }
 
         doc.setDrawColor(200, 200, 200);
         doc.line(margin, yPosition, doc.internal.pageSize.width - margin, yPosition);
@@ -183,7 +198,11 @@ export default defineComponent({
         doc.setFont('times', 'bold');
         doc.text('Creation Date:', margin, yPosition);
         doc.setFont('times', 'normal');
-        doc.text(clientData.client.createDate ? new Date(clientData.client.createDate).toLocaleDateString() : 'N/A', margin + 30, yPosition);
+        doc.text(
+          clientData.client.createDate ? new Date(clientData.client.createDate).toLocaleDateString() : 'N/A',
+          margin + 30,
+          yPosition,
+        );
         yPosition += 20;
 
         // Client Events Section (Table)
@@ -206,10 +225,12 @@ export default defineComponent({
           // Table Rows
           clientData.clientEvents.forEach(event => {
             checkPageBreak(10);
-            drawTableRow(margin, yPosition, [
-              event.event || 'N/A',
-              event.eventDate ? new Date(event.eventDate).toLocaleDateString() : 'N/A'
-            ], eventColWidths);
+            drawTableRow(
+              margin,
+              yPosition,
+              [event.event || 'N/A', event.eventDate ? new Date(event.eventDate).toLocaleDateString() : 'N/A'],
+              eventColWidths,
+            );
             yPosition += 7;
           });
           yPosition += 5;
@@ -237,12 +258,12 @@ export default defineComponent({
           // Table Rows
           clientData.productDeployementSummaries.forEach(summary => {
             checkPageBreak(10);
-            drawTableRow(margin, yPosition, [
-              summary.refContract || 'N/A',
-              summary.product || 'N/A',
-              summary.version || 'N/A',
-              summary.deployementType || 'N/A'
-            ], deployColWidths);
+            drawTableRow(
+              margin,
+              yPosition,
+              [summary.refContract || 'N/A', summary.product || 'N/A', summary.version || 'N/A', summary.deployementType || 'N/A'],
+              deployColWidths,
+            );
             yPosition += 7;
           });
           yPosition += 5;
@@ -295,7 +316,7 @@ export default defineComponent({
           doc.setFont('times', 'normal');
           doc.setTextColor(128, 128, 128);
           doc.text(`Page ${i} of ${totalPages}`, doc.internal.pageSize.width - 40, doc.internal.pageSize.height - 10);
-          doc.text(`Client: ${clientData.client.name}`, margin, doc.internal.pageSize.height - 10);
+          doc.text(`${clientData.client.name}`, margin, doc.internal.pageSize.height - 10);
         }
 
         // Generate PDF Blob
@@ -303,7 +324,6 @@ export default defineComponent({
         const url = window.URL.createObjectURL(pdfBlob);
         pdfUrl.value = url;
         showPdfModal.value = true;
-
       } catch (error) {
         console.error('Error generating PDF:', error);
         alertService.showHttpError(error.response || error);
@@ -319,7 +339,6 @@ export default defineComponent({
       pdfUrl.value = null;
       showPdfModal.value = false;
     };
-
 
     const downloadPdf = () => {
       if (pdfUrl.value) {

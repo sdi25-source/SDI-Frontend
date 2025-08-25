@@ -1,10 +1,14 @@
 <template>
   <div class="dashboard-content pt-lg-5">
     <div class="dashboard-header"></div>
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-message">{{ t('global.menu.entities.productLoading') }}</p>
+    </div>
     <!-- Products Overview Section -->
     <div class="dashboard-section shadow">
       <div class="section-header">
-        <h2>Products Overview</h2>
+        <h2>{{ t('global.menu.entities.productsOverview') }}</h2>
         <div class="scroll-controls">
           <button @click="scrollLeft" class="scroll-button" :disabled="isAtStart">
             <i class="bi bi-chevron-left"></i>
@@ -24,14 +28,16 @@
               </div>
               <div class="product-info">
                 <h4>{{ product.name }}</h4>
-                <p>Last version {{ latestVersions.get(product.name)?.version || 'N/A' }}</p>
+                <p>{{ t('global.menu.entities.lastVersion') }} {{ latestVersions.get(product.name)?.version || 'N/A' }}</p>
                 <p>
-                  {{ moduleVersionCounts.get(product.name) || 0 }} modules • {{ totalFeaturesPerProduct.get(product.name) || 0 }} features
+                  {{ moduleVersionCounts.get(product.name) || 0 }} {{ t('global.menu.entities.module') }} •
+                  {{ totalFeaturesPerProduct.get(product.name) || 0 }} {{ t('global.menu.entities.feature') }}
                 </p>
                 <div class="product-status" :class="product.badgeClass">
-                  Deploy {{ totalDeployementsPerProduct.get(product.name) || 0 }} times
+                  {{ t('global.menu.entities.deploy') }} {{ totalDeployementsPerProduct.get(product.name) || 0 }}
+                  {{ t('global.menu.entities.times') }}
                 </div>
-                <div class="product-status customer ml-2">{{ product.clients || 0 }} Customer</div>
+                <div class="product-status customer ml-2">{{ product.clients || 0 }} {{ t('global.menu.entities.customer') }}</div>
               </div>
             </div>
           </div>
@@ -43,13 +49,14 @@
     <div class="dashboard-content">
       <div v-if="!selectedProduct" class="section">
         <div class="chart-container">
-          <h4 class="chart-title">Product portfolio growth ({{ currentYear }})</h4>
+          <h4 class="chart-title">{{ t('global.menu.entities.productGrowth') }} ({{ currentYear }})</h4>
           <div class="chart-wrapper">
             <canvas ref="productsEvolutionChart" width="800" height="400"></canvas>
           </div>
           <div v-if="productsEvolutionData.labels.length === 0" class="no-data-message">
             No data available for the evolution of products
           </div>
+          <div v-if="productsEvolutionData.labels.length === 0" class="no-data-message">{{ t('global.menu.entities.noDataP') }}</div>
         </div>
       </div>
 
@@ -149,7 +156,7 @@
                     </table>
                   </div>
                   <div v-if="clients.length === 0" class="text-center text-muted mt-3">
-                    {{ t$('global.menu.entities.noClientDataForPV') }}
+                    {{ t('global.menu.entities.noClientDataForPV') }}
                   </div>
                 </div>
               </div>
@@ -169,6 +176,41 @@
             </div>
           </div>
         </div>
+
+        <div class="charts-header d-flex justify-content-between align-items-center mb-4">
+          <h3>{{ selectedProduct.name }} - {{ t('global.menu.entities.analyticsDash') }}</h3>
+          <button @click="closeCharts" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <div class="row">
+          <!-- Left Chart - Clients Distribution -->
+          <div class="col-md-6">
+            <div class="chart-container">
+              <h4 class="chart-title">
+                {{ t('global.menu.entities.clientDistByMD') }} ({{ t('global.menu.entities.lastVersion') }}:
+                {{ selectedProduct.name || 'N/A' }}
+                v{{ latestVersions.get(selectedProduct.name)?.version || 'N/A' }})
+              </h4>
+              <div class="chart-wrapper">
+                <canvas ref="clientsChart" width="400" height="400"></canvas>
+              </div>
+              <div v-if="clientsChartData.labels.length === 0" class="no-data-message">
+                {{ t('global.menu.entities.noClientDataForPV') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Chart - Product Versions -->
+          <div class="col-md-6">
+            <div class="chart-container">
+              <h4 class="chart-title">{{ t('global.menu.entities.moduleEvoByPV') }}</h4>
+              <div class="chart-wrapper">
+                <canvas ref="versionsChart" width="400" height="400"></canvas>
+              </div>
+              <div v-if="versionsChartData.labels.length === 0" class="no-data-message">{{ t('global.menu.entities.noDataForV') }}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -177,6 +219,37 @@
 <script lang="ts" src="./dashProducts.component.ts"></script>
 
 <style scoped>
+/* Loading Indicator Styles */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #0c2d57;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+.loading-message {
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #0c2d57;
+}
+
 /* Loading Indicator Styles */
 .loading-overlay {
   position: absolute;

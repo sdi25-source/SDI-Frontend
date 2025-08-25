@@ -84,16 +84,7 @@ export default defineComponent({
     };
 
     const convertToCSV = data => {
-      const headers = [
-        'Name',
-        'Code',
-        'Main Contact',
-        'Main Email',
-        'Phone',
-        'Client type',
-        'Client size',
-        'Created at'
-      ];
+      const headers = ['Name', 'Code', 'Main Contact', 'Main Email', 'Phone', 'Client type', 'Client size', 'Created at'];
 
       const csvContent = [
         headers.join(','),
@@ -233,7 +224,7 @@ export default defineComponent({
         }
 
         if (successCount > 0) {
-          alertService.showSuccess(`${successCount} clients importés avec succès`);
+          // alertService.showSuccess(`${successCount} clients importés avec succès`);
           await retrieveClients();
         }
 
@@ -414,18 +405,18 @@ export default defineComponent({
         }
       });
       removeId.value = instance.id;
-      removeEntity.value.show();
+      removeEntity.value = true;
     };
 
     const closeDialog = () => {
-      removeEntity.value.hide();
+      removeEntity.value = false;
     };
 
     const removeClient = async () => {
       try {
         await clientService().delete(removeId.value);
         const message = t$('sdiFrontendApp.client.deleted', { param: removeId.value }).toString();
-        alertService.showInfo(message, { variant: 'danger' });
+        // alertService.showInfo(message, { variant: 'danger' });
         clients.value = clients.value.filter(c => c.id !== removeId.value);
         allClients.value = allClients.value.filter(c => c.id !== removeId.value);
         updateTotalItems();

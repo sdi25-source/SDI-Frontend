@@ -1,19 +1,25 @@
 {
   "login": {
-    "title": "Authentification",
+    "title": "Connexion",
+    "subTitle": "Bon retour",
     "form": {
       "password": "Mot de passe",
       "password.placeholder": "Votre mot de passe",
-      "rememberme": "Garder la session ouverte",
-      "button": "Connexion"
+      "rememberme": "Se souvenir de moi",
+      "button": "Se connecter"
     },
     "messages": {
       "error": {
-        "authentication": "<strong>Erreur d'authentification !</strong> Veuillez vérifier vos identifiants de connexion."
+        "authentication": "<strong>Échec de la connexion !</strong> Veuillez vérifier vos identifiants et réessayer."
       }
     },
     "password": {
-      "forgot": "Avez-vous oublié votre mot de passe ?"
-    }
+      "forgot": "Mot de passe oublié ?",
+      "strong": "Le mot de passe doit contenir une majuscule, une minuscule, un chiffre et un caractère spécial"
+    },
+    "dhaveaccount": "Vous n'avez pas de compte ?",
+    "haveaccount": "Vous avez déjà un compte ?",
+    "signup": "Créer un compte",
+    "signin": "Se connecter"
   }
 }

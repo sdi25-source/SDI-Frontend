@@ -2,32 +2,32 @@
   "sdiFrontendApp": {
     "productVersion": {
       "home": {
-        "title": "ProductVersions",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Product Version",
-        "createOrEditLabel": "Créer ou éditer un Product Version",
-        "notFound": "Aucun Product Version trouvé"
+        "title": "Versions de Produit",
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer une nouvelle version de produit",
+        "createOrEditLabel": "Créer ou modifier une version de produit",
+        "notFound": "Aucune version de produit trouvée"
       },
-      "created": "Un nouveau Product Version a été créé avec l'identifiant { param }",
-      "updated": "Le Product Version avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Product Version avec l'identifiant { param } a été supprimé",
+      "created": "Une nouvelle version de produit a été créée avec l’identifiant { param }",
+      "updated": "Une version de produit a été mise à jour avec l’identifiant { param }",
+      "deleted": "Une version de produit a été supprimée avec l’identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Product Version { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer la version de produit { id } ?"
       },
       "detail": {
-        "title": "Product Version"
+        "title": "Version de Produit"
       },
       "id": "ID",
       "version": "Version",
-      "createDate": "Create Date",
-      "updateDate": "Update Date",
+      "createDate": "Date de création",
+      "updateDate": "Date de mise à jour",
       "notes": "Notes",
-      "productDeployementDetail": "Product Deployement Detail",
-      "productVersion": "Product Version",
-      "product": "Product",
-      "moduleVersion": "Module Version",
-      "infraComponentVersion": "Infra Component Version",
-      "root": "Root"
+      "productDeployementDetail": "Détail du déploiement du produit",
+      "productVersion": "Version du produit",
+      "product": "Produit",
+      "moduleVersion": "Version du module",
+      "infraComponentVersion": "Version du composant infra",
+      "root": "Version de base"
     }
   }
 }

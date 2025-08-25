@@ -2,33 +2,37 @@
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="header-container w-100 px-4 d-flex align-items-center justify-content-between shadow">
       <router-link to="/" class="logo d-flex align-items-center me-auto me-xl-0">
-        <h1>
-          <strong>{{ t$('global.title') }}</strong>
+        <h1 class="sdi-animated-title" @mouseover="isHovered = true" @mouseleave="isHovered = false">
+          <strong>
+            <span class="sdi-letter">S</span><span :class="['sdi-word', { 'sdi-word-expanded': isHovered }]">2M </span>
+            <span class="sdi-letter">D</span><span :class="['sdi-word', { 'sdi-word-expanded': isHovered }]">eployment </span>
+            <span class="sdi-letter">I</span><span :class="['sdi-word', { 'sdi-word-expanded': isHovered }]">nventory</span>
+          </strong>
         </h1>
       </router-link>
-
       <!-- Nav Menu -->
       <nav id="navmenu" class="navmenu pl-5 ml-5">
         <ul>
           <!-- Dashboards -->
           <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'dash' }">
-            <a href="#" class="no-link-style"><span>Dashboards</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <a href="#" class="no-link-style"
+              ><span>{{ t$('global.menu.entities.dashboards') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i
+            ></a>
             <ul>
               <div class="entities-menu-container">
                 <div class="entities-category">
                   <b-dropdown-item to="dashClients">
-                    <span>Customers Dashboard</span>
+                    <span>{{ t$('global.menu.entities.customerDash') }}</span>
                   </b-dropdown-item>
                 </div>
                 <div class="entities-category">
                   <b-dropdown-item to="dashProducts">
-                    <span>Products Dashboard</span>
+                    <span>{{ t$('global.menu.entities.productDash') }}</span>
                   </b-dropdown-item>
                 </div>
               </div>
             </ul>
           </li>
-
           <!-- Clients -->
           <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'customer' }">
             <a href="#" class="no-link-style">
@@ -38,7 +42,6 @@
               <customers-menu class="entities-menu-scroll" @menu-item-clicked="setActiveMenu('customer')" />
             </ul>
           </li>
-
           <!-- Products -->
           <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'product' }">
             <a href="#" class="no-link-style">
@@ -48,7 +51,6 @@
               <products-menu class="entities-menu-scroll" @menu-item-clicked="setActiveMenu('product')" />
             </ul>
           </li>
-
           <!-- Product Deployments -->
           <li v-if="authenticated" class="dropdown" :class="{ active: activeMenu === 'deployments' }">
             <a href="#" class="no-link-style">
@@ -58,7 +60,6 @@
               <deployments-menu class="entities-menu-scroll" @menu-item-clicked="setActiveMenu('deployments')" />
             </ul>
           </li>
-
           <!-- Parameters -->
           <li v-if="authenticated && hasAnyAuthority('ROLE_ADMIN')" class="dropdown" :class="{ active: activeMenu === 'parameters' }">
             <a href="#" class="no-link-style">
@@ -68,7 +69,6 @@
               <parameters-menu class="entities-menu-scroll" @menu-item-clicked="setActiveMenu('parameters')" />
             </ul>
           </li>
-
           <!-- Admin Menu -->
           <li v-if="authenticated && hasAnyAuthority('ROLE_ADMIN')" class="dropdown" :class="{ active: activeMenu === 'administration' }">
             <a href="#" class="no-link-style">
@@ -78,18 +78,48 @@
               <administration-menu @menu-item-clicked="setActiveMenu('administration')" />
             </ul>
           </li>
-
+          <li class="dropdown" v-if="authenticated">
+            <a href="#" class="no-link-style">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10a15.3 15.3 0 0 1-4 10a15.3 15.3 0 0 1-4-10a15.3 15.3 0 0 1 4-10z" />
+                <path d="M2 12h20" />
+              </svg>
+              <i class="bi bi-chevron-down toggle-dropdown pl-1"></i>
+            </a>
+            <ul>
+              <li
+                v-for="(value, key) in languages"
+                :key="`lang-${key}`"
+                @click="changeLanguage(key)"
+                :class="{ active: isActiveLanguage(key) }"
+              >
+                <router-link to="" class="d-flex align-items-center gap-1 no-link-style">
+                  <span>{{ value.flag }} {{ ' ' }}{{ value.name }}</span>
+                </router-link>
+              </li>
+            </ul>
+          </li>
           <!-- Home (Unauthenticated) -->
           <li>
             <router-link to="/" exact class="nav-link active" v-if="!authenticated" :class="{ active: activeMenu === 'home' }">
               <span>{{ t$('global.menu.home') }}</span>
             </router-link>
           </li>
-
           <!-- Account (Unauthenticated) -->
           <li class="dropdown" v-if="!authenticated" :class="{ active: activeMenu === 'account' }">
             <a href="#" class="no-link-style">
-              <span>{{ t$('global.menu.account.main') }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i>
+              <span>{{ t$('global.menu.account.main') }}</span> <i class="bi bi-chevron-down toggle-dropdown pl-1"></i>
             </a>
             <ul>
               <li>
@@ -106,14 +136,29 @@
               </li>
             </ul>
           </li>
+          <li class="dropdown" v-if="!authenticated">
+            <a href="#" class="no-link-style">
+              <span>{{ t$('global.menu.language') }}</span> <i class="bi bi-chevron-down toggle-dropdown pl-1"></i>
+            </a>
+            <ul>
+              <li
+                v-for="(value, key) in languages"
+                :key="`lang-${key}`"
+                @click="changeLanguage(key)"
+                :class="{ active: isActiveLanguage(key) }"
+              >
+                <router-link to="" class="d-flex align-items-center gap-1 no-link-style">
+                  <span>{{ value.flag }} {{ ' ' }}{{ value.name }}</span>
+                </router-link>
+              </li>
+            </ul>
+          </li>
         </ul>
       </nav>
-
       <!-- Login Button (Unauthenticated) -->
       <router-link to="/login" class="d-flex align-items-center gap-1 btn-getstarted" v-if="!authenticated">
         {{ t$('global.menu.account.login') }}
       </router-link>
-
       <!-- Authenticated Nav with Profile Badges and Dropdown -->
       <nav id="navmenu" class="navmenu pl-5 ml-5" v-if="authenticated">
         <ul>
@@ -161,44 +206,39 @@
 <script lang="ts" src="./jhi-navbar.component.ts"></script>
 
 <style scoped>
+/* Existing styles */
 .nav-icon {
   font-size: 20px;
   margin-right: 1px;
   width: 24px;
   text-align: center;
 }
-
 /* General styles for links */
 .entities-category .dropdown-item {
   padding: 6px 10px;
   font-size: 0.9rem;
 }
-
 .no-link-style {
   text-decoration: none;
   color: inherit;
   outline: none;
 }
-
 .no-link-style:hover,
 .no-link-style:focus,
 .no-link-style:active {
   text-decoration: none;
   color: inherit;
 }
-
 /* Navigation menu container */
 .navmenu {
   padding-left: 5px;
   padding-right: 5px;
 }
-
 /* Dropdown container */
 .dropdown {
   position: relative;
   display: inline-block;
 }
-
 /* Toggle icon (bi-list) */
 .toggle-dropdown {
   font-size: 1.2rem;
@@ -206,11 +246,9 @@
   cursor: pointer;
   transition: transform 0.2s ease;
 }
-
 .dropdown:hover .toggle-dropdown {
   transform: rotate(90deg);
 }
-
 /* Dropdown menu */
 .dropdown-menu {
   position: absolute;
@@ -232,29 +270,24 @@
     visibility 0.2s ease,
     transform 0.2s ease;
 }
-
 /* Show dropdown on hover */
 .dropdown:hover .dropdown-menu {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
 }
-
 /* Dropdown menu items */
 .dropdown-menu li {
   padding: 10px 15px;
   border-bottom: 1px solid #f0f0f0;
   transition: background-color 0.2s ease;
 }
-
 .dropdown-menu li:hover {
   background-color: #f8fafc;
 }
-
 .dropdown-menu li:last-child {
   border-bottom: none;
 }
-
 .dropdown-menu a {
   color: #333;
   text-decoration: none;
@@ -262,18 +295,15 @@
   align-items: center;
   gap: 8px;
 }
-
 .dropdown-menu a:hover {
   color: #0d83fd;
 }
-
 /* Role badges styling */
 .role-avatars {
   display: flex;
   align-items: center;
   margin-right: 10px;
 }
-
 .role-badge {
   width: 30px;
   height: 30px;
@@ -289,28 +319,22 @@
   position: relative; /* For tooltip positioning */
   cursor: pointer; /* Indicate hoverability */
 }
-
 .role-badge:first-child {
   margin-left: 0; /* No overlap for the first badge */
 }
-
 /* Specific colors for each role */
 .role-admin {
   background-color: #07459c; /* Bright blue for Admin */
 }
-
 .role-delivery {
   background-color: #4154f1; /* Dodger blue for Delivery Manager */
 }
-
 .role-commercial {
   background-color: #0378fb; /* Steel blue for Commercial */
 }
-
 .role-user {
   background-color: #87ceeb; /* Sky blue for User */
 }
-
 /* Tooltip styling */
 .role-tooltip {
   position: absolute;
@@ -330,51 +354,43 @@
     transform 0.2s ease;
   z-index: 1000;
 }
-
 .role-badge:hover .role-tooltip {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0); /* Slide up into position */
 }
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .dropdown-menu {
     right: auto;
     left: 0;
   }
-
   .role-avatars {
     margin-right: 5px;
   }
-
   .role-badge {
     width: 25px;
     height: 25px;
     font-size: 12px;
     margin-left: -8px;
   }
-
   .role-tooltip {
     top: -25px; /* Adjust for smaller badges */
     font-size: 11px;
     padding: 4px 8px;
   }
 }
-
 /* Ensure visibility near right edge of viewport */
 @media (min-width: 769px) {
   .dropdown-menu {
     right: 0;
     left: auto;
   }
-
   .dropdown:last-child .dropdown-menu {
     right: auto;
     left: 0;
   }
 }
-
 /* Additional styles from your full code to ensure consistency */
 .header-container {
   width: 90%;
@@ -382,7 +398,6 @@
   margin: 0 auto;
   padding: 0 10px;
 }
-
 /* Style for the entities menu scroll (for other dropdowns) */
 .entities-menu-scroll {
   max-height: 700px;
@@ -391,59 +406,48 @@
   display: block;
   padding-right: 5px;
 }
-
 .entities-menu-scroll::-webkit-scrollbar {
   width: 5px;
 }
-
 .entities-menu-scroll::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 5px;
 }
-
 .entities-menu-scroll::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 5px;
 }
-
 .entities-menu-scroll::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
-
 /* Media queries for responsive header container */
 @media (max-width: 1200px) {
   .header-container {
     max-width: 95%;
     padding: 0 15px;
   }
-
   .entities-menu-scroll {
     max-height: 280px;
   }
 }
-
 @media (max-width: 768px) {
   .header-container {
     max-width: 90%;
     padding: 0 20px;
   }
-
   .navmenu {
     padding-left: 0;
     padding-right: 0;
   }
-
   .entities-menu-scroll {
     max-height: 250px;
   }
 }
-
 @media (max-width: 576px) {
   .header-container {
     max-width: 100%;
     padding: 0 10px;
   }
-
   .entities-menu-scroll {
     max-height: 200px;
   }
@@ -453,5 +457,37 @@
   color: #666;
   padding: 2px 6px;
   border-radius: 4px;
+}
+
+/* New styles for the animated title */
+.sdi-animated-title strong {
+  display: inline-flex; /* Allows elements to sit side-by-side */
+  align-items: baseline; /* Align text baselines */
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflow during transition */
+}
+
+.sdi-letter {
+  /* Basic styling for S, D, I - ensures they are visible */
+  font-weight: bold;
+}
+
+.sdi-word {
+  /* Initial state: hidden and zero width */
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-width 0.4s ease-out,
+    opacity 0.4s ease-out; /* Smooth transition */
+  display: inline-block; /* Important for max-width transition */
+  vertical-align: baseline; /* Align with letters */
+}
+
+.sdi-word-expanded {
+  /* Expanded state: visible and full width */
+  max-width: 200px; /* A value large enough to contain the longest word (e.g., 'eployment ') */
+  opacity: 1;
+  padding-right: 5px;
 }
 </style>

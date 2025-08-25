@@ -22,7 +22,7 @@ export default defineComponent({
     const searchTimeout = ref(null);
 
     const currentPage = ref(1);
-    const itemsPerPage = ref(10);
+    const itemsPerPage = ref(20);
     const totalItems = ref(0);
 
     const isFetching = ref(false);
@@ -123,15 +123,17 @@ export default defineComponent({
     const prepareRemove = (instance: IClientEventType) => {
       clientEventTypes.value.forEach(type => (type.showDropdown = false));
       removeId.value = instance.id;
-      removeEntity.value.show();
+      removeEntity.value = true;
     };
 
-    const closeDialog = () => removeEntity.value.hide();
+    const closeDialog = () => {
+      removeEntity.value = false;
+    };
 
     const removeClientEventType = async () => {
       try {
         await clientEventTypeService().delete(removeId.value);
-        alertService.showInfo(t$('sdiFrontendApp.clientEventType.deleted', { param: removeId.value }).toString(), { variant: 'danger' });
+        //alertService.showInfo(t$('sdiFrontendApp.clientEventType.deleted', { param: removeId.value }).toString(), { variant: 'danger' });
 
         clientEventTypes.value = clientEventTypes.value.filter(type => type.id !== removeId.value);
         allClientEventTypes.value = allClientEventTypes.value.filter(type => type.id !== removeId.value);

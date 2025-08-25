@@ -3,42 +3,47 @@
     "client": {
       "home": {
         "title": "Clients",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Client",
-        "createOrEditLabel": "Créer ou éditer un Client",
-        "notFound": "Aucun Client trouvé"
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer un nouveau client",
+        "createOrEditLabel": "Créer ou modifier un client",
+        "notFound": "Aucun client trouvé"
       },
-      "created": "Un nouveau Client a été créé avec l'identifiant { param }",
-      "updated": "Le Client avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Client avec l'identifiant { param } a été supprimé",
+      "created": "Un nouveau client a été créé avec l'identifiant { param }",
+      "updated": "Un client a été mis à jour avec l'identifiant { param }",
+      "deleted": "Un client a été supprimé avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Client { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer ce client { id } ?"
       },
       "detail": {
         "title": "Client"
       },
       "id": "ID",
-      "clientLogo": "Client Logo",
-      "name": "Name",
+      "clientLogo": "Logo du client",
+      "name": "Nom",
       "code": "Code",
-      "mainContactName": "Main Contact Name",
-      "mainContactEmail": "Main Contact Email",
-      "currentCardHolderNumber": "Current Card Holder Number",
-      "currentBruncheNumber": "Current Brunche Number",
-      "currentCustomersNumber": "Current Customers Number",
-      "mainContactPhoneNumber": "Main Contact Phone Number",
-      "url": "Url",
-      "address": "Address",
-      "createDate": "Create Date",
-      "updateDate": "Update Date",
+      "mainContactName": "Nom du contact principal",
+      "mainContactEmail": "Email du contact principal",
+      "currentCardHolderNumber": "Numéro actuel des détenteurs de carte",
+      "currentBruncheNumber": "Numéro actuel des agences",
+      "currentCustomersNumber": "Numéro actuel des clients",
+      "mainContactPhoneNumber": "Numéro de téléphone du contact principal",
+      "url": "Site web",
+      "website": "Site web",
+      "address": "Adresse",
+      "createDate": "Date de création",
+      "updateDate": "Date de mise à jour",
       "notes": "Notes",
-      "countryName": "Country Name",
-      "region": "Region",
-      "productDeployement": "Product Deployement",
-      "size": "Size",
-      "clientType": "Client Type",
-      "certif": "Certif",
-      "country": "Country"
+      "countryName": "Nom du pays",
+      "region": "Région",
+      "productDeployement": "Déploiement du produit",
+      "size": "Taille du client",
+      "clientType": "Type de client",
+      "certif": "Certification",
+      "country": "Pays",
+      "relatedInformation": "Informations associées",
+      "selectCountry": "Sélectionner un pays",
+      "selectType": "Sélectionner un type",
+      "selectSize": "Sélectionner une taille"
     }
   }
 }

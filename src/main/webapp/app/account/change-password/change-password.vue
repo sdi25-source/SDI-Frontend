@@ -4,7 +4,7 @@
       <h1 v-if="username">
         <span v-html="t$('password.title', { username: username })"></span>
       </h1>
-      <p class="content-subtitle">Change your password to secure your account</p>
+      <p class="content-subtitle">{{ t$('password.subTitle') }}</p>
     </div>
 
     <div class="content-body">

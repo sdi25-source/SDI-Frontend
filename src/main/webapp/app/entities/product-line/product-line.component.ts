@@ -20,7 +20,7 @@ export default defineComponent({
     const searchTimeout = ref(null);
 
     const currentPage = ref(1);
-    const itemsPerPage = ref(10);
+    const itemsPerPage = ref(20);
     const totalItems = ref(0);
 
     const isFetching = ref(false);
@@ -113,10 +113,12 @@ export default defineComponent({
     const prepareRemove = (instance: IProductLine) => {
       productLines.value.forEach(pl => (pl.showDropdown = false));
       removeId.value = instance.id;
-      removeEntity.value.show();
+      removeEntity.value = true;
     };
 
-    const closeDialog = () => removeEntity.value.hide();
+    const closeDialog = () => {
+      removeEntity.value = false;
+    };
 
     const removeProductLine = async () => {
       try {

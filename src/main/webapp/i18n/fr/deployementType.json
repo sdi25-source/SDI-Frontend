@@ -2,27 +2,27 @@
   "sdiFrontendApp": {
     "deployementType": {
       "home": {
-        "title": "DeployementTypes",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Deployement Type",
-        "createOrEditLabel": "Créer ou éditer un Deployement Type",
-        "notFound": "Aucun Deployement Type trouvé"
+        "title": "Types de déploiement",
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer un nouveau type de déploiement",
+        "createOrEditLabel": "Créer ou modifier un type de déploiement",
+        "notFound": "Aucun type de déploiement trouvé"
       },
-      "created": "Un nouveau Deployement Type a été créé avec l'identifiant { param }",
-      "updated": "Le Deployement Type avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Deployement Type avec l'identifiant { param } a été supprimé",
+      "created": "Un nouveau type de déploiement a été créé avec l'identifiant { param }",
+      "updated": "Un type de déploiement a été mis à jour avec l'identifiant { param }",
+      "deleted": "Un type de déploiement a été supprimé avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Deployement Type { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer le type de déploiement { id } ?"
       },
       "detail": {
-        "title": "Deployement Type"
+        "title": "Type de déploiement"
       },
       "id": "ID",
       "type": "Type",
-      "createDate": "Create Date",
-      "updateDate": "Update Date",
+      "createDate": "Date de création",
+      "updateDate": "Date de mise à jour",
       "notes": "Notes",
-      "productDeployementDetail": "Product Deployement Detail"
+      "productDeployementDetail": "Détail du déploiement du produit"
     }
   }
 }

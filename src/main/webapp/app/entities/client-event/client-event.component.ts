@@ -179,11 +179,11 @@ export default defineComponent({
 
     const prepareRemove = (instance: IClientEvent) => {
       removeId.value = instance.id;
-      removeEntity.value.show();
+      removeEntity.value = true;
     };
 
     const closeDialog = () => {
-      removeEntity.value.hide();
+      removeEntity.value = false;
       removeId.value = null;
     };
 
@@ -191,7 +191,7 @@ export default defineComponent({
       try {
         await clientEventService().delete(removeId.value);
         const message = t$('sdiFrontendApp.clientEvent.deleted', { param: removeId.value }).toString();
-        alertService.showInfo(message, { variant: 'danger' });
+        // alertService.showInfo(message, { variant: 'danger' });
         clientEvents.value = clientEvents.value.filter(c => c.id !== removeId.value);
         allClientEvents.value = allClientEvents.value.filter(c => c.id !== removeId.value);
         updateTotalItems();

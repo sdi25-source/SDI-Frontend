@@ -3,27 +3,30 @@
     "certification": {
       "home": {
         "title": "Certifications",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Certification",
-        "createOrEditLabel": "Créer ou éditer un Certification",
-        "notFound": "Aucun Certification trouvé"
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer une nouvelle certification",
+        "createOrEditLabel": "Créer ou modifier une certification",
+        "notFound": "Aucune certification trouvée"
       },
-      "created": "Un nouveau Certification a été créé avec l'identifiant { param }",
-      "updated": "Le Certification avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Certification avec l'identifiant { param } a été supprimé",
+      "created": "Une nouvelle certification a été créée avec l'identifiant { param }",
+      "updated": "Une certification a été mise à jour avec l'identifiant { param }",
+      "deleted": "Une certification a été supprimée avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Certification { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer la certification { id } ?"
+      },
+      "deleteVersion": {
+        "question": "Êtes-vous sûr de vouloir supprimer la version { id } ?"
       },
       "detail": {
         "title": "Certification"
       },
       "id": "ID",
-      "name": "Name",
+      "name": "Nom",
       "description": "Description",
-      "createDate": "Create Date",
-      "updateDate": "Update Date",
-      "expireDate": "Expire Date",
-      "clientCertification": "Client Certification",
+      "createDate": "Date de création",
+      "updateDate": "Date de mise à jour",
+      "expireDate": "Date d'expiration",
+      "clientCertification": "Certification client",
       "version": "Version"
     }
   }

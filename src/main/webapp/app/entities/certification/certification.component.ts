@@ -22,7 +22,7 @@ export default defineComponent({
     const searchTimeout = ref(null);
 
     const currentPage = ref(1);
-    const itemsPerPage = ref(10);
+    const itemsPerPage = ref(20);
     const totalItems = ref(0);
 
     const isFetching = ref(false);

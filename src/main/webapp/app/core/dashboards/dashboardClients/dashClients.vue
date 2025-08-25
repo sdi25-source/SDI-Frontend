@@ -3,12 +3,12 @@
     <div class="dashboard-header"></div>
     <div v-if="loading" class="loading-overlay">
       <div class="loading-spinner"></div>
-      <p class="loading-message">Client Dashboard is loading ...</p>
+      <p class="loading-message">{{ t$('global.menu.entities.clientLoading') }}</p>
     </div>
     <!-- Clients Overview Section -->
     <div class="dashboard-section shadow">
       <div class="section-header">
-        <h2>Clients Overview</h2>
+        <h2>{{ t$('global.menu.entities.clientsOverview') }}</h2>
         <div class="scroll-controls">
           <button @click="scrollLeft" class="scroll-button" :disabled="isAtStart">
             <i class="bi bi-chevron-left"></i>
@@ -30,10 +30,11 @@
                 <h4>{{ client.name }}</h4>
                 <p>Type: {{ client.type || 'N/A' }}</p>
                 <p>
-                  {{ client.products }} products • {{ client.deployments }} deployments
+                  {{ client.products }} {{ t$('global.menu.entities.product') }} • {{ client.deployments }}
+                  {{ t$('global.menu.entities.deployements') }}
                 </p>
                 <div class="client-status" :class="client.badgeClass">
-                  {{ client.requestsOfChanges }} requests
+                  {{ client.requestsOfChanges }} {{ t$('global.menu.entities.requests') }}
                 </div>
               </div>
             </div>
@@ -46,31 +47,31 @@
     <div class="dashboard-content">
       <div v-if="!selectedClient" class="section">
         <div class="chart-container">
-          <h4 class="chart-title">Client portfolio growth ({{ currentYear }})</h4>
+          <h4 class="chart-title">{{ t$('global.menu.entities.clientGrowth') }} ({{ currentYear }})</h4>
           <div class="chart-wrapper">
             <canvas ref="clientsEvolutionChart" width="800" height="400"></canvas>
           </div>
-          <div v-if="clientsEvolutionData.labels.length === 0" class="no-data-message">No data available for the evolution of clients</div>
+          <div v-if="clientsEvolutionData.labels.length === 0" class="no-data-message">{{ t$('global.menu.entities.noDataC') }}</div>
         </div>
       </div>
 
       <!-- Charts Section -->
       <div v-else class="charts-section">
         <div class="charts-header d-flex justify-content-between align-items-center mb-4">
-          <h3>{{ selectedClient.name }} - Analytics Dashboard</h3>
-          <button @click="closeCharts" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i> Close</button>
+          <h3>{{ selectedClient.name }} - {{ t$('global.menu.entities.analyticsDash') }}</h3>
+          <button @click="closeCharts" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i></button>
         </div>
 
         <div class="row">
           <!-- Left Chart - Product Deployments Distribution -->
           <div class="col-md-6">
             <div class="chart-container">
-              <h4 class="chart-title">Product Deployments Distribution</h4>
+              <h4 class="chart-title">{{ t$('global.menu.entities.distribution') }}</h4>
               <div class="chart-wrapper">
                 <canvas ref="productDeploymentsChart" width="400" height="400"></canvas>
               </div>
               <div v-if="productDeploymentsChartData.labels.length === 0" class="no-data-message">
-                No product deployment data available
+                {{ t$('global.menu.entities.noDataProductAv') }}
               </div>
             </div>
           </div>
@@ -78,27 +79,27 @@
           <!-- Right Chart - Request of Changes by Customization Level -->
           <div class="col-md-6">
             <div class="chart-container">
-              <h4 class="chart-title">Request of Changes by Customization Level</h4>
+              <h4 class="chart-title">{{ t$('global.menu.entities.RequestCustomisation') }}</h4>
               <div class="chart-wrapper">
                 <canvas ref="requestChangesChart" width="400" height="400"></canvas>
               </div>
               <div v-if="requestChangesChartData.datasets.length === 0" class="no-data-message">
-                No request of changes data available
+                {{ t$('global.menu.entities.noDataRequestAv') }}
               </div>
               <!-- Summary Stats -->
               <div class="request-stats mt-3">
                 <div class="stats-grid">
                   <div class="stat-item">
                     <span class="stat-number">{{ totalRequests.basic }}</span>
-                    <span class="stat-label">Basic Changes</span>
+                    <span class="stat-label">{{ t$('global.menu.entities.basic') }}</span>
                   </div>
                   <div class="stat-item">
                     <span class="stat-number">{{ totalRequests.intermediate }}</span>
-                    <span class="stat-label">Intermediate Changes</span>
+                    <span class="stat-label">{{ t$('global.menu.entities.intermediate') }}</span>
                   </div>
                   <div class="stat-item">
                     <span class="stat-number">{{ totalRequests.advanced }}</span>
-                    <span class="stat-label">Advanced Changes</span>
+                    <span class="stat-label">{{ t$('global.menu.entities.advanced') }}</span>
                   </div>
                 </div>
               </div>
@@ -145,8 +146,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .dashboard-content {
@@ -266,7 +271,9 @@
   min-width: 280px;
   max-width: 280px;
   flex-shrink: 0;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   position: relative;
 }
 

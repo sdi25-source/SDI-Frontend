@@ -119,17 +119,17 @@ export default defineComponent({
     const prepareRemove = (instance: IDeployementType) => {
       deployementTypes.value.forEach(dt => (dt.showDropdown = false));
       removeId.value = instance.id;
-      removeEntity.value.show();
+      removeEntity.value = true;
     };
 
     const closeDialog = () => {
-      removeEntity.value.hide();
+      removeEntity.value = false;
     };
 
     const removeDeployementType = async () => {
       try {
         await deployementTypeService().delete(removeId.value);
-        alertService.showInfo(t$('sdiFrontendApp.deployementType.deleted', { param: removeId.value }).toString(), { variant: 'danger' });
+        //  alertService.showInfo(t$('sdiFrontendApp.deployementType.deleted', { param: removeId.value }).toString(), { variant: 'danger' });
 
         deployementTypes.value = deployementTypes.value.filter(dt => dt.id !== removeId.value);
         allDeployementTypes.value = allDeployementTypes.value.filter(dt => dt.id !== removeId.value);

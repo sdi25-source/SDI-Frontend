@@ -36,7 +36,6 @@
         </div>
       </div>
 
-
       <!-- Filters and Actions -->
       <div class="d-flex align-items-center">
         <!-- Filters -->
@@ -114,70 +113,162 @@
       <div class="table-responsive">
         <table class="table table-hover mb-0" aria-describedby="productDeployments">
           <thead class="thead-light">
-          <tr>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.productDeployement.refContract')"></span></th>
-            <th scope="col"><span v-text="t$('sdiFrontendApp.productDeployement.client')"></span></th>
-            <th scope="col"><span>Produit</span></th>
-
-            <th scope="col" width="220" class="text-center" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
-          </tr>
+            <tr>
+              <th scope="col"><span v-text="t$('sdiFrontendApp.productDeployement.refContract')"></span></th>
+              <th scope="col"><span v-text="t$('sdiFrontendApp.productDeployement.client')"></span></th>
+              <th scope="col"><span>Produit</span></th>
+              <th scope="col" width="220" class="text-center" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
+            </tr>
           </thead>
           <tbody>
-          <tr
-            v-for="productDeployment in paginatedProductDeployments"
-            :key="productDeployment.id"
-            data-cy="entityTable"
-            class="align-middle"
-            :class="{ 'selected-row': selectedProductDeployment && selectedProductDeployment.id === productDeployment.id }"
-            @click="toggleProductDeploymentSelection(productDeployment)"
-            style="cursor: pointer"
-          >
-            <td>
-              <template v-if="productDeployment.isEditing">
-                <input v-model="productDeployment.refContract" type="text" class="form-control-borderless" @click.stop />
-              </template>
-              <template v-else>
-                {{ productDeployment.refContract }}
-              </template>
-            </td>
-            <td>
-              <template v-if="productDeployment.isEditing">
-                <select v-model="productDeployment.client" class="form-control-borderless" @click.stop>
+            <tr
+              v-for="productDeployment in paginatedProductDeployments"
+              :key="productDeployment.id"
+              data-cy="entityTable"
+              class="align-middle"
+              :class="{ 'selected-row': selectedProductDeployment && selectedProductDeployment.id === productDeployment.id }"
+              @click="toggleProductDeploymentSelection(productDeployment)"
+              style="cursor: pointer"
+            >
+              <td>
+                <template v-if="productDeployment.isEditing">
+                  <input v-model="productDeployment.refContract" type="text" class="form-control-borderless" @click.stop />
+                </template>
+                <template v-else>
+                  {{ productDeployment.refContract }}
+                </template>
+              </td>
+              <td>
+                <template v-if="productDeployment.isEditing">
+                  <select v-model="productDeployment.client" class="form-control-borderless" @click.stop>
+                    <option v-for="client in clients" :key="client.id" :value="client">
+                      {{ client.name }}
+                    </option>
+                  </select>
+                </template>
+                <template v-else>
+                  {{ productDeployment.client ? productDeployment.client.name : '' }}
+                </template>
+              </td>
+              <td>
+                <template v-if="productDeployment.isEditing">
+                  <select v-model="productDeployment.product" class="form-control-borderless" @click.stop>
+                    <option v-for="product in products" :key="product.id" :value="product">
+                      {{ product.name }}
+                    </option>
+                  </select>
+                </template>
+                <template v-else>
+                  {{ productDeployment.product ? productDeployment.product.name : productDeployment.productName }}
+                </template>
+              </td>
+              <td class="text-center" @click.stop v-if="hasAnyAuthority('ROLE_USER')">
+                <div class="btn-group">
+                  <template v-if="productDeployment.isEditing">
+                    <div class="icon-container save-container" @click="saveProductDeployment(productDeployment)" title="Enregistrer">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
+                        <path
+                          d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </div>
+                    <div class="icon-container cancel-container" @click="cancelEdit(productDeployment)" title="Annuler">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
+                        <path
+                          d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="action-icons">
+                      <div
+                        class="icon-container edit-container"
+                        @click="editProductDeployment(productDeployment)"
+                        title="Modifier"
+                        v-if="hasAnyAuthority('ROLE_USER')"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          class="bi bi-pencil-fill"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                          />
+                        </svg>
+                      </div>
+                      <div class="icon-container delete-container" @click="prepareRemove(productDeployment)" title="Supprimer">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="26"
+                          height="26"
+                          fill="currentColor"
+                          class="bi bi-x"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      </div>
+                      <div class="icon-container settings-container" @click="openCertifications(productDeployment)" title="Certification">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="icon"
+                        >
+                          <circle cx="12" cy="8" r="7"></circle>
+                          <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                        </svg>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </td>
+            </tr>
+
+            <tr v-if="showAddRow" class="add-row">
+              <td>
+                <input
+                  type="text"
+                  class="form-control-borderless"
+                  v-model="newProductDeployment.refContract"
+                  placeholder="Référence contrat"
+                />
+              </td>
+              <td>
+                <select v-model="newProductDeployment.client" class="form-control-borderless">
+                  <option value="">Select a customer</option>
                   <option v-for="client in clients" :key="client.id" :value="client">
                     {{ client.name }}
                   </option>
                 </select>
-              </template>
-              <template v-else>
-                {{ productDeployment.client ? productDeployment.client.name : '' }}
-              </template>
-            </td>
-            <td>
-              <template v-if="productDeployment.isEditing">
-                <select v-model="productDeployment.product" class="form-control-borderless" @click.stop>
+              </td>
+              <td>
+                <select v-model="newProductDeployment.product" class="form-control-borderless">
+                  <option value="">Select a product</option>
                   <option v-for="product in products" :key="product.id" :value="product">
                     {{ product.name }}
                   </option>
                 </select>
-              </template>
-              <template v-else>
-                {{ productDeployment.product ? productDeployment.product.name : productDeployment.productName }}
-              </template>
-            </td>
-            <!--
-            <td class="text-truncate" style="max-width: 250px" :title="productDeployment.notes">
-              <template v-if="productDeployment.isEditing">
-                <input v-model="productDeployment.notes" type="text" class="form-control-borderless" @click.stop />
-              </template>
-              <template v-else>
-                {{ productDeployment.notes }}
-              </template>
-            </td>
-            -->
-            <td class="text-center" @click.stop v-if="hasAnyAuthority('ROLE_USER')">
-              <div class="btn-group">
-                <template v-if="productDeployment.isEditing">
-                  <div class="icon-container save-container" @click="saveProductDeployment(productDeployment)" title="Enregistrer">
+              </td>
+              <td class="text-center">
+                <div class="action-icons">
+                  <div class="icon-container save-container" @click="saveNewProductDeployment" title="Enregistrer">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
                       <path
                         d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
@@ -185,7 +276,7 @@
                       />
                     </svg>
                   </div>
-                  <div class="icon-container cancel-container" @click="cancelEdit(productDeployment)" title="Annuler">
+                  <div class="icon-container cancel-container" @click="cancelNewProductDeployment" title="Annuler">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
                       <path
                         d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
@@ -193,118 +284,12 @@
                       />
                     </svg>
                   </div>
-                </template>
-                <template v-else>
-                  <div class="action-icons">
-                    <div
-                      class="icon-container edit-container"
-                      @click="editProductDeployment(productDeployment)"
-                      title="Modifier"
-                      v-if="hasAnyAuthority('ROLE_USER')"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-pencil-fill"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
-                        />
-                      </svg>
-                    </div>
-                    <div class="icon-container delete-container" @click="prepareRemove(productDeployment)" title="Supprimer">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="26"
-                        height="26"
-                        fill="currentColor"
-                        class="bi bi-x"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    </div>
-                    <div class="icon-container settings-container" @click="openCertifications(productDeployment)" title="Certification">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="icon"
-                      >
-                        <circle cx="12" cy="8" r="7"></circle>
-                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-                      </svg>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </td>
-          </tr>
-
-          <tr v-if="showAddRow" class="add-row">
-            <td>
-              <input
-                type="text"
-                class="form-control-borderless"
-                v-model="newProductDeployment.refContract"
-                placeholder="Référence contrat"
-              />
-            </td>
-            <td>
-              <select v-model="newProductDeployment.client" class="form-control-borderless">
-                <option value="">Select a customer</option>
-                <option v-for="client in clients" :key="client.id" :value="client">
-                  {{ client.name }}
-                </option>
-              </select>
-            </td>
-            <td>
-              <select v-model="newProductDeployment.product" class="form-control-borderless">
-                <option value="">Select a product</option>
-                <option v-for="product in products" :key="product.id" :value="product">
-                  {{ product.name }}
-                </option>
-              </select>
-            </td>
-            <!--
-            <td><input type="text" class="form-control-borderless" v-model="newProductDeployment.notes" placeholder="Notes" /></td>
-            -->
-            <td class="text-center">
-              <div class="action-icons">
-                <div class="icon-container save-container" @click="saveNewProductDeployment" title="Enregistrer">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
-                    <path
-                      d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
-                      fill="currentColor"
-                    />
-                  </svg>
                 </div>
-                <div class="icon-container cancel-container" @click="cancelNewProductDeployment" title="Annuler">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
-                    <path
-                      d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </td>
-          </tr>
-          <tr v-if="paginatedProductDeployments.length === 0 && !showAddRow">
-            <td colspan="5" class="empty-message">No deployement available</td>
-          </tr>
+              </td>
+            </tr>
+            <tr v-if="paginatedProductDeployments.length === 0 && !showAddRow">
+              <td colspan="4" class="empty-message">No deployement available</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -384,40 +369,40 @@
               <div style="max-height: 400px; overflow-y: auto">
                 <table class="table table-hover" style="line-height: 1.2">
                   <thead>
-                  <tr>
-                    <th scope="col" class="pl-5">Name</th>
-                    <th>Version</th>
-                    <th scope="col" class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
-                  </tr>
+                    <tr>
+                      <th scope="col" class="pl-5">Name</th>
+                      <th>Version</th>
+                      <th scope="col" class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
+                    </tr>
                   </thead>
                   <tbody>
-                  <!-- Liste des certifications -->
-                  <tr v-for="(cert, index) in productDeploymentCertifications" :key="index">
-                    <td class="pl-5">{{ getCertificationCached(cert.id).certification.name }}</td>
-                    <td>{{ cert.version }}</td>
-                    <td class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">
-                      <button class="button-icon" @click="removeCertificationFromProduct(index)" aria-label="Supprimer">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          class="icon"
-                        >
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr v-if="productDeploymentCertifications.length === 0">
-                    <td colspan="3" class="empty-message">No selected certification</td>
-                  </tr>
+                    <!-- Liste des certifications -->
+                    <tr v-for="(cert, index) in productDeploymentCertifications" :key="index">
+                      <td class="pl-5">{{ getCertificationCached(cert.id).certification.name }}</td>
+                      <td>{{ cert.version }}</td>
+                      <td class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">
+                        <button class="button-icon" @click="removeCertificationFromProduct(index)" aria-label="Supprimer">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr v-if="productDeploymentCertifications.length === 0">
+                      <td colspan="3" class="empty-message">No selected certification</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -450,6 +435,7 @@
                   {{ selectedProductDeployment.product?.name }} - {{ selectedProductDeployment.client?.name }}
                 </span>
               </div>
+              z
             </div>
           </div>
           <button class="btn btn-sm btn-outline-dark rounded-1" @click="returnToProductDeploymentList">
@@ -500,57 +486,232 @@
                 </div>
                 <table class="table table-hover">
                   <thead class="thead-light">
-                  <tr>
-                    <th scope="col">Deployement</th>
-                    <th scope="col">Start date</th>
-                    <th scope="col">End date</th>
-                    <th scope="col">Deployement Type</th>
-                    <th scope="col">Product version</th>
-                    <th scope="col" width="260" class="text-center">Actions</th>
-                  </tr>
+                    <tr>
+                      <!--<th scope="col" width="30">
+                      <span class="text-muted small" style="font-size: 0.7rem;">Select</span>
+                    </th>-->
+                      <th scope="col">Deployement</th>
+                      <th scope="col">Start date</th>
+                      <th scope="col">End date</th>
+                      <th scope="col">Deployement Type</th>
+                      <th scope="col">Product version</th>
+                      <th scope="col" width="260" class="text-center">Actions</th>
+                    </tr>
                   </thead>
                   <tbody>
-                  <!-- Existing detail rows -->
-                  <tr v-for="detail in paginatedProductDeployementDetails" :key="detail.id" class="align-middle">
-                    <td class="text-truncate" style="max-width: 250px" :title="detail.notes">
-                      <template v-if="detail.isEditing">
-                        <input v-model="detail.notes" type="text" class="form-control" @click.stop />
-                      </template>
-                      <template v-else>
-                        {{ detail.notes }}
-                      </template>
-                    </td>
-                    <td>
-                      <template v-if="detail.isEditing">
-                        <input v-model="detail.startDeployementDate" type="date" class="form-control" @click.stop />
-                      </template>
-                      <template v-else>
-                        {{ formatDate(detail.startDeployementDate) }}
-                      </template>
-                    </td>
-                    <td>
-                      <template v-if="detail.isEditing">
-                        <input v-model="detail.endDeployementDate" type="date" class="form-control" @click.stop />
-                      </template>
-                      <template v-else>
-                        {{ formatDate(detail.endDeployementDate) }}
-                      </template>
-                    </td>
-                    <td>
-                      <template v-if="detail.isEditing">
-                        <select v-model="detail.deployementType" class="form-control" @click.stop>
+                    <!-- Existing detail rows -->
+                    <tr
+                      v-for="detail in paginatedProductDeployementDetails"
+                      :key="detail.id"
+                      class="align-middle"
+                      :class="{
+                        'detail-selected-for-config': selectedDetailForConfiguration && selectedDetailForConfiguration.id === detail.id,
+                      }"
+                      @click="selectDetailForConfiguration(detail)"
+                      style="cursor: pointer"
+                    >
+                      <!--<td @click.stop>
+                      <input
+                        type="checkbox"
+                        :checked="selectedDetailForConfiguration && selectedDetailForConfiguration.id === detail.id"
+                        @change="selectDetailForConfiguration(detail)"
+                        title="Select for configuration view"
+                        class="detail-config-checkbox"
+                        readonly
+                      />
+                    </td>-->
+                      <td class="text-truncate" style="max-width: 250px" :title="detail.notes">
+                        <template v-if="detail.isEditing">
+                          <input v-model="detail.notes" type="text" class="form-control" @click.stop />
+                        </template>
+                        <template v-else>
+                          {{ detail.notes }}
+                        </template>
+                      </td>
+                      <td>
+                        <template v-if="detail.isEditing">
+                          <input v-model="detail.startDeployementDate" type="date" class="form-control" @click.stop />
+                        </template>
+                        <template v-else>
+                          {{ formatDate(detail.startDeployementDate) }}
+                        </template>
+                      </td>
+                      <td>
+                        <template v-if="detail.isEditing">
+                          <input v-model="detail.endDeployementDate" type="date" class="form-control" @click.stop />
+                        </template>
+                        <template v-else>
+                          {{ formatDate(detail.endDeployementDate) }}
+                        </template>
+                      </td>
+                      <td>
+                        <template v-if="detail.isEditing">
+                          <select v-model="detail.deployementType" class="form-control" @click.stop>
+                            <option v-for="type in deployementTypes" :key="type.id" :value="type">
+                              {{ type.type }}
+                            </option>
+                          </select>
+                        </template>
+                        <template v-else>
+                          <span class="badge badge-dark">{{ detail.deployementType ? detail.deployementType.type : '' }}</span>
+                        </template>
+                      </td>
+                      <td>
+                        <template v-if="detail.isEditing">
+                          <select v-model="detail.productVersion" class="form-control" @click.stop>
+                            <option
+                              v-for="version in getFilteredProductVersions(selectedProductDeployment.productId)"
+                              :key="version.id"
+                              :value="version"
+                            >
+                              {{ version.version }}
+                            </option>
+                          </select>
+                        </template>
+                        <template v-else>
+                          <span class="badge badge-secondary">{{ detail.productVersion ? detail.productVersion.version : '' }}</span>
+                        </template>
+                      </td>
+                      <td class="text-center" @click.stop>
+                        <div class="action-icons">
+                          <template v-if="detail.isEditing">
+                            <button class="btn btn-success btn-sm mr-2" @click="saveProductDeployementDetail(detail)">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
+                                <path
+                                  d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
+                                  fill="currentColor"
+                                />
+                              </svg>
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" @click="cancelEditDetail(detail)">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
+                                <path
+                                  d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
+                                  fill="currentColor"
+                                />
+                              </svg>
+                            </button>
+                          </template>
+                          <template v-else>
+                            <div
+                              class="icon-container edit-container"
+                              v-if="hasAnyAuthority('ROLE_USER')"
+                              @click="editProductDeployementDetail(detail)"
+                              title="Modifier"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                class="bi bi-pencil-fill"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                                />
+                              </svg>
+                            </div>
+                            <div
+                              class="icon-container delete-container"
+                              v-if="hasAnyAuthority('ROLE_USER')"
+                              @click="prepareRemoveDetail(detail)"
+                              title="Supprimer"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="26"
+                                height="26"
+                                fill="currentColor"
+                                class="bi bi-x"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+                                  fill="currentColor"
+                                />
+                              </svg>
+                            </div>
+                            <!-- Configuration button for modules -->
+                            <div
+                              class="icon-container settings-container"
+                              v-if="hasAnyAuthority('ROLE_USER')"
+                              @click="openModuleSettings(detail)"
+                              title="Configuration des modules"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                class="bi bi-gear"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M8 4.754a3.246 3.246 0 1 0 0 6.492a3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"
+                                />
+                                <path
+                                  d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"
+                                />
+                              </svg>
+                            </div>
+                            <!-- Eye icon for viewing details -->
+                            <div class="icon-container view-container" @click="viewDetailInfo(detail)" title="Voir les détails">
+                              <font-awesome-icon icon="eye"></font-awesome-icon>
+                            </div>
+                            <!-- NOUVEAU: Icône de navigation vers la vue détaillée -->
+
+                            <!--                          <router-link-->
+                            <!--                            :to="{ name: 'ProductDeployementDetailView', params: { productDeployementDetailId: detail.id } }"-->
+                            <!--                            custom-->
+                            <!--                            v-slot="{ navigate }"-->
+                            <!--                          >-->
+                            <!--                            <div @click="navigate" class="icon-container navigate-container" title="Voir la page détaillée">-->
+                            <!--                              <svg-->
+                            <!--                                xmlns="http://www.w3.org/2000/svg"-->
+                            <!--                                width="16"-->
+                            <!--                                height="16"-->
+                            <!--                                fill="currentColor"-->
+                            <!--                                class="bi bi-arrow-right"-->
+                            <!--                                viewBox="0 0 16 16"-->
+                            <!--                              >-->
+                            <!--                                <path-->
+                            <!--                                  fill-rule="evenodd"-->
+                            <!--                                  d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"-->
+                            <!--                                />-->
+                            <!--                              </svg>-->
+                            <!--                            </div>-->
+                            <!--                          </router-link>-->
+                          </template>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <!-- Add new detail row -->
+                    <tr v-if="showAddDetailRow" class="add-row">
+                      <!--<td>
+                      <input type="checkbox" disabled style="opacity: 0.3" />
+                    </td>-->
+                      <td>
+                        <input type="text" class="form-control" v-model="newProductDeployementDetail.notes" placeholder="Deployement" />
+                      </td>
+                      <td>
+                        <input type="date" class="form-control" v-model="newProductDeployementDetail.startDeployementDate" />
+                      </td>
+                      <td>
+                        <input type="date" class="form-control" v-model="newProductDeployementDetail.endDeployementDate" />
+                      </td>
+                      <td>
+                        <select v-model="newProductDeployementDetail.deployementType" class="form-control">
+                          <option value="">Sélectionner un type</option>
                           <option v-for="type in deployementTypes" :key="type.id" :value="type">
                             {{ type.type }}
                           </option>
                         </select>
-                      </template>
-                      <template v-else>
-                        <span class="badge badge-dark">{{ detail.deployementType ? detail.deployementType.type : '' }}</span>
-                      </template>
-                    </td>
-                    <td>
-                      <template v-if="detail.isEditing">
-                        <select v-model="detail.productVersion" class="form-control" @click.stop>
+                      </td>
+                      <td>
+                        <select v-model="newProductDeployementDetail.productVersion" class="form-control">
+                          <option value="">Sélectionner une version</option>
                           <option
                             v-for="version in getFilteredProductVersions(selectedProductDeployment.productId)"
                             :key="version.id"
@@ -559,168 +720,41 @@
                             {{ version.version }}
                           </option>
                         </select>
-                      </template>
-                      <template v-else>
-                        <span class="badge badge-secondary">{{ detail.productVersion ? detail.productVersion.version : '' }}</span>
-                      </template>
-                    </td>
-                    <td class="text-center" @click.stop>
-                      <div class="action-icons">
-                        <template v-if="detail.isEditing">
-                          <button class="btn btn-success btn-sm mr-2" @click="saveProductDeployementDetail(detail)">
+                      </td>
+                      <td class="text-center">
+                        <div class="action-buttons">
+                          <button class="btn btn-success btn-sm mr-2" @click="saveNewProductDeployementDetail">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
                               <path
                                 d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
                                 fill="currentColor"
                               />
                             </svg>
+                            Enregistrer
                           </button>
-                          <button class="btn btn-outline-secondary btn-sm" @click="cancelEditDetail(detail)">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="icon-cancel">
-                              <path
-                                d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
-                                fill="currentColor"
-                              />
-                            </svg>
-                          </button>
-                        </template>
-                        <template v-else>
-                          <div
-                            class="icon-container edit-container"
-                            v-if="hasAnyAuthority('ROLE_USER')"
-                            @click="editProductDeployementDetail(detail)"
-                            title="Modifier"
-                          >
+                          <button class="btn btn-outline-secondary btn-sm" @click="cancelNewProductDeployementDetail">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="16"
                               height="16"
-                              fill="currentColor"
-                              class="bi bi-pencil-fill"
-                              viewBox="0 0 16 16"
-                            >
-                              <path
-                                d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
-                              />
-                            </svg>
-                          </div>
-                          <div
-                            class="icon-container delete-container"
-                            v-if="hasAnyAuthority('ROLE_USER')"
-                            @click="prepareRemoveDetail(detail)"
-                            title="Supprimer"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="26"
-                              height="26"
                               fill="currentColor"
                               class="bi bi-x"
                               viewBox="0 0 16 16"
                             >
                               <path
                                 d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
-                                fill="currentColor"
                               />
                             </svg>
-                          </div>
-                          <!-- Configuration button for modules -->
-                          <div
-                            class="icon-container settings-container"
-                            v-if="hasAnyAuthority('ROLE_USER')"
-                            @click="openModuleSettings(detail)"
-                            title="Configuration des modules"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="16"
-                              height="16"
-                              fill="currentColor"
-                              class="bi bi-gear"
-                              viewBox="0 0 16 16"
-                            >
-                              <path
-                                d="M8 4.754a3.246 3.246 0 1 0 0 6.492a3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"
-                              />
-                              <path
-                                d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"
-                              />
-                            </svg>
-                          </div>
-                          <!-- Eye icon for viewing details -->
-                          <div class="icon-container view-container" @click="viewDetailInfo(detail)" title="Voir les détails">
-                            <font-awesome-icon icon="eye"></font-awesome-icon>
-                          </div>
-                        </template>
-                      </div>
-                    </td>
-                  </tr>
+                            Annuler
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
 
-                  <!-- Add new detail row -->
-                  <tr v-if="showAddDetailRow" class="add-row">
-                    <td>
-                      <input type="text" class="form-control" v-model="newProductDeployementDetail.notes" placeholder="Deployement" />
-                    </td>
-                    <td>
-                      <input type="date" class="form-control" v-model="newProductDeployementDetail.startDeployementDate" />
-                    </td>
-                    <td>
-                      <input type="date" class="form-control" v-model="newProductDeployementDetail.endDeployementDate" />
-                    </td>
-                    <td>
-                      <select v-model="newProductDeployementDetail.deployementType" class="form-control">
-                        <option value="">Sélectionner un type</option>
-                        <option v-for="type in deployementTypes" :key="type.id" :value="type">
-                          {{ type.type }}
-                        </option>
-                      </select>
-                    </td>
-                    <td>
-                      <select v-model="newProductDeployementDetail.productVersion" class="form-control">
-                        <option value="">Sélectionner une version</option>
-                        <option
-                          v-for="version in getFilteredProductVersions(selectedProductDeployment.productId)"
-                          :key="version.id"
-                          :value="version"
-                        >
-                          {{ version.version }}
-                        </option>
-                      </select>
-                    </td>
-                    <td class="text-center">
-                      <div class="action-buttons">
-                        <button class="btn btn-success btn-sm mr-2" @click="saveNewProductDeployementDetail">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon-save">
-                            <path
-                              d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
-                              fill="currentColor"
-                            />
-                          </svg>
-                          Enregistrer
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm" @click="cancelNewProductDeployementDetail">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-x"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
-                            />
-                          </svg>
-                          Annuler
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Message if no data -->
-                  <tr v-if="productDeployementDetails.length === 0 && !showAddDetailRow">
-                      <td colspan="6" class="empty-message">No details available</td>
-                  </tr>
+                    <!-- Message if no data -->
+                    <tr v-if="productDeployementDetails.length === 0 && !showAddDetailRow">
+                      <td colspan="7" class="empty-message">No details available</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -728,33 +762,59 @@
               <!-- Configuration Tab -->
               <div class="configuration-tab" v-show="activeTab === 'configuration'">
                 <div class="d-flex justify-content-between mb-3">
-                  <h6 class="mb-0">Infrastructure configuration</h6>
+                  <h6 class="mb-0">
+                    Infrastructure configuration
+                    <span v-if="selectedDetailForConfiguration" class="text-muted ml-2">
+                      (for {{ selectedDetailForConfiguration.productVersion?.version || 'N/A' }})
+                    </span>
+                    <span v-else class="text-muted ml-2"> (click on a deployment detail row to see its specific configuration) </span>
+                  </h6>
                 </div>
                 <table class="table table-hover">
                   <thead class="thead-light">
-                  <tr>
-                    <th scope="col">Component</th>
-                    <th scope="col">Version</th>
-                  </tr>
+                    <tr>
+                      <th scope="col">Component</th>
+                      <th scope="col">Version</th>
+                    </tr>
                   </thead>
                   <tbody>
-                  <tr
-                    v-for="infraComponent in getInfraComponentVersionsForSelectedProduct()"
-                    :key="infraComponent.id"
-                    class="align-middle"
-                  >
-                    <td>
-                      <strong>{{ infraComponent.infraComponent ? infraComponent.infraComponent.name : 'N/A' }}</strong>
-                    </td>
-                    <td>
-                      <span class="badge badge-dark">{{ infraComponent.version }}</span>
-                    </td>
-                  </tr>
+                    <tr
+                      v-for="infraComponent in getInfraComponentVersionsForSelectedProduct()"
+                      :key="infraComponent.id"
+                      class="align-middle"
+                    >
+                      <td>
+                        <strong>{{ infraComponent.infraComponent ? infraComponent.infraComponent.name : 'N/A' }}</strong>
+                      </td>
+                      <td>
+                        <span class="badge badge-dark">{{ infraComponent.version }}</span>
+                      </td>
+                    </tr>
 
-                  <!-- Message if no infrastructure data -->
-                  <tr v-if="getInfraComponentVersionsForSelectedProduct().length === 0">
-                    <td colspan="2" class="empty-message">No configured infrastructure</td>
-                  </tr>
+                    <!-- Message if no infrastructure data -->
+                    <tr v-if="getInfraComponentVersionsForSelectedProduct().length === 0">
+                      <td colspan="2" class="text-center py-4">
+                        <div class="empty-state">
+                          <span v-if="selectedDetailForConfiguration"> No configured infrastructure for this product version </span>
+                          <span v-else>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="48"
+                              height="48"
+                              fill="currentColor"
+                              class="bi bi-cursor-fill text-muted mb-2"
+                              viewBox="0 0 16 16"
+                            >
+                              <path
+                                d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 5 0 0 1 .557.103z"
+                              />
+                            </svg>
+                            <h5 class="text-muted">No deployment selected</h5>
+                            <p class="text-muted">Click on a deployment detail row to view its infrastructure configuration</p>
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -854,11 +914,7 @@
                   <div class="select-wrapper">
                     <select v-model="selectedModuleVersionId" class="select">
                       <option value="">Select a version module</option>
-                      <option
-                        v-for="moduleVersion in availableModuleVersions"
-                        :key="moduleVersion.id"
-                        :value="moduleVersion.id"
-                      >
+                      <option v-for="moduleVersion in availableModuleVersions" :key="moduleVersion.id" :value="moduleVersion.id">
                         {{ getModuleName(moduleVersion) }} - {{ moduleVersion.version }}
                       </option>
                     </select>
@@ -957,16 +1013,16 @@
                 <span class="info-label-elegant">Deployement Type : </span>
                 <span class="info-value-elegant">
                   <span class="badge badge-dark">{{
-                      selectedDetailInfo.deployementType ? selectedDetailInfo.deployementType.type : 'N/A'
-                    }}</span>
+                    selectedDetailInfo.deployementType ? selectedDetailInfo.deployementType.type : 'N/A'
+                  }}</span>
                 </span>
               </div>
               <div class="info-row-elegant">
                 <span class="info-label-elegant">Product Version :</span>
                 <span class="info-value-elegant">
                   <span class="badge badge-secondary">{{
-                      selectedDetailInfo.productVersion ? selectedDetailInfo.productVersion.version : 'N/A'
-                    }}</span>
+                    selectedDetailInfo.productVersion ? selectedDetailInfo.productVersion.version : 'N/A'
+                  }}</span>
                 </span>
               </div>
             </div>
@@ -990,7 +1046,9 @@
               <h6 class="section-title-elegant">Deployed modules</h6>
               <div class="modules-list-elegant">
                 <div v-for="moduleVersion in selectedDetailInfo.allowedModuleVersions" :key="moduleVersion.id" class="module-item-elegant">
-                  <span class="module-name-elegant">{{ moduleVersion.module?.name || getModuleName(moduleVersion) || 'Module inconnu' }}</span>
+                  <span class="module-name-elegant">{{
+                    moduleVersion.module?.name || getModuleName(moduleVersion) || 'Module inconnu'
+                  }}</span>
                   <span class="module-version-elegant badge badge-primary">{{ moduleVersion.version }}</span>
                 </div>
               </div>
@@ -1037,15 +1095,15 @@
                 <span class="info-label">Type :</span>
                 <span class="info-value">
                   <span class="badge badge-secondary">{{
-                      selectedInfraInfo.infraComponent ? selectedInfraInfo.infraComponent.type : 'N/A'
-                    }}</span>
+                    selectedInfraInfo.infraComponent ? selectedInfraInfo.infraComponent.type : 'N/A'
+                  }}</span>
                 </span>
               </div>
               <div class="info-row">
                 <span class="info-label">Description:</span>
                 <span class="info-value">{{
-                    selectedInfraInfo.infraComponent ? selectedInfraInfo.infraComponent.description : 'Aucune description'
-                  }}</span>
+                  selectedInfraInfo.infraComponent ? selectedInfraInfo.infraComponent.description : 'Aucune description'
+                }}</span>
               </div>
             </div>
 
@@ -1076,80 +1134,131 @@
     </div>
 
     <!-- Delete Confirmation Modals -->
-    <b-modal ref="removeEntity" id="removeEntity" centered title-class="text-danger">
-      <template #modal-title>
-        <div class="d-flex align-items-center">
-          <font-awesome-icon icon="exclamation-triangle" class="text-danger mr-2"></font-awesome-icon>
-          <span
-            id="sdiFrontendApp.productDeployment.delete.question"
-            data-cy="productDeploymentDeleteDialogHeading"
-            v-text="t$('entity.delete.title')"
-            class="font-weight-bold"
-          ></span>
-        </div>
-      </template>
-      <div class="modal-body">
-        <p
-          id="jhi-delete-productDeployment-heading"
-          class="mb-0"
-          v-text="t$('sdiFrontendApp.productDeployment.delete.question', { id: removeId })"
-        ></p>
-      </div>
-      <template #modal-footer>
-        <div class="w-100">
-          <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-secondary" v-text="t$('entity.action.cancel')" @click="closeDialog()"></button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              id="jhi-confirm-delete-productDeployment"
-              data-cy="entityConfirmDeleteButton"
-              v-text="t$('entity.action.delete')"
-              @click="removeProductDeployment()"
-            ></button>
-          </div>
-        </div>
-      </template>
-    </b-modal>
-
-    <b-modal ref="removeDetailEntity" id="removeDetailEntity" centered title-class="text-danger">
-      <template #modal-title>
-        <div class="d-flex align-items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            fill="currentColor"
-            class="bi bi-exclamation-triangle-fill text-danger mr-2"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"
-            />
-          </svg>
-          <span class="font-weight-bold">Deletion confirmation</span>
-        </div>
-      </template>
-      <div class="modal-body">
-        <p class="mb-0">Are you sure you want to delete this deployment detail ?</p>
-      </div>
-      <template #modal-footer>
-        <div class="w-100">
-          <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-secondary" @click="closeDetailDialog()">Cancel</button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              id="jhi-confirm-delete-productDeployementDetail"
-              data-cy="entityConfirmDeleteButton"
-              @click="removeProductDeployementDetail()"
+    <div class="modal-backdrop" v-if="removeEntity" @click="closeDialog()"></div>
+    <div class="modal-container" v-if="removeEntity" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              class="bi bi-exclamation-triangle mr-2"
+              viewBox="0 0 16 16"
             >
-              Delete
-            </button>
-          </div>
+              <path
+                d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
+              />
+              <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+            </svg>
+            <span v-text="t$('entity.delete.title')"></span>
+          </h5>
+          <button type="button" class="close-button" @click="closeDialog()" aria-label="Fermer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              class="icon"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
-      </template>
-    </b-modal>
+
+        <div class="modal-body">
+          <p>
+            <strong v-text="t$('sdiFrontendApp.productDeployement.delete.question', {})"></strong>
+          </p>
+          <p v-text="t$('entity.delete.irreversible')"></p>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary rounded-2"
+            @click="closeDialog()"
+            v-text="t$('sdiFrontendApp.requestOfChange.delete.cancel')"
+          ></button>
+          <button
+            type="button"
+            class="btn btn-danger rounded-2"
+            @click="removeProductDeployment()"
+            v-text="t$('sdiFrontendApp.requestOfChange.delete.delete')"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" v-if="removeDetailEntity" @click="closeDetailDialog()"></div>
+    <div class="modal-container" v-if="removeDetailEntity" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              class="bi bi-exclamation-triangle mr-2"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
+              />
+              <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+            </svg>
+            <span v-text="t$('entity.delete.title')"></span>
+          </h5>
+          <button type="button" class="close-button" @click="closeDetailDialog()" aria-label="Fermer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              class="icon"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <p>
+            <strong v-text="t$('sdiFrontendApp.productDeployementDetail.delete.question', {})"></strong>
+          </p>
+          <p v-text="t$('entity.delete.irreversible')"></p>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary rounded-2"
+            @click="closeDetailDialog()"
+            v-text="t$('sdiFrontendApp.requestOfChange.delete.cancel')"
+          ></button>
+          <button
+            type="button"
+            class="btn btn-danger rounded-2"
+            @click="removeProductDeployementDetail()"
+            v-text="t$('sdiFrontendApp.requestOfChange.delete.delete')"
+          ></button>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="section"></div>
   <div class="section"></div>
@@ -1276,6 +1385,21 @@
 .selected-row {
   background-color: rgba(0, 0, 0, 0.05);
   border-left: 4px solid #000;
+}
+
+/* NOUVEAU: Styles pour la sélection de détail pour configuration */
+.detail-selected-for-config {
+  background-color: rgba(0, 123, 255, 0.1);
+  border-left: 4px solid #007bff;
+}
+
+.detail-config-checkbox {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+.detail-config-checkbox:checked {
+  accent-color: #007bff;
 }
 
 /* Filter styles */
@@ -1988,5 +2112,13 @@
 
 .module-version {
   font-size: 0.75rem;
+}
+
+.navigate-container {
+  color: #131f3a;
+}
+
+.navigate-container:hover {
+  background-color: rgba(0, 123, 255, 0.1);
 }
 </style>

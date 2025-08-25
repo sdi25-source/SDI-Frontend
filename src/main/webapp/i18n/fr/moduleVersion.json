@@ -2,35 +2,35 @@
   "sdiFrontendApp": {
     "moduleVersion": {
       "home": {
-        "title": "ModuleVersions",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Module Version",
-        "createOrEditLabel": "Créer ou éditer un Module Version",
-        "notFound": "Aucun Module Version trouvé"
+        "title": "Versions de Modules",
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer une nouvelle version de module",
+        "createOrEditLabel": "Créer ou modifier une version de module",
+        "notFound": "Aucune version de module trouvée"
       },
-      "created": "Un nouveau Module Version a été créé avec l'identifiant { param }",
-      "updated": "Le Module Version avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Module Version avec l'identifiant { param } a été supprimé",
+      "created": "Une nouvelle version de module a été créée avec l'identifiant { param }",
+      "updated": "Une version de module a été mise à jour avec l'identifiant { param }",
+      "deleted": "Une version de module a été supprimée avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Module Version { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer la version de module { id } ?"
       },
       "detail": {
-        "title": "Module Version"
+        "title": "Version de Module"
       },
       "id": "ID",
       "version": "Version",
-      "createDate": "Create Date",
-      "updateDate": "Update Date",
+      "createDate": "Date de création",
+      "updateDate": "Date de mise à jour",
       "notes": "Notes",
-      "moduleDeployement": "Module Deployement",
-      "moduleVersion": "Module Version",
+      "moduleDeployement": "Déploiement du Module",
+      "moduleVersion": "Version du Module",
       "module": "Module",
-      "feature": "Feature",
+      "feature": "Fonctionnalité",
       "domaine": "Domaine",
-      "root": "Root",
-      "productVersion": "Product Version",
-      "productDeployementDetail": "Product Deployement Detail",
-      "requestOfChange": "Request Of Change"
+      "root": "Racine",
+      "productVersion": "Version du Produit",
+      "productDeployementDetail": "Détail du Déploiement du Produit",
+      "requestOfChange": "Demande de Changement"
     }
   }
 }

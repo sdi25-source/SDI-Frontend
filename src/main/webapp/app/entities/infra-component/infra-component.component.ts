@@ -27,7 +27,7 @@ export default defineComponent({
 
     // Pagination
     const currentPage = ref(1);
-    const itemsPerPage = ref(10);
+    const itemsPerPage = ref(20);
     const totalItems = ref(0);
 
     const isFetching = ref(false);
@@ -409,7 +409,6 @@ export default defineComponent({
         infraComponent: component,
       };
 
-
       // Show the modal
       if (versionsModal.value && typeof versionsModal.value.show === 'function') {
         versionsModal.value.show();
@@ -417,11 +416,6 @@ export default defineComponent({
         console.error('versionsModal is not properly initialized or show method is unavailable');
       }
     };
-
-
-
-
-
 
     const closeVersionsModal = () => {
       versionsModal.value.hide();
@@ -637,7 +631,7 @@ export default defineComponent({
       await retrieveComponentTypes();
 
       // Initialiser les références aux modals
-     // versionsModal.value = ref('versionsModal');
+      // versionsModal.value = ref('versionsModal');
       removeEntity.value = ref('removeEntity');
       removeVersionEntity.value = ref('removeVersionEntity');
 

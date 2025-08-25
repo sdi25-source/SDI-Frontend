@@ -98,6 +98,8 @@ export default defineComponent({
 
     const loadProductsEvolutionData = async () => {
       try {
+        loading.value = true;
+        // Récupérer tous les produits avec leurs dates de création
         const allProducts = await productService.retrieve();
         const productsData = allProducts.data || allProducts;
         const currentYearProducts = productsData.filter((product: any) => {
@@ -161,6 +163,8 @@ export default defineComponent({
       } catch (error) {
         console.error('Error loading products evolution data:', error);
         productsEvolutionData.value = { labels: [], datasets: [] };
+      } finally {
+        loading.value = false;
       }
     };
 

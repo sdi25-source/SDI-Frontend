@@ -2,27 +2,27 @@
   "sdiFrontendApp": {
     "clientEventType": {
       "home": {
-        "title": "ClientEventTypes",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Client Event Type",
-        "createOrEditLabel": "Créer ou éditer un Client Event Type",
-        "notFound": "Aucun Client Event Type trouvé"
+        "title": "Types d'événements clients",
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer un nouveau type d'événement client",
+        "createOrEditLabel": "Créer ou modifier un type d'événement client",
+        "notFound": "Aucun type d'événement client trouvé"
       },
-      "created": "Un nouveau Client Event Type a été créé avec l'identifiant { param }",
-      "updated": "Le Client Event Type avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Client Event Type avec l'identifiant { param } a été supprimé",
+      "created": "Un nouveau type d'événement client a été créé avec l'identifiant { param }",
+      "updated": "Un type d'événement client a été mis à jour avec l'identifiant { param }",
+      "deleted": "Un type d'événement client a été supprimé avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Client Event Type { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer le type d'événement client { id } ?"
       },
       "detail": {
-        "title": "Client Event Type"
+        "title": "Type d'événement client"
       },
       "id": "ID",
       "type": "Type",
       "description": "Description",
-      "createDate": "Create Date",
-      "updateDate": "Update Date",
-      "clientEvent": "Client Event"
+      "createDate": "Date de création",
+      "updateDate": "Date de mise à jour",
+      "clientEvent": "Événement client"
     }
   }
 }

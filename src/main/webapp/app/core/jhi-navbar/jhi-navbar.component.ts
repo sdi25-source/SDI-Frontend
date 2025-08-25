@@ -1,7 +1,7 @@
 import { type Ref, computed, defineComponent, inject, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import axios from 'axios';  // Import axios
+import axios from 'axios'; // Import axios
 import type LoginService from '@/account/login.service';
 import type AccountService from '@/account/account.service';
 import languages from '@/shared/config/languages';
@@ -47,7 +47,8 @@ export default defineComponent({
     const versionTag = ref('...'); // Valeur initiale pendant chargement
 
     // Charger dynamiquement le tag version via API
-    axios.get('/api/version')
+    axios
+      .get('/api/version')
       .then(response => {
         versionTag.value = response.data;
       })
@@ -86,7 +87,7 @@ export default defineComponent({
     const toggleDropdown = () => {
       dropdownOpen.value = !dropdownOpen.value;
     };
-
+    const isHovered = ref(false);
     return {
       logout,
       subIsActive,
@@ -107,6 +108,7 @@ export default defineComponent({
       activeMenu,
       setActiveMenu,
       toggleDropdown,
+      isHovered,
       t$: useI18n().t,
     };
   },

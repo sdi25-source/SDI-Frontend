@@ -188,39 +188,69 @@
       </div>
     </div>
 
+    <!--  Modal suppression -->
+    <div class="modal-backdrop" v-if="removeEntity" @click="closeDialog()"></div>
+    <div class="modal-container" v-if="removeEntity" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              class="bi bi-exclamation-triangle mr-2"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
+              />
+              <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+            </svg>
+            <span v-text="t$('entity.delete.title')"></span>
+          </h5>
+          <button type="button" class="close-button" @click="closeDialog()" aria-label="Fermer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              class="icon"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
 
-    <!-- Modal suppression -->
-    <b-modal ref="removeEntity" id="removeEntity" centered title-class="text-danger">
-      <template #modal-title>
-        <div class="d-flex align-items-center">
-          <font-awesome-icon icon="exclamation-triangle" class="text-danger mr-2"></font-awesome-icon>
-          <span
-            id="sdiFrontendApp.clientEvent.delete.question"
-            data-cy="clientEventDeleteDialogHeading"
-            v-text="t$('entity.delete.title')"
-            class="font-weight-bold"
-          ></span>
+        <div class="modal-body">
+          <p>
+            <strong v-text="t$('sdiFrontendApp.clientEvent.delete.question', {})"></strong>
+          </p>
+          <p v-text="t$('entity.delete.irreversible')"></p>
         </div>
-      </template>
-      <div class="modal-body">
-        <p id="jhi-delete-clientEvent-heading" class="mb-0" v-text="t$('sdiFrontendApp.clientEvent.delete.question', { id: removeId })"></p>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary rounded-2"
+            @click="closeDialog()"
+            v-text="t$('sdiFrontendApp.requestOfChange.delete.cancel')"
+          ></button>
+          <button
+            type="button"
+            class="btn btn-danger rounded-2"
+            @click="removeClientEvent()"
+            v-text="t$('sdiFrontendApp.requestOfChange.delete.delete')"
+          ></button>
+        </div>
       </div>
-      <template #modal-footer>
-        <div class="w-100">
-          <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-secondary" v-text="t$('entity.action.cancel')" @click="closeDialog()"></button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              id="jhi-confirm-delete-clientEvent"
-              data-cy="entityConfirmDeleteButton"
-              v-text="t$('entity.action.delete')"
-              @click="removeClientEvent()"
-            ></button>
-          </div>
-        </div>
-      </template>
-    </b-modal>
+    </div>
   </div>
   <section class="section"></section>
   <section class="section"></section>
@@ -231,6 +261,125 @@
 <script lang="ts" src="./client-event.component.ts"></script>
 
 <style scoped>
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+}
+
+.modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  width: 90%;
+  max-width: 1000px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+  background-color: #f8fafc;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+}
+
+.button-primary {
+  background-color: #0c2d57;
+  color: white;
+  border-color: #0c2d57;
+}
+
+.button-primary:hover {
+  background-color: #26538a;
+}
+
+.button-secondary {
+  background-color: #f1f5f9;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+
+.button-secondary:hover {
+  background-color: #e2e8f0;
+}
+
+.close-button {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.close-button:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.modal-body {
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  border-top: 1px solid #f1f5f9;
+  background-color: #f8fafc;
+}
+
 .filter-item {
   display: inline-flex;
   align-items: center;
@@ -361,7 +510,6 @@
   border-radius: 6px;
   border: 1px dashed #e2e8f0;
 }
-
 
 .card {
   border-radius: 0.5rem;

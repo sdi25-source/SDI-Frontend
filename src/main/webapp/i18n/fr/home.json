@@ -1,35 +1,41 @@
 {
   "home": {
-    "title": "Census and Mapping of Deployed S2M Products",
-    "subtitle": "Real-time visualization and optimized management of S2M product deployments.",
+    "title": "Recensement et Cartographie des Produits S2M Déployés",
+    "subtitle": "Visualisation en temps réel et gestion optimisée des déploiements des produits S2M.",
     "logged": {
-      "message": "You are logged in as user \"{ username }\"."
+      "message": "Vous êtes connecté en tant qu'utilisateur \"{ username }\"."
     },
-    "question": "If you have any question on JHipster:",
+    "question": "Si vous avez une question sur JHipster :",
     "link": {
-      "homepage": "JHipster homepage",
-      "stackoverflow": "JHipster on Stack Overflow",
-      "bugtracker": "JHipster bug tracker",
-      "chat": "JHipster public chat room",
-      "follow": "follow {'@'}jhipster on Twitter"
+      "homepage": "Page d'accueil de JHipster",
+      "stackoverflow": "JHipster sur Stack Overflow",
+      "bugtracker": "Suivi des bugs JHipster",
+      "chat": "Salon de discussion public JHipster",
+      "follow": "suivez {'@'}jhipster sur Twitter"
     },
-    "like": "If you like JHipster, don't forget to give us a star on",
+    "welcome": "Bienvenue, ",
+    "toyour": "dans votre ",
+    "admin": "Administration",
+    "dm": "Responsable Livraison",
+    "commercial": "Commercial",
+    "space": "Espace",
+    "like": "Si vous aimez JHipster, n'oubliez pas de nous attribuer une étoile sur",
     "github": "GitHub",
-    "adminHomeTitle": "Admin Space",
-    "dmHomeTitle": "Delivery Manager Space",
-    "commercialHomeTitle": "Commercial space",
-    "start": "Get Started",
-    "di": "Deployment Inventory",
-    "text1": "Census and Mapping",
-    "sd": "of Deployed",
-    "sp": "S2M Products",
-    "desc": "Real-time visualization and optimized management of S2M product deployments.",
-    "equipeC": "Sales Team",
-    "equipeCdesc": "Manages clients and centralizes needs to guide strategic decisions.",
-    "equipeD": "Deployment Team",
-    "equipeDdesc": "Oversees customizations, product versions, and deployments.",
-    "equipeA": "Administrator Area",
-    "equipeAdesc": "Manages users, their roles, and validates system data.",
-    "refTitle": "+110 accompanied customer references."
+    "adminHomeTitle": "Espace Administrateur",
+    "dmHomeTitle": "Espace Responsable de la livraison",
+    "commercialHomeTitle": "Espace Commercial",
+    "start": "Commencer",
+    "di": "Inventaire des Déploiements",
+    "text1": "Recensement et Cartographie",
+    "sd": "des Produits",
+    "sp": "S2M Déployés",
+    "desc": "Visualisation en temps réel et gestion optimisée des déploiements des produits S2M.",
+    "equipeC": "Équipe Commerciale",
+    "equipeCdesc": "Gère les clients et centralise les besoins pour orienter les décisions stratégiques.",
+    "equipeD": "Équipe Déploiement",
+    "equipeDdesc": "Supervise les personnalisations, les versions des produits et les déploiements.",
+    "equipeA": "Administration",
+    "equipeAdesc": "Gère les utilisateurs, leurs rôles, et valide les données du système.",
+    "refTitle": "+110 références clients accompagnées."
   }
 }

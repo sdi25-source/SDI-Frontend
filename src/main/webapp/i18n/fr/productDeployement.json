@@ -2,25 +2,25 @@
   "sdiFrontendApp": {
     "productDeployement": {
       "home": {
-        "title": "ProductDeployements",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Product Deployement",
-        "createOrEditLabel": "Créer ou éditer un Product Deployement",
-        "notFound": "Aucun Product Deployement trouvé"
+        "title": "Déploiements de Produit",
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer un nouveau déploiement de produit",
+        "createOrEditLabel": "Créer ou modifier un déploiement de produit",
+        "notFound": "Aucun déploiement de produit trouvé"
       },
-      "created": "Un nouveau Product Deployement a été créé avec l'identifiant { param }",
-      "updated": "Le Product Deployement avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Product Deployement avec l'identifiant { param } a été supprimé",
+      "created": "Un nouveau déploiement de produit a été créé avec l'identifiant { param }",
+      "updated": "Un déploiement de produit a été mis à jour avec l'identifiant { param }",
+      "deleted": "Un déploiement de produit a été supprimé avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Product Deployement { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer le déploiement de produit { id } ?"
       },
       "detail": {
-        "title": "Product Deployement"
+        "title": "Déploiement de Produit"
       },
       "id": "ID",
-      "refContract": "Ref Contract",
-      "createDate": "Create Date",
-      "updateDate": "Update Date",
+      "refContract": "Réf Contrat",
+      "createDate": "Date de création",
+      "updateDate": "Date de mise à jour",
       "notes": "Notes",
       "client": "Client"
     }

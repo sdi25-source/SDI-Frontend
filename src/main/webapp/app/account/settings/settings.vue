@@ -5,7 +5,7 @@
         <div class="avatar-circle" v-if="username">{{ username.charAt(0).toUpperCase() }}</div>
         <h1 v-if="username">{{ username }}</h1>
       </div>
-      <p class="content-subtitle">Manage your personal information and account preferences</p>
+      <p class="content-subtitle">{{ t$('settings.title') }}</p>
     </div>
 
     <div class="content-body">
@@ -136,7 +136,7 @@
           <button type="submit" :disabled="v$.settingsAccount.$invalid" class="button button-primary">
             {{ t$('settings.form.button') }}
           </button>
-          <button type="button" @click="handleCancel()" class="button button-secondary">Annuler</button>
+          <button type="button" @click="handleCancel()" class="button button-secondary">{{ t$('settings.form.cancel') }}</button>
         </div>
       </form>
     </div>

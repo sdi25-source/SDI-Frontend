@@ -3,26 +3,26 @@
     "domaine": {
       "home": {
         "title": "Domaines",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Domaine",
-        "createOrEditLabel": "Créer ou éditer un Domaine",
-        "notFound": "Aucun Domaine trouvé"
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer un nouveau domaine",
+        "createOrEditLabel": "Créer ou modifier un domaine",
+        "notFound": "Aucun domaine trouvé"
       },
-      "created": "Un nouveau Domaine a été créé avec l'identifiant { param }",
-      "updated": "Le Domaine avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Domaine avec l'identifiant { param } a été supprimé",
+      "created": "Un nouveau domaine a été créé avec l'identifiant { param }",
+      "updated": "Un domaine a été mis à jour avec l'identifiant { param }",
+      "deleted": "Un domaine a été supprimé avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Domaine { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer le domaine { id } ?"
       },
       "detail": {
         "title": "Domaine"
       },
       "id": "ID",
-      "name": "Name",
-      "createDate": "Create Date",
-      "updateDate": "Update Date",
+      "name": "Nom",
+      "createDate": "Date de création",
+      "updateDate": "Date de mise à jour",
       "notes": "Notes",
-      "moduleVersion": "Module Version"
+      "moduleVersion": "Version du module"
     }
   }
 }

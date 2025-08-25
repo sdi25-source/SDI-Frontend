@@ -1,4 +1,4 @@
-import { defineComponent, inject, ref, type Ref, type ComputedRef, computed, onMounted } from 'vue';
+import { defineComponent, inject, ref, type Ref, type ComputedRef, computed, onMounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserManagementService from './user-management.service';
 import { useAlertService } from '@/shared/alert/alert.service';
@@ -28,6 +28,7 @@ export default defineComponent({
     const propOrder = ref('id');
     const reverse = ref(false);
     const isLoading = ref(false);
+    const isDeleting = ref(false); // Nouvel état pour éviter les clics multiples
     const removeId: Ref<string | null> = ref(null);
     const users = ref([]);
     const totalItems = ref(0);
@@ -65,7 +66,7 @@ export default defineComponent({
       return page.value >= totalPages.value;
     });
 
-    // Méthode de recherche
+    // Méthode de recherche améliorée
     const handleSearch = () => {
       if (searchTimeout.value) {
         clearTimeout(searchTimeout.value);
@@ -85,7 +86,7 @@ export default defineComponent({
           );
         }
         updateTotalItems();
-        page.value = 1; // Retour à la première page après une recherche
+        page.value = 1;
       }, 300);
     };
 
@@ -109,7 +110,7 @@ export default defineComponent({
         })
         .then(res => {
           users.value = res.data;
-          allUsers.value = [...res.data]; // Copie pour la recherche
+          allUsers.value = [...res.data];
           totalItems.value = parseInt(res.headers['x-total-count'], 10);
           queryCount.value = totalItems.value;
           isLoading.value = false;
@@ -164,35 +165,75 @@ export default defineComponent({
     const prepareRemove = user => {
       if (username.value === user.login) return;
       removeId.value = user.login;
-      if (removeUser.value) {
-        removeUser.value.show();
-      }
+      removeUser.value = true;
     };
 
-    const deleteUser = () => {
-      userManagementService
-        .remove(removeId.value)
-        .then(response => {
-          alertService.showInfo(
-            t(response.headers['x-frontendapp-alert'].toString(), {
-              param: decodeURIComponent(response.headers['x-frontendapp-params'].replace(/\+/g, ' ')),
-            }),
-            { variant: 'danger' },
-          );
+    // Méthode de suppression corrigée
+    const deleteUser = async () => {
+      if (isDeleting.value) return; // Éviter les clics multiples
 
-          removeId.value = null;
-          loadAll();
-          closeDialog();
-        })
-        .catch(error => {
+      isDeleting.value = true;
+
+      try {
+        const response = await userManagementService.remove(removeId.value);
+
+        // Afficher le message de succès
+        // if (response?.headers?.['x-frontendapp-alert']) {
+        //   alertService.showInfo(
+        //     t(response.headers['x-frontendapp-alert'].toString(), {
+        //       param: decodeURIComponent(response.headers['x-frontendapp-params']?.replace(/\+/g, ' ') || ''),
+        //     }),
+        //     { variant: 'danger' },
+        //   );
+        // } else {
+        //   // Message de succès par défaut
+        //   alertService.showInfo(t('userManagement.deleted', { param: removeId.value }) || 'Utilisateur supprimé avec succès', {
+        //     variant: 'success',
+        //   });
+        // }
+
+        // Fermer le modal immédiatement
+        closeDialog();
+
+        // Attendre que le modal soit fermé avant de recharger
+        await nextTick();
+
+        // Recharger les données
+        await loadAll();
+
+        // Réinitialiser l'ID de suppression
+        removeId.value = null;
+      } catch (error) {
+        console.error('Erreur lors de la suppression:', error);
+
+        // Gestion d'erreur plus robuste
+        if (error?.response?.status) {
+          // Erreur HTTP avec response
           alertService.showHttpError(error.response);
-        });
+        } else if (error?.message) {
+          // Erreur avec message
+          alertService.showError(error.message);
+        } else {
+          // Erreur générique
+          alertService.showError(t('error.server.not.reachable') || "Erreur lors de la suppression de l'utilisateur");
+        }
+
+        closeDialog(); // Fermer le modal même en cas d'erreur
+      } finally {
+        isDeleting.value = false;
+      }
     };
 
     const closeDialog = () => {
       if (removeUser.value) {
-        removeUser.value.hide();
+        removeUser.value = false;
       }
+    };
+
+    // Gestionnaire pour quand le modal est complètement fermé
+    const onModalHidden = () => {
+      removeId.value = null;
+      isDeleting.value = false;
     };
 
     const handleSyncList = () => {
@@ -234,6 +275,7 @@ export default defineComponent({
       propOrder,
       reverse,
       isLoading,
+      isDeleting,
       removeId,
       users,
       totalItems,
@@ -257,6 +299,7 @@ export default defineComponent({
       prepareRemove,
       deleteUser,
       closeDialog,
+      onModalHidden,
       handleSyncList,
       // Modals
       showDetailsModal,

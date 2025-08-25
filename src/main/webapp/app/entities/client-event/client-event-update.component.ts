@@ -90,10 +90,10 @@ export default defineComponent({
       try {
         if (clientEvent.value.id) {
           await clientEventService().update(clientEvent.value);
-          alertService.showInfo(t$('sdiFrontendApp.clientEvent.updated', { param: clientEvent.value.id }).toString());
+          //    alertService.showInfo(t$('sdiFrontendApp.clientEvent.updated', { param: clientEvent.value.id }).toString());
         } else {
           await clientEventService().create(clientEvent.value);
-          alertService.showInfo(t$('sdiFrontendApp.clientEvent.created', { param: clientEvent.value.id }).toString());
+          //  alertService.showInfo(t$('sdiFrontendApp.clientEvent.created', { param: clientEvent.value.id }).toString());
         }
         previousState();
       } catch (error) {
@@ -187,7 +187,6 @@ export default defineComponent({
         updateNotes();
       }
     };
-
 
     onMounted(async () => {
       const clientEventId = route.params?.clientEventId;

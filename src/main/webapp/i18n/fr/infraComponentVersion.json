@@ -2,29 +2,29 @@
   "sdiFrontendApp": {
     "infraComponentVersion": {
       "home": {
-        "title": "InfraComponentVersions",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Infra Component Version",
-        "createOrEditLabel": "Créer ou éditer un Infra Component Version",
-        "notFound": "Aucun Infra Component Version trouvé"
+        "title": "Versions des Composants d'Infrastructure",
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer une nouvelle version de composant d'infrastructure",
+        "createOrEditLabel": "Créer ou modifier une version de composant d'infrastructure",
+        "notFound": "Aucune version de composant d'infrastructure trouvée"
       },
-      "created": "Un nouveau Infra Component Version a été créé avec l'identifiant { param }",
-      "updated": "Le Infra Component Version avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Infra Component Version avec l'identifiant { param } a été supprimé",
+      "created": "Une nouvelle version de composant d'infrastructure a été créée avec l'identifiant { param }",
+      "updated": "Une version de composant d'infrastructure a été mise à jour avec l'identifiant { param }",
+      "deleted": "Une version de composant d'infrastructure a été supprimée avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Infra Component Version { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer la version de composant d'infrastructure { id } ?"
       },
       "detail": {
-        "title": "Infra Component Version"
+        "title": "Version de Composant d'Infrastructure"
       },
       "id": "ID",
       "version": "Version",
       "description": "Description",
-      "createDate": "Create Date",
-      "updateDate": "Update Date",
-      "infraComponent": "Infra Component",
-      "productVersion": "Product Version",
-      "productDeployementDetail": "Product Deployement Detail"
+      "createDate": "Date de création",
+      "updateDate": "Date de mise à jour",
+      "infraComponent": "Composant d'Infrastructure",
+      "productVersion": "Version du Produit",
+      "productDeployementDetail": "Détail du Déploiement du Produit"
     }
   }
 }

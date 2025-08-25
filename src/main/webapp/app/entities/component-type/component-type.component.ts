@@ -21,7 +21,7 @@ export default defineComponent({
 
     // Pagination
     const currentPage = ref(1);
-    const itemsPerPage = ref(10);
+    const itemsPerPage = ref(20);
     const totalItems = ref(0);
 
     const isFetching = ref(false);
@@ -142,18 +142,18 @@ export default defineComponent({
       });
 
       removeId.value = instance.id;
-      removeEntity.value.show();
+      removeEntity.value = true;
     };
 
     const closeDialog = () => {
-      removeEntity.value.hide();
+      removeEntity.value = false;
     };
 
     const removeComponentType = async () => {
       try {
         await componentTypeService().delete(removeId.value);
         const message = t$('sdiFrontendApp.componentType.deleted', { param: removeId.value }).toString();
-        alertService.showInfo(message, { variant: 'danger' });
+        //alertService.showInfo(message, { variant: 'danger' });
 
         // Mettre à jour les listes
         componentTypes.value = componentTypes.value.filter(ct => ct.id !== removeId.value);

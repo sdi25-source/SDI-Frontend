@@ -2,24 +2,24 @@
   "sdiFrontendApp": {
     "componentType": {
       "home": {
-        "title": "ComponentTypes",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Component Type",
-        "createOrEditLabel": "Créer ou éditer un Component Type",
-        "notFound": "Aucun Component Type trouvé"
+        "title": "Types de composants",
+        "refreshListLabel": "Rafraîchir la liste",
+        "createLabel": "Créer un nouveau type de composant",
+        "createOrEditLabel": "Créer ou modifier un type de composant",
+        "notFound": "Aucun type de composant trouvé"
       },
-      "created": "Un nouveau Component Type a été créé avec l'identifiant { param }",
-      "updated": "Le Component Type avec l'identifiant { param } a été mis à jour",
-      "deleted": "Le Component Type avec l'identifiant { param } a été supprimé",
+      "created": "Un nouveau type de composant a été créé avec l'identifiant { param }",
+      "updated": "Un type de composant a été mis à jour avec l'identifiant { param }",
+      "deleted": "Un type de composant a été supprimé avec l'identifiant { param }",
       "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Component Type { id } ?"
+        "question": "Êtes-vous sûr de vouloir supprimer le type de composant { id } ?"
       },
       "detail": {
-        "title": "Component Type"
+        "title": "Type de composant"
       },
       "id": "ID",
       "type": "Type",
-      "infraComponent": "Infra Component"
+      "infraComponent": "Composant d'infrastructure"
     }
   }
 }
