@@ -401,9 +401,7 @@
               <path
                 d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"
               />
-              <path
-                d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"
-              />
+              <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
             </svg>
             <span v-text="t$('entity.delete.title')"></span>
           </h5>
@@ -536,13 +534,7 @@
                 <h6 class="mb-2">Create New Module</h6>
                 <div class="form-group mb-2">
                   <label for="new-module-name">Name</label>
-                  <input
-                    type="text"
-                    id="new-module-name"
-                    class="form-control"
-                    v-model="newModuleInSettingsModal.name"
-                    placeholder="Name"
-                  />
+                  <input type="text" id="new-module-name" class="form-control" v-model="newModuleInSettingsModal.name" placeholder="Name" />
                 </div>
                 <div class="form-group mb-3">
                   <label for="new-module-desc">Description</label>
@@ -562,39 +554,39 @@
               <div style="max-height: 300px; overflow-y: auto">
                 <table class="table table-hover" style="line-height: 0.1">
                   <thead>
-                  <tr>
-                    <th scope="col" class="pl-5">Name</th>
-                    <th></th>
-                    <th scope="col" class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
-                  </tr>
+                    <tr>
+                      <th scope="col" class="pl-5">Name</th>
+                      <th></th>
+                      <th scope="col" class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
+                    </tr>
                   </thead>
                   <tbody v-for="(module, index) in productModules" :key="index">
-                  <tr>
-                    <td class="pl-5">{{ module.name }}</td>
-                    <td></td>
-                    <td class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">
-                      <button class="button-icon" @click="removeModuleFromProduct(index)" aria-label="Supprimer">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          class="icon"
-                        >
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr v-if="productModules.length === 0">
-                    <td colspan="3" class="empty-message">No selected module</td>
-                  </tr>
+                    <tr>
+                      <td class="pl-5">{{ module.name }}</td>
+                      <td></td>
+                      <td class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">
+                        <button class="button-icon" @click="removeModuleFromProduct(index)" aria-label="Supprimer">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr v-if="productModules.length === 0">
+                      <td colspan="3" class="empty-message">No selected module</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -610,7 +602,6 @@
         </div>
       </div>
     </div>
-
 
     <!-- Product certifications Modal -->
     <div class="modal-backdrop" v-if="showCertificationsModal" @click="closeCertificationsModal"></div>
@@ -686,43 +677,43 @@
               <div style="max-height: 400px; overflow-y: auto">
                 <table class="table table-hover" style="line-height: 1.2">
                   <thead>
-                  <tr>
-                    <th scope="col" class="pl-5">Name</th>
-                    <th>Version</th>
-                    <th>Added at</th>
-                    <th scope="col" class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
-                  </tr>
+                    <tr>
+                      <th scope="col" class="pl-5">Name</th>
+                      <th>Version</th>
+                      <th>Added at</th>
+                      <th scope="col" class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
+                    </tr>
                   </thead>
                   <tbody>
-                  <!-- Liste des certifications -->
-                  <!-- Updated to display client certifications instead of certification versions -->
-                  <tr v-for="(clientCert, index) in productCertifications" :key="index">
-                    <td class="pl-5">{{ clientCert.certification }}</td>
-                    <td>{{ clientCert.certificationVersion?.version }}</td>
-                    <td>{{ clientCert.certificationDate }}</td>
-                    <td class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">
-                      <button class="button-icon" @click="removeCertificationFromProduct(index)" aria-label="Supprimer">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          class="icon"
-                        >
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr v-if="productCertifications.length === 0">
-                    <td colspan="3" class="empty-message">No selected certification</td>
-                  </tr>
+                    <!-- Liste des certifications -->
+                    <!-- Updated to display client certifications instead of certification versions -->
+                    <tr v-for="(clientCert, index) in productCertifications" :key="index">
+                      <td class="pl-5">{{ clientCert.certification }}</td>
+                      <td>{{ clientCert.certificationVersion?.version }}</td>
+                      <td>{{ clientCert.certificationDate }}</td>
+                      <td class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">
+                        <button class="button-icon" @click="removeCertificationFromProduct(index)" aria-label="Supprimer">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr v-if="productCertifications.length === 0">
+                      <td colspan="3" class="empty-message">No selected certification</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -730,12 +721,9 @@
           </div>
         </div>
 
-        <div class="modal-footer">
-        </div>
+        <div class="modal-footer"></div>
       </div>
     </div>
-
-
 
     <!-- Detailed View Section (appears when a product is selected) -->
     <div v-if="selectedProduct && viewTabs" class="mt-4 product-detail-view" style="transition: all 2s ease">
@@ -1104,7 +1092,7 @@
                       <td class="pl-5">
                         <template v-if="isEditingModuleVersion && editingModuleVersionData && editingModuleVersionData.id === module.id">
                           <select v-model="editingModuleVersionData.module" class="form-control-borderless" @click.stop>
-                            <option v-for="moduleOption in moduleOptions" :key="moduleOption.id" :value="{ id: moduleOption.id }">
+                            <option v-for="moduleOption in selectedProduct.modules" :key="moduleOption.id" :value="{ id: moduleOption.id }">
                               {{ moduleOption.name }}
                             </option>
                           </select>
@@ -1232,7 +1220,7 @@
                           :class="{ 'is-invalid': !newModuleVersion.module }"
                         >
                           <option :value="null">{{ t$('global.form.selectModulePlaceholder') }}</option>
-                          <option v-for="module in moduleOptions" :key="module.id" :value="{ id: module.id }">
+                          <option v-for="module in selectedProduct.modules" :key="module.id" :value="{ id: module.id }">
                             {{ module.name }}
                           </option>
                         </select>
@@ -1995,7 +1983,6 @@
           </div>
         </div>
       </div>
-
 
       <!-- Product Version - Delete Confirmation Modal -->
       <div class="modal-backdrop" v-if="removeVersionEntity" @click="closeVersionDialog()"></div>
