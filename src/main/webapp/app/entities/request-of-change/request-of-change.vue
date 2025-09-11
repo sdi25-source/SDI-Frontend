@@ -190,11 +190,7 @@
                             />
                           </svg>
                         </div>
-                        <div
-                          class="icon-container settings-container"
-                          @click="viewRequestModules(request)"
-                          title="modules"
-                        >
+                        <div class="icon-container settings-container" @click="viewRequestModules(request)" title="modules">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="16"
@@ -246,7 +242,7 @@
         </div>
         <div class="card-body">
           <!-- Arrow Progress Steps -->
-          <div class="container-fluid mb-4 px-0">
+          <div class="container-fluid mb-4 px-0" v-if="!isStepActive('COMPLETED')">
             <div class="wrapper">
               <div class="arrow-steps clearfix">
                 <!-- PENDING Step -->
@@ -363,7 +359,6 @@
                   <div class="flex-grow-1">
                     <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.description')"></h6>
                     <div class="notes-content mb-0" v-html="selectedRequest.description || ' '"></div>
-
                   </div>
                   <div class="ms-4 text-end">
                     <h6 class="text-muted mb-2 small" v-text="t$('sdiFrontendApp.requestOfChange.createDate')"></h6>
@@ -730,13 +725,12 @@
                 </div>
               </div>
 
-
               <div class="form-group">
                 <label class="form-control-label" for="request-of-change-productVersion">Product Version</label>
                 <select v-model="newRequest.productVersion" class="form-select">
                   <optgroup v-for="group in groupedProductVersions" :key="group.product.id" :label="group.product.name">
                     <option v-for="version in group.versions" :key="version.id" :value="version">
-                     {{group.product.name}} {{ "- v" }} {{ version.version }}
+                      {{ group.product.name }} {{ '- v' }} {{ version.version }}
                     </option>
                   </optgroup>
                 </select>
@@ -842,7 +836,11 @@
 
               <!-- Rich Text Editor for Notes -->
               <div class="form-group">
-                <label class="form-control-label" v-text="t$('sdiFrontendApp.requestOfChange.description')" for="request-of-change-notes"></label>
+                <label
+                  class="form-control-label"
+                  v-text="t$('sdiFrontendApp.requestOfChange.description')"
+                  for="request-of-change-notes"
+                ></label>
                 <div class="input-with-validation">
                   <div class="rich-text-editor">
                     <!-- Toolbar -->
@@ -909,8 +907,8 @@
                       <div class="toolbar-divider"></div>
                       <button type="button" class="toolbar-btn" @click="insertCode">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="16,18 22,12 16,6"/>
-                          <polyline points="8,6 2,12 8,18"/>
+                          <polyline points="16,18 22,12 16,6" />
+                          <polyline points="8,6 2,12 8,18" />
                         </svg>
                       </button>
                     </div>
@@ -924,7 +922,7 @@
                       @keyup="updateToolbarState"
                       @mouseup="updateToolbarState"
                       :lang="'en'"
-                      style="direction: ltr; text-align: left;"
+                      style="direction: ltr; text-align: left"
                       data-cy="notes"
                     ></div>
                   </div>
@@ -1002,7 +1000,12 @@
                 class="badge bg-light text-dark p-2 rounded-pill position-relative"
               >
                 {{ module.module ? module.module.name : 'N/A' }} <span class="text-muted">{{ ' - v ' }}{{ module.version }}</span>
-                <span class="remove-module-icon" @click="removeModule(module.id)" title="remove a module"  v-if="hasAnyAuthority('ROLE_COMMERCIAL')">
+                <span
+                  class="remove-module-icon"
+                  @click="removeModule(module.id)"
+                  title="remove a module"
+                  v-if="hasAnyAuthority('ROLE_COMMERCIAL')"
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                     <path
                       d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
