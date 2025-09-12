@@ -14,6 +14,8 @@ import { type IClientSize } from '@/shared/model/client-size.model';
 import ClientTypeService from '@/entities/client-type/client-type.service';
 import { type IClientType } from '@/shared/model/client-type.model';
 import { Client, type IClient } from '@/shared/model/client.model';
+import intlTelInput, { type Iti } from 'intl-tel-input';
+import 'intl-tel-input/build/css/intlTelInput.css';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -45,6 +47,9 @@ export default defineComponent({
 
     const route = useRoute();
     const router = useRouter();
+
+    const itiInstance: Iti = ref<any>(null);
+    const phoneInput = ref(null);
 
     const previousState = () => router.go(-1);
 
@@ -215,7 +220,6 @@ export default defineComponent({
       }
     };
 
-
     const insertCode = () => {
       const selection = window.getSelection();
       if (selection && selection.rangeCount > 0) {
@@ -270,8 +274,36 @@ export default defineComponent({
     const v$ = useVuelidate(validationRules, client as any);
 
     onMounted(() => {
+      nextTick(() => {
+        const inputEl = phoneInput.value?.$el?.tagName === 'INPUT' ? phoneInput.value.$el : phoneInput.value?.$el?.querySelector('input');
+
+        if (inputEl) {
+          const iti = intlTelInput(inputEl, {
+            initialCountry: 'ma',
+            preferredCountries: ['ma', 'fr', 'us'],
+            separateDialCode: true,
+            utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js',
+          });
+
+          // Pré-remplir si on édite
+          if (client.value.mainContactPhoneNumber) {
+            iti.setNumber(client.value.mainContactPhoneNumber);
+          }
+
+          // Synchroniser avec Vuelidate
+          const updatePhoneValue = () => {
+            const fullNumber = iti.getNumber(); // format complet +212...
+            v$.value.mainContactPhoneNumber.$model = fullNumber;
+            client.value.mainContactPhoneNumber = fullNumber;
+          };
+
+          inputEl.addEventListener('input', updatePhoneValue);
+          inputEl.addEventListener('countrychange', updatePhoneValue);
+        }
+      });
+
       if (editorContent.value) {
-        editorContent.value.addEventListener('paste', (e) => {
+        editorContent.value.addEventListener('paste', e => {
           e.preventDefault();
           const text = e.clipboardData?.getData('text/plain') || '';
           document.execCommand('insertText', false, text);
@@ -310,6 +342,8 @@ export default defineComponent({
       applyHeading,
       applyFont,
       insertCode,
+      itiInstance,
+      phoneInput,
       ...dataUtils,
       v$,
       t$,
@@ -318,7 +352,11 @@ export default defineComponent({
 
   methods: {
     save(): void {
-      console.log('client : ', this.client);
+      if (this.itiInstance?.value) {
+        this.client.mainContactPhoneNumber = this.itiInstance.value.getNumber();
+        console.log('Téléphone formaté :', this.client.mainContactPhoneNumber);
+      }
+
       this.isSaving = true;
       if (this.client.id) {
         this.client.updateDate = new Date().toISOString().split('T')[0];

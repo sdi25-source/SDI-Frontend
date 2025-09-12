@@ -18,6 +18,7 @@ import { useStore, useTranslationStore } from '@/store';
 import '../content/scss/global.scss';
 import '../content/scss/vendor.scss';
 import TranslationService from '@/locale/translation.service';
+import 'intl-tel-input/build/css/intlTelInput.css';
 
 const pinia = createPinia();
 

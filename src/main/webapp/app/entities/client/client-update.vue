@@ -90,28 +90,6 @@
             </div>
 
             <div class="form-group">
-              <label class="label-c" v-text="t$('sdiFrontendApp.client.mainContactEmail')" for="client-mainContactEmail"></label>
-              <div class="input-with-validation">
-                <b-form-input
-                  type="email"
-                  name="mainContactEmail"
-                  id="client-mainContactEmail"
-                  data-cy="mainContactEmail"
-                  :state="v$.mainContactEmail.$anyDirty ? !v$.mainContactEmail.$invalid : null"
-                  v-model="v$.mainContactEmail.$model"
-                ></b-form-input>
-                <span class="valid-check" v-if="v$.mainContactEmail.$anyDirty && !v$.mainContactEmail.$invalid">
-                  <font-awesome-icon icon="check" class="text-success" />
-                </span>
-              </div>
-              <div v-if="v$.mainContactEmail.$anyDirty && v$.mainContactEmail.$invalid">
-                <small class="form-text text-danger" v-for="error of v$.mainContactEmail.$errors" :key="error.$uid">
-                  {{ error.$message }}
-                </small>
-              </div>
-            </div>
-
-            <div class="form-group">
               <label
                 class="label-c"
                 v-text="t$('sdiFrontendApp.client.currentCardHolderNumber')"
@@ -170,24 +148,48 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label
-                class="label-c"
-                v-text="t$('sdiFrontendApp.client.mainContactPhoneNumber')"
-                for="client-mainContactPhoneNumber"
-              ></label>
-              <div class="input-with-validation">
-                <b-form-input
-                  type="text"
-                  name="mainContactPhoneNumber"
-                  id="client-mainContactPhoneNumber"
-                  data-cy="mainContactPhoneNumber"
-                  :state="v$.mainContactPhoneNumber.$anyDirty ? !v$.mainContactPhoneNumber.$invalid : null"
-                  v-model="v$.mainContactPhoneNumber.$model"
-                ></b-form-input>
-                <span class="valid-check" v-if="v$.mainContactPhoneNumber.$anyDirty && !v$.mainContactPhoneNumber.$invalid">
-                  <font-awesome-icon icon="check" class="text-success" />
-                </span>
+            <div class="d-flex gap-3">
+              <div class="form-group flex-grow-1">
+                <label class="label-c" v-text="t$('sdiFrontendApp.client.mainContactEmail')" for="client-mainContactEmail"></label>
+                <div class="input-with-validation">
+                  <b-form-input
+                    type="email"
+                    name="mainContactEmail"
+                    id="client-mainContactEmail"
+                    data-cy="mainContactEmail"
+                    :state="v$.mainContactEmail.$anyDirty ? !v$.mainContactEmail.$invalid : null"
+                    v-model="v$.mainContactEmail.$model"
+                  ></b-form-input>
+                  <span class="valid-check" v-if="v$.mainContactEmail.$anyDirty && !v$.mainContactEmail.$invalid">
+                    <font-awesome-icon icon="check" class="text-success" />
+                  </span>
+                </div>
+                <div v-if="v$.mainContactEmail.$anyDirty && v$.mainContactEmail.$invalid">
+                  <small class="form-text text-danger" v-for="error of v$.mainContactEmail.$errors" :key="error.$uid">
+                    {{ error.$message }}
+                  </small>
+                </div>
+              </div>
+
+              <div class="form-group flex-grow-2">
+                <label
+                  class="label-c"
+                  v-text="t$('sdiFrontendApp.client.mainContactPhoneNumber')"
+                  for="client-mainContactPhoneNumber"
+                ></label>
+                <div class="input-with-validation">
+                  <b-form-input
+                    ref="phoneInput"
+                    type="tel"
+                    name="mainContactPhoneNumber"
+                    id="client-mainContactPhoneNumber"
+                    data-cy="mainContactPhoneNumber"
+                    :state="v$.mainContactPhoneNumber.$anyDirty ? !v$.mainContactPhoneNumber.$invalid : null"
+                  />
+                  <span class="valid-check" v-if="v$.mainContactPhoneNumber.$anyDirty && !v$.mainContactPhoneNumber.$invalid">
+                    <font-awesome-icon icon="check" class="text-success" />
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -336,7 +338,7 @@
                     class="editor-content"
                     contenteditable="true"
                     :lang="'en'"
-                    style="direction: ltr; text-align: left;"
+                    style="direction: ltr; text-align: left"
                     @input="updateNotes"
                     @keyup="updateToolbarState"
                     @mouseup="updateToolbarState"
