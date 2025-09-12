@@ -288,6 +288,12 @@
                         <polyline points="10,9 9,9 8,9"></polyline>
                       </svg>
                     </div>
+                    <div class="icon-container pdf-container" @click="viewDashboard(product)" title="dashboard">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 18V10H8V18H4ZM10 18V6H14V18H10ZM16 18V14H20V18H16Z" fill="#000000" />
+                        <path d="M2 20H22V22H2V20Z" fill="#000000" />
+                      </svg>
+                    </div>
                   </template>
                 </div>
               </td>
@@ -383,6 +389,8 @@
         </table>
       </div>
     </div>
+
+    <!-- Product Dashboard -->
 
     <!-- Product - Delete Confirmation Modal -->
     <div class="modal-backdrop" v-if="removeEntity" @click="closeDialog()"></div>

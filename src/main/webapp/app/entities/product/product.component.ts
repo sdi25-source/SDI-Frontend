@@ -19,6 +19,7 @@ import CertificationService from '@/entities/certification/certification.service
 import CertificationVersionService from '@/entities/certification/certification-version.service.ts';
 import ClientCertificationService from '@/entities/client-certification/client-certification.service.ts';
 import type AccountService from '@/account/account.service.ts';
+import { useRouter } from 'vue-router';
 import jsPDF from 'jspdf';
 import S2MLogo from '@/../content/images/bgImage.png';
 
@@ -2508,6 +2509,11 @@ export default defineComponent({
       }
     };
 
+    const router = useRouter();
+    const viewDashboard = product => {
+      router.push({ path: '/DashProducts', query: { selected: product.name } });
+    };
+
     return {
       t$,
       accountService,
@@ -2734,6 +2740,7 @@ export default defineComponent({
       resetFilters,
       handleSearch,
       exportProductToPDF,
+      viewDashboard,
     };
   },
   methods: {

@@ -14,6 +14,7 @@ import Chart from 'chart.js/auto';
 import type { IProductDeployement } from '@/shared/model/product-deployement.model.ts';
 import ProductDeployementService from '@/entities/product-deployement/product-deployement.service.ts';
 import ModuleService from '@/entities/module/module.service.ts';
+import { useRoute, useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'DashProductsComponent',
@@ -23,6 +24,7 @@ export default defineComponent({
     const username = inject<ComputedRef<string>>('currentUsername');
     const alertService = inject('alertService', () => useAlertService(), true);
     const { t } = useI18n();
+    const route = useRoute();
 
     const scrollContainer = ref<HTMLElement | null>(null);
     const isAtStart = ref(true);
@@ -96,7 +98,9 @@ export default defineComponent({
         });
         const monthlyCount = Array(12).fill(0);
         const cumulativeCount = Array(12).fill(0);
-        const productsByMonth = Array(12).fill(null).map(() => []);
+        const productsByMonth = Array(12)
+          .fill(null)
+          .map(() => []);
         const monthNames = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         currentYearProducts.forEach(product => {
           const month = new Date(product.createDate).getMonth();
@@ -119,7 +123,7 @@ export default defineComponent({
               borderWidth: 2,
               type: 'bar',
               order: 2,
-              productNames: productsByMonth
+              productNames: productsByMonth,
             },
             {
               label: 'Cumulative growth',
@@ -135,9 +139,9 @@ export default defineComponent({
               pointBorderWidth: 2,
               pointRadius: 6,
               pointHoverRadius: 8,
-              order: 1
-            }
-          ]
+              order: 1,
+            },
+          ],
         };
       } catch (error) {
         console.error('Error loading products evolution data:', error);
@@ -201,14 +205,17 @@ export default defineComponent({
               clientName = productDeployement.client.name;
             }
           }
-          const modules = detail.allowedModuleVersions?.map(mv => {
-            const moduleVersion = getModuleVersionWithModuleCached(mv.id);
-            return {
-              id: mv.id,
-              name: moduleVersion?.module?.name,
-              version: moduleVersion?.version
-            };
-          }).filter(mod => mod.name && mod.version) || [];
+          const modules =
+            detail.allowedModuleVersions
+              ?.map(mv => {
+                const moduleVersion = getModuleVersionWithModuleCached(mv.id);
+                return {
+                  id: mv.id,
+                  name: moduleVersion?.module?.name,
+                  version: moduleVersion?.version,
+                };
+              })
+              .filter(mod => mod.name && mod.version) || [];
           if (clientModules.has(clientName)) {
             clientModules.set(clientName, [...clientModules.get(clientName)!, ...modules]);
           } else {
@@ -218,9 +225,7 @@ export default defineComponent({
         clientsDeployments.value = Array.from(clientModules.entries())
           .map(([clientName, modules]) => ({
             clientName,
-            modules: modules.filter((mod, index, self) =>
-              index === self.findIndex(m => m.id === mod.id)
-            )
+            modules: modules.filter((mod, index, self) => index === self.findIndex(m => m.id === mod.id)),
           }))
           .filter(client => client.modules.length > 0)
           .sort((a, b) => a.clientName.localeCompare(b.clientName));
@@ -263,7 +268,12 @@ export default defineComponent({
             }
           }
           const moduleCount = detail.allowedModuleVersions?.length || 0;
-          const moduleNames = detail.allowedModuleVersions?.map(mv => getModuleVersionWithModuleCached(mv.id).module?.name + ' v' + getModuleVersionWithModuleCached(mv.id).version || 'Unknown Module') || [];
+          const moduleNames =
+            detail.allowedModuleVersions?.map(
+              mv =>
+                getModuleVersionWithModuleCached(mv.id).module?.name + ' v' + getModuleVersionWithModuleCached(mv.id).version ||
+                'Unknown Module',
+            ) || [];
           const uniqueModuleNames = clientModuleNames.get(clientName) || new Set<string>();
           moduleNames.forEach(name => uniqueModuleNames.add(name));
           clientModuleNames.set(clientName, uniqueModuleNames);
@@ -290,12 +300,15 @@ export default defineComponent({
               backgroundColor: backgroundColors,
               borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
               borderWidth: 2,
-              moduleNames: Array.from(clientModuleNames.entries()).reduce((acc, [client, names]) => {
-                acc[client] = Array.from(names);
-                return acc;
-              }, {} as Record<string, string[]>)
-            }
-          ]
+              moduleNames: Array.from(clientModuleNames.entries()).reduce(
+                (acc, [client, names]) => {
+                  acc[client] = Array.from(names);
+                  return acc;
+                },
+                {} as Record<string, string[]>,
+              ),
+            },
+          ],
         };
       } catch (error) {
         console.error('Error loading clients chart data:', error);
@@ -309,7 +322,7 @@ export default defineComponent({
         const versionRegex = /^\d+\.\d+\.\d+$/;
         const clientVersionRegex = /^[a-zA-Z]+_\d+\.\d+\.\d+$/;
         const nonClientVersions = productVersions.value.filter(
-          (pv: IProductVersion) => pv.version && versionRegex.test(pv.version) && !clientVersionRegex.test(pv.version)
+          (pv: IProductVersion) => pv.version && versionRegex.test(pv.version) && !clientVersionRegex.test(pv.version),
         );
         if (nonClientVersions.length === 0) {
           versionsChartData.value = { labels: [], datasets: [] };
@@ -369,9 +382,9 @@ export default defineComponent({
               pointRadius: 6,
               pointHoverRadius: 8,
               order: 1,
-              allNames: allNames
-            }
-          ]
+              allNames: allNames,
+            },
+          ],
         };
       } catch (error) {
         console.error('Error loading versions chart data:', error);
@@ -385,7 +398,7 @@ export default defineComponent({
         'rgba(245, 159, 0, 0.8)',
         'rgba(29, 126, 214, 0.8)',
         'rgba(156, 39, 176, 0.8)',
-        'rgba(255, 87, 34, 0.8)'
+        'rgba(255, 87, 34, 0.8)',
       ];
       const result = [];
       for (let i = 0; i < count; i++) {
@@ -436,13 +449,13 @@ export default defineComponent({
                           lineWidth: style.borderWidth,
                           pointStyle: 'circle',
                           hidden: !chart.getDataVisibility(i),
-                          index: i
+                          index: i,
                         };
                       });
                     }
                     return [];
-                  }
-                }
+                  },
+                },
               },
               tooltip: {
                 callbacks: {
@@ -455,7 +468,7 @@ export default defineComponent({
                     const moduleNames = context.dataset.moduleNames?.[label] || [];
                     const tooltipLines = [
                       `${label}: ${value} module(s) (${percentage}%)`,
-                      `Product: ${selectedProduct.value?.name} v${latestVersion}`
+                      `Product: ${selectedProduct.value?.name} v${latestVersion}`,
                     ];
                     if (moduleNames.length > 0) {
                       tooltipLines.push('Modules:');
@@ -466,11 +479,11 @@ export default defineComponent({
                       tooltipLines.push('No Modules');
                     }
                     return tooltipLines;
-                  }
-                }
-              }
-            }
-          }
+                  },
+                },
+              },
+            },
+          },
         });
       }
       if (versionsChart.value && versionsChartData.value.labels.length > 0) {
@@ -486,8 +499,8 @@ export default defineComponent({
                 position: 'top',
                 labels: {
                   usePointStyle: true,
-                  padding: 20
-                }
+                  padding: 20,
+                },
               },
               tooltip: {
                 callbacks: {
@@ -513,38 +526,38 @@ export default defineComponent({
                       }
                     }
                     return lines;
-                  }
-                }
-              }
+                  },
+                },
+              },
             },
             scales: {
               y: {
                 beginAtZero: true,
                 ticks: {
-                  stepSize: 1
+                  stepSize: 1,
                 },
                 title: {
                   display: true,
-                  text: 'Number of Modules'
-                }
+                  text: 'Number of Modules',
+                },
               },
               x: {
                 title: {
                   display: true,
-                  text: 'Product Versions (Chronological Order)'
-                }
-              }
+                  text: 'Product Versions (Chronological Order)',
+                },
+              },
             },
             elements: {
               line: {
-                tension: 0.4
+                tension: 0.4,
               },
               point: {
                 radius: 6,
-                hoverRadius: 8
-              }
-            }
-          }
+                hoverRadius: 8,
+              },
+            },
+          },
         });
       }
       if (productsEvolutionChart.value && productsEvolutionData.value.labels.length > 0) {
@@ -560,12 +573,12 @@ export default defineComponent({
                 position: 'top',
                 labels: {
                   usePointStyle: true,
-                  padding: 20
-                }
+                  padding: 20,
+                },
               },
               tooltip: {
                 callbacks: {
-                  label: function(context) {
+                  label: function (context) {
                     const datasetLabel = context.dataset.label || '';
                     const value = context.parsed.y;
                     if (datasetLabel.includes('Cumulative')) {
@@ -583,32 +596,32 @@ export default defineComponent({
                       return tooltip.split('\n');
                     }
                   },
-                  title: function(context) {
+                  title: function (context) {
                     return `${context[0].label} ${currentYear.value}`;
-                  }
-                }
-              }
+                  },
+                },
+              },
             },
             scales: {
               y: {
                 beginAtZero: true,
                 ticks: {
                   stepSize: 1,
-                  callback: function(value) {
+                  callback: function (value) {
                     return Number.isInteger(value) ? value : '';
-                  }
+                  },
                 },
                 title: {
                   display: true,
                   text: 'Number of products',
                   font: {
                     size: 14,
-                    weight: 'bold'
-                  }
+                    weight: 'bold',
+                  },
                 },
                 grid: {
-                  color: 'rgba(0, 0, 0, 0.1)'
-                }
+                  color: 'rgba(0, 0, 0, 0.1)',
+                },
               },
               x: {
                 title: {
@@ -616,19 +629,19 @@ export default defineComponent({
                   text: `month - ${currentYear.value}`,
                   font: {
                     size: 14,
-                    weight: 'bold'
-                  }
+                    weight: 'bold',
+                  },
                 },
                 grid: {
-                  display: false
-                }
-              }
+                  display: false,
+                },
+              },
             },
             animation: {
               duration: 1000,
-              easing: 'easeInOutQuart'
-            }
-          }
+              easing: 'easeInOutQuart',
+            },
+          },
         });
       }
     };
@@ -680,7 +693,7 @@ export default defineComponent({
         const clientVersionRegex = /^[a-zA-Z]+_\d+\.\d+\.\d+$/;
         await fetchProductVersions(productName);
         const nonClientVersions = productVersions.value.filter(
-          (pv: IProductVersion) => pv.version && versionRegex.test(pv.version) && !clientVersionRegex.test(pv.version)
+          (pv: IProductVersion) => pv.version && versionRegex.test(pv.version) && !clientVersionRegex.test(pv.version),
         );
         if (nonClientVersions.length === 0) {
           return null;
@@ -779,7 +792,7 @@ export default defineComponent({
       const module = moduleOptions.value.find(m => m.id === moduleVersion.module?.id);
       return {
         ...moduleVersion,
-        module: module ? { ...module } : null
+        module: module ? { ...module } : null,
       };
     };
 
@@ -790,6 +803,15 @@ export default defineComponent({
       checkScrollPosition();
       await fetchModuleOptions();
       await fetchModuleVersionOptions();
+
+      // Vérifie le paramètre de requête pour auto-sélectionner le produit
+      const selectedName = route.query.selected;
+      if (selectedName && typeof selectedName === 'string') {
+        const product = products.value.find(p => p.name === selectedName);
+        if (product) {
+          await selectProduct(product);
+        }
+      }
     });
 
     const openLogin = () => {
@@ -833,7 +855,7 @@ export default defineComponent({
       currentYear,
       clientsDeployments,
       expandedClients,
-      toggleClientExpansion
+      toggleClientExpansion,
     };
-  }
+  },
 });
