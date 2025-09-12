@@ -4,6 +4,8 @@ import ProductService from './product.service';
 import ProductVersionService from '@/entities/product-version/product-version.service';
 import ModuleService from '@/entities/module/module.service';
 import ModuleVersionService from '@/entities/module-version/module-version.service';
+import DomaineService from '@/entities/domaine/domaine.service';
+import { type IDomaine } from '@/shared/model/domaine.model';
 import FeatureService from '@/entities/feature/feature.service';
 import InfraComponentVersionService from '@/entities/infra-component-version/infra-component-version.service';
 import ProductLineService from '@/entities/product-line/product-line.service';
@@ -41,6 +43,8 @@ export default defineComponent({
     const certificationService = inject('certificationService', () => new CertificationService());
     const certificationVersionService = inject('certificationVersionService', () => new CertificationVersionService());
     const clientCertificationService = inject('clientCertificationService', () => new ClientCertificationService());
+
+    const domaineService = inject('domaineService', () => new DomaineService());
 
     const accountService = inject<AccountService>('accountService');
     const alertService = inject('alertService', () => useAlertService(), true);
@@ -89,7 +93,6 @@ export default defineComponent({
     const editProductLineIds = ref([]);
 
     const viewTabs = ref(false);
-
 
     // Product settings modal
     const showSettingsModal = ref(false);
@@ -150,6 +153,8 @@ export default defineComponent({
     const showModuleVersionDeleteModal = ref(false);
     const versionToDelete = ref(null);
     const moduleVersionToDelete = ref(null);
+
+    const domaines: Ref<IDomaine[]> = ref([]);
 
     // New item templates
     const newProduct = ref({
@@ -425,6 +430,17 @@ export default defineComponent({
       try {
         const res = await moduleService().retrieve();
         moduleOptions.value = res.data;
+        console.log('all modules :', res.data);
+      } catch (err) {
+        alertService.showHttpError(err.response);
+      }
+    };
+
+    const fetchDomaines = async () => {
+      try {
+        const res = await domaineService().retrieve();
+        domaines.value = res.data;
+        console.log('all domaines :', res.data);
       } catch (err) {
         alertService.showHttpError(err.response);
       }
@@ -532,7 +548,6 @@ export default defineComponent({
         selectedProduct.value = product;
         selectedVersion.value = null;
         viewTabs.value = true;
-
 
         // Update breadcrumb
         breadcrumb.value = [
@@ -1902,7 +1917,7 @@ export default defineComponent({
       selectedProduct.value = null;
       selectedVersion.value = null;
       productVersions.value = [];
-      viewTabs.value =  false;
+      viewTabs.value = false;
     };
 
     // Vercel Tabs functionality
@@ -1938,6 +1953,7 @@ export default defineComponent({
       await fetchInfraComponents();
       await fetchComponentTypes();
       await fetchModuleOptions();
+      await fetchDomaines();
       await fetchModuleVersionOptions();
       await retrieveCertifications();
       await retrieveCertificationsVersions();
@@ -2013,6 +2029,7 @@ export default defineComponent({
     const newModuleInSettingsModal = ref({
       name: '',
       description: '',
+      domaine: null,
       createDate: new Date().toISOString().split('T')[0],
       updateDate: new Date().toISOString().split('T')[0],
     });
@@ -2056,6 +2073,7 @@ export default defineComponent({
         newModuleInSettingsModal.value = {
           name: '',
           description: '',
+          domaine: null,
           createDate: new Date().toISOString().split('T')[0],
           updateDate: new Date().toISOString().split('T')[0],
         };
@@ -2074,6 +2092,7 @@ export default defineComponent({
       newModuleInSettingsModal.value = {
         name: '',
         description: '',
+        domaine: null,
         createDate: new Date().toISOString().split('T')[0],
         updateDate: new Date().toISOString().split('T')[0],
       };
@@ -2575,6 +2594,7 @@ export default defineComponent({
       removeModuleId,
       removeModuleEntity,
       features,
+      domaines,
       showFeaturesTable,
       showAddFeatureRow,
       showModuleFeaturesModal,

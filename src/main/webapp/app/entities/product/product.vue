@@ -536,6 +536,29 @@
                   <label for="new-module-name">Name</label>
                   <input type="text" id="new-module-name" class="form-control" v-model="newModuleInSettingsModal.name" placeholder="Name" />
                 </div>
+                <div class="form-group">
+                  <label class="form-control-label" for="module-domaine">Domaine</label>
+                  <select
+                    class="form-control"
+                    id="module-domaine"
+                    data-cy="domaine"
+                    name="domaine"
+                    v-model="newModuleInSettingsModal.domaine"
+                  >
+                    <option :value="null"></option>
+                    <option
+                      :value="
+                        newModuleInSettingsModal.domaine && domaineOption.id === newModuleInSettingsModal.domaine.id
+                          ? newModuleInSettingsModal.domaine
+                          : domaineOption
+                      "
+                      v-for="domaineOption in domaines"
+                      :key="domaineOption.id"
+                    >
+                      {{ domaineOption.name }}
+                    </option>
+                  </select>
+                </div>
                 <div class="form-group mb-3">
                   <label for="new-module-desc">Description</label>
                   <textarea
@@ -551,11 +574,13 @@
                   <button class="button button-primary btn-sm" @click="addNewModuleFromSettingsModal">Add</button>
                 </div>
               </div>
+
               <div style="max-height: 300px; overflow-y: auto">
                 <table class="table table-hover" style="line-height: 0.1">
                   <thead>
                     <tr>
                       <th scope="col" class="pl-5">Name</th>
+                      <th scope="col" class="pl-5">Domaine</th>
                       <th></th>
                       <th scope="col" class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">Actions</th>
                     </tr>
@@ -563,6 +588,7 @@
                   <tbody v-for="(module, index) in productModules" :key="index">
                     <tr>
                       <td class="pl-5">{{ module.name }}</td>
+                      <td class="pl-5">{{ module.domaine?.name }}</td>
                       <td></td>
                       <td class="pl-2" v-if="hasAnyAuthority('ROLE_USER')">
                         <button class="button-icon" @click="removeModuleFromProduct(index)" aria-label="Supprimer">
