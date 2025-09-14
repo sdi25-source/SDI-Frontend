@@ -46,12 +46,15 @@
     <!-- Dashboard Content - Conditional Display -->
     <div class="dashboard-content">
       <div v-if="!selectedClient">
-        <div class="chart-container">
-          <h4 class="chart-title-left">{{ t$('global.menu.entities.clientGrowth') }} ({{ currentYear }})</h4>
-          <div class="chart-wrapper">
-            <canvas ref="clientsEvolutionChart" width="800" height="400"></canvas>
-          </div>
-          <div v-if="clientsEvolutionData.labels.length === 0" class="no-data-message">{{ t$('global.menu.entities.noDataC') }}</div>
+        <div class="chart-container-dash">
+          <iframe
+            width="1530"
+            height="1900"
+            frameborder="0"
+            scrolling="no"
+            src="http://localhost:8088/superset/dashboard/p/gklYnm7Ebp5/?standalone=3"
+          >
+          </iframe>
         </div>
       </div>
 
@@ -85,9 +88,7 @@
                     ></div>
                     <div class="legend-info">
                       <span class="legend-name">{{ moduleName }}</span>
-                      <span class="legend-count">
-                        {{ productDeploymentsChartData.datasets[0].data[index] }} déploiement(s)
-                      </span>
+                      <span class="legend-count"> {{ productDeploymentsChartData.datasets[0].data[index] }} déploiement(s) </span>
                       <span class="legend-versions">
                         {{ productDeploymentsChartData.datasets[0].moduleDetails[moduleName]?.versions.length || 0 }} version(s)
                       </span>
@@ -133,16 +134,10 @@
         <div class="contracts-section pt-4">
           <h4 class="chart-title-left">Deployments par products</h4>
           <div class="contracts-table">
-            <div v-if="contracts.length === 0" class="no-data-message text-center py-4">
-              No contracts available for this client
-            </div>
+            <div v-if="contracts.length === 0" class="no-data-message text-center py-4">No contracts available for this client</div>
 
             <div v-else class="contracts-list">
-              <div
-                v-for="contract in contracts"
-                :key="contract.id"
-                class="contract-item"
-              >
+              <div v-for="contract in contracts" :key="contract.id" class="contract-item">
                 <!-- Contract Row -->
                 <div class="contract-row" @click="toggleContractExpansion(contract.id)">
                   <div class="expand-icon">
@@ -163,11 +158,7 @@
 
                 <!-- Deployment Details (Expanded) -->
                 <div v-if="expandedContracts.has(contract.id)" class="deployment-details">
-                  <div
-                    v-for="detail in contract.deploymentDetails"
-                    :key="detail.id"
-                    class="deployment-detail-item"
-                  >
+                  <div v-for="detail in contract.deploymentDetails" :key="detail.id" class="deployment-detail-item">
                     <!-- Deployment Detail Row -->
                     <div class="deployment-detail-row" @click="toggleDeploymentDetailExpansion(detail.id)">
                       <div class="expand-icon">
@@ -189,9 +180,7 @@
 
                     <!-- Module Deployments (Expanded) -->
                     <div v-if="expandedDeploymentDetails.has(detail.id)" class="module-deployments">
-                      <div v-if="detail.moduleDeployments.length === 0" class="no-modules-message">
-                        No module deployments
-                      </div>
+                      <div v-if="detail.moduleDeployments.length === 0" class="no-modules-message">No module deployments</div>
                       <div
                         v-else
                         v-for="moduleDeployment in detail.moduleDeployments"
@@ -220,7 +209,6 @@
       </div>
     </div>
 
-
     <!-- Module Details Popup -->
     <div v-if="showModulePopup" class="module-popup-overlay" @click="closeModulePopup">
       <div class="module-popup" @click.stop>
@@ -246,14 +234,10 @@
           <div class="deployments-history">
             <h4>Deployment History</h4>
             <div class="deployments-list">
-              <div v-if="!selectedModuleData?.deployments || selectedModuleData.deployments.length === 0"
-                   class="no-deployments">
+              <div v-if="!selectedModuleData?.deployments || selectedModuleData.deployments.length === 0" class="no-deployments">
                 No deployment history available
               </div>
-              <div v-else
-                   v-for="(deployment, index) in selectedModuleData.deployments"
-                   :key="index"
-                   class="deployment-history-item">
+              <div v-else v-for="(deployment, index) in selectedModuleData.deployments" :key="index" class="deployment-history-item">
                 <div class="deployment-version">
                   <span class="version-badge">v{{ deployment.version }}</span>
                 </div>
@@ -304,8 +288,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .dashboard-content {
@@ -425,7 +413,9 @@
   min-width: 280px;
   max-width: 280px;
   flex-shrink: 0;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   position: relative;
 }
 
@@ -532,7 +522,14 @@
   font-weight: 600;
   color: #0c2d57;
 }
-
+.chart-container-dash {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
 .chart-container {
   background-color: #ffffff;
   border-radius: 8px;
@@ -937,8 +934,14 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .popup-header {
@@ -983,7 +986,7 @@
 }
 
 .module-description h4 {
-  font-size: 1.0rem;
+  font-size: 1rem;
   margin-bottom: 10px;
   color: #333;
 }
@@ -1036,7 +1039,7 @@
 }
 
 .deployments-history h4 {
-  font-size: 1.0rem;
+  font-size: 1rem;
   margin-bottom: 10px;
   color: #333;
 }
@@ -1137,7 +1140,6 @@
     height: 400px;
     margin-bottom: 20px;
   }
-
 
   .stats-grid {
     grid-template-columns: 1fr;
