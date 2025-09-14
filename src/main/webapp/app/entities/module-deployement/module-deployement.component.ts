@@ -32,7 +32,7 @@ export default defineComponent({
     const searchTimeout = ref(null);
 
     const currentPage = ref(1);
-    const itemsPerPage = ref(5);
+    const itemsPerPage = ref(100);
     const totalItems = ref(0);
 
     const isFetching = ref(false);
@@ -47,7 +47,7 @@ export default defineComponent({
       createDate: new Date().toISOString().split('T')[0],
       updateDate: new Date().toISOString().split('T')[0],
       moduleVersion: null,
-      productDeployementDetail: null
+      productDeployementDetail: null,
     });
 
     const paginatedModuleDeployements = computed(() => {
@@ -88,9 +88,7 @@ export default defineComponent({
         } else {
           const searchLower = searchTerm.value.toLowerCase();
           moduleDeployements.value = allModuleDeployements.value.filter(md =>
-            Object.values(md).some(
-              val => typeof val === 'string' && val.toLowerCase().includes(searchLower)
-            )
+            Object.values(md).some(val => typeof val === 'string' && val.toLowerCase().includes(searchLower)),
           );
         }
         updateTotalItems();
@@ -159,10 +157,7 @@ export default defineComponent({
     const removeModuleDeployement = async () => {
       try {
         await moduleDeployementService().delete(removeId.value);
-        alertService.showInfo(
-          t$('sdiFrontendApp.moduleDeployement.deleted', { param: removeId.value }).toString(),
-          { variant: 'danger' }
-        );
+        alertService.showInfo(t$('sdiFrontendApp.moduleDeployement.deleted', { param: removeId.value }).toString(), { variant: 'danger' });
 
         moduleDeployements.value = moduleDeployements.value.filter(md => md.id !== removeId.value);
         allModuleDeployements.value = allModuleDeployements.value.filter(md => md.id !== removeId.value);
@@ -206,7 +201,7 @@ export default defineComponent({
           createDate: new Date().toISOString().split('T')[0],
           updateDate: new Date().toISOString().split('T')[0],
           moduleVersion: null,
-          productDeployementDetail: null
+          productDeployementDetail: null,
         };
 
         alertService.showAlert('Déploiement de module ajouté avec succès.', 'success', { variant: 'success' });
@@ -223,20 +218,22 @@ export default defineComponent({
         createDate: new Date().toISOString().split('T')[0],
         updateDate: new Date().toISOString().split('T')[0],
         moduleVersion: null,
-        productDeployementDetail: null
+        productDeployementDetail: null,
       };
     };
 
     const editModuleDeployement = moduleDeployement => {
       moduleDeployements.value.forEach(md => (md.showDropdown = false));
-      moduleDeployement.originalData = JSON.parse(JSON.stringify({
-        code: moduleDeployement.code,
-        notes: moduleDeployement.notes,
-        createDate: moduleDeployement.createDate,
-        updateDate: moduleDeployement.updateDate,
-        moduleVersion: moduleDeployement.moduleVersion,
-        productDeployementDetail: moduleDeployement.productDeployementDetail
-      }));
+      moduleDeployement.originalData = JSON.parse(
+        JSON.stringify({
+          code: moduleDeployement.code,
+          notes: moduleDeployement.notes,
+          createDate: moduleDeployement.createDate,
+          updateDate: moduleDeployement.updateDate,
+          moduleVersion: moduleDeployement.moduleVersion,
+          productDeployementDetail: moduleDeployement.productDeployementDetail,
+        }),
+      );
       moduleDeployement.isEditing = true;
     };
 
@@ -259,7 +256,7 @@ export default defineComponent({
           createDate: moduleDeployement.createDate,
           updateDate: new Date().toISOString().split('T')[0],
           moduleVersion: moduleDeployement.moduleVersion,
-          productDeployementDetail: moduleDeployement.productDeployementDetail
+          productDeployementDetail: moduleDeployement.productDeployementDetail,
         };
 
         const response = await moduleDeployementService().update(toSend);
@@ -303,12 +300,16 @@ export default defineComponent({
       router.push({ name: 'ModuleDeployementView', params: { moduleDeployementId: moduleDeployement.id } });
     };
 
-    watch(moduleDeployements, () => {
-      updateTotalItems();
-      if (currentPage.value > totalPages.value && totalPages.value > 0) {
-        currentPage.value = totalPages.value;
-      }
-    }, { deep: true });
+    watch(
+      moduleDeployements,
+      () => {
+        updateTotalItems();
+        if (currentPage.value > totalPages.value && totalPages.value > 0) {
+          currentPage.value = totalPages.value;
+        }
+      },
+      { deep: true },
+    );
 
     onMounted(async () => {
       await retrieveModuleVersions();

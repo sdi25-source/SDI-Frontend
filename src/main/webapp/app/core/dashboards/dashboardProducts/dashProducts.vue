@@ -1,10 +1,6 @@
 <template>
   <div class="dashboard-content pt-lg-5">
     <div class="dashboard-header"></div>
-    <div v-if="loading" class="loading-overlay">
-      <div class="loading-spinner"></div>
-      <p class="loading-message">{{ t$('global.menu.entities.productLoading') }}</p>
-    </div>
     <!-- Products Overview Section -->
     <div class="dashboard-section shadow">
       <div class="section-header">
@@ -47,18 +43,21 @@
 
     <!-- Dashboard Content - Conditional Display -->
     <div class="dashboard-content">
-      <div v-if="!selectedProduct" class="section">
+      <div v-if="!selectedProduct" class="">
         <div class="chart-container">
-          <h4 class="chart-title-left">{{ t$('global.menu.entities.productGrowth') }} ({{ currentYear }})</h4>
-          <div class="chart-wrapper">
-            <canvas ref="productsEvolutionChart" width="800" height="400"></canvas>
-          </div>
-          <div v-if="productsEvolutionData.labels.length === 0" class="no-data-message">{{ t$('global.menu.entities.noDataP') }}</div>
+          <iframe
+            width="1530"
+            height="1600"
+            frameborder="0"
+            scrolling="no"
+            src="http://localhost:8088/superset/dashboard/p/DZkakNn0Vg6/?standalone=3"
+          >
+          </iframe>
         </div>
       </div>
 
       <!-- Charts Section -->
-      <div v-else class="charts-section">
+      <div v-if="selectedProduct" class="charts-section">
         <div class="charts-header d-flex justify-content-between align-items-center mb-4">
           <h3>{{ selectedProduct.name }} - {{ t$('global.menu.entities.analyticsDash') }}</h3>
           <button @click="closeCharts" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i></button>
@@ -116,7 +115,7 @@
           <!-- Right Chart - Product Versions -->
           <div class="col-md-6">
             <div class="chart-container">
-              <h4 class="chart-title-center">{{ t$('global.menu.entities.moduleEvoByPV') }} </h4>
+              <h4 class="chart-title-center">{{ t$('global.menu.entities.moduleEvoByPV') }}</h4>
               <div class="chart-wrapper">
                 <canvas ref="versionsChart" width="400" height="400"></canvas>
               </div>
@@ -393,7 +392,7 @@
   background-color: #f8f9fa;
   border-radius: 8px;
   padding: 20px;
-  height: 500px;
+  height: auto;
   display: flex;
   flex-direction: column;
 }
@@ -575,12 +574,6 @@
     gap: 10px;
   }
 
-  .chart-container {
-    height: 400px;
-    margin-bottom: 20px;
-    padding: 15px;
-  }
-
   .contract-main,
   .module-deployment-main {
     flex-direction: column;
@@ -633,11 +626,6 @@
 
   .product-status {
     font-size: 11px;
-  }
-
-  .chart-container {
-    height: 350px;
-    padding: 15px;
   }
 
   .no-data-message {
